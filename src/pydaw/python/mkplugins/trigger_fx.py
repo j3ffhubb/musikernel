@@ -64,7 +64,7 @@ class triggerfx_plugin_ui(pydaw_abstract_plugin_ui):
         self.delay_hlayout = QHBoxLayout()
         self.delay_vlayout.addLayout(self.delay_hlayout)
 
-        f_knob_size = 48
+        f_knob_size = DEFAULT_KNOB_SIZE
 
         f_note_triggered_label = QLabel(_("Note-Triggered Effects"))
         f_note_triggered_label.setToolTip(

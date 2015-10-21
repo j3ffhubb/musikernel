@@ -29,6 +29,8 @@ from PyQt5.QtWidgets import *
 
 import numpy
 
+# This is for plugins to consume, it's not a default value anywhere
+DEFAULT_KNOB_SIZE = 64
 
 #KNOB_ARC_GRADIENT = QLinearGradient(0.0, 0.0, 90.0, 0.0)
 #KNOB_ARC_GRADIENT.setColorAt(0.0, QColor.fromRgb(120, 120, 150, 255))

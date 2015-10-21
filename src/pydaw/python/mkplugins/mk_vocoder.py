@@ -45,7 +45,7 @@ class mk_vocoder_plugin_ui(pydaw_abstract_plugin_ui):
         self.set_window_title(a_track_name)
         self.is_instrument = False
         #self.layout.setSizeConstraint(QLayout.SetFixedSize)
-        f_knob_size = 48
+        f_knob_size = DEFAULT_KNOB_SIZE
 
         self.groupbox_gridlayout = QGridLayout()
         self.layout.addLayout(self.groupbox_gridlayout)
