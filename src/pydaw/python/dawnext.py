@@ -233,9 +233,11 @@ class region_settings:
             REGION_TRACK_WIDTH, REGION_EDITOR_TRACK_HEIGHT + 2)
 
     def set_vzoom(self, a_val=None):
-        global REGION_EDITOR_TRACK_HEIGHT
+        global REGION_EDITOR_TRACK_HEIGHT, REGION_EDITOR_TOTAL_HEIGHT
         f_val = self.vzoom_slider.value()
         REGION_EDITOR_TRACK_HEIGHT = (f_val * 8) + 64
+        REGION_EDITOR_TOTAL_HEIGHT = (REGION_EDITOR_TRACK_COUNT *
+            REGION_EDITOR_TRACK_HEIGHT)
         self.set_vzoom_size()
 
     def hzoom_pressed(self, a_val=None):
@@ -1772,16 +1774,14 @@ class ItemSequencer(QGraphicsView):
 
     def get_item_coord(self, a_pos, a_clip=False):
         f_pos_x = a_pos.x()
-        f_pos_y = a_pos.y()
+        f_pos_y = a_pos.y() - REGION_EDITOR_HEADER_HEIGHT
         if a_clip or (
         f_pos_x > 0 and
-        f_pos_y > REGION_EDITOR_HEADER_HEIGHT and
+        f_pos_y > 0 and
         f_pos_y < REGION_EDITOR_TOTAL_HEIGHT):
             f_pos_x = pydaw_util.pydaw_clip_min(f_pos_x, 0.0)
             f_pos_y = pydaw_util.pydaw_clip_value(
-                f_pos_y, REGION_EDITOR_HEADER_HEIGHT,
-                REGION_EDITOR_TOTAL_HEIGHT)
-            f_pos_y = f_pos_y - REGION_EDITOR_HEADER_HEIGHT
+                f_pos_y, 0.0, REGION_EDITOR_TOTAL_HEIGHT)
             f_track_height = REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
             f_track = int(f_pos_y / REGION_EDITOR_TRACK_HEIGHT)
             f_val = (1.0 - ((f_pos_y - (f_track * REGION_EDITOR_TRACK_HEIGHT))
