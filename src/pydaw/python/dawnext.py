@@ -226,6 +226,7 @@ class region_settings:
         f_scrollbar.setValue(
             (REGION_EDITOR_TRACK_HEIGHT / self.old_height_px) *
             f_scrollbar.value())
+        MAIN_WINDOW.vscrollbar_released()  # Quantizes the vertical pos
         self.size_label.hide()
 
     def set_vzoom_size(self):
