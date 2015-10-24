@@ -39,6 +39,8 @@ DEFAULT_KNOB_SIZE = 64
 #KNOB_ARC_PEN = QPen(KNOB_ARC_GRADIENT, 5.0)
 KNOB_ARC_PEN = QPen(QtCore.Qt.white, 5.0)
 
+KNOB_BACKGROUND_PEN = QPen(QColor.fromRgb(60, 60, 60, 255), 5.0)
+
 class pydaw_plugin_file:
     """ Abstracts an instrument state file.  Plugins are not required
         to implement this and can instead implement their own custom
@@ -220,6 +222,8 @@ class pydaw_pixmap_knob(QDial):
         f_rect.setHeight(f_rect.height() - 5)
         f_rect.setX(f_rect.x() + 5)
         f_rect.setY(f_rect.y() + 5)
+        p.setPen(KNOB_BACKGROUND_PEN)
+        p.drawArc(f_rect, -136 * 16, 136 * 2 * -16)
         p.setPen(KNOB_ARC_PEN)
         p.drawArc(f_rect, -136 * 16, (f_rotate_value + 1.0) * -16)
 
