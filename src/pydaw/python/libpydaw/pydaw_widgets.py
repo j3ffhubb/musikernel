@@ -359,8 +359,10 @@ class pydaw_abstract_ui_control:
             self.val_conversion == KC_INT_PITCH:
                 self.value_label.setText(str(int(f_value)))
             elif self.val_conversion == KC_PITCH:
-                self.value_label.setText(
-                    str(int(pydaw_util.pydaw_pitch_to_hz(f_value))))
+                f_val = int(pydaw_util.pydaw_pitch_to_hz(f_value))
+                if f_val >= 1000:
+                    f_val = str(round(f_val * 0.001, 1)) + "k"
+                self.value_label.setText(str(f_val))
             elif self.val_conversion == KC_127_PITCH:
                 self.value_label.setText(
                     str(int(pydaw_util.pydaw_pitch_to_hz(
