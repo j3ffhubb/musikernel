@@ -33,13 +33,13 @@ import numpy
 DEFAULT_KNOB_SIZE = 64
 
 #KNOB_ARC_GRADIENT = QLinearGradient(0.0, 0.0, 90.0, 0.0)
-#KNOB_ARC_GRADIENT.setColorAt(0.0, QColor.fromRgb(120, 120, 150, 255))
-#KNOB_ARC_GRADIENT.setColorAt(0.33, QColor.fromRgb(190, 190, 190, 255))
+#KNOB_ARC_GRADIENT.setColorAt(0.0, QColor.fromRgb(190, 190, 210, 255))
+#KNOB_ARC_GRADIENT.setColorAt(0.33, QColor.fromRgb(220, 220, 220, 255))
 #KNOB_ARC_GRADIENT.setColorAt(0.66, QColor.fromRgb(255, 255, 255, 255))
 #KNOB_ARC_PEN = QPen(KNOB_ARC_GRADIENT, 5.0)
 KNOB_ARC_PEN = QPen(QtCore.Qt.white, 5.0)
 
-KNOB_BACKGROUND_PEN = QPen(QColor.fromRgb(60, 60, 60, 255), 5.0)
+KNOB_BACKGROUND_PEN = QPen(QColor.fromRgb(30, 30, 30, 255), 5.0)
 
 class pydaw_plugin_file:
     """ Abstracts an instrument state file.  Plugins are not required
