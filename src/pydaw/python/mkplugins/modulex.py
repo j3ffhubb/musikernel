@@ -103,12 +103,10 @@ class modulex_plugin_ui(pydaw_abstract_plugin_ui):
             QSpacerItem(1, 1, QSizePolicy.Expanding))
         self.layout.addLayout(self.presets_hlayout)
         self.spectrum_enabled = None
-        self.tab_widget = QTabWidget()
-        self.layout.addWidget(self.tab_widget)
         self.layout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.fx_tab = QWidget()
-        self.tab_widget.addTab(self.fx_tab, _("Effects"))
+        self.layout.addWidget(self.fx_tab)
         self.fx_layout = QGridLayout()
         self.fx_hlayout = QHBoxLayout(self.fx_tab)
         self.fx_hlayout.addLayout(self.fx_layout)

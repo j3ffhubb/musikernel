@@ -48,12 +48,10 @@ class mkdelay_plugin_ui(pydaw_abstract_plugin_ui):
         self.set_window_title(a_track_name)
         self.is_instrument = False
 
-        self.tab_widget = QTabWidget()
-        self.layout.addWidget(self.tab_widget)
         self.layout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.misc_tab = QWidget()
-        self.tab_widget.addTab(self.misc_tab, _("Delay"))
+        self.layout.addWidget(self.misc_tab)
         self.delay_vlayout = QVBoxLayout()
         self.misc_tab.setLayout(self.delay_vlayout)
         self.delay_hlayout = QHBoxLayout()
