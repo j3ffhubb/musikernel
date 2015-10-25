@@ -191,6 +191,7 @@ class region_settings:
         self.scrollbar.sliderPressed.connect(self.scrollbar_pressed)
         self.scrollbar.sliderReleased.connect(self.scrollbar_released)
         self.hlayout0.addWidget(self.scrollbar)
+        self.scrollbar.setSingleStep(SEQUENCER_PX_PER_BEAT)
 
         self.widgets_to_disable = (
             self.hzoom_slider, self.vzoom_slider, self.menu_button)
@@ -227,6 +228,7 @@ class region_settings:
             (REGION_EDITOR_TRACK_HEIGHT / self.old_height_px) *
             f_scrollbar.value())
         MAIN_WINDOW.vscrollbar_released()  # Quantizes the vertical pos
+        f_scrollbar.setSingleStep(REGION_EDITOR_TRACK_HEIGHT)
         self.size_label.hide()
 
     def set_vzoom_size(self):
@@ -260,6 +262,7 @@ class region_settings:
         self.scrollbar.setValue(
             (SEQUENCER_PX_PER_BEAT / self.old_px_per_beat) *
             self.scrollbar.value())
+        self.scrollbar.setSingleStep(SEQUENCER_PX_PER_BEAT)
         self.size_label.hide()
 
     def set_hzoom_size(self):
@@ -8692,6 +8695,7 @@ class pydaw_main_window(QScrollArea):
         self.midi_scroll_area.scrollContentsBy = self.midi_scrollContentsBy
         self.vscrollbar = self.midi_scroll_area.verticalScrollBar()
         self.vscrollbar.sliderReleased.connect(self.vscrollbar_released)
+        self.vscrollbar.setSingleStep(REGION_EDITOR_TRACK_HEIGHT)
 
         self.main_tabwidget.addTab(ITEM_EDITOR.widget, _("Item Editor"))
 
