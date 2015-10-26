@@ -75,6 +75,7 @@ RAYV2_DIST_OUTGAIN = 51
 RAYV2_OSC1_PB = 52
 RAYV2_OSC2_PB = 53
 RAYV2_DIST_TYPE = 54
+RAYV2_ADSR_LIN_MAIN = 55
 
 
 RAYV_PORT_MAP = {
@@ -149,7 +150,8 @@ class rayv_plugin_ui(pydaw_abstract_plugin_ui):
             RAYV_SUSTAIN, RAYV_RELEASE,
             _("ADSR Amp"), self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, self.preset_manager,
-            a_prefx_port=RAYV_ADSR_PREFX, a_knob_type=KC_LOG_TIME)
+            a_prefx_port=RAYV_ADSR_PREFX, a_knob_type=KC_LOG_TIME,
+            a_lin_port=RAYV2_ADSR_LIN_MAIN)
         self.hlayout1.addWidget(self.adsr_amp.groupbox)
 
         self.dist_widget = MultiDistWidget(

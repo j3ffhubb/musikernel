@@ -629,6 +629,8 @@ static void v_wayv_connect_port(PYFX_Handle instance, int port,
         case WAYV_MIN_NOTE: plugin->min_note = data; break;
         case WAYV_MAX_NOTE: plugin->max_note = data; break;
         case WAYV_MASTER_PITCH: plugin->master_pitch = data; break;
+
+        case WAYV_ADSR_LIN_MAIN: plugin->adsr_lin_main = data; break;
     }
 }
 
@@ -707,6 +709,9 @@ static void v_wayv_process_midi_event(
 
             t_wayv_osc * f_pfx_osc = NULL;
             t_wayv_poly_voice * f_wayv_voice = plugin_data->data[f_voice];
+
+            int f_adsr_main_lin = (int)(*plugin_data->adsr_lin_main);
+            f_wayv_voice->adsr_run_func = FP_ADSR_RUN[f_adsr_main_lin];
 
             float f_master_pitch = (*plugin_data->master_pitch);
 
@@ -890,7 +895,7 @@ static void v_wayv_process_midi_event(
             float f_release = *(plugin_data->release_main) * .01f;
             f_release = (f_release) * (f_release);
 
-            v_adsr_set_adsr_db(&f_wayv_voice->adsr_main,
+            FP_ADSR_SET[f_adsr_main_lin](&f_wayv_voice->adsr_main,
                 (f_attack), (f_decay), *(plugin_data->sustain_main),
                     (f_release));
 
@@ -1221,7 +1226,7 @@ static void v_run_wayv_voice(t_wayv *plugin_data,
         }
     }
 
-    v_adsr_run_db(&a_voice->adsr_main);
+    a_voice->adsr_run_func(&a_voice->adsr_main);
     a_voice->current_sample = 0.0f;
 
     f_rmp_run_ramp(&a_voice->glide_env);
@@ -1771,6 +1776,7 @@ PYFX_Descriptor *wayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, WAYV_MIN_NOTE, 0.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, WAYV_MAX_NOTE, 120.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, WAYV_MASTER_PITCH, 0.0f, -36.0f, 36.0f);
+    pydaw_set_pyfx_port(f_result, WAYV_ADSR_LIN_MAIN, 0.0f, 0.0f, 1.0f);
 
     f_port = WAYV_FM_MACRO1_OSC1_FM5;
 

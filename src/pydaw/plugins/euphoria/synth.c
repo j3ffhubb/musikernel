@@ -440,6 +440,11 @@ static void connectPortSampler(PYFX_Handle instance, int port,
     {
         plugin->master_pitch = data;
     }
+    else if(port == EUPHORIA_ADSR_LIN_MAIN)
+    {
+        plugin->adsr_lin_main = data;
+    }
+
 }
 
 static void v_euphoria_load(PYFX_Handle instance,
@@ -653,7 +658,7 @@ static void add_sample_lms_euphoria(t_euphoria * plugin_data, int n)
 
     //Run things that aren't per-channel like envelopes
 
-    v_adsr_run_db(&f_voice->adsr_amp);
+    f_voice->adsr_run_func(&f_voice->adsr_amp);
 
     if(f_voice->adsr_amp.stage == ADSR_STAGE_OFF)
     {
@@ -890,6 +895,9 @@ static void v_euphoria_process_midi_event(
                 plugin_data->sampleNo, a_event->tick);
             f_voice = plugin_data->data[f_voice_num];
             f_voice->velocities = a_event->velocity;
+
+            int f_adsr_main_lin = (int)(*plugin_data->adsr_lin_main);
+            f_voice->adsr_run_func = FP_ADSR_RUN[f_adsr_main_lin];
 
             f_voice->keyboard_track = ((float)(a_event->note)) * 0.007874016f;
             f_voice->velocity_track =
@@ -1168,9 +1176,9 @@ static void v_euphoria_process_midi_event(
             f_decay_a *= f_decay_a;
             float f_release_a = (*(plugin_data->release) * .01);
             f_release_a *= f_release_a;
-            v_adsr_set_adsr_db(&f_voice->adsr_amp,
-                    f_attack_a, f_decay_a, (*(plugin_data->sustain)),
-                    f_release_a);
+            FP_ADSR_SET[f_adsr_main_lin](&f_voice->adsr_amp,
+                f_attack_a, f_decay_a, (*(plugin_data->sustain)),
+                f_release_a);
 
             float f_attack_f = (*(plugin_data->attack_f) * .01);
             f_attack_f *= f_attack_f;
@@ -1756,6 +1764,7 @@ PYFX_Descriptor *euphoria_PYFX_descriptor()
 
     pydaw_set_pyfx_port(f_result, EUPHORIA_MIN_NOTE, 0.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, EUPHORIA_MAX_NOTE, 120.0f, 0.0f, 120.0f);
+    pydaw_set_pyfx_port(f_result, EUPHORIA_ADSR_LIN_MAIN, 1.0f, 0.0f, 1.0f);
 
     f_result->cleanup = cleanupSampler;
     f_result->connect_port = connectPortSampler;

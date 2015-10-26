@@ -80,6 +80,7 @@ typedef struct
 typedef struct
 {
     t_adsr adsr_filter;
+    fp_adsr_run adsr_run_func;
     t_adsr adsr_amp;
     t_ramp_env glide_env;
     t_ramp_env ramp_env;

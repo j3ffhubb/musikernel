@@ -241,6 +241,7 @@ static void v_rayv_connect_port(PYFX_Handle instance, int port,
         case RAYV_MASTER_PITCH:
             plugin->master_pitch = data;
             break;
+        case RAYV_ADSR_LIN_MAIN: plugin->adsr_lin_main = data; break;
     }
 }
 
@@ -317,6 +318,10 @@ static void v_rayv_process_midi_event(
                      plugin_data->sampleNo,
                      a_event->tick);
 
+            int f_adsr_main_lin = (int)(*plugin_data->adsr_lin_main);
+            plugin_data->data[f_voice]->adsr_run_func =
+                FP_ADSR_RUN[f_adsr_main_lin];
+
             plugin_data->data[f_voice]->amp =
                     f_db_to_linear_fast(
                     //-20db to 0db, + master volume (0 to -60)
@@ -385,7 +390,7 @@ static void v_rayv_process_midi_event(
             float f_release = *(plugin_data->release) * .01;
             f_release = (f_release) * (f_release);
 
-            v_adsr_set_adsr_db(&plugin_data->data[f_voice]->adsr_amp,
+            FP_ADSR_SET[f_adsr_main_lin](&plugin_data->data[f_voice]->adsr_amp,
                     (f_attack), (f_decay), *(plugin_data->sustain),
                     (f_release));
 
@@ -685,7 +690,7 @@ static void v_run_rayv_voice(t_rayv *plugin_data,
     a_voice->current_sample +=
         (f_run_white_noise(&a_voice->white_noise1) * (a_voice->noise_linamp));
 
-    v_adsr_run_db(&a_voice->adsr_amp);
+    a_voice->adsr_run_func(&a_voice->adsr_amp);
 
     if(a_voice->adsr_prefx)
     {
@@ -773,7 +778,7 @@ PYFX_Descriptor *rayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, RAYV_MIN_NOTE, 0.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, RAYV_MAX_NOTE, 120.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, RAYV_MASTER_PITCH, 0.0f, -36.0f, 36.0f);
-
+    pydaw_set_pyfx_port(f_result, RAYV_ADSR_LIN_MAIN, 0.0f, 0.0f, 1.0f);
 
     f_result->cleanup = v_cleanup_rayv;
     f_result->connect_port = v_rayv_connect_port;

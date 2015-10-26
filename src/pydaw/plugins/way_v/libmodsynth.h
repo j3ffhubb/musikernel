@@ -79,6 +79,7 @@ typedef struct
 
 typedef struct
 {
+    fp_adsr_run adsr_run_func;
     t_adsr adsr_main;
     /*This corresponds to the current sample being processed on this voice.
      * += this to the output buffer when finished.*/

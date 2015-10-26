@@ -1211,7 +1211,8 @@ class pydaw_adsr_widget:
                  a_rel_callback, a_val_callback,
                  a_port_dict=None, a_preset_mgr=None, a_attack_default=10,
                  a_prefx_port=None, a_knob_type=KC_TIME_DECIMAL,
-                 a_delay_port=None, a_hold_port=None):
+                 a_delay_port=None, a_hold_port=None,
+                 a_lin_port=None, a_lin_default=0):
         self.clipboard_dict = {}
         self.groupbox = QGroupBox(a_label)
         self.groupbox.contextMenuEvent = self.context_menu_event
@@ -1269,6 +1270,16 @@ class pydaw_adsr_widget:
                 "PreFX", a_prefx_port, a_rel_callback, a_val_callback,
                 a_port_dict, a_preset_mgr)
             self.prefx_checkbox.add_to_grid_layout(self.layout, 10)
+        if a_lin_port is not None:
+            assert a_lin_default in (0, 1)
+            self.lin_checkbox = pydaw_checkbox_control(
+                "Lin.", a_lin_port, a_rel_callback, a_val_callback,
+                a_port_dict, a_preset_mgr, a_lin_default)
+            self.lin_checkbox.control.setToolTip(
+                _("Use a linear curve instead of a logarithmic decibel \n"
+                "curve, use this when there are artifacts in the \n"
+                "release tail"))
+            self.lin_checkbox.add_to_grid_layout(self.layout, 12)
 
     def context_menu_event(self, a_event):
         f_menu = QMenu(self.groupbox)

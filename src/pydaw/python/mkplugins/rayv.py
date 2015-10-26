@@ -66,6 +66,8 @@ RAYV_ADSR_PREFX = 42
 RAYV_MIN_NOTE = 43
 RAYV_MAX_NOTE = 44
 RAYV_MASTER_PITCH = 45
+RAYV_ADSR_LIN_MAIN = 46
+
 
 RAYV_PORT_MAP = {
     "Attack": "2",
@@ -146,7 +148,8 @@ class rayv_plugin_ui(pydaw_abstract_plugin_ui):
             RAYV_SUSTAIN, RAYV_RELEASE,
             _("ADSR Amp"), self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, self.preset_manager,
-            a_prefx_port=RAYV_ADSR_PREFX, a_knob_type=KC_LOG_TIME)
+            a_prefx_port=RAYV_ADSR_PREFX, a_knob_type=KC_LOG_TIME,
+            a_lin_port=RAYV_ADSR_LIN_MAIN)
         self.hlayout1.addWidget(self.adsr_amp.groupbox)
         self.groupbox_distortion = QGroupBox(_("Distortion"))
         self.groupbox_distortion.setObjectName("plugin_groupbox")

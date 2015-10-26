@@ -75,10 +75,11 @@ extern "C" {
 #define RAYV2_OSC1_PB 52
 #define RAYV2_OSC2_PB 53
 #define RAYV2_DIST_TYPE 54
+#define RAYV2_ADSR_LIN_MAIN 55
 
 /* must be 1 + highest value above
  * CHANGE THIS IF YOU ADD OR TAKE AWAY ANYTHING*/
-#define RAYV2_COUNT 55
+#define RAYV2_COUNT 56
 
 #define RAYV2_POLYPHONY   16
 #define RAYV2_POLYPHONY_THRESH 12
@@ -90,6 +91,7 @@ typedef struct {
     PYFX_Data *output0;
     PYFX_Data *output1;
     PYFX_Data *tune;
+    PYFX_Data *adsr_lin_main;
     PYFX_Data *attack;
     PYFX_Data *decay;
     PYFX_Data *sustain;

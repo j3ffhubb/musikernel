@@ -75,6 +75,7 @@ typedef struct
     float filter_keytrk;
 
     t_adsr adsr_filter;
+    fp_adsr_run adsr_run_func;
     t_adsr adsr_amp;
     t_state_variable_filter svf_filter;
     fp_svf_run_filter svf_function;

@@ -283,6 +283,7 @@ EUPHORIA_LFO_PITCH_FINE = EUPHORIA_LAST_EQ_PORT
 EUPHORIA_MIN_NOTE = EUPHORIA_LFO_PITCH_FINE + 1
 EUPHORIA_MAX_NOTE = EUPHORIA_MIN_NOTE + 1
 EUPHORIA_MASTER_PITCH = EUPHORIA_MAX_NOTE + 1
+EUPHORIA_ADSR_LIN_MAIN = EUPHORIA_MASTER_PITCH + 1
 
 
 EUPHORIA_PORT_MAP = {
@@ -1073,7 +1074,8 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             EUPHORIA_DECAY, EUPHORIA_SUSTAIN,
             EUPHORIA_RELEASE, _("ADSR Amp"),
             self.plugin_rel_callback, self.plugin_val_callback,
-            self.port_dict, a_attack_default=0, a_knob_type=KC_LOG_TIME)
+            self.port_dict, a_attack_default=0, a_knob_type=KC_LOG_TIME,
+            a_lin_port=EUPHORIA_ADSR_LIN_MAIN, a_lin_default=1)
         #overriding the default for self, because we want a
         #low minimum default that won't click
         self.adsr_amp.release_knob.control.setMinimum(5)

@@ -81,6 +81,7 @@ typedef struct st_euphoria
         EUPHORIA_MONO_FX_COUNT];
 
     PYFX_Data *master_pitch;
+    PYFX_Data *adsr_lin_main;
     PYFX_Data *attack;
     PYFX_Data *decay;
     PYFX_Data *sustain;

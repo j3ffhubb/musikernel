@@ -269,6 +269,7 @@ static void v_rayv2_connect_port(PYFX_Handle instance, int port,
         case RAYV2_DIST_TYPE:
             plugin->dist_type = data;
             break;
+        case RAYV2_ADSR_LIN_MAIN: plugin->adsr_lin_main = data; break;
         default:
             assert(0);
             break;
@@ -365,6 +366,9 @@ static void v_rayv2_process_midi_event(
 
             t_rayv2_poly_voice * f_voice = plugin_data->data[f_voice_num];
 
+            int f_adsr_main_lin = (int)(*plugin_data->adsr_lin_main);
+            f_voice->adsr_run_func = FP_ADSR_RUN[f_adsr_main_lin];
+
             f_voice->amp = f_db_to_linear_fast(
                 //-20db to 0db, + master volume (0 to -60)
                 ((a_event->velocity * 0.094488) - 12.0f));
@@ -434,7 +438,7 @@ static void v_rayv2_process_midi_event(
             float f_release = *(plugin_data->release) * .01;
             f_release = (f_release) * (f_release);
 
-            v_adsr_set_adsr_db(&f_voice->adsr_amp,
+            FP_ADSR_SET[f_adsr_main_lin](&f_voice->adsr_amp,
                 f_attack, f_decay, *(plugin_data->sustain), f_release);
 
             float f_attack_f = *(plugin_data->attack_f) * .01;
@@ -740,7 +744,7 @@ static void v_run_rayv2_voice(t_rayv2 *plugin_data,
     current_sample +=
         a_voice->noise_func_ptr(&a_voice->white_noise1) * a_voice->noise_linamp;
 
-    v_adsr_run_db(&a_voice->adsr_amp);
+    a_voice->adsr_run_func(&a_voice->adsr_amp);
 
     if(a_voice->adsr_prefx)
     {
@@ -835,6 +839,7 @@ PYFX_Descriptor *rayv2_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, RAYV2_OSC1_PB, 0.0f, -36.0f, 36.0f);
     pydaw_set_pyfx_port(f_result, RAYV2_OSC2_PB, 0.0f, -36.0f, 36.0f);
     pydaw_set_pyfx_port(f_result, RAYV2_DIST_TYPE, 0.0f, 0.0f, 2.0f);
+    pydaw_set_pyfx_port(f_result, RAYV2_ADSR_LIN_MAIN, 0.0f, 0.0f, 1.0f);
 
 
     f_result->cleanup = v_cleanup_rayv2;

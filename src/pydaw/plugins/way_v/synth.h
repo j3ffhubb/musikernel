@@ -442,10 +442,11 @@ extern "C" {
 #define WAYV_MIN_NOTE 369
 #define WAYV_MAX_NOTE 370
 #define WAYV_MASTER_PITCH 371
+#define WAYV_ADSR_LIN_MAIN 372
 
 /* must be 1 + highest value above
  * CHANGE THIS IF YOU ADD OR TAKE AWAY ANYTHING*/
-#define WAYV_COUNT 372
+#define WAYV_COUNT 373
 
 #define WAYV_POLYPHONY   16
 #define WAYV_POLYPHONY_THRESH 12
@@ -454,6 +455,7 @@ typedef struct
 {
     PYFX_Data *output0;
     PYFX_Data *output1;
+    PYFX_Data *adsr_lin_main;
     PYFX_Data *attack_main;
     PYFX_Data *hold_main;
     PYFX_Data *decay_main;

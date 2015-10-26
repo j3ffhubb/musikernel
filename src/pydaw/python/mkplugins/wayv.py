@@ -435,6 +435,8 @@ WAYV_MIN_NOTE = 369
 WAYV_MAX_NOTE = 370
 WAYV_MASTER_PITCH = 371
 
+WAYV_ADSR_LIN_MAIN = 372
+
 
 WAYV_PORT_MAP = {
     "Master Attack": WAYV_ATTACK_MAIN,
@@ -863,7 +865,8 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
             self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, self.preset_manager,
             a_prefx_port=WAYV_ADSR_PREFX,
-            a_knob_type=KC_LOG_TIME, a_hold_port=WAYV_HOLD_MAIN)
+            a_knob_type=KC_LOG_TIME, a_hold_port=WAYV_HOLD_MAIN,
+            a_lin_port=WAYV_ADSR_LIN_MAIN)
         self.hlayout_master.addWidget(self.adsr_amp_main.groupbox)
 
         self.perc_env = pydaw_perc_env_widget(

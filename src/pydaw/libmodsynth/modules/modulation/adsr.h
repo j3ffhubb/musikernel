@@ -77,6 +77,7 @@ void v_adsr_set_hold_time(t_adsr*, float);
 
 void v_adsr_set_adsr_db(t_adsr*, float, float, float, float);
 void v_adsr_set_adsr(t_adsr*, float, float, float, float);
+void v_adsr_set_adsr_lin_from_db(t_adsr*, float, float, float, float);
 
 void v_adsr_retrigger(t_adsr *);
 void v_adsr_release(t_adsr *);
@@ -85,6 +86,19 @@ void v_adsr_run_db(t_adsr *);
 void v_adsr_kill(t_adsr *);
 
 t_adsr * g_adsr_get_adsr(float);
+
+typedef void (*fp_adsr_run)(t_adsr*);
+typedef void (*fp_adsr_set)(t_adsr*, float, float, float, float);
+
+fp_adsr_set FP_ADSR_SET[] = {
+    v_adsr_set_adsr_db,
+    v_adsr_set_adsr_lin_from_db
+};
+
+fp_adsr_run FP_ADSR_RUN[] = {
+    v_adsr_run_db,
+    v_adsr_run
+};
 
 /* void v_adsr_set_delay_time(t_adsr* a_adsr, float a_time)
  *
@@ -243,6 +257,12 @@ void v_adsr_set_adsr(t_adsr*__restrict a_adsr_ptr, float a_a,
     v_adsr_set_r_time(a_adsr_ptr, a_r);
 }
 
+void v_adsr_set_adsr_lin_from_db(t_adsr* a_adsr_ptr, float a_a,
+        float a_d, float a_s, float a_r)
+{
+    a_s = f_db_to_linear_fast(a_s);
+    v_adsr_set_adsr(a_adsr_ptr, a_a, a_d, a_s, a_r);
+}
 
 /* void v_adsr_set_adsr(
  * t_adsr* a_adsr_ptr,
@@ -411,7 +431,7 @@ void v_adsr_run_hold(t_adsr *self)
 
 void v_adsr_run_decay(t_adsr *self)
 {
-    self->output = (self->output) + (self->d_inc);
+    self->output += self->d_inc;
     if((self->output) <= (self->s_value))
     {
         self->output = self->s_value;
@@ -423,15 +443,12 @@ void v_adsr_run_decay_db(t_adsr *self)
 {
     if((self->output) < ADSR_DB_THRESHOLD_LINEAR)
     {
-        self->output =
-                (self->output) + (self->d_inc);
+        self->output += self->d_inc;
     }
     else
     {
-        self->output_db =
-                (self->output_db) + (self->d_inc_db);
-        self->output =
-                f_db_to_linear_fast(self->output_db);
+        self->output_db += self->d_inc_db;
+        self->output = f_db_to_linear_fast(self->output_db);
     }
 
     if((self->output) <= (self->s_value))
@@ -448,7 +465,7 @@ void v_adsr_run_sustain(t_adsr *self)
 
 void v_adsr_run_release(t_adsr *self)
 {
-    self->output = (self->output) + (self->r_inc);
+    self->output += self->r_inc;
     if((self->output) <= 0.0f)
     {
         self->output = 0.0f;
@@ -460,7 +477,7 @@ void v_adsr_run_release_db(t_adsr *self)
 {
     if((self->output) < ADSR_DB_THRESHOLD_LINEAR_RELEASE)
     {
-        self->output_db = (self->output_db) - 0.05f;
+        self->output_db -= 0.05f;
 
         if(self->output_db < -96.0f)
         {
@@ -474,7 +491,7 @@ void v_adsr_run_release_db(t_adsr *self)
     }
     else
     {
-        self->output_db = (self->output_db) + (self->r_inc_db);
+        self->output_db += self->r_inc_db;
         self->output = f_db_to_linear_fast(self->output_db);
     }
 }
