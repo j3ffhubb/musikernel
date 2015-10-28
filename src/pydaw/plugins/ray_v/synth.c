@@ -778,7 +778,7 @@ PYFX_Descriptor *rayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, RAYV_MIN_NOTE, 0.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, RAYV_MAX_NOTE, 120.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, RAYV_MASTER_PITCH, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV_ADSR_LIN_MAIN, 0.0f, 0.0f, 1.0f);
+    pydaw_set_pyfx_port(f_result, RAYV_ADSR_LIN_MAIN, 1.0f, 0.0f, 1.0f);
 
     f_result->cleanup = v_cleanup_rayv;
     f_result->connect_port = v_rayv_connect_port;

@@ -839,7 +839,7 @@ PYFX_Descriptor *rayv2_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, RAYV2_OSC1_PB, 0.0f, -36.0f, 36.0f);
     pydaw_set_pyfx_port(f_result, RAYV2_OSC2_PB, 0.0f, -36.0f, 36.0f);
     pydaw_set_pyfx_port(f_result, RAYV2_DIST_TYPE, 0.0f, 0.0f, 2.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_ADSR_LIN_MAIN, 0.0f, 0.0f, 1.0f);
+    pydaw_set_pyfx_port(f_result, RAYV2_ADSR_LIN_MAIN, 1.0f, 0.0f, 1.0f);
 
 
     f_result->cleanup = v_cleanup_rayv2;

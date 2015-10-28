@@ -1212,7 +1212,7 @@ class pydaw_adsr_widget:
                  a_port_dict=None, a_preset_mgr=None, a_attack_default=10,
                  a_prefx_port=None, a_knob_type=KC_TIME_DECIMAL,
                  a_delay_port=None, a_hold_port=None,
-                 a_lin_port=None, a_lin_default=0):
+                 a_lin_port=None, a_lin_default=1):
         self.clipboard_dict = {}
         self.groupbox = QGroupBox(a_label)
         self.groupbox.contextMenuEvent = self.context_menu_event

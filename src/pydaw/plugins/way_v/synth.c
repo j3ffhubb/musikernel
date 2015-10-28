@@ -1776,7 +1776,7 @@ PYFX_Descriptor *wayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, WAYV_MIN_NOTE, 0.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, WAYV_MAX_NOTE, 120.0f, 0.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, WAYV_MASTER_PITCH, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, WAYV_ADSR_LIN_MAIN, 0.0f, 0.0f, 1.0f);
+    pydaw_set_pyfx_port(f_result, WAYV_ADSR_LIN_MAIN, 1.0f, 0.0f, 1.0f);
 
     f_port = WAYV_FM_MACRO1_OSC1_FM5;
 
