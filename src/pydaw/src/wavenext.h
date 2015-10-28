@@ -336,7 +336,7 @@ inline void v_pydaw_run_wave_editor(int sample_count,
             if((self->ab_audio_item->sample_read_heads[0].whole_number) <
                 (self->ab_audio_item->sample_end_offset))
             {
-                v_adsr_run_db(&self->ab_audio_item->adsrs[0]);
+                v_adsr_run(&self->ab_audio_item->adsrs[0]);
                 v_pydaw_audio_item_set_fade_vol(self->ab_audio_item, 0);
 
                 if(self->ab_wav_item->channels == 1)

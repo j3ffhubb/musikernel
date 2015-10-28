@@ -526,7 +526,7 @@ t_pydaw_audio_item * g_pydaw_audio_item_get(float a_sr)
     for(f_i = 0; f_i < MK_AUDIO_ITEM_SEND_COUNT; ++f_i)
     {
         g_adsr_init(&f_result->adsrs[f_i], a_sr);
-        v_adsr_set_adsr_db(&f_result->adsrs[f_i], 0.003f, 0.1f, 0.0f, 0.2f);
+        v_adsr_set_adsr(&f_result->adsrs[f_i], 0.003f, 0.1f, 1.0f, 0.2f);
         v_adsr_retrigger(&f_result->adsrs[f_i]);
         f_result->adsrs[f_i].stage = ADSR_STAGE_OFF;
         g_ifh_init(&f_result->sample_read_heads[f_i]);

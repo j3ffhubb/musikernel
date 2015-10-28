@@ -1799,7 +1799,7 @@ void v_dn_audio_items_run(t_dawnext * self, t_dn_item_ref * a_item_ref,
                     break;
                 }
 
-                v_adsr_run_db(&f_audio_item->adsrs[f_send_num]);
+                v_adsr_run(&f_audio_item->adsrs[f_send_num]);
 
                 ++f_i2;
             }//while < sample count
