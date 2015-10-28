@@ -1,20 +1,20 @@
-Document: musikernel1
-Title: Debian musikernel1 Manual
+Document: musikernel2
+Title: Debian musikernel2 Manual
 Author: <insert document author here>
-Abstract: This manual describes what musikernel1 is
+Abstract: This manual describes what musikernel2 is
  and how it can be used to
  manage online manuals on Debian systems.
 Section: unknown
 
 Format: debiandoc-sgml
-Files: /usr/share/doc/musikernel1/musikernel1.sgml.gz
+Files: /usr/share/doc/musikernel2/musikernel2.sgml.gz
 
 Format: postscript
-Files: /usr/share/doc/musikernel1/musikernel1.ps.gz
+Files: /usr/share/doc/musikernel2/musikernel2.ps.gz
 
 Format: text
-Files: /usr/share/doc/musikernel1/musikernel1.text.gz
+Files: /usr/share/doc/musikernel2/musikernel2.text.gz
 
 Format: HTML
-Index: /usr/share/doc/musikernel1/html/index.html
-Files: /usr/share/doc/musikernel1/html/*.html
+Index: /usr/share/doc/musikernel2/html/index.html
+Files: /usr/share/doc/musikernel2/html/*.html

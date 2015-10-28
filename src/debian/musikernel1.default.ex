@@ -1,6 +1,6 @@
-# Defaults for musikernel1 initscript
-# sourced by /etc/init.d/musikernel1
-# installed at /etc/default/musikernel1 by the maintainer scripts
+# Defaults for musikernel2 initscript
+# sourced by /etc/init.d/musikernel2
+# installed at /etc/default/musikernel2 by the maintainer scripts
 
 #
 # This is a POSIX shell fragment

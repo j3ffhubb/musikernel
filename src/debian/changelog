@@ -1,4 +1,4 @@
-musikernel1 ({VERSION}-1) trusty; urgency=low
+musikernel2 ({VERSION}-1) trusty; urgency=low
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
 

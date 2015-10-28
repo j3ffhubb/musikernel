@@ -1,5 +1,5 @@
 #!/bin/sh
-# postrm script for musikernel1
+# postrm script for musikernel2
 #
 # see: dh_installdeb(1)
 

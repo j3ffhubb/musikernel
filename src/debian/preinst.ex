@@ -1,5 +1,5 @@
 #!/bin/sh
-# preinst script for musikernel1
+# preinst script for musikernel2
 #
 # see: dh_installdeb(1)
 

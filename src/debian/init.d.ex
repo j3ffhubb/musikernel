@@ -1,6 +1,6 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          musikernel1
+# Provides:          musikernel2
 # Required-Start:    $local_fs $network $remote_fs $syslog
 # Required-Stop:     $local_fs $network $remote_fs $syslog
 # Default-Start:     2 3 4 5
@@ -17,9 +17,9 @@
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="musikernel1"
-NAME=musikernel1
-DAEMON=/usr/sbin/musikernel1
+DESC="musikernel2"
+NAME=musikernel2
+DAEMON=/usr/sbin/musikernel2
 DAEMON_ARGS=""
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME

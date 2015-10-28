@@ -1,3 +1,9 @@
+######Important
+
+The master branch is the development branch for the unreleased MusiKernel v2.
+If you're looking for the code for the released MusiKernel v1, use the
+"musikernel1" branch.
+
 - **Twitter** - Follow @musikernel for the latest news and release announcements
 - [**KVR** - See screenshots](http://www.kvraudio.com/product/musikernel-by-musikernel)
 - [**Youtube** - Watch MusiKernel tutorial videos](https://www.youtube.com/channel/UCf_PgsosvLpxkN6bff9NESA/videos)
@@ -45,7 +51,7 @@ Ubuntu packages can be downloaded directly from [here](https://github.com/j3ffhu
 ######Debian and Ubuntu
 
 ```
-cd [musikernel dir]/src 
+cd [musikernel dir]/src
 ./ubuntu_deps.sh   # as root
 make deps
 make deb  # as root

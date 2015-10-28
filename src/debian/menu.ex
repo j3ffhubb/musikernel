@@ -1,2 +1,2 @@
-?package(musikernel1):needs="X11|text|vc|wm" section="Applications/see-menu-manual"\
-  title="musikernel1" command="/usr/bin/musikernel1"
+?package(musikernel2):needs="X11|text|vc|wm" section="Applications/see-menu-manual"\
+  title="musikernel2" command="/usr/bin/musikernel2"

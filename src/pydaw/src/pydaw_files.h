@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include <sys/stat.h>
 #include <assert.h>
 
-#define MUSIKERNEL_VERSION "musikernel1"
+#define MUSIKERNEL_VERSION "musikernel2"
 
 /*Standard string sizes*/
 #define PYDAW_XLARGE_STRING 1048576

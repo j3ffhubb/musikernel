@@ -30,7 +30,7 @@ SetCompressor /SOLID lzma
 
 Name "${{PRODUCT_NAME}} ${{PRODUCT_VERSION}}"
 OutFile "{MAJOR_VERSION}-{MINOR_VERSION}-win-x{bits}.exe"
-InstallDir "C:\musikernel\mingw{bits}"
+InstallDir "C:\{MAJOR_VERSION}\mingw{bits}"
 
 ;--------------------------------
 ;Interface Settings
@@ -64,12 +64,10 @@ InstallDir "C:\musikernel\mingw{bits}"
   !insertmacro MUI_LANGUAGE "English"
 
 Section "install"
-  ; deprecated
-  RMDir /r "C:\musikernel1-64"
   RMDir /r $INSTDIR
   SetOutPath $INSTDIR
   writeUninstaller "$INSTDIR\uninstall.exe"
-  File /r "C:\musikernel\mingw{bits}\*"
+  File /r "C:\{MAJOR_VERSION}\mingw{bits}\*"
   RMDir /r "$SMPROGRAMS\${{PRODUCT_NAME}} ({bits} bit)"
   CreateDirectory "$SMPROGRAMS\${{PRODUCT_NAME}} ({bits} bit)"
   SetOutPath "$INSTDIR\bin"
@@ -100,19 +98,19 @@ with open(os.path.join(CWD, "..", "src", "major-version.txt")) as fh:
 shutil.copy(
     os.path.join(CWD, "mingw-w64-portaudio",
         "mingw-w64-x86_64-portaudio-19_20140130-2-any.pkg.tar.xz"),
-    r"C:\musikernel\home\pydaw")
+    r"C:\{}\home\pydaw".format(MAJOR_VERSION))
 
 for arch, bits in (("x86_64", "64"),): # ("i686", "32"),
     src = ("mingw-w64-{arch}-{MAJOR_VERSION}-{MINOR_VERSION}"
         "-1-any.pkg.tar.xz".format(
         arch=arch, MAJOR_VERSION=MAJOR_VERSION, MINOR_VERSION=MINOR_VERSION))
-    dest = r"C:\musikernel\home\pydaw".format(
+    dest = r"C:\{MAJOR_VERSION}\home\pydaw".format(
         bits=bits, MAJOR_VERSION=MAJOR_VERSION)
     if not os.path.isdir(dest):
         os.makedirs(dest)
     shutil.copy(src, dest)
 
-shell = r"C:\musikernel\mingw64_shell.bat"
+shell = r"C:\{}\mingw64_shell.bat".format(MAJOR_VERSION)
 os.system(shell)
 
 print("""\
@@ -122,7 +120,9 @@ rm *  # remove all package files to save space
 """)
 input("Press 'enter' to continue")
 
-shutil.copy(os.path.join(CWD, "musikernel1.bat"), r"C:\musikernel\mingw64\bin")
+shutil.copy(
+    os.path.join(CWD, "{}.bat".format(MAJOR_VERSION)),
+    r"C:\{}\mingw64\bin".format(MAJOR_VERSION))
 
 NSIS = r"C:\Program Files (x86)\NSIS\Bin\makensis.exe"
 

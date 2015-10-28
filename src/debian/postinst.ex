@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for musikernel1
+# postinst script for musikernel2
 #
 # see: dh_installdeb(1)
 

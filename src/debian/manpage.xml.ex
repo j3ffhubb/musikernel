@@ -56,9 +56,9 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
   <!ENTITY dhsection   "SECTION">
   <!-- TITLE should be something like "User commands" or similar (see
        http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
-  <!ENTITY dhtitle     "musikernel1 User Manual">
+  <!ENTITY dhtitle     "musikernel2 User Manual">
   <!ENTITY dhucpackage "MUSIKERNEL1">
-  <!ENTITY dhpackage   "musikernel1">
+  <!ENTITY dhpackage   "musikernel2">
 ]>
 
 <refentry>

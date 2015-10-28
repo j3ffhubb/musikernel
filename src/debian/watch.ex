@@ -8,16 +8,16 @@ version=3
 
 # Uncomment to examine a Webpage
 # <Webpage URL> <string match>
-#http://www.example.com/downloads.php musikernel1-(.*)\.tar\.gz
+#http://www.example.com/downloads.php musikernel2-(.*)\.tar\.gz
 
 # Uncomment to examine a Webserver directory
-#http://www.example.com/pub/musikernel1-(.*)\.tar\.gz
+#http://www.example.com/pub/musikernel2-(.*)\.tar\.gz
 
 # Uncommment to examine a FTP server
-#ftp://ftp.example.com/pub/musikernel1-(.*)\.tar\.gz debian uupdate
+#ftp://ftp.example.com/pub/musikernel2-(.*)\.tar\.gz debian uupdate
 
 # Uncomment to find new files on sourceforge, for devscripts >= 2.9
-# http://sf.net/musikernel1/musikernel1-(.*)\.tar\.gz
+# http://sf.net/musikernel2/musikernel2-(.*)\.tar\.gz
 
 # Uncomment to find new files on GooglePages
-# http://example.googlepages.com/foo.html musikernel1-(.*)\.tar\.gz
+# http://example.googlepages.com/foo.html musikernel2-(.*)\.tar\.gz

@@ -2,7 +2,7 @@
 
 import os, sys, subprocess
 
-pydaw_version = "musikernel1"
+pydaw_version = "musikernel2"
 
 print("sys.argv == {}".format(sys.argv))
 

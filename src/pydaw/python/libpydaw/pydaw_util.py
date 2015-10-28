@@ -78,7 +78,7 @@ MKENGINE_DIR = os.path.abspath(os.path.join(PYTHON_DIR, "..", "mkengine"))
 
 pydaw_terminating_char = "\\"
 
-global_pydaw_version_string = "musikernel1"
+global_pydaw_version_string = "musikernel2"
 global_pydaw_file_type_string = 'MusiKernel Project (default.{})'.format(
     global_pydaw_version_string)
 global_euphoria_file_type_string = 'Euphoria Sample File (*.u4ia4)'
@@ -169,7 +169,8 @@ class EngineLibThread(QtCore.QThread):
         global ENGINE_RETCODE
         myargv = ctypes.c_char_p * 5
         argv = myargv(
-            b"/usr/bin/musikernel1-engine", INSTALL_PREFIX.encode("ascii"),
+            b"/usr/bin/{}-engine".format(global_pydaw_version_string),
+            INSTALL_PREFIX.encode("ascii"),
             PROJECT_DIR.encode("ascii"), b"0",
             str(USE_HUGEPAGES).encode("ascii"))
         ENGINE_RETCODE = ENGINE_LIB.main(5, ctypes.byref(argv))

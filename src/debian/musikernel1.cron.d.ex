@@ -1,4 +1,4 @@
 #
-# Regular cron jobs for the musikernel1 package
+# Regular cron jobs for the musikernel2 package
 #
-0 4	* * *	root	[ -x /usr/bin/musikernel1_maintenance ] && /usr/bin/musikernel1_maintenance
+0 4	* * *	root	[ -x /usr/bin/musikernel2_maintenance ] && /usr/bin/musikernel2_maintenance

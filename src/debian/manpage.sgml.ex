@@ -27,7 +27,7 @@ manpage.1: manpage.sgml
   <!ENTITY dhemail     "<email>musikernel@gmail.com</email>">
   <!ENTITY dhusername  "userbuntu">
   <!ENTITY dhucpackage "<refentrytitle>MUSIKERNEL1</refentrytitle>">
-  <!ENTITY dhpackage   "musikernel1">
+  <!ENTITY dhpackage   "musikernel2">
 
   <!ENTITY debian      "<productname>Debian</productname>">
   <!ENTITY gnu         "<acronym>GNU</acronym>">
