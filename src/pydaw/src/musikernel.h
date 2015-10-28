@@ -95,8 +95,7 @@ int MASTER_OUT_R = 1;
 #define MK_CONFIGURE_KEY_CLEAN_WAV_POOL "cwp"
 
 #define MK_HOST_DAWNEXT 0
-#define MK_HOST_EDMNEXT 1
-#define MK_HOST_WAVENEXT 2
+#define MK_HOST_WAVENEXT 1
 
 
 #define MK_HOST_COUNT 3
@@ -355,6 +354,29 @@ void v_ui_send(char * a_path, char * a_msg)
 }
 
 #endif
+
+void v_pytrack_routing_set(t_pytrack_routing * self, int a_output,
+        int a_sidechain)
+{
+    self->output = a_output;
+    self->sidechain = a_sidechain;
+
+    if(a_output >= 0)
+    {
+        self->active = 1;
+    }
+    else
+    {
+        self->active = 0;
+    }
+}
+
+void v_pytrack_routing_free(t_pytrack_routing * self)
+{
+    free(self);
+}
+
+
 
 /* default generic t_mk_host->mix function pointer */
 void v_default_mix()

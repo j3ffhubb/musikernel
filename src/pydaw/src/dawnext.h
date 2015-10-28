@@ -2311,7 +2311,7 @@ void g_dn_item_get(t_dawnext* self, int a_uid)
         {
             v_iterate_2d_char_array(f_current_string);
             int f_index = atoi(f_current_string->current_str);
-            
+
             if(f_result->audio_items->items[f_index])
             {
                 t_paif * f_paif = g_paif8_get();

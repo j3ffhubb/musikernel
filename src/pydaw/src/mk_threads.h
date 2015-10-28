@@ -21,7 +21,6 @@ GNU General Public License for more details.
     #define RT_SCHED SCHED_FIFO
 #endif
 
-#include "edmnext.h"
 #include "dawnext.h"
 #include "wavenext.h"
 
@@ -41,7 +40,6 @@ void v_open_project(const char*, int);
 
 void v_pydaw_open_tracks()
 {
-    v_en_open_tracks();
     v_wn_open_tracks();
 }
 
@@ -73,7 +71,6 @@ void v_open_project(const char* a_project_folder, int a_first_load)
         v_wav_pool_add_items(musikernel->wav_pool, musikernel->wav_pool_file);
     }
 
-    v_en_open_project(a_first_load);
     v_wn_open_project();
     v_dn_open_project(a_first_load);
 
@@ -95,18 +92,12 @@ void v_pydaw_activate(
     musikernel->hosts[MK_HOST_DAWNEXT].audio_inputs = v_dn_update_audio_inputs;
     musikernel->hosts[MK_HOST_DAWNEXT].mix = v_default_mix;
 
-    musikernel->hosts[MK_HOST_EDMNEXT].run = v_en_run_engine;
-    musikernel->hosts[MK_HOST_EDMNEXT].osc_send = v_en_osc_send;
-    musikernel->hosts[MK_HOST_EDMNEXT].audio_inputs = NULL;
-    musikernel->hosts[MK_HOST_EDMNEXT].mix = v_default_mix;
-
     musikernel->hosts[MK_HOST_WAVENEXT].run = v_pydaw_run_wave_editor;
     musikernel->hosts[MK_HOST_WAVENEXT].osc_send = v_wn_osc_send;
     musikernel->hosts[MK_HOST_WAVENEXT].audio_inputs = v_wn_update_audio_inputs;
     musikernel->hosts[MK_HOST_WAVENEXT].mix = v_default_mix;
 
     g_dn_instantiate();
-    g_en_instantiate();
     g_wavenext_get();
 
     v_open_project(a_project_path, 1);
@@ -355,7 +346,7 @@ void * v_pydaw_worker_thread(void* a_arg)
             break;
         }
 
-        v_en_process(f_args);
+        v_dn_process(f_args);
 
         pthread_spin_unlock(f_lock);
     }

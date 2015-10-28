@@ -153,7 +153,7 @@ class transport_widget:
         self.grid_layout1.addWidget(QLabel(_("Host")), 0, 55)
         self.host_combobox = QComboBox()
         self.host_combobox.setMinimumWidth(120)
-        self.host_combobox.addItems(["DAW-Next", "EDM-Next", "Wave-Next"])
+        self.host_combobox.addItems(["DAW-Next", "Wave-Next"])
         self.host_combobox.currentIndexChanged.connect(
             libmk.MAIN_WINDOW.set_host)
         self.grid_layout1.addWidget(self.host_combobox, 1, 55)
@@ -258,7 +258,6 @@ def engine_lib_callback(a_path, a_msg):
 
 
 class MkMainWindow(QMainWindow):
-    edmnext_callback = QtCore.pyqtSignal(str, list)
     dawnext_callback = QtCore.pyqtSignal(str, list)
     wavenext_callback = QtCore.pyqtSignal(str, list)
 
@@ -311,14 +310,12 @@ class MkMainWindow(QMainWindow):
 
         SPLASH_SCREEN.status_update(_("Loading DAW-Next"))
         import dawnext
-        SPLASH_SCREEN.status_update(_("Loading EDM-Next"))
-        import edmnext
         SPLASH_SCREEN.status_update(_("Loading Wave-Next"))
         import wavenext
 
         self.wave_editor_module = wavenext
 
-        libmk.HOST_MODULES = (dawnext, edmnext, wavenext)
+        libmk.HOST_MODULES = (dawnext, wavenext)
         self.host_windows = tuple(x.MAIN_WINDOW for x in libmk.HOST_MODULES)
 
         self.current_module = dawnext
@@ -460,15 +457,12 @@ class MkMainWindow(QMainWindow):
         self.osc_server = None
 
         if pydaw_util.IS_ENGINE_LIB:
-            self.edmnext_callback.connect(
-                edmnext.MAIN_WINDOW.configure_callback)
             self.dawnext_callback.connect(
                 dawnext.MAIN_WINDOW.configure_callback)
             self.wavenext_callback.connect(
                 wavenext.MAIN_WINDOW.configure_callback)
 
             self.engine_callback_dict = {
-                "musikernel/edmnext": self.edmnext_callback,
                 "musikernel/wavenext": self.wavenext_callback,
                 "musikernel/dawnext": self.dawnext_callback
                 }
@@ -481,9 +475,6 @@ class MkMainWindow(QMainWindow):
                 self.osc_server = None
             if self.osc_server is not None:
                 print(self.osc_server.get_url())
-                self.osc_server.add_method(
-                    "musikernel/edmnext", 's',
-                    edmnext.MAIN_WINDOW.configure_callback)
                 self.osc_server.add_method(
                     "musikernel/wavenext", 's',
                     wavenext.MAIN_WINDOW.configure_callback)

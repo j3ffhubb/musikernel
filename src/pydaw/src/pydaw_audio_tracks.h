@@ -121,8 +121,8 @@ typedef struct
 typedef struct
 {
     t_pydaw_audio_item * items[PYDAW_MAX_AUDIO_ITEM_COUNT];
-    t_audio_item_index indexes[EN_TRACK_COUNT][PYDAW_MAX_AUDIO_ITEM_COUNT];
-    int index_counts[EN_TRACK_COUNT];
+    t_audio_item_index indexes[DN_TRACK_COUNT][PYDAW_MAX_AUDIO_ITEM_COUNT];
+    int index_counts[DN_TRACK_COUNT];
     int sample_rate;
     int uid;
 } t_pydaw_audio_items;
@@ -557,7 +557,7 @@ t_pydaw_audio_items * g_pydaw_audio_items_get(int a_sr)
         f_result->items[f_i] = 0; //g_pydaw_audio_item_get((float)(a_sr));
     }
 
-    for(f_i = 0; f_i < EN_TRACK_COUNT; ++f_i)
+    for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i)
     {
         f_result->index_counts[f_i] = 0;
 

@@ -131,7 +131,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_device_dialog.py
 
 %{{_usr}}/lib/{0}/pydaw/mkengine/{0}.so
-%{{_usr}}/lib/{0}/pydaw/python/edmnext.py
 %{{_usr}}/lib/{0}/presets/MODULEX.mkp
 %{{_usr}}/lib/{0}/presets/RAYV.mkp
 %{{_usr}}/lib/{0}/presets/RAYV2.mkp
@@ -140,10 +139,7 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/liblo.cpython-{4}m.so
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/portaudio.py
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/portmidi.py
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/gradients.py
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_history.py
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/osc.py
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/project.py
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_util.py
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_widgets.py
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/staging.py
@@ -185,7 +181,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/strings.py
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/scales.py
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/strings.py
 
 %{{_usr}}/lib/{0}/pydaw/python/mkplugins/__init__.py
 %{{_usr}}/lib/{0}/pydaw/python/mkplugins/euphoria.py
@@ -211,7 +206,6 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/python/mkplugins/mk_limiter.py
 %{{_usr}}/lib/{0}/pydaw/python/libmk/__init__.py
 %{{_usr}}/lib/{0}/pydaw/python/libmk/mk_project.py
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__init__.py
 %{{_usr}}/lib/{0}/pydaw/python/wavenext.py
 
 %{{_usr}}/lib/{0}/pydaw/python/dawnext.py
@@ -223,8 +217,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{{_usr}}/lib/{0}/pydaw/python/__pycache__/dawnext.cpython-34.pyc
 %{{_usr}}/lib/{0}/pydaw/python/__pycache__/dawnext.cpython-34.pyo
-%{{_usr}}/lib/{0}/pydaw/python/__pycache__/edmnext.cpython-34.pyc
-%{{_usr}}/lib/{0}/pydaw/python/__pycache__/edmnext.cpython-34.pyo
 %{{_usr}}/lib/{0}/pydaw/python/__pycache__/musikernel.cpython-34.pyc
 %{{_usr}}/lib/{0}/pydaw/python/__pycache__/musikernel.cpython-34.pyo
 %{{_usr}}/lib/{0}/pydaw/python/__pycache__/wavenext.cpython-34.pyc
@@ -239,16 +231,6 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/project.cpython-34.pyo
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/strings.cpython-34.pyc
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/strings.cpython-34.pyo
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/__init__.cpython-34.pyc
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/__init__.cpython-34.pyo
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/gradients.cpython-34.pyc
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/gradients.cpython-34.pyo
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/osc.cpython-34.pyc
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/osc.cpython-34.pyo
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/project.cpython-34.pyc
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/project.cpython-34.pyo
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/strings.cpython-34.pyc
-%{{_usr}}/lib/{0}/pydaw/python/libedmnext/__pycache__/strings.cpython-34.pyo
 %{{_usr}}/lib/{0}/pydaw/python/libmk/__pycache__/__init__.cpython-34.pyc
 %{{_usr}}/lib/{0}/pydaw/python/libmk/__pycache__/__init__.cpython-34.pyo
 %{{_usr}}/lib/{0}/pydaw/python/libmk/__pycache__/mk_project.cpython-34.pyc

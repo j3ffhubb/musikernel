@@ -972,12 +972,7 @@ int v_configure(const char * path, const char * key, const char * value)
         }
     }
 
-    if(!strcmp(path, "/musikernel/edmnext"))
-    {
-        v_en_configure(key, value);
-        return 0;
-    }
-    else if(!strcmp(path, "/musikernel/wavenext"))
+    if(!strcmp(path, "/musikernel/wavenext"))
     {
         v_wn_configure(key, value);
         return 0;

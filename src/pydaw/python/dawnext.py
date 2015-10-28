@@ -9011,7 +9011,7 @@ class pydaw_main_window(QScrollArea):
             CC_EDITOR, PB_EDITOR, SEQUENCER, ROUTING_GRAPH_WIDGET):
                 f_widget.prepare_to_quit()
         except Exception as ex:
-            print("Exception thrown while attempting to close EDM-Next")
+            print("Exception thrown while attempting to close DAW-Next")
             print("Exception:  {}".format(ex))
 
 

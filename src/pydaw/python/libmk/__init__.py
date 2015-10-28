@@ -123,7 +123,7 @@ class AbstractIPC:
         MusiKernel engine
     """
     def __init__(self, a_with_audio=False,
-             a_configure_path="/musikernel/edmnext"):
+             a_configure_path="/musikernel/dawnext"):
         if not a_with_audio:
             self.with_osc = False
             return

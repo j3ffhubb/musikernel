@@ -39,7 +39,6 @@ GNU General Public License for more details.
 #include "../pydaw/libmodsynth/lib/lmalloc.h"
 #include <unistd.h>
 
-int edmnext_main(int argc, char** argv);
 int dawnext_main(int argc, char** argv);
 void print_help();
 int main(int argc, char** argv);
@@ -47,9 +46,6 @@ int main(int argc, char** argv);
 void print_help()
 {
     printf("Usage:\n");
-    printf("%s_render edmnext [project_dir] [output_file] [start_region] "
-        "[start_bar] [end_region] [end_bar] [sample_rate] "
-        "[buffer_size] [thread_count] [huge_pages]\n\n", MUSIKERNEL_VERSION);
     printf("%s_render dawnext [project_dir] [output_file] [start_beat] "
         "[end_beat] [sample_rate] [buffer_size] [thread_count] "
         "[huge_pages] [stem]\n\n", MUSIKERNEL_VERSION);
@@ -62,10 +58,6 @@ int main(int argc, char** argv)
         print_help();
         return 1;
     }
-    else if(!strcmp(argv[1], "edmnext"))
-    {
-        return edmnext_main(argc, argv);
-    }
     else if(!strcmp(argv[1], "dawnext"))
     {
         return dawnext_main(argc, argv);
@@ -75,102 +67,6 @@ int main(int argc, char** argv)
         print_help();
         return 1;
     }
-}
-
-int edmnext_main(int argc, char** argv)
-{
-    if(argc < 12)
-    {
-        print_help();
-        return 1;
-    }
-
-    char * f_project_dir = argv[2];
-    char * f_output_file = argv[3];
-    int f_start_region = atoi(argv[4]);
-    int f_start_bar = atoi(argv[5]);
-    int f_end_region = atoi(argv[6]);
-    int f_end_bar = atoi(argv[7]);
-    int f_sample_rate = atoi(argv[8]);
-    int f_buffer_size = atoi(argv[9]);
-    int f_thread_count = atoi(argv[10]);
-
-    int f_huge_pages = atoi(argv[11]);
-    assert(f_huge_pages == 0 || f_huge_pages == 1);
-
-    if(f_huge_pages)
-    {
-        printf("Attempting to use hugepages\n");
-    }
-
-    USE_HUGEPAGES = f_huge_pages;
-
-    int f_create_file = 1;
-
-    int f_i;
-    for(f_i = 12; f_i < argc; ++f_i)
-    {
-        if(!strcmp(argv[f_i], "--no-file"))
-        {
-            f_create_file = 0;
-        }
-    }
-
-    float** f_output;
-    hpalloc((void**)&f_output, sizeof(float*) * 2);
-
-    v_pydaw_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 0);
-
-    /*
-    PYDAW_AUDIO_INPUT_TRACK_COUNT = 2;
-    v_pydaw_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 1);
-    v_wn_test();
-    */
-
-    f_i = 0;
-    while(f_i < 2)
-    {
-        hpalloc((void**)&f_output[f_i], sizeof(float) * f_buffer_size);
-        f_i++;
-    }
-
-    f_i = 0;
-    while(f_i < f_buffer_size)
-    {
-        f_output[0][f_i] = 0.0f;
-        f_output[1][f_i] = 0.0f;
-        f_i++;
-    }
-
-    musikernel->sample_count = f_buffer_size;
-
-    v_en_offline_render_prep(edmnext);
-
-    /*
-    v_pydaw_set_midi_device(edmnext, 1, 0, 5);
-    v_set_playback_mode(edmnext, 1, 0, 0, 0);
-
-    t_pydaw_seq_event f_events[2];
-    v_pydaw_ev_set_noteon(&f_events[0], 0, 60, 100);
-    f_events[0].tick = 2;
-    v_pydaw_ev_set_noteoff(&f_events[1], 0, 60, 100);
-    f_events[1].tick = 200;
-
-    f_i = 0;
-    while(f_i < 20)
-    {
-        v_pydaw_run_main_loop(
-            edmnext, 512, f_events, 2, 512 * (f_i + 1),
-            f_engine->output0, f_engine->output1, 0);
-    }
-    */
-
-    v_en_offline_render(edmnext, f_start_region, f_start_bar,
-            f_end_region, f_end_bar, f_output_file, 0, f_create_file);
-
-    v_pydaw_destructor();
-
-    return 0;
 }
 
 int dawnext_main(int argc, char** argv)

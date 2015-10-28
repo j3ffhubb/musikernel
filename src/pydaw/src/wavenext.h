@@ -578,8 +578,6 @@ void v_wn_test()
     v_wn_set_playback_mode(wavenext, PYDAW_PLAYBACK_MODE_OFF, 0);
 
     printf("End Wave-Next test\n");
-
-    v_pydaw_set_host(MK_HOST_EDMNEXT);
 }
 
 #endif	/* WAVENEXT_H */
