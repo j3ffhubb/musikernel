@@ -283,9 +283,12 @@ class plugin_settings_base:
             a_save_callback, a_name_callback, a_qcbox=False):
         self.plugin_ui = None
         self.set_plugin_func = a_set_plugin_func
-        self.layout = QHBoxLayout()
         self.vlayout = QVBoxLayout()
-        self.vlayout.addLayout(self.layout)
+        self.controls_widget = QWidget()
+        self.controls_widget.setObjectName("plugin_rack")
+        self.layout = QHBoxLayout(self.controls_widget)
+        self.layout.addWidget(QLabel(_("Plugin")))
+        self.vlayout.addWidget(self.controls_widget)
         self.suppress_osc = False
         self.save_callback = a_save_callback
         self.name_callback = a_name_callback
@@ -451,6 +454,7 @@ class plugin_settings_main(plugin_settings_base):
     def add_to_layout(self):
         plugin_settings_base.add_to_layout(self)
         self.layout.addWidget(self.menu_button)
+        self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
 
 
 class plugin_settings_mixer(plugin_settings_base):

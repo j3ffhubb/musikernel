@@ -3,6 +3,11 @@ QWidget:focus
     outline: none;
 }
 
+QWidget#plugin_rack
+{
+    background-color:rgb(3, 3, 3);
+}
+
 QWidget#mainwindow, QWidget#ccmaptabwidget, QWidget#itemtabwidget, QMessageBox
 {
     background-color:rgb(93, 93, 93);
