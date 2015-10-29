@@ -372,8 +372,10 @@ class plugin_settings_base:
             self.plugin_combobox.setCurrentIndex(
                 self.plugin_combobox.findText(f_name))
         self.plugin_index = a_val.plugin_index
+
         self.plugin_uid = a_val.plugin_uid
         self.power_checkbox.setChecked(a_val.power == 1)
+        self.on_show_ui()
         self.suppress_osc = False
 
     def get_value(self):
@@ -564,6 +566,7 @@ class PluginRack:
         self.scrollarea.setWidget(self.scroll_widget)
         for plugin in self.plugins:
             self.scroll_vlayout.addLayout(plugin.vlayout)
+        self.open_plugins()
 
     def name_callback(self):
         tracks = self.PROJECT.get_tracks()
