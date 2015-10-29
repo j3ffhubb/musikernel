@@ -8026,10 +8026,25 @@ class seq_track:
         self.port_num = None
         self.ccs_in_use_combobox = None
         self.suppress_osc = False
+        self.automation_combobox = None
 
     def menu_button_pressed(self):
         if not self.menu_created:
             self.create_menu()
+
+        self.suppress_ccs_in_use = True
+        index = self.automation_combobox.currentIndex()
+        plugins = PROJECT.get_track_plugins(self.track_number)
+        if plugins:
+            names = [PLUGIN_UIDS_REVERSE[x.plugin_index]
+                for x in plugins.plugins]
+        else:
+            names = ["None" for x in range(10)]
+        self.automation_combobox.clear()
+        self.automation_combobox.addItems(names)
+        self.automation_combobox.setCurrentIndex(index)
+        self.suppress_ccs_in_use = False
+
         self.update_in_use_combobox()
 
     def create_menu(self):
@@ -8043,6 +8058,13 @@ class seq_track:
         self.action_widget = QWidgetAction(self.button_menu)
         self.action_widget.setDefaultWidget(self.menu_widget)
         self.button_menu.addAction(self.action_widget)
+
+        self.automation_combobox = QComboBox()
+        self.automation_combobox.setMinimumWidth(240)
+        self.menu_gridlayout.addWidget(QLabel(_("Plugin:")), 5, 20)
+        self.menu_gridlayout.addWidget(self.automation_combobox, 5, 21)
+        self.automation_combobox.currentIndexChanged.connect(
+            self.automation_callback)
 
         self.control_combobox = QComboBox()
         self.control_combobox.setMinimumWidth(240)
@@ -8145,10 +8167,16 @@ class seq_track:
     def context_menu_event(self, a_event=None):
         pass
 
-    def automation_callback(self, a_plugin_uid, a_plugin_type, a_name):
-        self.automation_uid = int(a_plugin_uid)
-        self.automation_plugin = int(a_plugin_type)
-        self.automation_plugin_name = str(a_name)
+    def automation_callback(self, a_val=None):
+        if self.suppress_ccs_in_use:
+            return
+        plugins = PROJECT.get_track_plugins(self.track_number)
+        index = self.automation_combobox.currentIndex()
+        plugin = plugins.plugins[index]
+        self.automation_uid = int(plugin.plugin_uid)
+        self.automation_plugin = int(plugin.plugin_index)
+        self.automation_plugin_name = PLUGIN_UIDS_REVERSE[
+            self.automation_plugin]
         self.plugin_changed()
         if not libmk.IS_PLAYING:
             SEQUENCER.open_region()

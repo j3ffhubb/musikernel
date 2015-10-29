@@ -208,9 +208,9 @@ class AbstractTransport:
 class pydaw_track_plugin:
     def __init__(self, a_index, a_plugin_index, a_plugin_uid,
                  a_mute=0, a_solo=0, a_power=1):
-        self.index = int(a_index)
-        self.plugin_index = int(a_plugin_index)
-        self.plugin_uid = int(a_plugin_uid)
+        self.index = int(a_index)  # index in the plugin chain
+        self.plugin_index = int(a_plugin_index) # the plugin type
+        self.plugin_uid = int(a_plugin_uid) # the uid in the project
         self.mute = int(a_mute)
         self.solo = int(a_solo)
         self.power = int(a_power)
