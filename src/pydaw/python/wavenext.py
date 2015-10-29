@@ -680,7 +680,7 @@ class pydaw_wave_editor_widget:
             f_plugin = plugin_settings_wave_editor(
                 PROJECT.wn_osc.pydaw_set_plugin,
                 f_i, self.track_number, self.menu_gridlayout,
-                self.save_callback, self.name_callback, None)
+                self.save_callback, self.name_callback)
             self.plugins.append(f_plugin)
         self.action_widget = QWidgetAction(self.fx_menu)
         self.action_widget.setDefaultWidget(self.menu_widget)

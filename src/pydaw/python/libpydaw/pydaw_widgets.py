@@ -4920,23 +4920,24 @@ class pydaw_abstract_plugin_ui:
         self.midi_learn_callback = a_midi_learn_callback
         self.cc_map_callback = a_cc_map_callback
         self.widget = QScrollArea(libmk.MAIN_WINDOW)
-        self.widget.setWindowFlags(QtCore.Qt.Window)
+        #self.widget.setWindowFlags(QtCore.Qt.Window)
         self.widget.setObjectName("plugin_ui")
-        self.widget.setMinimumSize(500, 500)
+        #self.widget.setMinimumSize(500, 500)
         self.widget.setStyleSheet(str(a_stylesheet))
         self.widget.closeEvent = self.widget_close_event
         self.widget.keyPressEvent = self.widget_keyPressEvent
 
-        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.scrollarea_widget = QWidget()
-        self.scrollarea_widget.setObjectName("plugin_ui")
-        self.widget.setWidgetResizable(True)
-        self.widget.setWidget(self.scrollarea_widget)
+#        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+#        self.widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+#        self.scrollarea_widget = QWidget()
+#        self.scrollarea_widget.setObjectName("plugin_ui")
+#        self.widget.setWidgetResizable(True)
+#        self.widget.setWidget(self.scrollarea_widget)
 
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(2, 2, 2, 2)
-        self.scrollarea_widget.setLayout(self.layout)
+#        self.scrollarea_widget.setLayout(self.layout)
+        self.widget.setLayout(self.layout)
         self.port_dict = {}
         self.effects = []
         self.configure_dict = {}
@@ -5012,6 +5013,8 @@ class pydaw_abstract_plugin_ui:
         self.save_file_on_exit = False
 
     def show_widget(self):
+        print("Nooooo!!!")
+        return
         self.layout.update()
         self.layout.activate()
         f_size = self.scrollarea_widget.size()

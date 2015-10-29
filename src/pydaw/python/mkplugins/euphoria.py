@@ -1202,6 +1202,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.open_plugin_file()
         self.set_midi_learn(EUPHORIA_PORT_MAP)
+        self.widget.setMinimumHeight(640)
 
     @staticmethod
     def get_wav_pool_uids(a_plugin_uid):
@@ -1233,9 +1234,6 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                 self.eq_ports[a_value][f_i][2].get_value())
 
         self.eq6.update_viewer()
-
-    def set_default_size(self):
-        self.widget.resize(1100, 693)
 
     def monofx0_callback(self, a_port, a_val):
         self.monofx_all_callback(

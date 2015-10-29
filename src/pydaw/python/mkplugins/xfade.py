@@ -56,8 +56,6 @@ class xfade_plugin_ui(pydaw_abstract_plugin_ui):
         self.volume_slider.add_to_grid_layout(self.volume_gridlayout, 0)
         self.volume_slider.control.setMinimumWidth(300)
         self.volume_slider.value_label.setMinimumWidth(60)
-        self.scrollarea_widget.setFixedHeight(120)
-        self.scrollarea_widget.setFixedWidth(375)
         self.midpoint_knob = pydaw_knob_control(
             f_knob_size, _("Mid-Point"), XFADE_MIDPOINT,
             self.plugin_rel_callback, self.plugin_val_callback,

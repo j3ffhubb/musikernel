@@ -185,7 +185,7 @@ class mk_plugin_ui_dict:
                 x.raise_widget()
 
     def open_plugin_ui(
-            self, a_plugin_uid, a_plugin_type, a_title, a_show=True):
+            self, a_plugin_uid, a_plugin_type, a_title, a_show=False):
         if not a_plugin_uid in self.ui_dict:
             f_plugin = PLUGIN_UI_TYPES[a_plugin_type](
                 self.ctrl_update_callback, self.project, self.plugin_pool_dir,
@@ -281,14 +281,16 @@ class plugin_settings_base:
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
             a_layout, a_save_callback, a_name_callback,
-            a_automation_callback, a_offset=0, a_send=None, a_qcbox=False):
+            a_offset=0, a_send=None, a_qcbox=False):
+        self.plugin_ui = None
         self.set_plugin_func = a_set_plugin_func
         self.layout = a_layout
+        self.vlayout = QVBoxLayout()
+        self.vlayout.addLayout(self.layout)
         self.offset = a_offset
         self.suppress_osc = False
         self.save_callback = a_save_callback
         self.name_callback = a_name_callback
-        self.automation_callback = a_automation_callback
         self.plugin_uid = -1
         self.track_num = a_track_num
         self.index = a_index
@@ -312,15 +314,11 @@ class plugin_settings_base:
         if a_qcbox or True:
             self.plugin_combobox.currentIndexChanged.connect(
                 self.on_plugin_change)
-        self.ui_button = QPushButton("UI")
-        self.ui_button.released.connect(self.on_show_ui)
-        self.ui_button.setObjectName("uibutton")
-        self.ui_button.setFixedWidth(24)
-        if a_automation_callback is not None:
-            self.automation_radiobutton = QRadioButton("")
-            self.automation_radiobutton.clicked.connect(
-                self.automation_check_changed)
-        self.power_checkbox = QCheckBox("")
+#        self.ui_button = QPushButton("UI")
+#        self.ui_button.released.connect(self.on_show_ui)
+#        self.ui_button.setObjectName("uibutton")
+#        self.ui_button.setFixedWidth(24)
+        self.power_checkbox = QCheckBox("Power")
         self.power_checkbox.setChecked(True)
         self.power_checkbox.clicked.connect(self.on_power_changed)
         self.add_to_layout()
@@ -329,19 +327,12 @@ class plugin_settings_base:
         self.layout.removeWidget(self.plugin_combobox)
         self.layout.removeWidget(self.ui_button)
         self.layout.removeWidget(self.power_checkbox)
-        if self.automation_callback is not None:
-            self.layout.removeWidget(self.automation_radiobutton)
 
     def add_to_layout(self):
         self.layout.addWidget(
             self.plugin_combobox, self.index + 1, 0 + self.offset)
         self.layout.addWidget(
-            self.ui_button, self.index + 1, 1 + self.offset)
-        self.layout.addWidget(
             self.power_checkbox, self.index + 1, 3 + self.offset)
-        if self.automation_callback is not None:
-            self.layout.addWidget(
-                self.automation_radiobutton, self.index + 1, 2 + self.offset)
 
     def clear(self):
         self.set_value(libmk.pydaw_track_plugin(self.index, 0, -1))
@@ -370,15 +361,6 @@ class plugin_settings_base:
             libmk.PROJECT.copy_plugin(
                 PLUGIN_SETTINGS_COPY_OBJ.plugin_uid, self.plugin_uid)
         self.on_plugin_change()
-
-    def automation_check_changed(self):
-        if self.automation_radiobutton.isChecked():
-            plugin_name = str(self.plugin_combobox.currentText())
-            if plugin_name:
-                self.automation_callback(
-                    self.plugin_uid,
-                    get_plugin_uid_by_name(plugin_name),
-                    self.plugin_combobox.currentText())
 
     def set_value(self, a_val):
         self.suppress_osc = True
@@ -418,8 +400,7 @@ class plugin_settings_base:
             self.plugin_uid, self.power_checkbox.isChecked())
         if a_save:
             self.save_callback()
-            if self.automation_callback:
-                self.automation_check_changed()
+        self.on_show_ui()
 
     def on_power_changed(self, a_val=None):
         f_index = get_plugin_uid_by_name(self.plugin_combobox.currentText())
@@ -436,15 +417,18 @@ class plugin_settings_base:
         f_index = get_plugin_uid_by_name(self.plugin_combobox.currentText())
         if f_index == 0 or self.plugin_uid == -1:
             return
-        libmk.PLUGIN_UI_DICT.open_plugin_ui(
+        if self.plugin_ui:
+            self.vlayout.removeWidget(self.plugin_ui.widget)
+        self.plugin_ui = libmk.PLUGIN_UI_DICT.open_plugin_ui(
             self.plugin_uid, f_index,
             "Track:  {}".format(self.name_callback()))
+        self.vlayout.addWidget(self.plugin_ui.widget)
 
 class plugin_settings_main(plugin_settings_base):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
             a_layout, a_save_callback, a_name_callback,
-            a_automation_callback, a_offset=0, a_send=None):
+            a_offset=0, a_send=None):
         self.plugin_list = MAIN_PLUGIN_NAMES
 
         self.menu_button = QPushButton(_("Menu"))
@@ -464,7 +448,7 @@ class plugin_settings_main(plugin_settings_base):
         plugin_settings_base.__init__(
             self, a_set_plugin_func, a_index, a_track_num, a_layout,
             a_save_callback, a_name_callback,
-            a_automation_callback, a_offset, a_send)
+            a_offset, a_send)
 
     def remove_from_layout(self):
         plugin_settings_base.remove_from_layout(self)
@@ -480,12 +464,12 @@ class plugin_settings_mixer(plugin_settings_base):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
             a_layout, a_save_callback, a_name_callback,
-            a_automation_callback, a_offset=0, a_send=None):
+            a_offset=0, a_send=None):
         self.plugin_list = MIXER_PLUGIN_NAMES
         plugin_settings_base.__init__(
             self, a_set_plugin_func, a_index, a_track_num, a_layout,
             a_save_callback, a_name_callback,
-            a_automation_callback, a_offset, a_send, a_qcbox=True)
+            a_offset, a_send, a_qcbox=True)
         self.bus_index = a_index
         self.index += 10
 
@@ -494,84 +478,125 @@ class plugin_settings_wave_editor(plugin_settings_base):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
             a_layout, a_save_callback, a_name_callback,
-            a_automation_callback, a_offset=0, a_send=None):
+            a_offset=0, a_send=None):
         self.plugin_list = WAVE_EDITOR_PLUGIN_NAMES
         plugin_settings_base.__init__(
             self, a_set_plugin_func, a_index, a_track_num, a_layout,
             a_save_callback, a_name_callback,
-            a_automation_callback, a_offset, a_send)
+            a_offset, a_send)
 
-class track_send:
-    def __init__(
-            self, a_index, a_track_num, a_layout, a_save_callback,
-            a_get_rg_func, a_save_rg_func, a_track_names):
-        self.get_rg_func = a_get_rg_func
-        self.save_rg_func = a_save_rg_func
-        self.save_callback = a_save_callback
-        self.suppress_osc = True
-        self.track_num = a_track_num
-        self.index = int(a_index)
-        self.bus_combobox = QComboBox()
-        self.bus_combobox.setMinimumWidth(180)
-        self.bus_combobox.wheelEvent = self.wheel_event
-        self.bus_combobox.currentIndexChanged.connect(self.on_bus_changed)
-        self.sidechain_checkbox = QCheckBox()
-        self.sidechain_checkbox.clicked.connect(self.sidechain_toggled)
-        self.update_names(a_track_names)
-        a_layout.addWidget(self.bus_combobox, a_index + 1, 20)
-        a_layout.addWidget(self.sidechain_checkbox, a_index + 1, 27)
-        self.last_value = 0
-        self.plugin_uid = -1
-        self.suppress_osc = False
+class PluginRackTab:
+    def __init__(self):
+        self.widget = QWidget(libmk.MAIN_WINDOW)
+        self.vlayout = QVBoxLayout(self.widget)
+        self.menu_layout = QHBoxLayout()
+        self.vlayout.addLayout(self.menu_layout)
+        self.track_combobox = QComboBox()
+        self.menu_layout.addWidget(self.track_combobox)
+        self.stacked_widget = QStackedWidget()
+        self.vlayout.addWidget(self.stacked_widget)
+        self.enabled = True
+        self.plugin_racks = {}
 
-    def on_bus_changed(self, a_value=0):
-        self.update_engine()
+    def initialize(self, a_project):
+        self.PROJECT = a_project
+        self.track_combobox.currentIndexChanged.connect(self.track_changed)
 
-    def sidechain_toggled(self, a_val=None):
-        self.update_engine(False)
+    def tab_selected(self):
+        """ Call this when the parent tab widget switches to this tab """
+        self.track_changed()
 
-    def update_engine(self, a_check=True):
-        if not self.suppress_osc:
-            f_graph = self.get_rg_func()
-            if not self.track_num in f_graph.graph:
-                f_graph.graph[self.track_num] = {}
-            f_index = self.bus_combobox.currentIndex() - 1
-            if a_check and f_index != -1:
-                f_feedback = f_graph.check_for_feedback(
-                    f_index, self.track_num, self.index)
-                if f_feedback:
-                    QMessageBox.warning(
-                        self.bus_combobox, _("Error"),
-                        _("Can't set the route, it would create "
-                        "a feedback loop"))
-                    self.suppress_osc = True
-                    self.bus_combobox.setCurrentIndex(self.last_value)
-                    self.suppress_osc = False
-                    return
-            f_graph.graph[self.track_num][self.index] = self.get_value()
-            self.save_rg_func(f_graph)
-            self.last_value = self.bus_combobox.currentIndex()
+    def track_changed(self, a_val=None):
+        if not self.enabled:
+            return
+        f_index = self.track_combobox.currentIndex()
+        if f_index not in self.plugin_racks:
+            f_rack = PluginRack(self.PROJECT, f_index)
+            self.plugin_racks[f_index] = f_rack
+            self.stacked_widget.addWidget(self.plugin_racks[f_index].widget)
+        self.stacked_widget.setCurrentWidget(self.plugin_racks[f_index].widget)
 
-    def wheel_event(self, a_event=None):
-        pass
+    def set_track_names(self, a_list):
+        self.track_combobox.clear()
+        self.track_combobox.addItems(a_list)
 
-    def get_value(self):
-        return pydaw_track_send(
-            self.track_num, self.index,
-            self.bus_combobox.currentIndex() - 1,
-            1 if self.sidechain_checkbox.isChecked() else 0)
+    def set_track_order(self, a_dict):
+        self.enabled = False
+        f_index = self.track_combobox.currentIndex()
+        f_new_index = a_dict[f_index]
+        self.plugin_racks = {y:self.plugin_racks[x] for x, y in a_dict.items()}
+        for k, v in self.plugin_racks:
+            v.track_number = k
+        self.track_combobox.setCurrentIndex(f_new_index)
+        self.enabled = True
 
-    def set_value(self, a_val):
-        self.suppress_osc = True
-        self.bus_combobox.setCurrentIndex(a_val.output + 1)
-        self.sidechain_checkbox.setChecked(
-            True if a_val.sidechain == 1 else False)
-        self.suppress_osc = False
 
-    def update_names(self, a_track_names):
-        f_index = self.bus_combobox.currentIndex()
-        self.suppress_osc = True
-        self.bus_combobox.clear()
-        self.bus_combobox.addItems(["None"] + a_track_names)
-        self.bus_combobox.setCurrentIndex(f_index)
-        self.suppress_osc = False
+class PluginRack:
+    def __init__(self, a_project, a_track_number, a_type=plugin_settings_main):
+        self.track_number = int(a_track_number)
+        self.PROJECT = a_project
+        self.plugins = [
+            a_type(
+                self.PROJECT.IPC.pydaw_set_plugin, x, a_track_number,
+                QGridLayout(), self.save_callback, self.name_callback)
+            for x in range(10)]
+        self.widget = QWidget(libmk.MAIN_WINDOW)
+        self.vlayout = QVBoxLayout(self.widget)
+        self.menu_hlayout = QHBoxLayout()
+        self.vlayout.addLayout(self.menu_hlayout)
+        self.plugins_button = QPushButton(_("Menu"))
+        self.plugins_menu = QMenu(self.widget)
+        self.plugins_button.setMenu(self.plugins_menu)
+        self.plugins_order_action = self.plugins_menu.addAction(_("Order..."))
+        self.plugins_order_action.triggered.connect(self.set_plugin_order)
+        self.menu_hlayout.addWidget(self.plugins_button)
+        self.scrollarea = QScrollArea()
+        self.scrollarea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOff)
+        self.scrollarea.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOn)
+        self.vlayout.addWidget(self.scrollarea)
+        self.scrollarea.setWidgetResizable(True)
+        self.scroll_widget = QWidget()
+        self.scroll_widget.setObjectName("plugin_ui")
+        self.scroll_vlayout = QVBoxLayout(self.scroll_widget)
+        #self.scroll_widget.setContentsMargins(0, 0, 0, 0)
+        self.scrollarea.setWidget(self.scroll_widget)
+        for plugin in self.plugins:
+            self.scroll_vlayout.addLayout(plugin.vlayout)
+
+    def name_callback(self):
+        tracks = self.PROJECT.get_tracks()
+        return str(tracks.tracks[self.track_number].name)
+
+    def set_plugin_order(self):
+        f_labels = ["{} : {}".format(f_i, x.plugin_combobox.currentText())
+            for f_i, x in zip(range(1, 11), self.plugins)]
+        f_result = pydaw_widgets.ordered_table_dialog(
+            f_labels, self.plugins, 30, 200, MAIN_WINDOW)
+        if f_result:
+            for f_plugin in self.plugins:
+                f_plugin.remove_from_layout()
+            for f_i, f_plugin in zip(range(len(f_result)), f_result):
+                f_plugin.index = f_i
+                f_plugin.on_plugin_change(a_save=False)
+                f_plugin.add_to_layout()
+            self.plugins[0:len(f_result)] = f_result
+            self.save_callback()
+            self.open_plugins()
+
+    def open_plugins(self):
+        f_plugins = self.PROJECT.get_track_plugins(self.track_number)
+        if f_plugins:
+            for f_plugin in f_plugins.plugins:
+                self.plugins[f_plugin.index].set_value(f_plugin)
+
+    def save_callback(self):
+        f_result = libmk.pydaw_track_plugins()
+        f_result.plugins = [x.get_value() for x in self.plugins]
+        self.PROJECT.save_track_plugins(self.track_number, f_result)
+        self.PROJECT.commit(
+            "Update track plugins for '{}', {}".format(
+            self.name_callback(), self.track_number))
+
+

@@ -455,8 +455,12 @@ class tracks_widget:
             for x in self.tracks}
 
     def update_plugin_track_map(self):
-        self.plugin_uid_map = {int(y.plugin_uid):int(x)
-            for x in self.tracks for y in self.tracks[x].plugins}
+        self.plugin_uid_map = {}
+        for x in self.tracks:
+            plugins = PROJECT.get_track_plugins(x)
+            if plugins:
+                for y in plugins.plugins:
+                    self.plugin_uid_map[int(y.plugin_uid)] = int(x)
 
     def has_automation(self, a_track_num):
         return self.automation_dict[int(a_track_num)]
@@ -568,6 +572,8 @@ def global_update_track_comboboxes(a_index=None, a_value=None):
         f_cbox.clearEditText()
         f_cbox.addItems(TRACK_NAMES)
         f_cbox.setCurrentIndex(f_current_index)
+
+    PLUGIN_RACK.set_track_names(TRACK_NAMES)
 
     SUPPRESS_TRACK_COMBOBOX_CHANGES = False
     ROUTING_GRAPH_WIDGET.draw_graph(
@@ -8015,7 +8021,6 @@ class seq_track:
             self.mute_checkbox.stateChanged.connect(self.on_mute)
             self.mute_checkbox.setObjectName("mute_checkbox")
             self.hlayout3.addWidget(self.mute_checkbox)
-        self.plugins = []
         self.action_widget = None
         self.automation_plugin_name = "None"
         self.port_num = None
@@ -8025,13 +8030,9 @@ class seq_track:
     def menu_button_pressed(self):
         if not self.menu_created:
             self.create_menu()
-        for f_send in self.sends:
-            f_send.update_names(TRACK_NAMES)
-        self.open_plugins()
         self.update_in_use_combobox()
 
     def create_menu(self):
-        self.plugins = []
         if self.action_widget:
             self.button_menu.removeAction(self.action_widget)
         self.menu_created = True
@@ -8039,43 +8040,6 @@ class seq_track:
         self.menu_hlayout = QHBoxLayout(self.menu_widget)
         self.menu_gridlayout = QGridLayout()
         self.menu_hlayout.addLayout(self.menu_gridlayout)
-        self.plugins_button = QPushButton(_("Menu"))
-        self.plugins_menu = QMenu(self.menu_widget)
-        self.plugins_button.setMenu(self.plugins_menu)
-        self.plugins_order_action = self.plugins_menu.addAction(_("Order..."))
-        self.plugins_order_action.triggered.connect(self.set_plugin_order)
-        self.menu_gridlayout.addWidget(self.plugins_button, 0, 0)
-        self.menu_gridlayout.addWidget(QLabel(_("A")), 0, 2)
-        self.menu_gridlayout.addWidget(QLabel(_("P")), 0, 3)
-        for f_i in range(10):
-            f_plugin = plugin_settings_main(
-                PROJECT.IPC.pydaw_set_plugin,
-                f_i, self.track_number, self.menu_gridlayout,
-                self.save_callback, self.name_callback,
-                self.automation_callback)
-            self.plugins.append(f_plugin)
-        self.sends = []
-        if self.track_number != 0:
-            self.menu_gridlayout.addWidget(
-                QLabel(_("Sends")), 0, 20)
-            self.menu_gridlayout.addWidget(
-                QLabel(_("Mixer Plugin")), 0, 21)
-            self.menu_gridlayout.addWidget(
-                QLabel(_("Sidechain")), 0, 27)
-            self.menu_gridlayout.addWidget(QLabel(_("A")), 0, 23)
-            self.menu_gridlayout.addWidget(QLabel(_("P")), 0, 24)
-            for f_i in range(4):
-                f_send = track_send(
-                    f_i, self.track_number, self.menu_gridlayout,
-                    self.save_callback, PROJECT.get_routing_graph,
-                    PROJECT.save_routing_graph, TRACK_NAMES)
-                self.sends.append(f_send)
-                f_plugin = plugin_settings_mixer(
-                    PROJECT.IPC.pydaw_set_plugin,
-                    f_i, self.track_number, self.menu_gridlayout,
-                    self.save_callback, self.name_callback,
-                    self.automation_callback, a_offset=21, a_send=f_send)
-                self.plugins.append(f_plugin)
         self.action_widget = QWidgetAction(self.button_menu)
         self.action_widget.setDefaultWidget(self.menu_widget)
         self.button_menu.addAction(self.action_widget)
@@ -8094,30 +8058,12 @@ class seq_track:
         self.menu_gridlayout.addWidget(QLabel(_("In Use:")), 10, 20)
         self.menu_gridlayout.addWidget(self.ccs_in_use_combobox, 10, 21)
 
-    def set_plugin_order(self):
-        f_labels = ["{} : {}".format(f_i, x.plugin_combobox.currentText())
-            for f_i, x in zip(range(1, 11), self.plugins)]
-        f_result = pydaw_widgets.ordered_table_dialog(
-            f_labels, self.plugins, 30, 200, MAIN_WINDOW)
-        if f_result:
-            for f_plugin in self.plugins:
-                f_plugin.remove_from_layout()
-            for f_i, f_plugin in zip(range(len(f_result)), f_result):
-                f_plugin.index = f_i
-                f_plugin.on_plugin_change(a_save=False)
-                f_plugin.add_to_layout()
-            self.plugins[0:len(f_result)] = f_result
-            self.save_callback()
-            self.create_menu()
-            self.open_plugins()
-
     def refresh(self):
         self.track_name_lineedit.setText(TRACK_NAMES[self.track_number])
         if self.menu_created:
             for f_plugin in self.plugins:
                 f_plugin.remove_from_layout()
             self.create_menu()
-            self.open_plugins()
 
     def get_plugin_uids(self):
         return [x.plugin_uid for x in self.plugins if x.plugin_uid != -1]
@@ -8208,12 +8154,6 @@ class seq_track:
             SEQUENCER.open_region()
 
     def save_callback(self):
-        f_result = libmk.pydaw_track_plugins()
-        f_result.plugins = [x.get_value() for x in self.plugins]
-        PROJECT.save_track_plugins(self.track_number, f_result)
-        PROJECT.commit(
-            "Update track plugins for '{}', {}".format(
-            self.name_callback(), self.track_number))
         self.check_output()
         self.plugin_changed()
 
@@ -8224,7 +8164,6 @@ class seq_track:
             PROJECT.save_routing_graph(f_graph)
             PROJECT.commit(_("Set default output "
                 "for track {}".format(self.track_number)))
-            self.open_plugins()
 
     def name_callback(self):
         return str(self.track_name_lineedit.text())
@@ -8237,21 +8176,6 @@ class seq_track:
             self.solo_checkbox.setChecked(a_track.solo)
             self.mute_checkbox.setChecked(a_track.mute)
         self.suppress_osc = False
-
-    def open_plugins(self):
-        if not self.menu_created:
-            self.create_menu()
-        f_plugins = PROJECT.get_track_plugins(self.track_number)
-        if f_plugins:
-            for f_plugin in f_plugins.plugins:
-                self.plugins[f_plugin.index].set_value(f_plugin)
-        if not self.sends:  # master track, etc...
-            return
-        f_graph = PROJECT.get_routing_graph()
-        if self.track_number in f_graph.graph:
-            f_sends = f_graph.graph[self.track_number]
-            for f_i, f_send in f_sends.items():
-                self.sends[f_i].set_value(f_send)
 
     def get_track(self):
         return pydaw_track(
@@ -8709,6 +8633,9 @@ class pydaw_main_window(QScrollArea):
         self.notes_tab.setAcceptRichText(False)
         self.notes_tab.leaveEvent = self.on_edit_notes
         self.main_tabwidget.addTab(self.notes_tab, _("Project Notes"))
+
+        self.main_tabwidget.addTab(PLUGIN_RACK.widget, _("Plugin Rack"))
+
         self.main_tabwidget.currentChanged.connect(self.tab_changed)
 
         self.collapse_splitters_action = QAction(self)
@@ -8929,6 +8856,8 @@ class pydaw_main_window(QScrollArea):
                 PROJECT.get_routing_graph(), TRACK_NAMES)
         elif f_index == 3:
             global_open_mixer()
+        elif f_index == 5:
+            PLUGIN_RACK.tab_selected()
         f_bool = not f_index
         AUDIO_SEQ_WIDGET.set_multiselect(f_bool)
         AUDIO_SEQ_WIDGET.filter_func = \
@@ -9070,6 +8999,7 @@ def global_open_project(a_project_file):
     REGION_SETTINGS.open_region()
     REGION_SETTINGS.snap_combobox.setCurrentIndex(1)
     TRANSPORT.open_project()
+    PLUGIN_RACK.initialize(PROJECT)
 
 def global_new_project(a_project_file):
     global PROJECT
@@ -9082,6 +9012,7 @@ def global_new_project(a_project_file):
     global_open_mixer()
     REGION_SETTINGS.open_region()
     REGION_SETTINGS.snap_combobox.setCurrentIndex(1)
+    PLUGIN_RACK.initialize(PROJECT)
 
 PROJECT = DawNextProject(global_pydaw_with_audio)
 
@@ -9130,6 +9061,8 @@ def routing_graph_toggle_callback(a_src, a_dest, a_sidechain):
 
 ROUTING_GRAPH_WIDGET = pydaw_widgets.routing_graph_widget(
     routing_graph_toggle_callback)
+
+PLUGIN_RACK = PluginRackTab()
 
 # Must call this after instantiating the other widgets,
 # as it relies on them existing

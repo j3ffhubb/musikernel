@@ -65,7 +65,7 @@ class mkeq_plugin_ui(pydaw_abstract_plugin_ui):
             MKEQ_EQ1_FREQ,
             self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, a_preset_mgr=self.preset_manager,
-            a_size=f_knob_size)
+            a_size=f_knob_size, a_vlayout=False)
 
         self.layout.addWidget(self.eq6.widget)
 
