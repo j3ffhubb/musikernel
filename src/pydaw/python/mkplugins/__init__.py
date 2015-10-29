@@ -280,21 +280,18 @@ class PluginComboBox(QPushButton):
 class plugin_settings_base:
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_layout, a_save_callback, a_name_callback,
-            a_offset=0, a_send=None, a_qcbox=False):
+            a_save_callback, a_name_callback, a_qcbox=False):
         self.plugin_ui = None
         self.set_plugin_func = a_set_plugin_func
-        self.layout = a_layout
+        self.layout = QHBoxLayout()
         self.vlayout = QVBoxLayout()
         self.vlayout.addLayout(self.layout)
-        self.offset = a_offset
         self.suppress_osc = False
         self.save_callback = a_save_callback
         self.name_callback = a_name_callback
         self.plugin_uid = -1
         self.track_num = a_track_num
         self.index = a_index
-        self.send = a_send
         self.plugin_index = None
         # Qt 5.5.0 completely breaks PluginComboBox's use of QMenu,
         # so not using it for now, unfortunately.
@@ -325,14 +322,11 @@ class plugin_settings_base:
 
     def remove_from_layout(self):
         self.layout.removeWidget(self.plugin_combobox)
-        self.layout.removeWidget(self.ui_button)
         self.layout.removeWidget(self.power_checkbox)
 
     def add_to_layout(self):
-        self.layout.addWidget(
-            self.plugin_combobox, self.index + 1, 0 + self.offset)
-        self.layout.addWidget(
-            self.power_checkbox, self.index + 1, 3 + self.offset)
+        self.layout.addWidget(self.plugin_combobox)
+        self.layout.addWidget(self.power_checkbox)
 
     def clear(self):
         self.set_value(libmk.pydaw_track_plugin(self.index, 0, -1))
@@ -429,8 +423,7 @@ class plugin_settings_base:
 class plugin_settings_main(plugin_settings_base):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_layout, a_save_callback, a_name_callback,
-            a_offset=0, a_send=None):
+            a_save_callback, a_name_callback):
         self.plugin_list = MAIN_PLUGIN_NAMES
 
         self.menu_button = QPushButton(_("Menu"))
@@ -448,9 +441,8 @@ class plugin_settings_main(plugin_settings_base):
         f_clear_action.triggered.connect(self.clear)
 
         plugin_settings_base.__init__(
-            self, a_set_plugin_func, a_index, a_track_num, a_layout,
-            a_save_callback, a_name_callback,
-            a_offset, a_send)
+            self, a_set_plugin_func, a_index, a_track_num,
+            a_save_callback, a_name_callback)
 
     def remove_from_layout(self):
         plugin_settings_base.remove_from_layout(self)
@@ -458,20 +450,17 @@ class plugin_settings_main(plugin_settings_base):
 
     def add_to_layout(self):
         plugin_settings_base.add_to_layout(self)
-        self.layout.addWidget(
-            self.menu_button, self.index + 1, 4 + self.offset)
+        self.layout.addWidget(self.menu_button)
 
 
 class plugin_settings_mixer(plugin_settings_base):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_layout, a_save_callback, a_name_callback,
-            a_offset=0, a_send=None):
+            a_save_callback, a_name_callback):
         self.plugin_list = MIXER_PLUGIN_NAMES
         plugin_settings_base.__init__(
-            self, a_set_plugin_func, a_index, a_track_num, a_layout,
-            a_save_callback, a_name_callback,
-            a_offset, a_send, a_qcbox=True)
+            self, a_set_plugin_func, a_index, a_track_num,
+            a_save_callback, a_name_callback, a_qcbox=True)
         self.bus_index = a_index
         self.index += 10
 
@@ -479,13 +468,11 @@ class plugin_settings_mixer(plugin_settings_base):
 class plugin_settings_wave_editor(plugin_settings_base):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_layout, a_save_callback, a_name_callback,
-            a_offset=0, a_send=None):
+            a_save_callback, a_name_callback):
         self.plugin_list = WAVE_EDITOR_PLUGIN_NAMES
         plugin_settings_base.__init__(
-            self, a_set_plugin_func, a_index, a_track_num, a_layout,
-            a_save_callback, a_name_callback,
-            a_offset, a_send)
+            self, a_set_plugin_func, a_index, a_track_num,
+            a_save_callback, a_name_callback)
 
 class PluginRackTab:
     def __init__(self):
@@ -540,7 +527,7 @@ class PluginRack:
         self.plugins = [
             a_type(
                 self.PROJECT.IPC.pydaw_set_plugin, x, a_track_number,
-                QGridLayout(), self.save_callback, self.name_callback)
+                self.save_callback, self.name_callback)
             for x in range(10)]
         self.widget = QWidget(libmk.MAIN_WINDOW)
         self.vlayout = QVBoxLayout(self.widget)
