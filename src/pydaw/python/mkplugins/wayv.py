@@ -1102,6 +1102,7 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
     def configure_plugin(self, a_key, a_message):
         self.configure_dict[a_key] = a_message
         self.configure_callback(self.plugin_uid, a_key, a_message)
+        self.has_updated_controls = True
 
     def set_configure(self, a_key, a_message):
         self.configure_dict[a_key] = a_message
@@ -1140,6 +1141,7 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
                 self.configure_plugin(f_key, a_dict[f_key])
             else:
                 self.configure_plugin(f_key, f_empty_eng_val)
+        self.has_updated_controls = True
 
     def set_fm_origin(self):
         self.fm_origin = []

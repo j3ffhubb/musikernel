@@ -1389,6 +1389,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
     def configure_plugin(self, a_key, a_message):
         self.configure_dict[a_key] = a_message
         self.configure_callback(self.plugin_uid, a_key, a_message)
+        self.has_updated_controls = True
 
     def set_configure(self, a_key, a_message):
         self.configure_dict[a_key] = a_message
