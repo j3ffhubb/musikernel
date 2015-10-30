@@ -20,6 +20,7 @@ libmk.mkplugins = sys.modules[__name__]
 
 from libmk.mk_project import *
 from libpydaw.translate import _
+from libpydaw import pydaw_widgets
 
 import mkplugins.euphoria
 import mkplugins.rayv
@@ -315,13 +316,6 @@ class plugin_settings_base:
         self.power_checkbox = QCheckBox("Power")
         self.power_checkbox.setChecked(True)
         self.power_checkbox.clicked.connect(self.on_power_changed)
-        self.add_to_layout()
-
-    def remove_from_layout(self):
-        self.layout.removeWidget(self.plugin_combobox)
-        self.layout.removeWidget(self.power_checkbox)
-
-    def add_to_layout(self):
         self.layout.addWidget(self.plugin_combobox)
         self.layout.addWidget(self.power_checkbox)
 
@@ -416,6 +410,7 @@ class plugin_settings_base:
             self.plugin_uid, f_index, "")
         self.vlayout.addWidget(self.plugin_ui.widget)
 
+
 class plugin_settings_main(plugin_settings_base):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
@@ -439,14 +434,6 @@ class plugin_settings_main(plugin_settings_base):
         plugin_settings_base.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
             a_save_callback, a_name_callback)
-
-    def remove_from_layout(self):
-        plugin_settings_base.remove_from_layout(self)
-        self.layout.removeWidget(self.menu_button)
-
-    def add_to_layout(self):
-        plugin_settings_base.add_to_layout(self)
-        self.layout.addWidget(self.menu_button)
         self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
 
 
@@ -460,6 +447,7 @@ class plugin_settings_mixer(plugin_settings_base):
             a_save_callback, a_name_callback, a_qcbox=True)
         self.bus_index = a_index
         self.index += 10
+        self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
 
 
 class plugin_settings_wave_editor(plugin_settings_base):
@@ -560,17 +548,20 @@ class PluginRack:
         f_labels = ["{} : {}".format(f_i, x.plugin_combobox.currentText())
             for f_i, x in zip(range(1, 11), self.plugins)]
         f_result = pydaw_widgets.ordered_table_dialog(
-            f_labels, self.plugins, 30, 200, MAIN_WINDOW)
+            f_labels, self.plugins, 30, 200, libmk.MAIN_WINDOW)
         if f_result:
-            for f_plugin in self.plugins:
-                f_plugin.remove_from_layout()
             for f_i, f_plugin in zip(range(len(f_result)), f_result):
                 f_plugin.index = f_i
                 f_plugin.on_plugin_change(a_save=False)
-                f_plugin.add_to_layout()
+            print(self.plugins, f_result)
             self.plugins[0:len(f_result)] = f_result
+            print(self.plugins, f_result)
             self.save_callback()
-            self.open_plugins()
+            #self.open_plugins()
+            for plugin in self.plugins:
+                self.scroll_vlayout.removeItem(plugin.vlayout)
+            for plugin in self.plugins:
+                self.scroll_vlayout.addLayout(plugin.vlayout)
 
     def open_plugins(self):
         f_plugins = self.PROJECT.get_track_plugins(self.track_number)
