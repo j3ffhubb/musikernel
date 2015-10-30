@@ -768,7 +768,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_tab.setObjectName("plugin_widget")
         self.sample_tab_layout = QVBoxLayout(self.sample_tab)
 
-        self.file_browser = pydaw_file_browser_widget()
+        self.file_browser = FileBrowserWidget()
         self.sample_tab_layout.addWidget(self.file_browser.hsplitter)
 
         self.file_browser.load_button.pressed.connect(

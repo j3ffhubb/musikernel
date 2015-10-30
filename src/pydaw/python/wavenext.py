@@ -600,7 +600,7 @@ class pydaw_wave_editor_widget:
         self.layout = QVBoxLayout(self.widget)
         self.right_widget = QWidget()
         self.vlayout = QVBoxLayout(self.right_widget)
-        self.file_browser = pydaw_widgets.pydaw_file_browser_widget()
+        self.file_browser = pydaw_widgets.FileBrowserWidget()
         self.file_browser.load_button.pressed.connect(self.on_file_open)
         self.file_browser.list_file.itemDoubleClicked.connect(
             self.on_file_open)

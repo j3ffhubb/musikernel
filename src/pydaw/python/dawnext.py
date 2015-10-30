@@ -107,7 +107,10 @@ DRAW_SEQUENCER_GRAPHS = True
 class region_settings:
     def __init__(self):
         self.enabled = False
-        self.hlayout0 = QHBoxLayout()
+        self.widget = QWidget()
+        self.widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.hlayout0 = QHBoxLayout(self.widget)
+        self.hlayout0.setContentsMargins(1, 1, 1, 1)
         self.edit_mode_combobox = QComboBox()
         self.edit_mode_combobox.setMinimumWidth(132)
         self.edit_mode_combobox.addItems([_("Items"), _("Automation")])
@@ -5212,15 +5215,41 @@ def global_paif_rel_callback(a_port, a_val):
         CURRENT_ITEM.set_row(CURRENT_AUDIO_ITEM_INDEX, f_index_list)
         PROJECT.save_item(CURRENT_ITEM_NAME, CURRENT_ITEM)
 
-class audio_items_viewer_widget(pydaw_widgets.AbstractFileBrowserWidget):
-    def __init__(self):
+class FileDragDropper(pydaw_widgets.AbstractFileBrowserWidget):
+    def __init__(self, a_filter_func=pydaw_util.is_audio_file):
         pydaw_widgets.AbstractFileBrowserWidget.__init__(
-            self, a_filter_func=pydaw_util.is_audio_midi_file)
-
+            self, a_filter_func=a_filter_func)
         self.list_file.setDragEnabled(True)
         self.list_file.mousePressEvent = self.file_mouse_press_event
         self.preview_button.pressed.connect(self.on_preview)
         self.stop_preview_button.pressed.connect(self.on_stop_preview)
+
+    def on_preview(self):
+        f_list = self.list_file.selectedItems()
+        if f_list:
+            libmk.IPC.pydaw_preview_audio(
+                os.path.join(
+                *(str(x) for x in (self.last_open_dir, f_list[0].text()))))
+
+    def on_stop_preview(self):
+        libmk.IPC.pydaw_stop_preview()
+
+    def file_mouse_press_event(self, a_event):
+        QListWidget.mousePressEvent(self.list_file, a_event)
+        global AUDIO_ITEMS_TO_DROP, MIDI_FILES_TO_DROP
+        AUDIO_ITEMS_TO_DROP = []
+        MIDI_FILES_TO_DROP = []
+        for f_item in self.list_file.selectedItems():
+            f_path = os.path.join(
+                *(str(x) for x in (self.last_open_dir, f_item.text())))
+            if pydaw_util.is_midi_file(f_path):
+                MIDI_FILES_TO_DROP.append(f_path)
+            else:
+                AUDIO_ITEMS_TO_DROP.append(f_path)
+
+class audio_items_viewer_widget(FileDragDropper):
+    def __init__(self):
+        FileDragDropper.__init__(self, pydaw_util.is_audio_file)
 
         self.modulex = pydaw_widgets.pydaw_per_audio_item_fx_widget(
             global_paif_rel_callback, global_paif_val_callback)
@@ -5286,6 +5315,7 @@ class audio_items_viewer_widget(pydaw_widgets.AbstractFileBrowserWidget):
 
         self.audio_items_clipboard = []
         self.disable_on_play = (self.menu_button,)
+        self.set_multiselect(False)
 
     def on_play(self):
         for f_item in self.disable_on_play:
@@ -5305,19 +5335,6 @@ class audio_items_viewer_widget(pydaw_widgets.AbstractFileBrowserWidget):
             self.folders_widget.setToolTip("")
             self.modulex.widget.setToolTip("")
 
-    def file_mouse_press_event(self, a_event):
-        QListWidget.mousePressEvent(self.list_file, a_event)
-        global AUDIO_ITEMS_TO_DROP, MIDI_FILES_TO_DROP
-        AUDIO_ITEMS_TO_DROP = []
-        MIDI_FILES_TO_DROP = []
-        for f_item in self.list_file.selectedItems():
-            f_path = os.path.join(
-                *(str(x) for x in (self.last_open_dir, f_item.text())))
-            if pydaw_util.is_midi_file(f_path):
-                MIDI_FILES_TO_DROP.append(f_path)
-            else:
-                AUDIO_ITEMS_TO_DROP.append(f_path)
-
     def on_select_all(self):
         if CURRENT_REGION is None or libmk.IS_PLAYING:
             return
@@ -5333,16 +5350,6 @@ class audio_items_viewer_widget(pydaw_widgets.AbstractFileBrowserWidget):
         if CURRENT_REGION is None or libmk.IS_PLAYING:
             return
         AUDIO_SEQ.delete_selected()
-
-    def on_preview(self):
-        f_list = self.list_file.selectedItems()
-        if f_list:
-            libmk.IPC.pydaw_preview_audio(
-                os.path.join(
-                *(str(x) for x in (self.last_open_dir, f_list[0].text()))))
-
-    def on_stop_preview(self):
-        libmk.IPC.pydaw_stop_preview()
 
     def on_modulex_copy(self):
         if CURRENT_AUDIO_ITEM_INDEX is not None and CURRENT_ITEM:
@@ -7512,7 +7519,8 @@ class item_list_editor:
 
         self.tab_widget = QTabWidget()
 
-        self.tab_widget.addTab(AUDIO_SEQ_WIDGET.widget, _("Audio"))
+        AUDIO_SEQ_WIDGET.hsplitter.insertWidget(0, AUDIO_SEQ_WIDGET.widget)
+        self.tab_widget.addTab(AUDIO_SEQ_WIDGET.hsplitter, _("Audio"))
 
         self.piano_roll_tab = QWidget()
         self.tab_widget.addTab(self.piano_roll_tab, _("Piano Roll"))
@@ -8624,8 +8632,7 @@ class pydaw_main_window(QScrollArea):
 
         #The tabs
         self.main_tabwidget = QTabWidget()
-        AUDIO_SEQ_WIDGET.hsplitter.insertWidget(0, self.main_tabwidget)
-        self.main_layout.addWidget(AUDIO_SEQ_WIDGET.hsplitter)
+        self.main_layout.addWidget(self.main_tabwidget)
 
         self.song_region_tab = QWidget()
         self.song_region_vlayout = QVBoxLayout()
@@ -8637,7 +8644,7 @@ class pydaw_main_window(QScrollArea):
         self.sequencer_vlayout.addWidget(self.song_region_tab)
         self.main_tabwidget.addTab(self.sequencer_widget, _("Sequencer"))
 
-        self.song_region_vlayout.addLayout(REGION_SETTINGS.hlayout0)
+        self.song_region_vlayout.addWidget(REGION_SETTINGS.widget)
 
         self.midi_scroll_area = QScrollArea()
         self.midi_scroll_area.setWidgetResizable(True)
@@ -8650,7 +8657,14 @@ class pydaw_main_window(QScrollArea):
         self.midi_scroll_area.setWidget(self.midi_scroll_widget)
         self.midi_hlayout.addWidget(TRACK_PANEL.tracks_widget)
         self.midi_hlayout.addWidget(SEQUENCER)
-        self.sequencer_vlayout.addWidget(self.midi_scroll_area)
+
+        self.file_browser = FileDragDropper(pydaw_util.is_audio_midi_file)
+        self.file_browser.set_multiselect(True)
+        self.file_browser.hsplitter.setSizePolicy(
+            QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.sequencer_vlayout.addWidget(self.file_browser.hsplitter)
+        self.file_browser.hsplitter.insertWidget(0, self.midi_scroll_area)
+        self.file_browser.hsplitter.setSizes([9999, 200])
 
         self.midi_scroll_area.scrollContentsBy = self.midi_scrollContentsBy
         self.vscrollbar = self.midi_scroll_area.verticalScrollBar()
@@ -8673,28 +8687,10 @@ class pydaw_main_window(QScrollArea):
 
         self.main_tabwidget.currentChanged.connect(self.tab_changed)
 
-        self.collapse_splitters_action = QAction(self)
-        self.addAction(self.collapse_splitters_action)
-        self.collapse_splitters_action.triggered.connect(
-            self.collapse_file_browser)
-        self.collapse_splitters_action.setShortcut(
-            QKeySequence("CTRL+Right"))
-        self.last_file_browser_size = 100
-        self.collapse_file_browser(a_restore=True)
-
     def vscrollbar_released(self, a_val=None):
         f_val = round(self.vscrollbar.value() /
             REGION_EDITOR_TRACK_HEIGHT) * REGION_EDITOR_TRACK_HEIGHT
         self.vscrollbar.setValue(int(f_val))
-
-    def collapse_file_browser(self, a_restore=False):
-        f_size = AUDIO_SEQ_WIDGET.hsplitter.sizes()[1]
-        if a_restore or not f_size:
-            AUDIO_SEQ_WIDGET.hsplitter.setSizes(
-                [9999, self.last_file_browser_size])
-        else:
-            self.last_file_browser_size = f_size
-            AUDIO_SEQ_WIDGET.hsplitter.setSizes([9999, 0])
 
     def on_offline_render(self):
         def ok_handler():
@@ -8893,13 +8889,6 @@ class pydaw_main_window(QScrollArea):
             global_open_mixer()
 
         PLUGIN_RACK.tab_selected(f_index == TAB_PLUGIN_RACK)
-
-        f_bool = f_index == TAB_SEQUENCER
-        AUDIO_SEQ_WIDGET.set_multiselect(f_bool)
-        AUDIO_SEQ_WIDGET.filter_func = \
-            pydaw_util.is_audio_midi_file if f_bool \
-            else pydaw_util.is_audio_file
-        AUDIO_SEQ_WIDGET.set_folder(AUDIO_SEQ_WIDGET.last_open_dir)
 
     def on_edit_notes(self, a_event=None):
         QTextEdit.leaveEvent(self.notes_tab, a_event)

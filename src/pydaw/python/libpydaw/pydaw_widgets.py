@@ -2085,7 +2085,7 @@ class AbstractFileBrowserWidget():
         return f_result
 
 
-class pydaw_file_browser_widget(AbstractFileBrowserWidget):
+class FileBrowserWidget(AbstractFileBrowserWidget):
     def __init__(self):
         AbstractFileBrowserWidget.__init__(self)
         self.load_button = QPushButton(_("Load"))
