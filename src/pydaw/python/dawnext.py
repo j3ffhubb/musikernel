@@ -728,7 +728,7 @@ class SequencerItem(QGraphicsRectItem):
         editors = (CURRENT_ITEM.items, CURRENT_ITEM.notes,
              CURRENT_ITEM.ccs, CURRENT_ITEM.pitchbends)
         current_index = ITEM_EDITOR.tab_widget.currentIndex()
-        if not editors[current_index]:
+        if current_index < len(editors) and not editors[current_index]:
             for i in range(len(editors)):
                 if editors[i]:
                     current_index = i

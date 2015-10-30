@@ -44,8 +44,6 @@ class xfade_plugin_ui(pydaw_abstract_plugin_ui):
         self.is_instrument = False
         self.layout.setSizeConstraint(QLayout.SetFixedSize)
         f_knob_size = DEFAULT_KNOB_SIZE
-        self.widget.setToolTip(XFADE_TOOLTIP)
-        self.widget.setMinimumHeight(120)
 
         self.hlayout = QHBoxLayout()
         self.layout.addLayout(self.hlayout)
@@ -65,6 +63,8 @@ class xfade_plugin_ui(pydaw_abstract_plugin_ui):
             -600, 0, -300, KC_DECIMAL, self.port_dict, None)
         self.midpoint_knob.add_to_grid_layout(self.volume_gridlayout, 1)
         self.midpoint_knob.value_label.setMinimumWidth(60)
+
+        self.hlayout.addWidget(QLabel(XFADE_TOOLTIP))
 
         self.open_plugin_file()
         self.set_midi_learn(XFADE_PORT_MAP)
