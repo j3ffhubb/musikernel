@@ -49,56 +49,50 @@ class mkdelay_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.layout.setSizeConstraint(QLayout.SetFixedSize)
 
-        self.misc_tab = QWidget()
-        self.layout.addWidget(self.misc_tab)
-        self.delay_vlayout = QVBoxLayout()
-        self.misc_tab.setLayout(self.delay_vlayout)
         self.delay_hlayout = QHBoxLayout()
-        self.delay_vlayout.addLayout(self.delay_hlayout)
+        self.layout.addLayout(self.delay_hlayout)
 
         f_knob_size = DEFAULT_KNOB_SIZE
         self.preset_manager = None
 
-        delay_groupbox = QGroupBox(_("Delay"))
-        delay_groupbox.setObjectName("plugin_groupbox")
-        self.delay_hlayout.addWidget(delay_groupbox)
-        delay_gridlayout = QGridLayout(delay_groupbox)
-        self.delay_hlayout.addWidget(delay_groupbox)
+        self.delay_gridlayout = QGridLayout()
+        self.delay_hlayout.addLayout(self.delay_gridlayout)
+
         self.delay_time_knob = pydaw_knob_control(
             f_knob_size, _("Time"), MKDELAY_DELAY_TIME,
             self.plugin_rel_callback, self.plugin_val_callback,
             10, 100, 50, KC_TIME_DECIMAL, self.port_dict, self.preset_manager)
-        self.delay_time_knob.add_to_grid_layout(delay_gridlayout, 0)
+        self.delay_time_knob.add_to_grid_layout(self.delay_gridlayout, 0)
         self.feedback = pydaw_knob_control(
             f_knob_size, _("Fdbk"), MKDELAY_FEEDBACK,
             self.plugin_rel_callback, self.plugin_val_callback,
             -200, 0, -120, KC_TENTH, self.port_dict, self.preset_manager)
-        self.feedback.add_to_grid_layout(delay_gridlayout, 1)
+        self.feedback.add_to_grid_layout(self.delay_gridlayout, 1)
         self.dry_knob = pydaw_knob_control(
             f_knob_size, _("Dry"), MKDELAY_DRY,
             self.plugin_rel_callback, self.plugin_val_callback,
             -300, 0, 0, KC_TENTH, self.port_dict, self.preset_manager)
-        self.dry_knob.add_to_grid_layout(delay_gridlayout, 2)
+        self.dry_knob.add_to_grid_layout(self.delay_gridlayout, 2)
         self.wet_knob = pydaw_knob_control(
             f_knob_size, _("Wet"), MKDELAY_WET,
             self.plugin_rel_callback, self.plugin_val_callback, -300, 0, -120,
             KC_TENTH, self.port_dict, self.preset_manager)
-        self.wet_knob.add_to_grid_layout(delay_gridlayout, 3)
+        self.wet_knob.add_to_grid_layout(self.delay_gridlayout, 3)
         self.duck_knob = pydaw_knob_control(
             f_knob_size, _("Duck"), MKDELAY_DUCK,
             self.plugin_rel_callback, self.plugin_val_callback,
             -40, 0, 0, KC_INTEGER, self.port_dict, self.preset_manager)
-        self.duck_knob.add_to_grid_layout(delay_gridlayout, 4)
+        self.duck_knob.add_to_grid_layout(self.delay_gridlayout, 4)
         self.cutoff_knob = pydaw_knob_control(
             f_knob_size, _("Cutoff"), MKDELAY_CUTOFF,
             self.plugin_rel_callback, self.plugin_val_callback,
             40, 118, 90, KC_PITCH, self.port_dict, self.preset_manager)
-        self.cutoff_knob.add_to_grid_layout(delay_gridlayout, 5)
+        self.cutoff_knob.add_to_grid_layout(self.delay_gridlayout, 5)
         self.stereo_knob = pydaw_knob_control(
             f_knob_size, _("Stereo"), MKDELAY_STEREO,
             self.plugin_rel_callback, self.plugin_val_callback,
             0, 100, 100, KC_DECIMAL, self.port_dict, self.preset_manager)
-        self.stereo_knob.add_to_grid_layout(delay_gridlayout, 6)
+        self.stereo_knob.add_to_grid_layout(self.delay_gridlayout, 6)
 
         self.open_plugin_file()
         self.set_midi_learn(MKDELAY_PORT_MAP)

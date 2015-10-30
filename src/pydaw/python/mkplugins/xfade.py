@@ -42,12 +42,16 @@ class xfade_plugin_ui(pydaw_abstract_plugin_ui):
             a_cc_map_callback)
         self._plugin_name = "XFADE"
         self.is_instrument = False
-        #self.layout.setSizeConstraint(QLayout.SetFixedSize)
+        self.layout.setSizeConstraint(QLayout.SetFixedSize)
         f_knob_size = DEFAULT_KNOB_SIZE
         self.widget.setToolTip(XFADE_TOOLTIP)
+        self.widget.setMinimumHeight(120)
+
+        self.hlayout = QHBoxLayout()
+        self.layout.addLayout(self.hlayout)
 
         self.volume_gridlayout = QGridLayout()
-        self.layout.addLayout(self.volume_gridlayout)
+        self.hlayout.addLayout(self.volume_gridlayout)
         self.volume_slider = pydaw_slider_control(
             QtCore.Qt.Horizontal, "X-Fade", XFADE_SLIDER,
             self.plugin_rel_callback, self.plugin_val_callback,

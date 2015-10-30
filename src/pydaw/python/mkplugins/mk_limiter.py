@@ -41,24 +41,13 @@ class mk_lim_plugin_ui(pydaw_abstract_plugin_ui):
         self.preset_manager = None
         self.layout.setSizeConstraint(QLayout.SetFixedSize)
 
-        self.misc_tab = QWidget()
-        self.layout.addWidget(self.misc_tab)
-        self.delay_vlayout = QVBoxLayout()
-        self.misc_tab.setLayout(self.delay_vlayout)
         self.delay_hlayout = QHBoxLayout()
-        self.delay_vlayout.addLayout(self.delay_hlayout)
+        self.layout.addLayout(self.delay_hlayout)
 
         f_knob_size = DEFAULT_KNOB_SIZE
 
-        self.reverb_groupbox = QGroupBox("MK Limiter")
-        self.reverb_groupbox.setObjectName("plugin_groupbox")
-        self.groupbox_gridlayout = QGridLayout(
-            self.reverb_groupbox)
-        self.reverb_hlayout = QHBoxLayout()
-        self.delay_vlayout.addLayout(self.reverb_hlayout)
-        self.reverb_hlayout.addWidget(self.reverb_groupbox)
-        self.reverb_hlayout.addItem(
-            QSpacerItem(1, 1, QSizePolicy.Expanding))
+        self.groupbox_gridlayout = QGridLayout()
+        self.delay_hlayout.addLayout(self.groupbox_gridlayout)
 
         self.thresh_knob = pydaw_knob_control(
             f_knob_size, _("Thresh"), MK_LIM_THRESHOLD,
@@ -79,12 +68,7 @@ class mk_lim_plugin_ui(pydaw_abstract_plugin_ui):
         self.release_knob.add_to_grid_layout(self.groupbox_gridlayout, 22)
 
         self.peak_meter = peak_meter(16, False)
-        self.reverb_hlayout.addWidget(self.peak_meter.widget)
-
-        self.delay_spacer_layout = QVBoxLayout()
-        self.delay_vlayout.addLayout(self.delay_spacer_layout)
-        self.delay_spacer_layout.addItem(
-            QSpacerItem(1, 1, vPolicy=QSizePolicy.Expanding))
+        self.delay_hlayout.addWidget(self.peak_meter.widget)
 
         self.ui_msg_enabled = pydaw_null_control(
             MK_LIM_UI_MSG_ENABLED,
