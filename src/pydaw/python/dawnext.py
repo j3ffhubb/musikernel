@@ -40,6 +40,12 @@ import libmk
 from libmk import mk_project
 from libdawnext import *
 
+TAB_SEQUENCER = 0
+TAB_PLUGIN_RACK = 1
+TAB_ITEM_EDITOR = 2
+TAB_ROUTING = 3
+TAB_MIXER = 4
+TAB_NOTES = 5
 
 START_PEN = QPen(QColor.fromRgb(120, 120, 255), 6.0)
 END_PEN = QPen(QColor.fromRgb(255, 60, 60), 6.0)
@@ -725,7 +731,7 @@ class SequencerItem(QGraphicsRectItem):
                     current_index = i
                     ITEM_EDITOR.tab_widget.setCurrentIndex(current_index)
                     break
-        MAIN_WINDOW.main_tabwidget.setCurrentIndex(1)
+        MAIN_WINDOW.main_tabwidget.setCurrentIndex(TAB_ITEM_EDITOR)
         #Ensure that notes are visible
         if current_index == 1 and CURRENT_ITEM.notes:
             height = PIANO_ROLL_EDITOR.geometry().height()
@@ -8427,7 +8433,7 @@ class transport_widget(libmk.AbstractTransport):
             f_widget.setEnabled(a_enabled)
 
     def on_play(self):
-        if MAIN_WINDOW.main_tabwidget.currentIndex() == 1:
+        if MAIN_WINDOW.main_tabwidget.currentIndex() == TAB_ITEM_EDITOR:
             SEQUENCER.open_region()
         REGION_SETTINGS.on_play()
         AUDIO_SEQ_WIDGET.on_play()
@@ -8642,6 +8648,7 @@ class pydaw_main_window(QScrollArea):
         self.vscrollbar.sliderReleased.connect(self.vscrollbar_released)
         self.vscrollbar.setSingleStep(REGION_EDITOR_TRACK_HEIGHT)
 
+        self.main_tabwidget.addTab(PLUGIN_RACK.widget, _("Plugin Rack"))
         self.main_tabwidget.addTab(ITEM_EDITOR.widget, _("Item Editor"))
 
         self.automation_tab = QWidget()
@@ -8654,8 +8661,6 @@ class pydaw_main_window(QScrollArea):
         self.notes_tab.setAcceptRichText(False)
         self.notes_tab.leaveEvent = self.on_edit_notes
         self.main_tabwidget.addTab(self.notes_tab, _("Project Notes"))
-
-        self.main_tabwidget.addTab(PLUGIN_RACK.widget, _("Plugin Rack"))
 
         self.main_tabwidget.currentChanged.connect(self.tab_changed)
 
@@ -8868,22 +8873,22 @@ class pydaw_main_window(QScrollArea):
 
     def tab_changed(self):
         f_index = self.main_tabwidget.currentIndex()
-        if f_index == 0 and not libmk.IS_PLAYING:
+        if f_index == TAB_SEQUENCER and not libmk.IS_PLAYING:
             SEQUENCER.open_region()
-        elif f_index == 1:
+        elif f_index == TAB_PLUGIN_RACK:
+            PLUGIN_RACK.tab_selected()
+        elif f_index == TAB_ITEM_EDITOR:
             ITEM_EDITOR.tab_changed()
-        elif f_index == 2:
+        elif f_index == TAB_ROUTING:
             ROUTING_GRAPH_WIDGET.draw_graph(
                 PROJECT.get_routing_graph(), TRACK_NAMES)
-        elif f_index == 3:
+        elif f_index == TAB_MIXER:
             global_open_mixer()
-        elif f_index == 5:
-            PLUGIN_RACK.tab_selected()
-        f_bool = not f_index
+        f_bool = f_index == TAB_SEQUENCER
         AUDIO_SEQ_WIDGET.set_multiselect(f_bool)
         AUDIO_SEQ_WIDGET.filter_func = \
             pydaw_util.is_audio_midi_file if f_bool \
-            else pydaw_util.is_audio_midi_file
+            else pydaw_util.is_audio_file
         AUDIO_SEQ_WIDGET.set_folder(AUDIO_SEQ_WIDGET.last_open_dir)
 
     def on_edit_notes(self, a_event=None):
