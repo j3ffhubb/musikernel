@@ -462,12 +462,30 @@ class PluginRackTab:
         self.menu_layout = QHBoxLayout()
         self.vlayout.addLayout(self.menu_layout)
         self.track_combobox = QComboBox()
+        self.track_combobox.setMinimumWidth(300)
+        self.menu_layout.addWidget(QLabel(_("Track")))
         self.menu_layout.addWidget(self.track_combobox)
+
+        self.plugins_button = QPushButton(_("Menu"))
+        self.plugins_menu = QMenu(self.widget)
+        self.plugins_button.setMenu(self.plugins_menu)
+        self.plugins_order_action = self.plugins_menu.addAction(_("Order..."))
+        self.plugins_order_action.triggered.connect(self.set_plugin_order)
+        self.menu_layout.addItem(QSpacerItem(20, 1))
+        self.menu_layout.addWidget(self.plugins_button)
+
+        self.menu_layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
+
         self.stacked_widget = QStackedWidget()
         self.vlayout.addWidget(self.stacked_widget)
         self.enabled = True
         self.plugin_racks = {}
         self.last_rack_num = None
+
+    def set_plugin_order(self):
+        index = self.track_combobox.currentIndex()
+        rack = self.plugin_racks[index]
+        rack.set_plugin_order()
 
     def initialize(self, a_project):
         self.PROJECT = a_project
@@ -533,16 +551,10 @@ class PluginRack:
                 self.PROJECT.IPC.pydaw_set_plugin, x, a_track_number,
                 self.save_callback)
             for x in range(10)]
-        self.widget = QWidget(libmk.MAIN_WINDOW)
+        self.widget = QWidget()
         self.vlayout = QVBoxLayout(self.widget)
-        self.menu_hlayout = QHBoxLayout()
-        self.vlayout.addLayout(self.menu_hlayout)
-        self.plugins_button = QPushButton(_("Menu"))
-        self.plugins_menu = QMenu(self.widget)
-        self.plugins_button.setMenu(self.plugins_menu)
-        self.plugins_order_action = self.plugins_menu.addAction(_("Order..."))
-        self.plugins_order_action.triggered.connect(self.set_plugin_order)
-        self.menu_hlayout.addWidget(self.plugins_button)
+        self.vlayout.setContentsMargins(1, 1, 1, 1)
+
         self.scrollarea = QScrollArea()
         self.scrollarea.setHorizontalScrollBarPolicy(
             QtCore.Qt.ScrollBarAlwaysOff)
