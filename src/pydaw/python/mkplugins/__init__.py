@@ -458,6 +458,8 @@ class plugin_settings_wave_editor(plugin_settings_base):
         plugin_settings_base.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
             a_save_callback, a_name_callback)
+        self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
+
 
 class PluginRackTab:
     def __init__(self):
@@ -574,7 +576,6 @@ class PluginRack:
         f_result.plugins = [x.get_value() for x in self.plugins]
         self.PROJECT.save_track_plugins(self.track_number, f_result)
         self.PROJECT.commit(
-            "Update track plugins for '{}', {}".format(
-            self.name_callback(), self.track_number))
+            "Update track plugins for track {}".format(self.track_number))
 
 
