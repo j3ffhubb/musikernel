@@ -30,6 +30,10 @@ import libmk
 
 TRACK_COUNT_ALL = 1
 
+TAB_EDITOR = 0
+TAB_PLUGIN_RACK = 1
+TAB_NOTES = 2
+
 def set_tooltips_enabled(a_enabled):
     """ Set extensive tooltips as an alternative to
         maintaining a separate user manual
@@ -514,7 +518,14 @@ class pydaw_main_window(QScrollArea):
         self.notes_tab.setAcceptRichText(False)
         self.notes_tab.leaveEvent = self.on_edit_notes
         self.main_tabwidget.addTab(self.notes_tab, _("Project Notes"))
+        self.main_tabwidget.currentChanged.connect(self.tab_changed)
 
+    def tab_changed(self):
+        f_index = self.main_tabwidget.currentIndex()
+        if f_index == TAB_PLUGIN_RACK:
+            for plugin in PLUGIN_RACK.plugins:
+                if plugin.plugin_ui:
+                    plugin.plugin_ui.widget_show()
 
     def on_offline_render(self, a_val=None):
         WAVE_EDITOR.on_export()
@@ -1214,7 +1225,8 @@ def global_open_project(a_project_file):
     WAVE_EDITOR.open_project()
     TRANSPORT.open_project()
     PLUGIN_RACK = PluginRack(PROJECT, 0, plugin_settings_wave_editor)
-    MAIN_WINDOW.main_tabwidget.addTab(PLUGIN_RACK.widget, _("Plugin Rack"))
+    MAIN_WINDOW.main_tabwidget.insertTab(
+        1, PLUGIN_RACK.widget, _("Plugin Rack"))
 
 
 def global_new_project(a_project_file):
@@ -1226,7 +1238,8 @@ def global_new_project(a_project_file):
     MAIN_WINDOW.notes_tab.setText("")
     WAVE_EDITOR.open_project()
     PLUGIN_RACK = PluginRack(PROJECT, 0, plugin_settings_wave_editor)
-    MAIN_WINDOW.main_tabwidget.addTab(PLUGIN_RACK.widget, _("Plugin Rack"))
+    MAIN_WINDOW.main_tabwidget.insertTab(
+        1, PLUGIN_RACK.widget, _("Plugin Rack"))
 
 def active_wav_pool_uids():
     """ Wave-Next doesn't participate in the normal wav pool, so
