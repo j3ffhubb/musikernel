@@ -5133,8 +5133,4 @@ class pydaw_abstract_plugin_ui:
         """
         print("Unknown ui_message: {} : {}".format(a_name, a_value))
 
-    def set_window_title(self, a_track_name):
-        pass  #Override this function
-
-
 

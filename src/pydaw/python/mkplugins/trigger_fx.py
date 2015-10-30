@@ -49,7 +49,6 @@ class triggerfx_plugin_ui(pydaw_abstract_plugin_ui):
             a_configure_callback, a_folder, a_midi_learn_callback,
             a_cc_map_callback)
         self._plugin_name = "MODULEX"
-        self.set_window_title(a_track_name)
         self.is_instrument = False
 
         self.preset_manager = None
@@ -141,11 +140,6 @@ class triggerfx_plugin_ui(pydaw_abstract_plugin_ui):
 
     def save_plugin_file(self):
         pydaw_abstract_plugin_ui.save_plugin_file(self)
-
-    def set_window_title(self, a_track_name):
-        self.track_name = str(a_track_name)
-        self.widget.setWindowTitle(
-            "MusiKernel TriggerFX - {}".format(self.track_name))
 
     def widget_close_event(self, a_event):
         pydaw_abstract_plugin_ui.widget_close_event(self, a_event)

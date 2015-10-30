@@ -8156,13 +8156,6 @@ class seq_track:
         PROJECT.commit(
             _("Set name for track {} to {}").format(self.track_number,
             self.track_name_lineedit.text()))
-        f_plugins = PROJECT.get_track_plugins(self.track_number)
-        if not f_plugins:
-            return
-        for f_plugin in f_plugins.plugins:
-            libmk.PLUGIN_UI_DICT.plugin_set_window_title(
-                f_plugin.plugin_uid,
-                _("Track: {}").format(self.name_callback()))
 
     def context_menu_event(self, a_event=None):
         pass

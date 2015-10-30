@@ -355,7 +355,6 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             self, a_val_callback, a_project, a_plugin_uid, a_stylesheet,
             a_configure_callback, a_folder, a_midi_learn_callback,
             a_cc_map_callback, a_can_resize=True)
-        self.set_window_title(a_track_name)
         self.track_name = str(a_track_name)
         self.widget.setWindowTitle(
             "MusiKernel Euphoria - {}".format(self.track_name))
@@ -1386,11 +1385,6 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.mono_fx_tab_selected_sample.addItems(f_combobox_items)
         self.selected_radiobuttons[0].click()
         self.sample_selected_monofx_groupChanged(0)
-
-    def set_window_title(self, a_track_name):
-        self.track_name = str(a_track_name)
-        self.widget.setWindowTitle(
-            "MusiKernel Euphoria - {}".format(self.track_name))
 
     def configure_plugin(self, a_key, a_message):
         self.configure_dict[a_key] = a_message

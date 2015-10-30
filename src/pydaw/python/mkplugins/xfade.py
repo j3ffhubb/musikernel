@@ -41,7 +41,6 @@ class xfade_plugin_ui(pydaw_abstract_plugin_ui):
             a_configure_callback, a_folder, a_midi_learn_callback,
             a_cc_map_callback)
         self._plugin_name = "XFADE"
-        self.set_window_title(a_track_name)
         self.is_instrument = False
         #self.layout.setSizeConstraint(QLayout.SetFixedSize)
         f_knob_size = DEFAULT_KNOB_SIZE
@@ -65,11 +64,6 @@ class xfade_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.open_plugin_file()
         self.set_midi_learn(XFADE_PORT_MAP)
-
-    def set_window_title(self, a_track_name):
-        self.track_name = str(a_track_name)
-        self.widget.setWindowTitle(
-            "X-Fade - {}".format(self.track_name))
 
     def raise_widget(self):
         pydaw_abstract_plugin_ui.raise_widget(self)

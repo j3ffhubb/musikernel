@@ -560,7 +560,6 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
             a_configure_callback, a_folder, a_midi_learn_callback,
             a_cc_map_callback)
         self._plugin_name = "WAYV"
-        self.set_window_title(a_track_name)
         self.is_instrument = True
 
         f_osc_types = [_("Off"),
@@ -1141,11 +1140,6 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
                 self.configure_plugin(f_key, a_dict[f_key])
             else:
                 self.configure_plugin(f_key, f_empty_eng_val)
-
-    def set_window_title(self, a_track_name):
-        self.track_name = str(a_track_name)
-        self.widget.setWindowTitle(
-            "MusiKernel Way-V - {}".format(self.track_name))
 
     def set_fm_origin(self):
         self.fm_origin = []

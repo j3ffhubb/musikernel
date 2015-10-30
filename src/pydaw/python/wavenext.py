@@ -85,7 +85,7 @@ pydaw_file_pyinput = os.path.join(wavenext_folder, "input.txt")
 class WaveNextProject(libmk.AbstractProject):
     def __init__(self, a_with_audio):
         self.TRACK_COUNT = TRACK_COUNT_ALL
-        self.wn_osc = WaveNextOsc(a_with_audio)
+        self.IPC = WaveNextOsc(a_with_audio)
         self.suppress_updates = False
 
     def save_track_plugins(self, a_uid, a_track):
@@ -119,7 +119,7 @@ class WaveNextProject(libmk.AbstractProject):
             self.new_project(a_project_file)
 
 #        if a_notify_osc:
-#            self.wn_osc.pydaw_open_song(self.project_folder)
+#            self.IPC.pydaw_open_song(self.project_folder)
 
     def new_project(self, a_project_file, a_notify_osc=True):
         self.set_project_folders(a_project_file)
@@ -131,7 +131,7 @@ class WaveNextProject(libmk.AbstractProject):
 
 #        self.commit("Created project")
 #        if a_notify_osc:
-#            self.wn_osc.pydaw_open_song(self.project_folder)
+#            self.IPC.pydaw_open_song(self.project_folder)
 
     def get_notes(self):
         if os.path.isfile(self.pynotes_file):
@@ -301,7 +301,7 @@ class AudioInputWidget:
             f_result.add_track(f_i, f_input.get_value())
         PROJECT.save_audio_inputs(f_result)
         if a_notify:
-            PROJECT.wn_osc.save_audio_inputs()
+            PROJECT.IPC.save_audio_inputs()
 
     def active(self):
         return [x.get_value() for x in self.inputs
@@ -354,7 +354,7 @@ class transport_widget(libmk.AbstractTransport):
 
     def on_panic(self):
         pass
-        #PROJECT.wn_osc.pydaw_panic()
+        #PROJECT.IPC.pydaw_panic()
 
     def set_time(self, f_text):
         #f_text = "{}:{}.{}".format(f_minutes, str(f_seconds).zfill(2), f_frac)
@@ -364,11 +364,11 @@ class transport_widget(libmk.AbstractTransport):
         if not WAVE_EDITOR.current_file:
             return False
         WAVE_EDITOR.on_play()
-        PROJECT.wn_osc.pydaw_wn_playback(1)
+        PROJECT.IPC.pydaw_wn_playback(1)
         return True
 
     def on_stop(self):
-        PROJECT.wn_osc.pydaw_wn_playback(0)
+        PROJECT.IPC.pydaw_wn_playback(0)
         WAVE_EDITOR.on_stop()
         self.playback_menu_button.setEnabled(True)
         if libmk.IS_RECORDING:
@@ -384,7 +384,7 @@ class transport_widget(libmk.AbstractTransport):
                 "to open the Menu->File->HardwareSettings in the \n"
                 "transport and set the number of audio inputs to 1 or more"))
             return False
-        PROJECT.wn_osc.pydaw_wn_playback(2)
+        PROJECT.IPC.pydaw_wn_playback(2)
         self.playback_menu_button.setEnabled(False)
         return True
 
@@ -514,6 +514,7 @@ class pydaw_main_window(QScrollArea):
         self.notes_tab.setAcceptRichText(False)
         self.notes_tab.leaveEvent = self.on_edit_notes
         self.main_tabwidget.addTab(self.notes_tab, _("Project Notes"))
+
 
     def on_offline_render(self, a_val=None):
         WAVE_EDITOR.on_export()
@@ -659,32 +660,6 @@ class pydaw_wave_editor_widget:
 
         self.history_button = QPushButton(_("History"))
         self.file_hlayout.addWidget(self.history_button)
-
-        self.fx_button = QPushButton(_("Effects"))
-        self.file_hlayout.addWidget(self.fx_button)
-
-        ###############################
-
-        self.fx_menu = QMenu()
-        self.fx_menu.aboutToShow.connect(self.open_plugins)
-        self.fx_button.setMenu(self.fx_menu)
-        self.track_number = 0
-        self.plugins = []
-        self.menu_widget = QWidget()
-        self.menu_hlayout = QHBoxLayout(self.menu_widget)
-        self.menu_gridlayout = QGridLayout()
-        self.menu_hlayout.addLayout(self.menu_gridlayout)
-        self.menu_gridlayout.addWidget(QLabel(_("Plugins")), 0, 0)
-        self.menu_gridlayout.addWidget(QLabel(_("P")), 0, 3)
-        for f_i in range(10):
-            f_plugin = plugin_settings_wave_editor(
-                PROJECT.wn_osc.pydaw_set_plugin,
-                f_i, self.track_number,
-                self.save_callback, self.name_callback)
-            self.plugins.append(f_plugin)
-        self.action_widget = QWidgetAction(self.fx_menu)
-        self.action_widget.setDefaultWidget(self.menu_widget)
-        self.fx_menu.addAction(self.action_widget)
 
         ###############################
 
@@ -982,7 +957,7 @@ class pydaw_wave_editor_widget:
                 self.copy_to_clipboard_checked = False
 
             f_file_name = str(f_name.text())
-            PROJECT.wn_osc.pydaw_we_export(f_file_name)
+            PROJECT.IPC.pydaw_we_export(f_file_name)
             self.last_offline_dir = os.path.dirname(f_file_name)
             self.open_exported = f_open_exported.isChecked()
             f_window.close()
@@ -1120,7 +1095,7 @@ class pydaw_wave_editor_widget:
             f_action = f_menu.addAction(f_path)
             f_action.file_name = f_path
         self.history_button.setMenu(f_menu)
-        PROJECT.wn_osc.pydaw_ab_open(a_file)
+        PROJECT.IPC.pydaw_ab_open(a_file)
         self.marker_callback()
         libmk.APP.restoreOverrideCursor()
 
@@ -1162,7 +1137,7 @@ class pydaw_wave_editor_widget:
     def marker_callback(self, a_val=None):
         if self.callbacks_enabled:
             f_item = self.get_audio_item()
-            PROJECT.wn_osc.pydaw_we_set(
+            PROJECT.IPC.pydaw_we_set(
                 "0|{}".format(f_item))
             f_start = self.sample_graph.start_marker.value
             self.set_time_label(f_start * 0.001, True)
@@ -1228,7 +1203,7 @@ def global_close_all():
 
 #Opens or creates a new project
 def global_open_project(a_project_file):
-    global PROJECT, TRACK_NAMES
+    global PROJECT, TRACK_NAMES, PLUGIN_RACK
     PROJECT = WaveNextProject(global_pydaw_with_audio)
     PROJECT.suppress_updates = True
     PROJECT.open_project(a_project_file, False)
@@ -1238,16 +1213,20 @@ def global_open_project(a_project_file):
     MAIN_WINDOW.notes_tab.setText(PROJECT.get_notes())
     WAVE_EDITOR.open_project()
     TRANSPORT.open_project()
+    PLUGIN_RACK = PluginRack(PROJECT, 0, plugin_settings_wave_editor)
+    MAIN_WINDOW.main_tabwidget.addTab(PLUGIN_RACK.widget, _("Plugin Rack"))
 
 
 def global_new_project(a_project_file):
-    global PROJECT
+    global PROJECT, PLUGIN_RACK
     PROJECT = WaveNextProject(global_pydaw_with_audio)
     PROJECT.new_project(a_project_file)
     WAVE_EDITOR.last_offline_dir = libmk.PROJECT.user_folder
     MAIN_WINDOW.last_offline_dir = libmk.PROJECT.user_folder
     MAIN_WINDOW.notes_tab.setText("")
     WAVE_EDITOR.open_project()
+    PLUGIN_RACK = PluginRack(PROJECT, 0, plugin_settings_wave_editor)
+    MAIN_WINDOW.main_tabwidget.addTab(PLUGIN_RACK.widget, _("Plugin Rack"))
 
 def active_wav_pool_uids():
     """ Wave-Next doesn't participate in the normal wav pool, so
@@ -1268,3 +1247,5 @@ if libmk.TOOLTIPS_ENABLED:
     set_tooltips_enabled(libmk.TOOLTIPS_ENABLED)
 
 CLOSE_ENGINE_ON_RENDER = False
+
+PLUGIN_RACK = None

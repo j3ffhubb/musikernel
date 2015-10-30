@@ -221,12 +221,6 @@ class mk_plugin_ui_dict:
             f_widget = self.ui_dict[f_track_num].widget
             f_widget.hide()
 
-    def plugin_set_window_title(self, a_plugin_uid, a_track_name):
-        f_plugin_uid = int(a_plugin_uid)
-        if f_plugin_uid in self.ui_dict:
-            self.ui_dict[a_plugin_uid].set_window_title(a_track_name)
-
-
     def close_all_plugin_windows(self):
         for v in list(self.ui_dict.values()):
             v.is_quitting = True
@@ -419,8 +413,7 @@ class plugin_settings_base:
         if self.plugin_ui:
             self.vlayout.removeWidget(self.plugin_ui.widget)
         self.plugin_ui = libmk.PLUGIN_UI_DICT.open_plugin_ui(
-            self.plugin_uid, f_index,
-            "Track:  {}".format(self.name_callback()))
+            self.plugin_uid, f_index, "")
         self.vlayout.addWidget(self.plugin_ui.widget)
 
 class plugin_settings_main(plugin_settings_base):

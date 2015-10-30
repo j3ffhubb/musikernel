@@ -40,7 +40,6 @@ class scc_plugin_ui(pydaw_abstract_plugin_ui):
             a_configure_callback, a_folder, a_midi_learn_callback,
             a_cc_map_callback)
         self._plugin_name = "Sidechain Comp."
-        self.set_window_title(a_track_name)
         self.is_instrument = False
 
         self.preset_manager = None
@@ -116,11 +115,6 @@ class scc_plugin_ui(pydaw_abstract_plugin_ui):
         self.open_plugin_file()
         self.set_midi_learn(SCC_PORT_MAP)
         self.enable_ui_msg(True)
-
-    def set_window_title(self, a_track_name):
-        self.track_name = str(a_track_name)
-        self.widget.setWindowTitle(
-            "Sidechain Comp. - {}".format(self.track_name))
 
     def widget_close_event(self, a_event):
         self.enable_ui_msg(False)

@@ -114,7 +114,6 @@ class rayv_plugin_ui(pydaw_abstract_plugin_ui):
             a_configure_callback, a_folder, a_midi_learn_callback,
             a_cc_map_callback)
         self._plugin_name = "RAYV2"
-        self.set_window_title(a_track_name)
         self.is_instrument = True
         f_osc_types = [
             _("Off"), _("Saw"), _("Square"), _("H-Square"), _("Q-Square"),
@@ -282,8 +281,3 @@ class rayv_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.open_plugin_file()
         self.set_midi_learn(RAYV_PORT_MAP)
-
-    def set_window_title(self, a_track_name):
-        self.track_name = str(a_track_name)
-        self.widget.setWindowTitle(
-            "MusiKernel Ray-V 2 - {}".format(self.track_name))

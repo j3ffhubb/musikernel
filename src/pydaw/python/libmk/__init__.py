@@ -155,6 +155,10 @@ class AbstractProject:
     def __init__(self):
         self.plugin_pool_folder = None
 
+    def commit(self, *args, **kwargs):
+        """ Used for undo history """
+        pass
+
     def create_file(self, a_folder, a_file, a_text):
         """  Call save_file only if the file doesn't exist... """
         if not os.path.isfile(os.path.join(
