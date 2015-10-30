@@ -275,7 +275,7 @@ class PluginComboBox(QPushButton):
 class plugin_settings_base:
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_name_callback, a_qcbox=False):
+            a_save_callback, a_qcbox=False):
         self.plugin_ui = None
         self.set_plugin_func = a_set_plugin_func
         self.vlayout = QVBoxLayout()
@@ -286,7 +286,6 @@ class plugin_settings_base:
         self.vlayout.addWidget(self.controls_widget)
         self.suppress_osc = False
         self.save_callback = a_save_callback
-        self.name_callback = a_name_callback
         self.plugin_uid = -1
         self.track_num = a_track_num
         self.index = a_index
@@ -413,8 +412,7 @@ class plugin_settings_base:
 
 class plugin_settings_main(plugin_settings_base):
     def __init__(
-            self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_name_callback):
+            self, a_set_plugin_func, a_index, a_track_num, a_save_callback):
         self.plugin_list = MAIN_PLUGIN_NAMES
 
         self.menu_button = QPushButton(_("Menu"))
@@ -432,19 +430,17 @@ class plugin_settings_main(plugin_settings_base):
         f_clear_action.triggered.connect(self.clear)
 
         plugin_settings_base.__init__(
-            self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_name_callback)
+            self, a_set_plugin_func, a_index, a_track_num, a_save_callback)
         self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
 
 
 class plugin_settings_mixer(plugin_settings_base):
     def __init__(
-            self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_name_callback):
+            self, a_set_plugin_func, a_index, a_track_num, a_save_callback):
         self.plugin_list = MIXER_PLUGIN_NAMES
         plugin_settings_base.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_name_callback, a_qcbox=True)
+            a_save_callback, a_qcbox=True)
         self.bus_index = a_index
         self.index += 10
         self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
@@ -452,12 +448,10 @@ class plugin_settings_mixer(plugin_settings_base):
 
 class plugin_settings_wave_editor(plugin_settings_base):
     def __init__(
-            self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_name_callback):
+            self, a_set_plugin_func, a_index, a_track_num, a_save_callback):
         self.plugin_list = WAVE_EDITOR_PLUGIN_NAMES
         plugin_settings_base.__init__(
-            self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_name_callback)
+            self, a_set_plugin_func, a_index, a_track_num, a_save_callback)
         self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
 
 
@@ -514,7 +508,7 @@ class PluginRack:
         self.plugins = [
             a_type(
                 self.PROJECT.IPC.pydaw_set_plugin, x, a_track_number,
-                self.save_callback, self.name_callback)
+                self.save_callback)
             for x in range(10)]
         self.widget = QWidget(libmk.MAIN_WINDOW)
         self.vlayout = QVBoxLayout(self.widget)
@@ -541,10 +535,6 @@ class PluginRack:
         for plugin in self.plugins:
             self.scroll_vlayout.addLayout(plugin.vlayout)
         self.open_plugins()
-
-    def name_callback(self):
-        tracks = self.PROJECT.get_tracks()
-        return str(tracks.tracks[self.track_number].name)
 
     def set_plugin_order(self):
         f_labels = ["{} : {}".format(f_i, x.plugin_combobox.currentText())
