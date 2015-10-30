@@ -95,12 +95,11 @@ class mk_lim_plugin_ui(pydaw_abstract_plugin_ui):
         self.set_midi_learn(MK_LIM_PORT_MAP)
         self.enable_ui_msg(True)
 
-    def widget_close_event(self, a_event):
+    def widget_close(self):
         self.enable_ui_msg(False)
-        pydaw_abstract_plugin_ui.widget_close_event(self, a_event)
+        pydaw_abstract_plugin_ui.widget_close(self)
 
-    def raise_widget(self):
-        pydaw_abstract_plugin_ui.raise_widget(self)
+    def widget_show(self):
         self.enable_ui_msg(True)
 
     def enable_ui_msg(self, a_enabled):

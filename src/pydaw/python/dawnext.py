@@ -8884,8 +8884,6 @@ class pydaw_main_window(QScrollArea):
         f_index = self.main_tabwidget.currentIndex()
         if f_index == TAB_SEQUENCER and not libmk.IS_PLAYING:
             SEQUENCER.open_region()
-        elif f_index == TAB_PLUGIN_RACK:
-            PLUGIN_RACK.tab_selected()
         elif f_index == TAB_ITEM_EDITOR:
             ITEM_EDITOR.tab_changed()
         elif f_index == TAB_ROUTING:
@@ -8893,6 +8891,9 @@ class pydaw_main_window(QScrollArea):
                 PROJECT.get_routing_graph(), TRACK_NAMES)
         elif f_index == TAB_MIXER:
             global_open_mixer()
+
+        PLUGIN_RACK.tab_selected(f_index == TAB_PLUGIN_RACK)
+
         f_bool = f_index == TAB_SEQUENCER
         AUDIO_SEQ_WIDGET.set_multiselect(f_bool)
         AUDIO_SEQ_WIDGET.filter_func = \

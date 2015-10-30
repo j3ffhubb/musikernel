@@ -196,7 +196,7 @@ class mk_plugin_ui_dict:
             pydaw_center_widget_on_screen(f_plugin.widget)
             self.ui_dict[a_plugin_uid] = f_plugin
             if a_show:
-                f_plugin.show_widget()
+                assert False, "This code path should be deprecated"
             else:
                 return f_plugin
         else:
@@ -467,14 +467,33 @@ class PluginRackTab:
         self.vlayout.addWidget(self.stacked_widget)
         self.enabled = True
         self.plugin_racks = {}
+        self.last_rack_num = None
 
     def initialize(self, a_project):
         self.PROJECT = a_project
         self.track_combobox.currentIndexChanged.connect(self.track_changed)
 
-    def tab_selected(self):
-        """ Call this when the parent tab widget switches to this tab """
-        self.track_changed()
+    def tab_selected(self, a_is_selected):
+        """ Call this when the parent tab widget switches to/from this tab """
+        if a_is_selected:
+            self.track_changed()
+        else:
+            self.close_rack(self.track_combobox.currentIndex())
+
+    def show_rack(self, a_rack_num):
+        rack = self.plugin_racks[a_rack_num]
+        for plugin in rack.plugins:
+            if plugin.plugin_ui:
+                plugin.plugin_ui.widget_show()
+
+    def close_rack(self, a_rack_num):
+        if a_rack_num not in self.plugin_racks:
+            print("{} not in self.plugins_racks".format(a_rack_num))
+            return
+        rack = self.plugin_racks[a_rack_num]
+        for plugin in rack.plugins:
+            if plugin.plugin_ui:
+                plugin.plugin_ui.widget_close()
 
     def track_changed(self, a_val=None):
         if not self.enabled:
@@ -484,7 +503,11 @@ class PluginRackTab:
             f_rack = PluginRack(self.PROJECT, f_index)
             self.plugin_racks[f_index] = f_rack
             self.stacked_widget.addWidget(self.plugin_racks[f_index].widget)
+        self.show_rack(f_index)
         self.stacked_widget.setCurrentWidget(self.plugin_racks[f_index].widget)
+        if self.last_rack_num is not None and self.last_rack_num != f_index:
+            self.close_rack(self.last_rack_num)
+        self.last_rack_num = f_index
 
     def set_track_names(self, a_list):
         self.track_combobox.clear()

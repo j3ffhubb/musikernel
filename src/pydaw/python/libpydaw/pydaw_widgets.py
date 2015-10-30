@@ -4924,7 +4924,6 @@ class pydaw_abstract_plugin_ui:
         self.widget.setObjectName("plugin_ui")
         #self.widget.setMinimumSize(500, 500)
         self.widget.setStyleSheet(str(a_stylesheet))
-        self.widget.closeEvent = self.widget_close_event
         self.widget.keyPressEvent = self.widget_keyPressEvent
 
 #        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
@@ -4945,6 +4944,7 @@ class pydaw_abstract_plugin_ui:
         self.save_file_on_exit = True
         self.is_quitting = False
         self._plugin_name = None
+        self.has_updated_controls = False
 
     @staticmethod
     def get_wav_pool_uids(a_plugin_uid):
@@ -5012,35 +5012,6 @@ class pydaw_abstract_plugin_ui:
     def delete_plugin_file(self):
         self.save_file_on_exit = False
 
-    def show_widget(self):
-        print("Nooooo!!!")
-        return
-        self.layout.update()
-        self.layout.activate()
-        f_size = self.scrollarea_widget.size()
-        f_desktop_size = QApplication.desktop().screen().rect()
-
-        f_x = f_size.width() + 21
-        f_y = f_size.height()
-
-        if self.can_resize or \
-        f_x > f_desktop_size.width() - 40 or \
-        f_y > f_desktop_size.height() - 40:
-            f_y += 21
-            f_x = pydaw_util.pydaw_clip_value(
-                f_x, 400, f_desktop_size.width())
-            f_y = pydaw_util.pydaw_clip_value(
-                f_y, 400, f_desktop_size.height())
-            self.widget.resize(f_x, f_y)
-            self.set_default_size()
-        else:
-            self.widget.setHorizontalScrollBarPolicy(
-                QtCore.Qt.ScrollBarAlwaysOff)
-            self.widget.setVerticalScrollBarPolicy(
-                QtCore.Qt.ScrollBarAlwaysOff)
-            self.widget.setFixedSize(f_x, f_y)
-        self.widget.show()
-
     def open_plugin_file(self):
         if self.folder is not None:
             f_file_path = os.path.join(
@@ -5055,9 +5026,11 @@ class pydaw_abstract_plugin_ui:
             else:
                 print("pydaw_abstract_plugin_ui.open_plugin_file():"
                     " '{}' did not exist, not loading.".format(f_file_path))
+                self.has_updated_controls = True
 
-    def raise_widget(self):
-        self.widget.raise_()
+    def widget_show(self):
+        """ Override to do something when the widget is shown """
+        pass
 
     def save_plugin_file(self):
         if self.folder is not None:
@@ -5069,15 +5042,10 @@ class pydaw_abstract_plugin_ui:
 #                _("Update controls for {}").format(self.track_name))
 #            self.mk_project.flush_history()
 
-    def widget_close_event(self, a_event):
-        if self.save_file_on_exit:
+    def widget_close(self):
+        """ Override to do something when the widget is hidden """
+        if self.has_updated_controls and self.save_file_on_exit:
             self.save_plugin_file()
-        if self.is_quitting:
-            a_event.accept()
-        else:
-            self.widget.hide()
-            a_event.ignore()
-        #QWidget.closeEvent(self.widget, a_event)
 
     def plugin_rel_callback(self, a_port, a_val):
         """ This can optionally be implemented, otherwise it's
@@ -5087,6 +5055,7 @@ class pydaw_abstract_plugin_ui:
 
     def plugin_val_callback(self, a_port, a_val):
         self.val_callback(self.plugin_uid, a_port, a_val)
+        self.has_updated_controls = True
 
     def set_control_val(self, a_port, a_val):
         f_port = int(a_port)
@@ -5113,7 +5082,7 @@ class pydaw_abstract_plugin_ui:
         """ Override this function to allow str|str key/value pair
             messages to be sent to the back-end
         """
-        pass
+        self.has_updated_controls = True
 
     def set_configure(self, a_key, a_message):
         """ Override this function to configure the
@@ -5125,7 +5094,7 @@ class pydaw_abstract_plugin_ui:
         """ Override this to re-configure a plugin from scratch with the
             values in a_dict
         """
-        pass
+        self.has_updated_controls = True
 
     def ui_message(self, a_name, a_value):
         """ Override to display ephemeral data such as

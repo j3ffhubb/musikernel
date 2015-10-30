@@ -135,18 +135,3 @@ class triggerfx_plugin_ui(pydaw_abstract_plugin_ui):
         self.open_plugin_file()
         self.set_midi_learn(TRIGGERFX_PORT_MAP)
 
-    def open_plugin_file(self):
-        pydaw_abstract_plugin_ui.open_plugin_file(self)
-
-    def save_plugin_file(self):
-        pydaw_abstract_plugin_ui.save_plugin_file(self)
-
-    def widget_close_event(self, a_event):
-        pydaw_abstract_plugin_ui.widget_close_event(self, a_event)
-
-    def raise_widget(self):
-        pydaw_abstract_plugin_ui.raise_widget(self)
-
-    def ui_message(self, a_name, a_value):
-        pydaw_abstract_plugin_ui.ui_message(a_name, a_value)
-

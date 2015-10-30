@@ -86,12 +86,11 @@ class mkeq_plugin_ui(pydaw_abstract_plugin_ui):
         self.spectrum_enabled.set_value(0)
         pydaw_abstract_plugin_ui.save_plugin_file(self)
 
-    def widget_close_event(self, a_event):
+    def widget_close(self):
         self.enable_spectrum(False)
-        pydaw_abstract_plugin_ui.widget_close_event(self, a_event)
+        pydaw_abstract_plugin_ui.widget_close(self)
 
-    def raise_widget(self):
-        pydaw_abstract_plugin_ui.raise_widget(self)
+    def widget_show(self):
         self.enable_spectrum(True)
 
     def enable_spectrum(self, a_enabled):
