@@ -8053,6 +8053,11 @@ class seq_track:
 
         self.update_in_use_combobox()
 
+    def open_plugins(self):
+        PLUGIN_RACK.track_combobox.setCurrentIndex(self.track_number)
+        MAIN_WINDOW.main_tabwidget.setCurrentIndex(TAB_PLUGIN_RACK)
+        self.button_menu.close()
+
     def create_menu(self):
         if self.action_widget:
             self.button_menu.removeAction(self.action_widget)
@@ -8064,6 +8069,10 @@ class seq_track:
         self.action_widget = QWidgetAction(self.button_menu)
         self.action_widget.setDefaultWidget(self.menu_widget)
         self.button_menu.addAction(self.action_widget)
+
+        self.plugins_button = QPushButton(_("Plugins"))
+        self.menu_gridlayout.addWidget(self.plugins_button, 0, 21)
+        self.plugins_button.pressed.connect(self.open_plugins)
 
         self.automation_combobox = QComboBox()
         self.automation_combobox.setMinimumWidth(240)
