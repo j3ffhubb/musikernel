@@ -174,13 +174,13 @@ class mk_plugin_ui_dict:
         return self.ui_dict[a_plugin_uid]
 
     def open_plugin_ui(
-            self, a_plugin_uid, a_plugin_type, a_title, a_show=False):
+            self, a_plugin_uid, a_plugin_type, a_show=False, a_is_mixer=False):
         if not a_plugin_uid in self.ui_dict:
             f_plugin = PLUGIN_UI_TYPES[a_plugin_type](
-                self.ctrl_update_callback, self.project, self.plugin_pool_dir,
-                a_plugin_uid, a_title, self.stylesheet,
-                self.configure_callback, self.midi_learn_callback,
-                self.load_cc_map_callback)
+                self.ctrl_update_callback, self.project, a_plugin_uid,
+                self.stylesheet, self.configure_callback, self.plugin_pool_dir,
+                self.midi_learn_callback, self.load_cc_map_callback,
+                a_is_mixer)
             pydaw_center_widget_on_screen(f_plugin.widget)
             self.ui_dict[a_plugin_uid] = f_plugin
             if a_show:
@@ -263,7 +263,8 @@ class PluginComboBox(QPushButton):
 class AbstractPluginSettings:
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_qcbox=False, a_mixer=False):
+            a_save_callback, a_qcbox=False, a_is_mixer=False):
+        self.is_mixer = a_is_mixer
         self.plugin_ui = None
         self.set_plugin_func = a_set_plugin_func
         self.vlayout = QVBoxLayout()
@@ -294,7 +295,7 @@ class AbstractPluginSettings:
 
         self.power_checkbox = QCheckBox("Power")
         self.power_checkbox.setChecked(True)
-        if a_mixer:
+        if a_is_mixer:
             self.vlayout.addWidget(self.plugin_combobox)
             self.vlayout.setAlignment(self.plugin_combobox, QtCore.Qt.AlignTop)
         else:
@@ -395,7 +396,7 @@ class AbstractPluginSettings:
         if self.plugin_ui:
             self.vlayout.removeWidget(self.plugin_ui.widget)
         self.plugin_ui = libmk.PLUGIN_UI_DICT.open_plugin_ui(
-            self.plugin_uid, f_index, "")
+            self.plugin_uid, f_index)
         self.vlayout.addWidget(self.plugin_ui.widget)
 
 
@@ -429,7 +430,7 @@ class PluginSettingsMixer(AbstractPluginSettings):
         self.plugin_list = MIXER_PLUGIN_NAMES
         AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_qcbox=True, a_mixer=True)
+            a_save_callback, a_qcbox=True, a_is_mixer=True)
 
 
 class PluginSettingsWaveEditor(AbstractPluginSettings):

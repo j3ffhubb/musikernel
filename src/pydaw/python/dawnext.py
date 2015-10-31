@@ -7974,8 +7974,7 @@ def global_open_mixer():
                 f_send.output == -1:  # None
                     continue
                 f_plugin_ui = libmk.PLUGIN_UI_DICT.open_plugin_ui(
-                    f_plugin_obj.plugin_uid, f_plugin_obj.plugin_index,
-                    "Track:  {}".format(f_track_index), False)
+                    f_plugin_obj.plugin_uid, f_plugin_obj.plugin_index, False)
                 MIXER_WIDGET.set_plugin_widget(
                     f_track_index, k, f_send.output, f_plugin_ui)
     MIXER_WIDGET.update_track_names(

@@ -27,20 +27,18 @@ MKCHNL_PORT_MAP = {
 }
 
 class mkchnl_plugin_ui(pydaw_abstract_plugin_ui):
-    def __init__(self, a_val_callback, a_project,
-                 a_folder, a_plugin_uid, a_track_name, a_stylesheet,
-                 a_configure_callback, a_midi_learn_callback,
-                 a_cc_map_callback):
-        pydaw_abstract_plugin_ui.__init__(
-            self, a_val_callback, a_project, a_plugin_uid, a_stylesheet,
-            a_configure_callback, a_folder, a_midi_learn_callback,
-            a_cc_map_callback)
+    def __init__(self, *args, **kwargs):
+        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "MKCHNL"
         self.is_instrument = False
-        #self.layout.setSizeConstraint(QLayout.SetFixedSize)
         f_knob_size = 32
         self.gain_gridlayout = QGridLayout()
-        self.layout.addLayout(self.gain_gridlayout)
+        if self.is_mixer:
+            self.layout.addLayout(self.gain_gridlayout)
+        else:
+            self.hlayout = QHBoxLayout()
+            self.layout.addLayout(self.hlayout)
+            self.hlayout.addLayout(self.gain_gridlayout)
         self.gain_knob = pydaw_knob_control(
             f_knob_size, _("Gain"), MKCHNL_GAIN,
             self.plugin_rel_callback, self.plugin_val_callback,
@@ -61,16 +59,21 @@ class mkchnl_plugin_ui(pydaw_abstract_plugin_ui):
         self.volume_gridlayout = QGridLayout()
         self.layout.addLayout(self.volume_gridlayout)
         self.volume_slider = pydaw_slider_control(
-            QtCore.Qt.Vertical, "Vol", MKCHNL_VOL_SLIDER,
+            QtCore.Qt.Vertical if self.is_mixer else QtCore.Qt.Horizontal,
+            "Vol", MKCHNL_VOL_SLIDER,
             self.plugin_rel_callback, self.plugin_val_callback,
             -5000, 0, 0, KC_DECIMAL, self.port_dict)
-        self.volume_slider.add_to_grid_layout(self.volume_gridlayout, 0)
-        self.volume_slider.control.setMinimumHeight(240)
-        self.volume_slider.control.setSizePolicy(
-            QSizePolicy.Minimum, QSizePolicy.Expanding)
-        self.widget.setFixedWidth(130)
+        if self.is_mixer:
+            self.volume_slider.add_to_grid_layout(self.volume_gridlayout, 0)
+            self.volume_slider.control.setSizePolicy(
+                QSizePolicy.Minimum, QSizePolicy.Expanding)
+        else:
+            self.volume_slider_layout = QGridLayout()
+            self.volume_slider_layout.setSizeConstraint(QLayout.SetMaximumSize)
+            self.hlayout.addLayout(self.volume_slider_layout, 1)
+            self.volume_slider.add_to_grid_layout(
+                self.volume_slider_layout, 0, a_alignment=None)
         self.volume_slider.value_label.setMinimumWidth(91)
-        self.widget.setWidgetResizable(True)
         self.open_plugin_file()
         self.set_midi_learn(MKCHNL_PORT_MAP)
 

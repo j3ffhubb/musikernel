@@ -347,14 +347,9 @@ SMP_TB_INTERPOLATION_MODE_INDEX = 11
 EUPHORIA_INSTRUMENT_CLIPBOARD = None
 
 class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
-    def __init__(
-            self, a_val_callback, a_project, a_folder, a_plugin_uid,
-            a_track_name, a_stylesheet, a_configure_callback,
-            a_midi_learn_callback, a_cc_map_callback):
-        pydaw_abstract_plugin_ui.__init__(
-            self, a_val_callback, a_project, a_plugin_uid, a_stylesheet,
-            a_configure_callback, a_folder, a_midi_learn_callback,
-            a_cc_map_callback, a_can_resize=True)
+    def __init__(self, *args, **kwargs):
+        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        #a_can_resize=True)
         self.track_name = str(a_track_name)
         self.widget.setWindowTitle(
             "MusiKernel Euphoria - {}".format(self.track_name))

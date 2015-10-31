@@ -386,15 +386,25 @@ class pydaw_abstract_ui_control:
                 self.value_label.setText(str(round(f_value * .1, 1)))
 
 
-    def add_to_grid_layout(self, a_layout, a_x):
+    def add_to_grid_layout(
+            self, a_layout, a_x, a_alignment=QtCore.Qt.AlignHCenter):
         if self.name_label is not None:
+            if a_alignment:
+                a_layout.addWidget(
+                    self.name_label, 0, a_x, alignment=a_alignment)
+            else:
+                a_layout.addWidget(self.name_label, 0, a_x)
+        if a_alignment:
             a_layout.addWidget(
-                self.name_label, 0, a_x, alignment=QtCore.Qt.AlignHCenter)
-        a_layout.addWidget(
-            self.control, 1, a_x, alignment=QtCore.Qt.AlignHCenter)
+                self.control, 1, a_x, alignment=a_alignment)
+        else:
+            a_layout.addWidget(self.control, 1, a_x)
         if self.value_label is not None:
-            a_layout.addWidget(
-                self.value_label, 2, a_x, alignment=QtCore.Qt.AlignHCenter)
+            if a_alignment:
+                a_layout.addWidget(
+                    self.value_label, 2, a_x, alignment=a_alignment)
+            else:
+                a_layout.addWidget(self.value_label, 2, a_x)
 
     def set_value_dialog(self):
         def ok_handler(a_self=None, a_val=None):
@@ -4910,7 +4920,8 @@ class pydaw_per_audio_item_fx_widget:
 class pydaw_abstract_plugin_ui:
     def __init__(self, a_val_callback, a_project, a_plugin_uid, a_stylesheet,
                  a_configure_callback, a_folder, a_midi_learn_callback,
-                 a_cc_map_callback, a_can_resize=False):
+                 a_cc_map_callback, a_can_resize=False, a_is_mixer=False):
+        self.is_mixer = a_is_mixer
         self.plugin_uid = int(a_plugin_uid)
         self.folder = str(a_folder)
         self.can_resize = a_can_resize
@@ -4919,23 +4930,14 @@ class pydaw_abstract_plugin_ui:
         self.configure_callback = a_configure_callback
         self.midi_learn_callback = a_midi_learn_callback
         self.cc_map_callback = a_cc_map_callback
-        self.widget = QScrollArea(libmk.MAIN_WINDOW)
-        #self.widget.setWindowFlags(QtCore.Qt.Window)
+        self.widget = QWidget(libmk.MAIN_WINDOW)
+        self.widget.closeEvent = self.widget_close_event
         self.widget.setObjectName("plugin_ui")
-        #self.widget.setMinimumSize(500, 500)
         self.widget.setStyleSheet(str(a_stylesheet))
         self.widget.keyPressEvent = self.widget_keyPressEvent
 
-#        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-#        self.widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-#        self.scrollarea_widget = QWidget()
-#        self.scrollarea_widget.setObjectName("plugin_ui")
-#        self.widget.setWidgetResizable(True)
-#        self.widget.setWidget(self.scrollarea_widget)
-
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(2, 2, 2, 2)
-#        self.scrollarea_widget.setLayout(self.layout)
         self.widget.setLayout(self.layout)
         self.port_dict = {}
         self.effects = []
@@ -4951,7 +4953,7 @@ class pydaw_abstract_plugin_ui:
         return set()
 
     def widget_keyPressEvent(self, a_event):
-        QScrollArea.keyPressEvent(self.widget, a_event)
+        QWidget.keyPressEvent(self.widget, a_event)
         if a_event.key() == QtCore.Qt.Key_Space:
             libmk.TRANSPORT.on_spacebar()
 
@@ -5041,6 +5043,10 @@ class pydaw_abstract_plugin_ui:
 #            self.mk_project.commit(
 #                _("Update controls for {}").format(self.track_name))
 #            self.mk_project.flush_history()
+
+    def widget_close_event(self, a_event):
+        self.widget_close()
+        QWidget.closeEvent(self.widget, a_event)
 
     def widget_close(self):
         """ Override to do something when the widget is hidden """

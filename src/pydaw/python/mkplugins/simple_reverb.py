@@ -34,14 +34,8 @@ SREVERB_PORT_MAP = {
 
 
 class sreverb_plugin_ui(pydaw_abstract_plugin_ui):
-    def __init__(self, a_val_callback, a_project,
-                 a_folder, a_plugin_uid, a_track_name, a_stylesheet,
-                 a_configure_callback, a_midi_learn_callback,
-                 a_cc_map_callback):
-        pydaw_abstract_plugin_ui.__init__(
-            self, a_val_callback, a_project, a_plugin_uid, a_stylesheet,
-            a_configure_callback, a_folder, a_midi_learn_callback,
-            a_cc_map_callback)
+    def __init__(self, *args, **kwargs):
+        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "SREVERB"
         self.is_instrument = False
 
