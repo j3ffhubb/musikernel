@@ -8110,9 +8110,6 @@ class seq_track:
                 f_plugin.remove_from_layout()
             self.create_menu()
 
-    def get_plugin_uids(self):
-        return [x.plugin_uid for x in self.plugins if x.plugin_uid != -1]
-
     def plugin_changed(self, a_val=None):
         self.control_combobox.clear()
         if self.automation_plugin_name != "None":
@@ -8954,10 +8951,12 @@ class pydaw_main_window(QScrollArea):
                     f_port, float(f_val))
         for k, f_val in f_cc_dict.items():
             f_track_num, f_cc = (int(x) for x in k)
-            for f_plugin_uid in \
-            TRACK_PANEL.tracks[f_track_num].get_plugin_uids():
-                if f_plugin_uid in libmk.PLUGIN_UI_DICT:
-                    libmk.PLUGIN_UI_DICT[f_plugin_uid].set_cc_val(f_cc, f_val)
+            if f_track_num in PLUGIN_RACK.plugin_racks:
+                rack = PLUGIN_RACK.plugin_racks[f_track_num]
+                for f_plugin_uid in rack.get_plugin_uids():
+                    if f_plugin_uid in libmk.PLUGIN_UI_DICT:
+                        libmk.PLUGIN_UI_DICT[
+                            f_plugin_uid].set_cc_val(f_cc, f_val)
 
     def prepare_to_quit(self):
         try:

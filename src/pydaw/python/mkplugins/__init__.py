@@ -571,6 +571,9 @@ class PluginRack:
             self.scroll_vlayout.addLayout(plugin.vlayout)
         self.open_plugins()
 
+    def get_plugin_uids(self):
+        return [x.plugin_uid for x in self.plugins if x.plugin_uid != -1]
+
     def set_plugin_order(self):
         f_labels = ["{} : {}".format(f_i, x.plugin_combobox.currentText())
             for f_i, x in zip(range(1, 11), self.plugins)]
