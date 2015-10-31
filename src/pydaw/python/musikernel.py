@@ -528,9 +528,6 @@ class MkMainWindow(QMainWindow):
         self.main_stack.setCurrentIndex(a_index)
         self.current_module = libmk.HOST_MODULES[a_index]
         self.current_window = self.host_windows[a_index]
-        if libmk.PLUGIN_UI_DICT:
-            # Must call this before setting libmk.CURRENT_HOST
-            libmk.PLUGIN_UI_DICT.set_host(a_index)
         libmk.CURRENT_HOST = a_index
         libmk.IPC.pydaw_set_host(a_index)
 

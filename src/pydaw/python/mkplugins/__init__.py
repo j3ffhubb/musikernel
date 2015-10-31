@@ -158,7 +158,6 @@ class mk_plugin_ui_dict:
             a_stylesheet: Qt-CSS string
         """
         self.ui_dict = {}
-        self.host_sets = {}
         self.midi_learn_control = None
         self.ctrl_update_callback = a_ipc.pydaw_update_plugin_control
         self.project = a_project
@@ -173,17 +172,6 @@ class mk_plugin_ui_dict:
 
     def __getitem__(self, a_plugin_uid):
         return self.ui_dict[a_plugin_uid]
-
-    def set_host(self, a_new_host):
-        f_old_host = libmk.CURRENT_HOST
-        self.host_sets[f_old_host] = [
-            x for x in self.ui_dict.values() if not x.widget.isHidden()]
-        for x in self.host_sets[f_old_host]:
-            x.widget.close()
-        if a_new_host in self.host_sets:
-            for x in self.host_sets[a_new_host]:
-                x.widget.setHidden(False)
-                x.raise_widget()
 
     def open_plugin_ui(
             self, a_plugin_uid, a_plugin_type, a_title, a_show=False):
@@ -272,18 +260,13 @@ class PluginComboBox(QPushButton):
                 f_action.plugin_name = f_name
 
 
-class plugin_settings_base:
+class AbstractPluginSettings:
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_qcbox=False):
+            a_save_callback, a_qcbox=False, a_mixer=False):
         self.plugin_ui = None
         self.set_plugin_func = a_set_plugin_func
         self.vlayout = QVBoxLayout()
-        self.controls_widget = QWidget()
-        self.controls_widget.setObjectName("plugin_rack")
-        self.layout = QHBoxLayout(self.controls_widget)
-        self.layout.addWidget(QLabel(_("Plugin")))
-        self.vlayout.addWidget(self.controls_widget)
         self.suppress_osc = False
         self.save_callback = a_save_callback
         self.plugin_uid = -1
@@ -308,15 +291,21 @@ class plugin_settings_base:
         if a_qcbox or True:
             self.plugin_combobox.currentIndexChanged.connect(
                 self.on_plugin_change)
-#        self.ui_button = QPushButton("UI")
-#        self.ui_button.released.connect(self.on_show_ui)
-#        self.ui_button.setObjectName("uibutton")
-#        self.ui_button.setFixedWidth(24)
+
         self.power_checkbox = QCheckBox("Power")
         self.power_checkbox.setChecked(True)
-        self.power_checkbox.clicked.connect(self.on_power_changed)
-        self.layout.addWidget(self.plugin_combobox)
-        self.layout.addWidget(self.power_checkbox)
+        if a_mixer:
+            self.vlayout.addWidget(self.plugin_combobox)
+            self.vlayout.setAlignment(self.plugin_combobox, QtCore.Qt.AlignTop)
+        else:
+            self.controls_widget = QWidget()
+            self.controls_widget.setObjectName("plugin_rack")
+            self.layout = QHBoxLayout(self.controls_widget)
+            self.layout.addWidget(QLabel(_("Plugin")))
+            self.vlayout.addWidget(self.controls_widget)
+            self.layout.addWidget(self.plugin_combobox)
+            self.power_checkbox.clicked.connect(self.on_power_changed)
+            self.layout.addWidget(self.power_checkbox)
 
     def clear(self):
         self.set_value(libmk.pydaw_track_plugin(self.index, 0, -1))
@@ -410,7 +399,7 @@ class plugin_settings_base:
         self.vlayout.addWidget(self.plugin_ui.widget)
 
 
-class plugin_settings_main(plugin_settings_base):
+class PluginSettingsMain(AbstractPluginSettings):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback):
         self.plugin_list = MAIN_PLUGIN_NAMES
@@ -429,28 +418,25 @@ class plugin_settings_main(plugin_settings_base):
         f_clear_action = self.menu.addAction(_("Clear"))
         f_clear_action.triggered.connect(self.clear)
 
-        plugin_settings_base.__init__(
+        AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback)
         self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
 
 
-class plugin_settings_mixer(plugin_settings_base):
+class PluginSettingsMixer(AbstractPluginSettings):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback):
         self.plugin_list = MIXER_PLUGIN_NAMES
-        plugin_settings_base.__init__(
+        AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_qcbox=True)
-        self.bus_index = a_index
-        self.index += 10
-        self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
+            a_save_callback, a_qcbox=True, a_mixer=True)
 
 
-class plugin_settings_wave_editor(plugin_settings_base):
+class PluginSettingsWaveEditor(AbstractPluginSettings):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback):
         self.plugin_list = WAVE_EDITOR_PLUGIN_NAMES
-        plugin_settings_base.__init__(
+        AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback)
         self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
 
@@ -543,7 +529,7 @@ class PluginRackTab:
 
 
 class PluginRack:
-    def __init__(self, a_project, a_track_number, a_type=plugin_settings_main):
+    def __init__(self, a_project, a_track_number, a_type=PluginSettingsMain):
         self.track_number = int(a_track_number)
         self.PROJECT = a_project
         self.plugins = [
@@ -570,6 +556,8 @@ class PluginRack:
         for plugin in self.plugins:
             self.scroll_vlayout.addLayout(plugin.vlayout)
         self.open_plugins()
+        self.scroll_vlayout.addItem(
+            QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Expanding))
 
     def get_plugin_uids(self):
         return [x.plugin_uid for x in self.plugins if x.plugin_uid != -1]

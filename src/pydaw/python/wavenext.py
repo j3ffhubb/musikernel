@@ -1224,7 +1224,7 @@ def global_open_project(a_project_file):
     MAIN_WINDOW.notes_tab.setText(PROJECT.get_notes())
     WAVE_EDITOR.open_project()
     TRANSPORT.open_project()
-    PLUGIN_RACK = PluginRack(PROJECT, 0, plugin_settings_wave_editor)
+    PLUGIN_RACK = PluginRack(PROJECT, 0, PluginSettingsWaveEditor)
     MAIN_WINDOW.main_tabwidget.insertTab(
         1, PLUGIN_RACK.widget, _("Plugin Rack"))
 
@@ -1237,7 +1237,7 @@ def global_new_project(a_project_file):
     MAIN_WINDOW.last_offline_dir = libmk.PROJECT.user_folder
     MAIN_WINDOW.notes_tab.setText("")
     WAVE_EDITOR.open_project()
-    PLUGIN_RACK = PluginRack(PROJECT, 0, plugin_settings_wave_editor)
+    PLUGIN_RACK = PluginRack(PROJECT, 0, PluginSettingsWaveEditor)
     MAIN_WINDOW.main_tabwidget.insertTab(
         1, PLUGIN_RACK.widget, _("Plugin Rack"))
 
