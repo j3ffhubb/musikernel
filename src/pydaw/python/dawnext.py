@@ -39,6 +39,7 @@ import libdawnext.strings
 import libmk
 from libmk import mk_project
 from libdawnext import *
+import mkplugins
 
 TAB_SEQUENCER = 0
 TAB_PLUGIN_RACK = 1
@@ -9059,7 +9060,7 @@ PIANO_ROLL_EDITOR_WIDGET = piano_roll_editor_widget()
 AUDIO_SEQ = audio_items_viewer()
 AUDIO_SEQ_WIDGET = audio_items_viewer_widget()
 ITEM_EDITOR = item_list_editor()
-MIXER_WIDGET = pydaw_widgets.mixer_widget(TRACK_COUNT_ALL)
+MIXER_WIDGET = mkplugins.MixerWidget(TRACK_COUNT_ALL)
 
 def get_mixer_peak_meters():
     for k, v in MIXER_WIDGET.tracks.items():
