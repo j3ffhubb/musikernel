@@ -4920,11 +4920,10 @@ class pydaw_per_audio_item_fx_widget:
 class pydaw_abstract_plugin_ui:
     def __init__(self, a_val_callback, a_project, a_plugin_uid, a_stylesheet,
                  a_configure_callback, a_folder, a_midi_learn_callback,
-                 a_cc_map_callback, a_can_resize=False, a_is_mixer=False):
+                 a_cc_map_callback, a_is_mixer=False):
         self.is_mixer = a_is_mixer
         self.plugin_uid = int(a_plugin_uid)
         self.folder = str(a_folder)
-        self.can_resize = a_can_resize
         self.mk_project = a_project
         self.val_callback = a_val_callback
         self.configure_callback = a_configure_callback
