@@ -390,6 +390,9 @@ class AbstractPluginSettings:
         pass
 
     def on_show_ui(self):
+        plugin_name = str(self.plugin_combobox.currentText())
+        if not plugin_name:
+            return
         f_index = get_plugin_uid_by_name(self.plugin_combobox.currentText())
         if f_index == 0 or self.plugin_uid == -1:
             return
@@ -432,6 +435,7 @@ class PluginSettingsMixer(AbstractPluginSettings):
             self, a_set_plugin_func, a_index, a_track_num,
             a_save_callback, a_qcbox=True, a_is_mixer=True)
         self.index += 10
+        self.vlayout.setParent(None)
 
 
 class PluginSettingsWaveEditor(AbstractPluginSettings):
@@ -617,10 +621,10 @@ class MixerChannel:
         if not f_result:
             f_result = libmk.pydaw_track_plugins()
             f_result.plugins = [
-                pydaw_track_plugin(x, 0, -1) for x in range(14)]
+                libmk.pydaw_track_plugin(x, 0, -1) for x in range(14)]
         elif len(f_result.plugins) < 14:
             for i in range(len(f_result.plugins), 14):
-                f_result.plugins.append(pydaw_track_plugin(x, 0, -1))
+                f_result.plugins.append(libmk.pydaw_track_plugin(x, 0, -1))
 
         for index, plugin in (
         (k, v.get_value()) for k, v in self.sends.items()):
