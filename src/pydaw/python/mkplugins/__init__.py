@@ -431,6 +431,7 @@ class PluginSettingsMixer(AbstractPluginSettings):
         AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
             a_save_callback, a_qcbox=True, a_is_mixer=True)
+        self.index += 10
 
 
 class PluginSettingsWaveEditor(AbstractPluginSettings):
@@ -597,7 +598,8 @@ class PluginRack:
 
 
 class MixerChannel:
-    def __init__(self, a_name):
+    def __init__(self, a_name, a_track_num):
+        self.track_number = a_track_num
         self.widget = QWidget()
         self.vlayout = QVBoxLayout(self.widget)
         self.sends = {}
@@ -610,14 +612,32 @@ class MixerChannel:
         self.peak_meter = pydaw_widgets.peak_meter(20, True)
         self.grid_layout.addWidget(self.peak_meter.widget, 0, 0, 2, 1)
 
+    def save_callback(self):
+        f_result = self.PROJECT.get_track_plugins(self.track_number)
+        if not f_result:
+            f_result = libmk.pydaw_track_plugins()
+            f_result.plugins = [
+                pydaw_track_plugin(x, 0, -1) for x in range(14)]
+        elif len(f_result.plugins) < 14:
+            for i in range(len(f_result.plugins), 14):
+                f_result.plugins.append(pydaw_track_plugin(x, 0, -1))
+
+        for index, plugin in (
+        (k, v.get_value()) for k, v in self.sends.items()):
+            f_result.plugins[plugin.index] = plugin
+        self.PROJECT.save_track_plugins(self.track_number, f_result)
+        self.PROJECT.commit(
+            "Update mixer plugins for track {}".format(self.track_number))
+
     def clear(self):
         self.sends = {}
         self.outputs = {}
         self.output_labels = {}
         for i in reversed(range(1, self.grid_layout.count())):
-            f_widget = self.grid_layout.itemAt(i).widget()
-            self.grid_layout.removeWidget(f_widget)
-            f_widget.setParent(None)
+            f_widget = self.grid_layout.itemAt(i).layout()
+            if f_widget:
+                self.grid_layout.removeItem(f_widget)
+                f_widget.setParent(None)
 
     def set_name(self, a_name, a_dict):
         self.name_label.setText(a_name)
@@ -631,15 +651,13 @@ class MixerChannel:
         assert(a_index != -1)
         if a_index in self.sends:
             self.remove_plugin(a_index)
+        a_plugin.save_callback = self.save_callback
         self.sends[a_index] = a_plugin
         self.outputs[a_index] = a_output
         f_label = QLabel(str(a_output))
         self.output_labels[a_index] = f_label
         self.grid_layout.addWidget(f_label, 0, a_index + 1)
-        a_plugin.widget.setSizePolicy(
-            QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self.grid_layout.addWidget(a_plugin.widget, 1, a_index + 1)
-        a_plugin.widget.setHidden(False)
+        self.grid_layout.addLayout(a_plugin.vlayout, 1, a_index + 1)
 
     def remove_plugin(self, a_index):
         if a_index in self.sends:
@@ -662,10 +680,17 @@ class MixerWidget:
         self.widget.setWidget(self.main_widget)
         self.tracks = {}
         self.grid_layout = QGridLayout(self.main_widget)
+        self.track_count = a_track_count
         for f_i in range(a_track_count):
-            f_channel = MixerChannel("track{}".format(f_i))
+            f_channel = MixerChannel("track{}".format(f_i), f_i)
             self.tracks[f_i] = f_channel
             self.grid_layout.addWidget(f_channel.widget, 0, f_i)
+
+    def set_project(self, a_project):
+        self.PROJECT = a_project
+        for f_i in range(self.track_count):
+            self.tracks[f_i].PROJECT = a_project
+
 
     def set_tooltips(self, a_enabled):
         if a_enabled:
@@ -676,6 +701,11 @@ class MixerWidget:
     def update_track_names(self, a_track_names_dict):
         for k, v in a_track_names_dict.items():
             self.tracks[k].set_name(v, a_track_names_dict)
+
+    def add_send(
+            self, a_track_index, a_send_index, a_output, a_plugin_settings):
+        self.tracks[a_track_index].add_plugin(
+            a_send_index, a_plugin_settings, a_output)
 
     def set_plugin_widget(
             self, a_track_index, a_send_index, a_output, a_plugin):

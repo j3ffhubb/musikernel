@@ -766,7 +766,7 @@ class pydaw_track:
             self.track_pos, self.name))))
 
 
-class pydaw_routing_graph:
+class RoutingGraph:
     def __init__(self):
         self.graph = {}
 
@@ -823,7 +823,7 @@ class pydaw_routing_graph:
                 for f_i in range(4):
                     if f_i not in self.graph[a_src]:
                         break
-            f_result = pydaw_track_send(a_src, f_i, a_dest, a_sidechain)
+            f_result = TrackSend(a_src, f_i, a_dest, a_sidechain)
             self.graph[a_src][f_i] = f_result
             self.set_node(a_src, self.graph[a_src])
         return None
@@ -833,7 +833,7 @@ class pydaw_routing_graph:
         assert(a_track_num != 0)
         if not a_track_num in self.graph or \
         not self.graph[a_track_num]:
-            f_send = pydaw_track_send(a_track_num, 0, a_output, 0)
+            f_send = TrackSend(a_track_num, 0, a_output, 0)
             self.set_node(a_track_num, {0:f_send})
             return True
         else:
@@ -864,7 +864,7 @@ class pydaw_routing_graph:
     @staticmethod
     def from_str(a_str):
         f_str = str(a_str)
-        f_result = pydaw_routing_graph()
+        f_result = RoutingGraph()
         f_tracks = {}
         for f_line in f_str.split("\n"):
             if f_line == "\\":
@@ -875,7 +875,7 @@ class pydaw_routing_graph:
                 assert(f_uid not in f_tracks)
                 f_tracks[f_uid] = {}
             elif f_line_arr[0] == "s":
-                f_send = pydaw_track_send(*f_line_arr[1:])
+                f_send = TrackSend(*f_line_arr[1:])
                 f_tracks[f_uid][f_send.index] = f_send
             elif f_line_arr[0] == "c":
                 pass
@@ -886,7 +886,7 @@ class pydaw_routing_graph:
         return f_result
 
 
-class pydaw_track_send:
+class TrackSend:
     def __init__(self, a_track_num, a_index, a_output, a_sidechain):
         self.track_num = int(a_track_num)
         self.index = int(a_index)

@@ -231,9 +231,9 @@ class DawNextProject(libmk.AbstractProject):
     def get_routing_graph(self):
         if os.path.isfile(self.routing_graph_file):
             with open(self.routing_graph_file) as f_handle:
-                return pydaw_routing_graph.from_str(f_handle.read())
+                return RoutingGraph.from_str(f_handle.read())
         else:
-            return pydaw_routing_graph()
+            return RoutingGraph()
 
     def save_routing_graph(self, a_graph, a_notify=True):
         self.save_file("", pydaw_file_routing_graph, str(a_graph))

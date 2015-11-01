@@ -7971,13 +7971,20 @@ def global_open_mixer():
             if f_track_index in f_plugins and \
             f_send_plugin_index in f_plugins[f_track_index]:
                 f_plugin_obj = f_plugins[f_track_index][f_send_plugin_index]
-                if f_plugin_obj.plugin_index == 0 or \
-                f_send.output == -1:  # None
-                    continue
-                f_plugin_ui = libmk.PLUGIN_UI_DICT.open_plugin_ui(
-                    f_plugin_obj.plugin_uid, f_plugin_obj.plugin_index, False)
-                MIXER_WIDGET.set_plugin_widget(
-                    f_track_index, k, f_send.output, f_plugin_ui)
+                f_plugin_uid = f_plugin_obj.plugin_index
+            else:
+                f_plugin_obj = None
+                f_plugin_uid = 0
+                #if f_plugin_obj.plugin_index == 0: # or \
+                #f_send.output == -1:  # None
+                #    continue
+            f_plugin = mkplugins.PluginSettingsMixer(
+                PROJECT.IPC.pydaw_set_plugin, f_plugin_uid,
+                f_track_index, None)
+            if f_plugin_obj:
+                f_plugin.set_value(f_plugin_obj)
+            MIXER_WIDGET.add_send(
+                f_track_index, k, f_send.output, f_plugin)
     MIXER_WIDGET.update_track_names(
         {f_i:x for f_i, x in zip(
         range(len(TRACK_NAMES)), TRACK_NAMES)})
@@ -9024,6 +9031,7 @@ def global_open_project(a_project_file):
     REGION_SETTINGS.snap_combobox.setCurrentIndex(1)
     TRANSPORT.open_project()
     PLUGIN_RACK.initialize(PROJECT)
+    MIXER_WIDGET.set_project(PROJECT)
 
 def global_new_project(a_project_file):
     global PROJECT
@@ -9037,6 +9045,7 @@ def global_new_project(a_project_file):
     REGION_SETTINGS.open_region()
     REGION_SETTINGS.snap_combobox.setCurrentIndex(1)
     PLUGIN_RACK.initialize(PROJECT)
+    MIXER_WIDGET.set_project(PROJECT)
 
 PROJECT = DawNextProject(global_pydaw_with_audio)
 
