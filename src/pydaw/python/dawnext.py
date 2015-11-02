@@ -576,7 +576,7 @@ def global_update_track_comboboxes(a_index=None, a_value=None):
         TRACK_NAMES[int(a_index)] = str(a_value)
     global SUPPRESS_TRACK_COMBOBOX_CHANGES
     SUPPRESS_TRACK_COMBOBOX_CHANGES = True
-    for f_cbox in AUDIO_TRACK_COMBOBOXES:
+    for f_cbox in TRACK_NAME_COMBOBOXES:
         f_current_index = f_cbox.currentIndex()
         f_cbox.clear()
         f_cbox.clearEditText()
@@ -7887,7 +7887,7 @@ class ItemListViewer:
         self.pitchbend_table_widget.resizeColumnsToContents()
 
 
-class midi_device:
+class MidiDevice:
     def __init__(self, a_name, a_index, a_layout, a_save_callback):
         self.suppress_updates = True
         self.name = str(a_name)
@@ -7901,7 +7901,7 @@ class midi_device:
         self.track_combobox = QComboBox()
         self.track_combobox.setMinimumWidth(180)
         self.track_combobox.addItems(TRACK_NAMES)
-        AUDIO_TRACK_COMBOBOXES.append(self.track_combobox)
+        TRACK_NAME_COMBOBOXES.append(self.track_combobox)
         self.track_combobox.currentIndexChanged.connect(self.device_changed)
         a_layout.addWidget(self.track_combobox, f_index, 2)
         self.suppress_updates = False
@@ -7909,9 +7909,12 @@ class midi_device:
     def device_changed(self, a_val=None):
         if SUPPRESS_TRACK_COMBOBOX_CHANGES or self.suppress_updates:
             return
+        track_index = self.track_combobox.currentIndex()
         PROJECT.IPC.pydaw_midi_device(
             self.record_checkbox.isChecked(), self.index,
-            self.track_combobox.currentIndex())
+            track_index)
+        if track_index:  # not master
+            TRACK_PANEL.tracks[track_index].check_output()
         self.save_callback()
 
     def get_routing(self):
@@ -7937,7 +7940,7 @@ class MidiDevicesDialog:
         self.layout.addWidget(QLabel(_("Output")), 0, 2)
         for f_name, f_i in zip(
         pydaw_util.MIDI_IN_DEVICES, range(len(pydaw_util.MIDI_IN_DEVICES))):
-            f_device = midi_device(
+            f_device = MidiDevice(
                 f_name, f_i, self.layout, self.save_callback)
             self.devices.append(f_device)
             self.devices_dict[f_name] = f_device
@@ -8256,7 +8259,7 @@ class AudioInput:
             self.update_engine)
         self.output_track_combobox = QComboBox()
         self.output_track_combobox.setMinimumWidth(140)
-        AUDIO_TRACK_COMBOBOXES.append(self.output_track_combobox)
+        TRACK_NAME_COMBOBOXES.append(self.output_track_combobox)
         self.output_track_combobox.addItems(TRACK_NAMES)
         self.output_track_combobox.currentIndexChanged.connect(
             self.output_track_changed)
@@ -9033,7 +9036,7 @@ TRACK_NAMES = ["Master" if x == 0 else "track{}".format(x)
     for x in range(TRACK_COUNT_ALL)]
 
 SUPPRESS_TRACK_COMBOBOX_CHANGES = False
-AUDIO_TRACK_COMBOBOXES = []
+TRACK_NAME_COMBOBOXES = []
 
 SEQUENCER = ItemSequencer()
 
