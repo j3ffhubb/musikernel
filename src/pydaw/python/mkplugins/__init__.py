@@ -151,7 +151,7 @@ def pydaw_center_widget_on_screen(a_widget):
     f_y = pydaw_clip_value(f_desktop_center.y() - f_widget_center.y(), 0, 200)
     a_widget.move(f_x, f_y)
 
-class mk_plugin_ui_dict:
+class MkPluginUiDict:
     def __init__(self, a_project, a_ipc, a_stylesheet):
         """ a_project:    libmk.AbstractProject
             a_ipc:        libmk.AbstractIPC

@@ -27,7 +27,7 @@ from libpydaw.translate import _
 import libmk
 from libmk import mk_project
 import libpydaw.strings
-from mkplugins import mk_plugin_ui_dict
+from mkplugins import MkPluginUiDict
 
 import time
 import gc
@@ -1373,7 +1373,7 @@ def global_open_project(a_project_file, a_wait=True):
         libmk.PROJECT.create_backup()
     except Exception as ex:
         print("ERROR:  libmk.PROJECT.create_backup() failed: {}".format(ex))
-    libmk.PLUGIN_UI_DICT = mk_plugin_ui_dict(
+    libmk.PLUGIN_UI_DICT = MkPluginUiDict(
         libmk.PROJECT, libmk.IPC, MAIN_WINDOW.styleSheet())
     for f_module in libmk.HOST_MODULES:
         f_module.global_open_project(a_project_file)
@@ -1384,7 +1384,7 @@ def global_new_project(a_project_file, a_wait=True):
     libmk.PROJECT = mk_project.MkProject()
     libmk.PROJECT.new_project(a_project_file)
     MAIN_WINDOW.last_offline_dir = libmk.PROJECT.user_folder
-    libmk.PLUGIN_UI_DICT = mk_plugin_ui_dict(
+    libmk.PLUGIN_UI_DICT = MkPluginUiDict(
         libmk.PROJECT, libmk.IPC, MAIN_WINDOW.styleSheet())
     for f_module in libmk.HOST_MODULES:
         f_module.global_new_project(a_project_file)
