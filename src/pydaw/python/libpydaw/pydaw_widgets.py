@@ -13,8 +13,9 @@ GNU General Public License for more details.
 
 """
 
-import os
+import collections
 import math
+import os
 import shutil
 
 from . import pydaw_util
@@ -290,7 +291,7 @@ KC_TENTH = 11
 
 LAST_TEMPO_COMBOBOX_INDEX = 2
 
-class pydaw_abstract_ui_control:
+class AbstractUiControl:
     def __init__(self, a_label, a_port_num, a_rel_callback, a_val_callback,
                  a_val_conversion=KC_NONE, a_port_dict=None, a_preset_mgr=None,
                  a_default_value=None):
@@ -300,6 +301,8 @@ class pydaw_abstract_ui_control:
             self.name_label = QLabel(str(a_label))
             self.name_label.setAlignment(QtCore.Qt.AlignCenter)
             self.name_label.setMinimumWidth(15)
+        self.undo_history = collections.deque()
+        self.value_set = 0
         self.port_num = int(a_port_num)
         self.val_callback = a_val_callback
         self.rel_callback = a_rel_callback
@@ -322,9 +325,12 @@ class pydaw_abstract_ui_control:
             self.set_value(self.default_value, True)
 
     def set_value(self, a_val, a_changed=False):
+        f_val = int(a_val)
+        if self.value_set < 2:
+            self.value_set += 1
+            self.add_undo_history(f_val)
         if not a_changed:
             self.suppress_changes = True
-        f_val = int(a_val)
         self.control.setValue(f_val)
         self.control_value_changed(f_val)
         self.suppress_changes = False
@@ -338,53 +344,68 @@ class pydaw_abstract_ui_control:
         self.label_value_127_add_to = 0.0 - a_min;
         self.label_value_127_multiply_by = ((a_max - a_min) / 127.0);
 
+    def add_undo_history(self, value):
+        self.undo_history.append(value)
+        if len(self.undo_history) > 10:
+            self.undo_history.popleft()
+
     def control_released(self):
+        value = self.control.value()
+        self.add_undo_history(value)
         if self.rel_callback is not None:
-            self.rel_callback(self.port_num, self.control.value())
+            self.rel_callback(self.port_num, value)
+
+    def value_conversion(self, a_value):
+        """ Convert a control value to a human-readable string """
+        f_value = float(a_value)
+        f_dec_value = 0.0
+        retval = None
+        if self.val_conversion == KC_NONE:
+            pass
+        elif self.val_conversion == KC_DECIMAL or \
+        self.val_conversion == KC_TIME_DECIMAL or \
+        self.val_conversion == KC_HZ_DECIMAL:
+            retval = (str(round(f_value * .01, 2)))
+        elif self.val_conversion == KC_INTEGER or \
+        self.val_conversion == KC_INT_PITCH:
+            retval = (str(int(f_value)))
+        elif self.val_conversion == KC_PITCH:
+            f_val = int(pydaw_util.pydaw_pitch_to_hz(f_value))
+            if f_val >= 1000:
+                f_val = str(round(f_val * 0.001, 1)) + "k"
+            retval = (str(f_val))
+        elif self.val_conversion == KC_127_PITCH:
+            retval = (
+                str(int(pydaw_util.pydaw_pitch_to_hz(
+                (f_value * 0.818897638) + 20.0))))
+        elif self.val_conversion == KC_127_ZERO_TO_X:
+            f_dec_value = (float(f_value) *
+                self.label_value_127_multiply_by) - \
+                self.label_value_127_add_to
+            f_dec_value = ((int)(f_dec_value * 10.0)) * 0.1
+            retval = (str(round(f_dec_value, 2)))
+        elif self.val_conversion == KC_127_ZERO_TO_X_INT:
+            f_dec_value = (float(f_value) *
+                self.label_value_127_multiply_by) - \
+                self.label_value_127_add_to
+            retval = (str(int(f_dec_value)))
+        elif self.val_conversion == KC_LOG_TIME:
+            f_dec_value = float(f_value) * 0.01
+            f_dec_value = f_dec_value * f_dec_value
+            retval = (str(round(f_dec_value, 2)))
+        elif self.val_conversion == KC_TENTH:
+            retval = (str(round(f_value * .1, 1)))
+        else:
+            assert False, "Unknown self.val_conversion: {}".format(
+                self.val_conversion)
+        return retval
 
     def control_value_changed(self, a_value):
         if not self.suppress_changes:
             self.val_callback(self.port_num, self.control.value())
 
         if self.value_label is not None:
-            f_value = float(a_value)
-            f_dec_value = 0.0
-            if self.val_conversion == KC_NONE:
-                pass
-            elif self.val_conversion == KC_DECIMAL or \
-            self.val_conversion == KC_TIME_DECIMAL or \
-            self.val_conversion == KC_HZ_DECIMAL:
-                self.value_label.setText(str(round(f_value * .01, 2)))
-            elif self.val_conversion == KC_INTEGER or \
-            self.val_conversion == KC_INT_PITCH:
-                self.value_label.setText(str(int(f_value)))
-            elif self.val_conversion == KC_PITCH:
-                f_val = int(pydaw_util.pydaw_pitch_to_hz(f_value))
-                if f_val >= 1000:
-                    f_val = str(round(f_val * 0.001, 1)) + "k"
-                self.value_label.setText(str(f_val))
-            elif self.val_conversion == KC_127_PITCH:
-                self.value_label.setText(
-                    str(int(pydaw_util.pydaw_pitch_to_hz(
-                    (f_value * 0.818897638) + 20.0))))
-            elif self.val_conversion == KC_127_ZERO_TO_X:
-                f_dec_value = (float(f_value) *
-                    self.label_value_127_multiply_by) - \
-                    self.label_value_127_add_to
-                f_dec_value = ((int)(f_dec_value * 10.0)) * 0.1
-                self.value_label.setText(str(round(f_dec_value, 2)))
-            elif self.val_conversion == KC_127_ZERO_TO_X_INT:
-                f_dec_value = (float(f_value) *
-                    self.label_value_127_multiply_by) - \
-                    self.label_value_127_add_to
-                self.value_label.setText(str(int(f_dec_value)))
-            elif self.val_conversion == KC_LOG_TIME:
-                f_dec_value = float(f_value) * 0.01
-                f_dec_value = f_dec_value * f_dec_value
-                self.value_label.setText(str(round(f_dec_value, 2)))
-            elif self.val_conversion == KC_TENTH:
-                self.value_label.setText(str(round(f_value * .1, 1)))
-
+            self.value_label.setText(self.value_conversion(a_value))
 
     def add_to_grid_layout(
             self, a_layout, a_x, a_alignment=QtCore.Qt.AlignHCenter):
@@ -636,9 +657,20 @@ class pydaw_abstract_ui_control:
         f_dialog.move(self.control.mapToGlobal(QtCore.QPoint(0.0, 0.0)))
         f_dialog.exec_()
 
+    def undo_action_callback(self, a_action):
+        value = a_action.control_value
+        self.set_value(value)
+        self.add_undo_history(value)
 
     def contextMenuEvent(self, a_event):
         f_menu = QMenu(self.control)
+        if self.undo_history:
+            undo_menu = QMenu(_("Undo"))
+            f_menu.addMenu(undo_menu)
+            undo_menu.triggered.connect(self.undo_action_callback)
+            for x in reversed(self.undo_history):
+                action = undo_menu.addAction(self.value_conversion(x))
+                action.control_value = x
         if self.midi_learn_callback:
             f_ml_action = f_menu.addAction(_("MIDI Learn"))
             f_ml_action.triggered.connect(self.midi_learn)
@@ -737,12 +769,12 @@ class pydaw_null_control:
     def set_midi_learn(self, a_ignored, a_ignored2):
         pass
 
-class pydaw_knob_control(pydaw_abstract_ui_control):
+class pydaw_knob_control(AbstractUiControl):
     def __init__(self, a_size, a_label, a_port_num,
                  a_rel_callback, a_val_callback,
                  a_min_val, a_max_val, a_default_val, a_val_conversion=KC_NONE,
                  a_port_dict=None, a_preset_mgr=None):
-        pydaw_abstract_ui_control.__init__(
+        AbstractUiControl.__init__(
             self, a_label, a_port_num, a_rel_callback,
             a_val_callback, a_val_conversion, a_port_dict, a_preset_mgr,
             a_default_val)
@@ -756,12 +788,12 @@ class pydaw_knob_control(pydaw_abstract_ui_control):
         self.set_value(a_default_val)
 
 
-class pydaw_slider_control(pydaw_abstract_ui_control):
+class pydaw_slider_control(AbstractUiControl):
     def __init__(self, a_orientation, a_label, a_port_num, a_rel_callback,
                  a_val_callback, a_min_val, a_max_val,
                  a_default_val, a_val_conversion=KC_NONE, a_port_dict=None,
                  a_preset_mgr=None):
-        pydaw_abstract_ui_control.__init__(
+        AbstractUiControl.__init__(
             self, a_label, a_port_num, a_rel_callback, a_val_callback,
             a_val_conversion, a_port_dict, a_preset_mgr, a_default_val)
         self.control = QSlider(a_orientation)
@@ -775,12 +807,12 @@ class pydaw_slider_control(pydaw_abstract_ui_control):
         self.set_value(a_default_val)
 
 
-class pydaw_spinbox_control(pydaw_abstract_ui_control):
+class pydaw_spinbox_control(AbstractUiControl):
     def __init__(self, a_label, a_port_num, a_rel_callback,
                  a_val_callback, a_min_val, a_max_val,
                  a_default_val, a_val_conversion=KC_NONE,
                  a_port_dict=None, a_preset_mgr=None):
-        pydaw_abstract_ui_control.__init__(
+        AbstractUiControl.__init__(
             self, a_label, a_port_num, a_rel_callback,
             a_val_callback, a_val_conversion,
             a_port_dict, a_preset_mgr, a_default_val)
@@ -794,12 +826,12 @@ class pydaw_spinbox_control(pydaw_abstract_ui_control):
         self.set_value(a_default_val)
 
 
-class pydaw_doublespinbox_control(pydaw_abstract_ui_control):
+class pydaw_doublespinbox_control(AbstractUiControl):
     def __init__(self, a_label, a_port_num, a_rel_callback,
                  a_val_callback, a_min_val, a_max_val,
                  a_default_val, a_val_conversion=KC_NONE, a_port_dict=None,
                  a_preset_mgr=None):
-        pydaw_abstract_ui_control.__init__(
+        AbstractUiControl.__init__(
             self, a_label, a_port_num, a_rel_callback,
             a_val_callback, a_val_conversion,
             a_port_dict, a_preset_mgr, a_default_val)
@@ -813,10 +845,10 @@ class pydaw_doublespinbox_control(pydaw_abstract_ui_control):
         self.set_value(a_default_val)
 
 
-class pydaw_checkbox_control(pydaw_abstract_ui_control):
+class pydaw_checkbox_control(AbstractUiControl):
     def __init__(self, a_label, a_port_num, a_rel_callback, a_val_callback,
                  a_port_dict=None, a_preset_mgr=None, a_default=0):
-        pydaw_abstract_ui_control.__init__(
+        AbstractUiControl.__init__(
             self, None, a_port_num, a_rel_callback, a_val_callback,
             a_port_dict=a_port_dict, a_preset_mgr=a_preset_mgr,
             a_default_value=a_default)
@@ -855,7 +887,7 @@ class pydaw_checkbox_control(pydaw_abstract_ui_control):
             return 0
 
 
-class pydaw_combobox_control(pydaw_abstract_ui_control):
+class pydaw_combobox_control(AbstractUiControl):
     def __init__(self, a_size, a_label, a_port_num,
                  a_rel_callback, a_val_callback,
                  a_items_list=[], a_port_dict=None, a_default_index=None,
