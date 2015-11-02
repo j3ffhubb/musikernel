@@ -296,9 +296,12 @@ class AbstractPluginSettings:
         self.power_checkbox = QCheckBox("Power")
         self.power_checkbox.setChecked(True)
 
-        if a_is_mixer:
+        if self.is_mixer:
             self.vlayout.addWidget(self.plugin_combobox)
             self.vlayout.setAlignment(self.plugin_combobox, QtCore.Qt.AlignTop)
+            self.spacer = QSpacerItem(
+                1, 1, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            self.vlayout.addItem(self.spacer)
         else:
             self.controls_widget = QWidget()
             self.controls_widget.setObjectName("plugin_rack")
@@ -405,12 +408,16 @@ class AbstractPluginSettings:
         f_index = get_plugin_uid_by_name(self.plugin_combobox.currentText())
         if f_index == 0 or self.plugin_uid == -1:
             print(self.track_num, f_index, self.plugin_uid)
+            if self.is_mixer:
+                self.vlayout.addItem(self.spacer)
             return
         if self.plugin_ui:
             print(self.track_num, "removing", self.plugin_ui.widget)
             self.vlayout.removeWidget(self.plugin_ui.widget)
         self.plugin_ui = libmk.PLUGIN_UI_DICT.open_plugin_ui(
             self.plugin_uid, f_index, a_is_mixer=self.is_mixer)
+        if self.is_mixer:
+            self.vlayout.removeItem(self.spacer)
         self.vlayout.addWidget(self.plugin_ui.widget)
 
 
@@ -630,7 +637,6 @@ class MixerChannel:
         self.outputs = {}
         self.output_labels = {}
         self.name_label = QLabel(a_name)
-        self.name_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.vlayout.addWidget(self.name_label, -1, QtCore.Qt.AlignTop)
         self.grid_layout = QGridLayout()
         self.vlayout.addLayout(self.grid_layout, 1)
