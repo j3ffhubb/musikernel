@@ -81,7 +81,7 @@ WAVE_EDITOR_PLUGIN_NAMES = [
     ("Mixer", PLUGINS_MIXER)
 ]
 
-MIXER_PLUGIN_NAMES = ["None"] + PLUGINS_MIXER
+MIXER_PLUGIN_NAMES = [("Mixer", PLUGINS_MIXER)]
 PLUGIN_UIDS_REVERSE = {v:k for k, v in PLUGIN_UIDS.items()}
 CC_NAMES = {x:[] for x in PLUGIN_NAMES}
 CONTROLLER_PORT_NAME_DICT = {x:{} for x in PLUGIN_NAMES}
@@ -345,15 +345,17 @@ class AbstractPluginSettings:
         self.suppress_osc = True
         # More Qt 5.5.0 regression work-around
         if self.qcbox:
+            assert False, "Codepath should not be in use"
             self.plugin_combobox.setCurrentIndex(a_val.plugin_index)
         else:
             f_name = PLUGIN_UIDS_REVERSE[a_val.plugin_index]
-            self.plugin_combobox.setCurrentIndex(
-                self.plugin_combobox.findText(f_name))
+            index = self.plugin_combobox.findText(f_name)
+            self.plugin_combobox.setCurrentIndex(index)
         self.plugin_index = a_val.plugin_index
 
         self.plugin_uid = a_val.plugin_uid
         self.power_checkbox.setChecked(a_val.power == 1)
+        print("O...M...G...")
         self.on_show_ui()
         self.suppress_osc = False
 
@@ -397,11 +399,16 @@ class AbstractPluginSettings:
     def on_show_ui(self):
         plugin_name = str(self.plugin_combobox.currentText())
         if not plugin_name:
+            print(
+                self.track_num, "'{}'".format(plugin_name),
+                "not plugin_name")
             return
         f_index = get_plugin_uid_by_name(self.plugin_combobox.currentText())
         if f_index == 0 or self.plugin_uid == -1:
+            print(self.track_num, f_index, self.plugin_uid)
             return
         if self.plugin_ui:
+            print(self.track_num, "removing", self.plugin_ui.widget)
             self.vlayout.removeWidget(self.plugin_ui.widget)
         self.plugin_ui = libmk.PLUGIN_UI_DICT.open_plugin_ui(
             self.plugin_uid, f_index, a_is_mixer=self.is_mixer)
@@ -438,7 +445,7 @@ class PluginSettingsMixer(AbstractPluginSettings):
         self.plugin_list = MIXER_PLUGIN_NAMES
         AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_qcbox=True, a_is_mixer=True)
+            a_save_callback, a_is_mixer=True)
         self.index += 10
         self.vlayout.setParent(None)
         self.plugin_combobox.setMinimumWidth(120)
@@ -597,7 +604,12 @@ class PluginRack:
         f_plugins = self.PROJECT.get_track_plugins(self.track_number)
         if f_plugins:
             for f_plugin in f_plugins.plugins[:10]:
-                self.plugins[f_plugin.index].set_value(f_plugin)
+                if f_plugin.index not in range(len(self.plugins)):
+                    print(
+                        "Dammit", self.track_number, f_plugin.index,
+                        self.plugins)
+                else:
+                    self.plugins[f_plugin.index].set_value(f_plugin)
 
     def save_callback(self):
         f_result = libmk.pydaw_track_plugins()
@@ -619,6 +631,7 @@ class MixerChannel:
         self.outputs = {}
         self.output_labels = {}
         self.name_label = QLabel(a_name)
+        self.name_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.vlayout.addWidget(self.name_label, -1, QtCore.Qt.AlignTop)
         self.grid_layout = QGridLayout()
         self.vlayout.addLayout(self.grid_layout, 1)
@@ -629,7 +642,7 @@ class MixerChannel:
         f_result = self.PROJECT.get_track_plugins(self.track_number)
 
         for index, plugin in (
-        (k, v.get_value()) for k, v in self.sends.items()):
+        (k + 10, v.get_value()) for k, v in self.sends.items()):
             f_result.plugins[index] = plugin
         self.PROJECT.save_track_plugins(self.track_number, f_result)
         self.PROJECT.commit(
@@ -653,9 +666,8 @@ class MixerChannel:
 
     def add_plugin(self, a_index):
         plugin = PluginSettingsMixer(
-            self.PROJECT.IPC.pydaw_set_plugin, 0,
-            self.track_number, None)
-        plugin.save_callback = self.save_callback
+            self.PROJECT.IPC.pydaw_set_plugin, a_index,
+            self.track_number, self.save_callback)
         self.sends[a_index] = plugin
         self.outputs[a_index] = -1
         f_label = QLabel("")
@@ -670,10 +682,10 @@ class MixerChannel:
             @a_hidden: bool, True to hide, False to show
         """
         plugin_ui = self.sends[a_index].plugin_ui
+        self.sends[a_index].plugin_combobox.setHidden(a_hidden)
         if plugin_ui:
             plugin_ui.widget.setHidden(a_hidden)
         self.output_labels[a_index].setHidden(a_hidden)
-        print(locals())
 
     def set_plugin(self, a_graph_dict, a_plugin_dict):
         """ Update the routes and plugins
@@ -686,11 +698,15 @@ class MixerChannel:
         """
         self.outputs = {k:v.output for k, v in a_graph_dict.items()}
         for i in range(len(self.sends)):
-            print(self.outputs)
-            hidden = i in self.outputs and self.outputs[i] != -1
+            hidden = not (i in self.outputs and self.outputs[i] != -1)
+            plugin_index = i + 10
+            if plugin_index in a_plugin_dict:
+                print(self.track_number, "set_value(",
+                    a_plugin_dict[plugin_index], ")")
+                self.sends[i].set_value(a_plugin_dict[plugin_index])
+            else:
+                print(plugin_index, "not in", a_plugin_dict)
             self.change_send_visibility(i, hidden)
-            if i in a_plugin_dict:
-                self.sends[i].set_value(a_plugin_dict[i])
 
     def set_project(self, a_project):
         """ Load the project
@@ -718,13 +734,14 @@ class MixerWidget:
         self.grid_layout = QGridLayout(self.main_widget)
         self.track_count = a_track_count
         for f_i in range(a_track_count):
-            f_channel = MixerChannel("track{}".format(f_i), f_i)
+            f_channel = MixerChannel(
+                "Master" if f_i == 0 else "track{}".format(f_i), f_i)
             self.tracks[f_i] = f_channel
             self.grid_layout.addWidget(f_channel.widget, 0, f_i)
 
     def set_project(self, a_project):
         self.PROJECT = a_project
-        for f_i in range(self.track_count):
+        for f_i in range(1, self.track_count):
             self.tracks[f_i].set_project(a_project)
 
     def update_sends(self, a_graph, a_plugins):
