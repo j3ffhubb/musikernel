@@ -413,7 +413,7 @@ REGION_EDITOR_HEADER_GRADIENT.setColorAt(1.0, QColor.fromRgb(65, 65, 65))
 
 ALL_PEAK_METERS = {}
 
-class tracks_widget:
+class TrackPanel:
     def __init__(self):
         self.tracks = {}
         self.plugin_uid_map = {}
@@ -3186,7 +3186,7 @@ def normalize_dialog():
 
 PAINTER_PATH_CACHE = {}
 
-class audio_viewer_item(QGraphicsRectItem):
+class AudioSeqItem(QGraphicsRectItem):
     def __init__(self, a_track_num, a_audio_item, a_graph):
         QGraphicsRectItem.__init__(self)
         self.setFlag(QGraphicsItem.ItemIsMovable)
@@ -3440,7 +3440,7 @@ class audio_viewer_item(QGraphicsRectItem):
 
     def set_tooltips(self, a_on):
         if a_on:
-            self.setToolTip(libpydaw.strings.audio_viewer_item)
+            self.setToolTip(libpydaw.strings.AudioSeqItem)
             self.start_handle.setToolTip(
                 _("Use this handle to resize the item by changing "
                 "the start point."))
@@ -4476,7 +4476,7 @@ AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(0.6, QColor.fromRgb(43, 43, 43))
 AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(1.0, QColor.fromRgb(65, 65, 65))
 
 
-class audio_items_viewer(QGraphicsView):
+class AudioItemSeq(QGraphicsView):
     def __init__(self):
         QGraphicsView.__init__(self)
         self.reset_line_lists()
@@ -4605,7 +4605,7 @@ class audio_items_viewer(QGraphicsView):
 
     def set_tooltips(self, a_on):
         if a_on:
-            self.setToolTip(libpydaw.strings.audio_items_viewer)
+            self.setToolTip(libpydaw.strings.AudioItemSeq)
         else:
             self.setToolTip("")
         for f_item in self.audio_items:
@@ -4841,7 +4841,7 @@ class audio_items_viewer(QGraphicsView):
 
     def draw_item(self, a_audio_item_index, a_audio_item, a_graph):
         """a_start in seconds, a_length in seconds"""
-        f_audio_item = audio_viewer_item(
+        f_audio_item = AudioSeqItem(
             a_audio_item_index, a_audio_item, a_graph)
         self.audio_items.append(f_audio_item)
         self.scene.addItem(f_audio_item)
@@ -5248,7 +5248,7 @@ class FileDragDropper(pydaw_widgets.AbstractFileBrowserWidget):
             else:
                 AUDIO_ITEMS_TO_DROP.append(f_path)
 
-class audio_items_viewer_widget(FileDragDropper):
+class AudioItemSeqWidget(FileDragDropper):
     def __init__(self):
         FileDragDropper.__init__(self, pydaw_util.is_audio_file)
 
@@ -5911,7 +5911,7 @@ class piano_key_item(QGraphicsRectItem):
         QGraphicsRectItem.hoverLeaveEvent(self, a_event)
         self.setBrush(self.o_brush)
 
-class piano_roll_editor(QGraphicsView):
+class PianoRollEditor(QGraphicsView):
     def __init__(self):
         self.viewer_width = 1000
         self.grid_div = 16
@@ -5969,7 +5969,7 @@ class piano_roll_editor(QGraphicsView):
 
     def set_tooltips(self, a_on):
         if a_on:
-            self.setToolTip(libpydaw.strings.piano_roll_editor)
+            self.setToolTip(libpydaw.strings.PianoRollEditor)
         else:
             self.setToolTip("")
 
@@ -6474,7 +6474,7 @@ class piano_roll_editor(QGraphicsView):
         return int(f_beat * 2.0 * a_amt)
 
 
-class piano_roll_editor_widget:
+class PianoRollEditorWidget:
     def __init__(self):
         self.widget = QWidget()
         self.vlayout = QVBoxLayout()
@@ -7509,7 +7509,7 @@ LAST_ITEM = None
 LAST_ITEM_REF = None
 CURRENT_ITEM_LEN = 4
 
-class item_list_editor:
+class ItemListViewer:
     def __init__(self):
         self.enabled = False
         self.events_follow_default = True
@@ -7925,7 +7925,7 @@ class midi_device:
         self.record_checkbox.setChecked(a_routing.on)
         self.suppress_updates = False
 
-class midi_devices_dialog:
+class MidiDevicesDialog:
     def __init__(self):
         self.layout = QGridLayout()
         self.devices = []
@@ -8588,7 +8588,7 @@ class transport_widget(libmk.AbstractTransport):
             self.group_box.setToolTip("")
 
 
-class pydaw_main_window(QScrollArea):
+class MainWindow(QScrollArea):
     def __init__(self):
         QScrollArea.__init__(self)
         self.first_offline_render = True
@@ -9042,13 +9042,13 @@ CC_EDITOR = automation_viewer()
 CC_EDITOR_WIDGET = automation_viewer_widget(CC_EDITOR)
 
 REGION_SETTINGS = region_settings()
-TRACK_PANEL = tracks_widget()
+TRACK_PANEL = TrackPanel()
 
-PIANO_ROLL_EDITOR = piano_roll_editor()
-PIANO_ROLL_EDITOR_WIDGET = piano_roll_editor_widget()
-AUDIO_SEQ = audio_items_viewer()
-AUDIO_SEQ_WIDGET = audio_items_viewer_widget()
-ITEM_EDITOR = item_list_editor()
+PIANO_ROLL_EDITOR = PianoRollEditor()
+PIANO_ROLL_EDITOR_WIDGET = PianoRollEditorWidget()
+AUDIO_SEQ = AudioItemSeq()
+AUDIO_SEQ_WIDGET = AudioItemSeqWidget()
+ITEM_EDITOR = ItemListViewer()
 MIXER_WIDGET = mkplugins.MixerWidget(TRACK_COUNT_ALL)
 
 def get_mixer_peak_meters():
@@ -9059,7 +9059,7 @@ get_mixer_peak_meters()
 
 MIDI_EDITORS = (PIANO_ROLL_EDITOR, CC_EDITOR, PB_EDITOR)
 
-MIDI_DEVICES_DIALOG = midi_devices_dialog()
+MIDI_DEVICES_DIALOG = MidiDevicesDialog()
 TRANSPORT = transport_widget()
 
 def routing_graph_toggle_callback(a_src, a_dest, a_sidechain):
@@ -9079,7 +9079,7 @@ PLUGIN_RACK = PluginRackTab()
 
 # Must call this after instantiating the other widgets,
 # as it relies on them existing
-MAIN_WINDOW = pydaw_main_window()
+MAIN_WINDOW = MainWindow()
 
 PIANO_ROLL_EDITOR.verticalScrollBar().setSliderPosition(
     PIANO_ROLL_EDITOR.scene.height() * 0.4)

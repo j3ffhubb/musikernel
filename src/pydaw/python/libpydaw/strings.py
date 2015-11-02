@@ -86,7 +86,7 @@ pitchbend_dialog = _(
 Use this dialog to add points with precision,or double-click on
 the editor to add points.""")
 
-piano_roll_editor = _(
+PianoRollEditor = _(
 """Click 'Menu->Show Tooltips' in the transport to disable these tooltips
 
 Click+drag to draw notes
@@ -104,11 +104,11 @@ The Quantize, Transpose and Velocity actions in the menu button open dialogs
 to manipulate the selected notes (or all notes if none are selected)""")
 
 
-audio_items_viewer = _("""Drag audio files from the file browser onto here.
+AudioItemSeq = _("""Drag audio files from the file browser onto here.
 
 Click 'Menu->Show Tooltips' in the transport to disable these tooltips""")
 
-audio_viewer_item = _(
+AudioSeqItem = _(
 """Right click on an audio item to see the various tools and actions available.
 Click and drag selected to move.
 SHIFT+Click to split items

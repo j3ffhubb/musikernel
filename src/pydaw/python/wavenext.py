@@ -496,7 +496,7 @@ class pydaw_audio_item(MkAudioItem):
         f_result = pydaw_audio_item(*a_arr)
         return f_result
 
-class pydaw_main_window(QScrollArea):
+class MainWindow(QScrollArea):
     def __init__(self):
         QScrollArea.__init__(self)
         self.first_offline_render = True
@@ -1261,7 +1261,7 @@ ALL_PEAK_METERS = {}
 
 WAVE_EDITOR = pydaw_wave_editor_widget()
 TRANSPORT = transport_widget()
-MAIN_WINDOW = pydaw_main_window()
+MAIN_WINDOW = MainWindow()
 
 if libmk.TOOLTIPS_ENABLED:
     set_tooltips_enabled(libmk.TOOLTIPS_ENABLED)
