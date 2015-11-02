@@ -7964,24 +7964,7 @@ def global_open_mixer():
         f_track_plugins = PROJECT.get_track_plugins(k)
         if f_track_plugins:
             f_plugins[k] = {x.index:x for x in f_track_plugins.plugins}
-    MIXER_WIDGET.clear()
-    for f_track_index, f_send_dict in f_graph.graph.items():
-        for k, f_send in f_send_dict.items():
-            f_send_plugin_index = k + 10
-            if f_track_index in f_plugins and \
-            f_send_plugin_index in f_plugins[f_track_index]:
-                f_plugin_obj = f_plugins[f_track_index][f_send_plugin_index]
-                f_plugin_uid = f_plugin_obj.plugin_index
-            else:
-                f_plugin_obj = None
-                f_plugin_uid = 0
-            f_plugin = mkplugins.PluginSettingsMixer(
-                PROJECT.IPC.pydaw_set_plugin, f_plugin_uid,
-                f_track_index, None)
-            if f_plugin_obj:
-                f_plugin.set_value(f_plugin_obj)
-            MIXER_WIDGET.add_send(
-                f_track_index, k, f_send.output, f_plugin)
+    MIXER_WIDGET.update_sends(f_graph, f_plugins)
     MIXER_WIDGET.update_track_names(
         {f_i:x for f_i, x in zip(
         range(len(TRACK_NAMES)), TRACK_NAMES)})

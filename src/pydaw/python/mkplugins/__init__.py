@@ -295,6 +295,7 @@ class AbstractPluginSettings:
 
         self.power_checkbox = QCheckBox("Power")
         self.power_checkbox.setChecked(True)
+
         if a_is_mixer:
             self.vlayout.addWidget(self.plugin_combobox)
             self.vlayout.setAlignment(self.plugin_combobox, QtCore.Qt.AlignTop)
@@ -337,6 +338,10 @@ class AbstractPluginSettings:
         self.on_plugin_change()
 
     def set_value(self, a_val):
+        """ Set the plugin for this track and plugin index
+
+            @a_val:  A libmk.pydaw_track_plugin
+        """
         self.suppress_osc = True
         # More Qt 5.5.0 regression work-around
         if self.qcbox:
@@ -560,7 +565,7 @@ class PluginRack:
         self.scroll_vlayout = QVBoxLayout(self.scroll_widget)
         #self.scroll_widget.setContentsMargins(0, 0, 0, 0)
         self.scrollarea.setWidget(self.scroll_widget)
-        for plugin in self.plugins:
+        for plugin in self.plugins[:10]:
             self.scroll_vlayout.addLayout(plugin.vlayout)
         self.open_plugins()
         self.scroll_vlayout.addItem(
@@ -603,7 +608,10 @@ class PluginRack:
 
 
 class MixerChannel:
-    def __init__(self, a_name, a_track_num):
+    def __init__(self, a_name, a_track_num, a_plugin_count=10, a_send_count=4):
+        self.PROJECT = None
+        self.plugin_count = int(a_plugin_count)
+        self.send_count = int(a_send_count)
         self.track_number = a_track_num
         self.widget = QWidget()
         self.vlayout = QVBoxLayout(self.widget)
@@ -622,63 +630,78 @@ class MixerChannel:
 
         for index, plugin in (
         (k, v.get_value()) for k, v in self.sends.items()):
-            libmk.pprint(locals())
             f_result.plugins[index] = plugin
         self.PROJECT.save_track_plugins(self.track_number, f_result)
         self.PROJECT.commit(
             "Update mixer plugins for track {}".format(self.track_number))
 
-    def clear(self):
-        self.sends = {}
-        self.outputs = {}
-        self.output_labels = {}
-        for i in reversed(range(1, self.grid_layout.count())):
-            f_layout = self.grid_layout.itemAt(i).layout()
-            if f_layout:
-                self.grid_layout.removeItem(f_layout)
-                f_layout.setParent(None)
-            f_widget = self.grid_layout.itemAt(i)
-            if f_widget:
-                f_widget = f_widget.widget()
-                if f_widget:
-                    self.grid_layout.removeWidget(f_widget)
-                    f_widget.setParent(None)
-            libmk.pprint(locals())
-
     def set_name(self, a_name, a_dict):
+        """ Set the track name label and the send labels
+
+            @a_name: The name of this track
+            @a_dict: A dictionary of {track_number: track_name, ...} for
+                     all tracks
+        """
+        if not self.output_labels:
+            return # not loaded yet
         self.name_label.setText(a_name)
         for k in self.outputs:
             if self.outputs[k] == -1:
-                self.remove_plugin(k)
+                self.output_labels[k].setText("")
             else:
                 self.output_labels[k].setText(a_dict[self.outputs[k]])
-        libmk.pprint(locals())
 
-    def add_plugin(self, a_index, a_plugin, a_output):
-        assert(a_index != -1)
-        if a_index in self.sends:
-            self.remove_plugin(a_index)
-        a_plugin.save_callback = self.save_callback
-        self.sends[a_index] = a_plugin
-        self.outputs[a_index] = a_output
-        f_label = QLabel(str(a_output))
+    def add_plugin(self, a_index):
+        plugin = PluginSettingsMixer(
+            self.PROJECT.IPC.pydaw_set_plugin, 0,
+            self.track_number, None)
+        plugin.save_callback = self.save_callback
+        self.sends[a_index] = plugin
+        self.outputs[a_index] = -1
+        f_label = QLabel("")
         self.output_labels[a_index] = f_label
         self.grid_layout.addWidget(f_label, 0, a_index + 1)
-        self.grid_layout.addLayout(a_plugin.vlayout, 1, a_index + 1)
-        libmk.pprint(locals())
+        self.grid_layout.addLayout(plugin.vlayout, 1, a_index + 1)
 
-    def remove_plugin(self, a_index):
-        assert a_index in self.sends, ""
-        f_layout = self.sends.pop(a_index).vlayout
-        self.grid_layout.removeItem(f_layout)
-        f_widget.setParent(None)
-        f_widget.setHidden(True)
+    def change_send_visibility(self, a_index, a_hidden):
+        """ Show or hide a track send
 
-        f_widget = self.output_labels.pop(a_index)
-        self.grid_layout.removeWidget(f_widget)
-        f_widget.setParent(None)
-        f_widget.setHidden(True)
-        libmk.pprint(locals())
+            @a_index:  int, the send index
+            @a_hidden: bool, True to hide, False to show
+        """
+        plugin_ui = self.sends[a_index].plugin_ui
+        if plugin_ui:
+            plugin_ui.widget.setHidden(a_hidden)
+        self.output_labels[a_index].setHidden(a_hidden)
+        print(locals())
+
+    def set_plugin(self, a_graph_dict, a_plugin_dict):
+        """ Update the routes and plugins
+
+            @a_graph_dict:  A libmk.mk_project.RoutingGraph.graph[
+                                track_number] node:
+                            {send_index: libmk.mk_project.TrackSend, ...}
+            @a_plugin_dict: A dictionary of {track_index:
+                            {plugin_index: libmk.pydaw_track_plugin}}
+        """
+        self.outputs = {k:v.output for k, v in a_graph_dict.items()}
+        for i in range(len(self.sends)):
+            print(self.outputs)
+            hidden = i in self.outputs and self.outputs[i] != -1
+            self.change_send_visibility(i, hidden)
+            if i in a_plugin_dict:
+                self.sends[i].set_value(a_plugin_dict[i])
+
+    def set_project(self, a_project):
+        """ Load the project
+
+            @a_project: A instance of a class inheriting libmk.AbstractProject
+        """
+        assert not self.PROJECT, "self.PROJECT is already set"
+        self.PROJECT = a_project
+        for i in range(self.send_count):
+            self.add_plugin(i)
+
 
 MIXER_TOOLTIP = _("""This is the mixer.
 To add volume sliders, etc...  select a mixer plugin for each send on
@@ -702,7 +725,19 @@ class MixerWidget:
     def set_project(self, a_project):
         self.PROJECT = a_project
         for f_i in range(self.track_count):
-            self.tracks[f_i].PROJECT = a_project
+            self.tracks[f_i].set_project(a_project)
+
+    def update_sends(self, a_graph, a_plugins):
+        """ Update the mixer, show channels for active routings
+            and hide inactive routings
+
+            @a_graph:   A libmk.mk_project.RoutingGraph
+            @a_plugins: A dict of {track_index:
+                        {plugin_index:libmk.pydaw_track_plugin, ...}, ...}
+        """
+        for i in range(1, len(self.tracks)):
+            graph_dict = a_graph.graph[i] if i in a_graph.graph else {}
+            self.tracks[i].set_plugin(graph_dict, a_plugins[i])
 
     def set_tooltips(self, a_enabled):
         if a_enabled:
@@ -713,19 +748,6 @@ class MixerWidget:
     def update_track_names(self, a_track_names_dict):
         for k, v in a_track_names_dict.items():
             self.tracks[k].set_name(v, a_track_names_dict)
-
-    def add_send(
-            self, a_track_index, a_send_index, a_output, a_plugin_settings):
-        self.tracks[a_track_index].add_plugin(
-            a_send_index, a_plugin_settings, a_output)
-
-    def set_plugin_widget(
-            self, a_track_index, a_send_index, a_output, a_plugin):
-        self.tracks[a_track_index].add_plugin(
-            a_send_index, a_plugin, a_output)
-
-    def remove_plugin_widget(self, a_track_index, a_send_index):
-        self.tracks[a_track_index].remove_plugin(a_send_index)
 
     def clear(self):
         for v in self.tracks.values():

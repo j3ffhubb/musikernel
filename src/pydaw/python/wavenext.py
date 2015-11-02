@@ -34,6 +34,8 @@ TAB_EDITOR = 0
 TAB_PLUGIN_RACK = 1
 TAB_NOTES = 2
 
+TOTAL_FX_COUNT = 10
+
 def set_tooltips_enabled(a_enabled):
     """ Set extensive tooltips as an alternative to
         maintaining a separate user manual
@@ -132,6 +134,11 @@ class WaveNextProject(libmk.AbstractProject):
             print(project_dir)
             if not os.path.isdir(project_dir):
                 os.makedirs(project_dir)
+
+        plugins = libmk.pydaw_track_plugins()
+        for i2 in range(TOTAL_FX_COUNT):
+            plugins.plugins.append(libmk.pydaw_track_plugin(i2, 0, -1))
+        self.save_track_plugins(0, plugins)
 
 #        self.commit("Created project")
 #        if a_notify_osc:

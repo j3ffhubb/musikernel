@@ -189,6 +189,7 @@ class AbstractProject:
     def get_track_plugins(self, a_track_num):
         f_folder = self.track_pool_folder
         f_path = os.path.join(*(str(x) for x in (f_folder, a_track_num)))
+        print(f_path)
         if os.path.isfile(f_path):
             with open(f_path) as f_handle:
                 f_str = f_handle.read()
