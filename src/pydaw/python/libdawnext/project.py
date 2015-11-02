@@ -35,6 +35,7 @@ from PyQt5 import QtCore
 from libpydaw import pydaw_history
 
 import wavefile
+import mkplugins
 
 TRACK_COUNT_ALL = 32
 MAX_AUDIO_ITEM_COUNT = 256
@@ -43,10 +44,6 @@ PIXMAP_TILE_WIDTH = 4000
 
 PIXMAP_BEAT_WIDTH = 48
 PIXMAP_TILE_HEIGHT = 32
-
-NORMAL_FX_COUNT = 10
-MIXER_FX_COUNT = 4
-TOTAL_FX_COUNT = NORMAL_FX_COUNT + MIXER_FX_COUNT
 
 pydaw_folder_dawnext = os.path.join("projects", "dawnext")
 pydaw_folder_items = os.path.join(pydaw_folder_dawnext, "items")
@@ -198,7 +195,7 @@ class DawNextProject(libmk.AbstractProject):
                 a_track_uid=i, a_track_pos=i,
                 a_name="Master" if i == 0 else "track{}".format(i)))
             plugins = libmk.pydaw_track_plugins()
-            for i2 in range(TOTAL_FX_COUNT):
+            for i2 in range(mkplugins.TOTAL_PLUGINS_PER_TRACK):
                 plugins.plugins.append(libmk.pydaw_track_plugin(i2, 0, -1))
             self.save_track_plugins(i, plugins)
 

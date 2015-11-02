@@ -46,6 +46,10 @@ from libpydaw.pydaw_util import pydaw_clip_value
 
 PLUGIN_INSTRUMENT_COUNT = 3  # For inserting the split line into the menu
 
+PLUGINS_PER_TRACK = 10
+SENDS_PER_TRACK = 4
+TOTAL_PLUGINS_PER_TRACK = PLUGINS_PER_TRACK + SENDS_PER_TRACK
+
 PLUGIN_NAMES = [
     "Euphoria", "Ray-V", "Ray-V 2", "Way-V", "MK Channel", "MK Compressor",
     "MK Delay", "MK EQ", "MK Limiter", "MK Vocoder", "Modulex",
@@ -189,7 +193,9 @@ class MkPluginUiDict:
                 return f_plugin
         else:
             if not a_show:
-                return self.ui_dict[a_plugin_uid]
+                retval = self.ui_dict[a_plugin_uid]
+                retval.widget_show()  # Always enable UI messages
+                return retval
             if self.ui_dict[a_plugin_uid].widget.isHidden():
                 self.ui_dict[a_plugin_uid].widget.show()
             self.ui_dict[a_plugin_uid].raise_widget()
@@ -373,10 +379,11 @@ class AbstractPluginSettings:
             return
         f_index = get_plugin_uid_by_name(self.plugin_combobox.currentText())
         if f_index == 0:
-            self.vlayout.removeWidget(self.plugin_ui.widget)
+            if self.plugin_ui:
+                self.vlayout.removeWidget(self.plugin_ui.widget)
+                self.plugin_ui = None
             libmk.PLUGIN_UI_DICT.close_plugin_ui(self.plugin_uid)
             self.plugin_uid = -1
-            self.plugin_ui = None
         elif self.plugin_uid == -1 or self.plugin_index != f_index:
             if self.plugin_uid > -1:
                 libmk.PLUGIN_UI_DICT.close_plugin_ui(self.plugin_uid)
@@ -454,7 +461,7 @@ class PluginSettingsMixer(AbstractPluginSettings):
         AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
             a_save_callback, a_is_mixer=True)
-        self.index += 10
+        self.index += PLUGINS_PER_TRACK
         self.vlayout.setParent(None)
         self.plugin_combobox.setMinimumWidth(120)
 
@@ -563,7 +570,7 @@ class PluginRack:
             a_type(
                 self.PROJECT.IPC.pydaw_set_plugin, x, a_track_number,
                 self.save_callback)
-            for x in range(10)]
+            for x in range(PLUGINS_PER_TRACK)]
         self.widget = QWidget()
         self.vlayout = QVBoxLayout(self.widget)
         self.vlayout.setContentsMargins(1, 1, 1, 1)
@@ -580,7 +587,7 @@ class PluginRack:
         self.scroll_vlayout = QVBoxLayout(self.scroll_widget)
         #self.scroll_widget.setContentsMargins(0, 0, 0, 0)
         self.scrollarea.setWidget(self.scroll_widget)
-        for plugin in self.plugins[:10]:
+        for plugin in self.plugins[:PLUGINS_PER_TRACK]:
             self.scroll_vlayout.addLayout(plugin.vlayout)
         self.open_plugins()
         self.scroll_vlayout.addItem(
@@ -611,7 +618,7 @@ class PluginRack:
     def open_plugins(self):
         f_plugins = self.PROJECT.get_track_plugins(self.track_number)
         if f_plugins:
-            for f_plugin in f_plugins.plugins[:10]:
+            for f_plugin in f_plugins.plugins[:PLUGINS_PER_TRACK]:
                 if f_plugin.index not in range(len(self.plugins)):
                     print(
                         "Dammit", self.track_number, f_plugin.index,
@@ -621,17 +628,16 @@ class PluginRack:
 
     def save_callback(self):
         f_result = self.PROJECT.get_track_plugins(self.track_number)
-        f_result.plugins[:10] = [x.get_value() for x in self.plugins]
+        f_result.plugins[:PLUGINS_PER_TRACK] = [
+            x.get_value() for x in self.plugins]
         self.PROJECT.save_track_plugins(self.track_number, f_result)
         self.PROJECT.commit(
             "Update track plugins for track {}".format(self.track_number))
 
 
 class MixerChannel:
-    def __init__(self, a_name, a_track_num, a_plugin_count=10, a_send_count=4):
+    def __init__(self, a_name, a_track_num):
         self.PROJECT = None
-        self.plugin_count = int(a_plugin_count)
-        self.send_count = int(a_send_count)
         self.track_number = a_track_num
         self.widget = QWidget()
         self.vlayout = QVBoxLayout(self.widget)
@@ -649,7 +655,7 @@ class MixerChannel:
         f_result = self.PROJECT.get_track_plugins(self.track_number)
 
         for index, plugin in (
-        (k + 10, v.get_value()) for k, v in self.sends.items()):
+        (k + PLUGINS_PER_TRACK, v.get_value()) for k, v in self.sends.items()):
             f_result.plugins[index] = plugin
         self.PROJECT.save_track_plugins(self.track_number, f_result)
         self.PROJECT.commit(
@@ -706,7 +712,7 @@ class MixerChannel:
         self.outputs = {k:v.output for k, v in a_graph_dict.items()}
         for i in range(len(self.sends)):
             hidden = not (i in self.outputs and self.outputs[i] != -1)
-            plugin_index = i + 10
+            plugin_index = i + PLUGINS_PER_TRACK
             if plugin_index in a_plugin_dict:
                 self.sends[i].set_value(a_plugin_dict[plugin_index])
             else:
@@ -720,7 +726,7 @@ class MixerChannel:
         """
         assert not self.PROJECT, "self.PROJECT is already set"
         self.PROJECT = a_project
-        for i in range(self.send_count):
+        for i in range(SENDS_PER_TRACK):
             self.add_plugin(i)
 
 
