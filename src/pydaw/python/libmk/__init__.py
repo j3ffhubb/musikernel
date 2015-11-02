@@ -14,6 +14,8 @@ GNU General Public License for more details.
 
 import datetime
 import os
+import traceback
+
 from libpydaw import pydaw_util
 
 if pydaw_util.IS_LINUX and not pydaw_util.IS_ENGINE_LIB:
@@ -258,3 +260,33 @@ class pydaw_track_plugins:
             else:
                 assert(False)
         return f_result
+
+def pprint(arg, recursion_level=1):
+    """ Pretty-print a data structure
+        @arg:             A dict, list, tuple or set
+        @recursion_level: Don't pass a value for this, it's for the
+                          function to use when calling itself recursively
+    """
+    indent = recursion_level * 2 * " "
+    if recursion_level == 1:
+        print("\n")
+        traceback.print_stack()
+        print()
+    if isinstance(arg, (list, set, tuple)):
+        for x in arg:
+            if isinstance(x, (dict, list, set, tuple)):
+                pprint(x, recursion_level + 1)
+            else:
+                print("{}{}".format(indent, x))
+    if isinstance(arg, dict):
+        for k in sorted(arg):
+            v = arg[k]
+            if isinstance(v, (dict, list, set, tuple)):
+                print("{}{}:".format(indent, k))
+                pprint(v, recursion_level + 1)
+            else:
+                print("{}{}: {}".format(indent, k, v))
+    else:
+        assert False, "Unsupported type {}".format(type(arg))
+    if recursion_level == 1:
+        print("\n")

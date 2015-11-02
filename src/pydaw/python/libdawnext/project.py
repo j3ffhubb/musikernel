@@ -44,6 +44,10 @@ PIXMAP_TILE_WIDTH = 4000
 PIXMAP_BEAT_WIDTH = 48
 PIXMAP_TILE_HEIGHT = 32
 
+NORMAL_FX_COUNT = 10
+MIXER_FX_COUNT = 4
+TOTAL_FX_COUNT = NORMAL_FX_COUNT + MIXER_FX_COUNT
+
 pydaw_folder_dawnext = os.path.join("projects", "dawnext")
 pydaw_folder_items = os.path.join(pydaw_folder_dawnext, "items")
 pydaw_folder_tracks = os.path.join(pydaw_folder_dawnext, "tracks")
@@ -193,6 +197,11 @@ class DawNextProject(libmk.AbstractProject):
             f_tracks.add_track(i, pydaw_track(
                 a_track_uid=i, a_track_pos=i,
                 a_name="Master" if i == 0 else "track{}".format(i)))
+            plugins = libmk.pydaw_track_plugins()
+            for i2 in range(TOTAL_FX_COUNT):
+                plugins.plugins.append(libmk.pydaw_track_plugin(i2, 0, -1))
+            self.save_track_plugins(i, plugins)
+
         self.create_file("", pydaw_file_pytracks, str(f_tracks))
 
         self.commit("Created project")
@@ -772,6 +781,10 @@ class DawNextProject(libmk.AbstractProject):
             #Is there a need for a configure message here?
 
     def save_track_plugins(self, a_uid, a_track):
+        """ @a_uid:   int, the track number
+            @a_track: libmk.pydaw_track_plugins
+        """
+        int(a_uid)  # Test that it can be cast to an int
         f_folder = pydaw_folder_tracks
         if not self.suppress_updates:
             self.save_file(f_folder, str(a_uid), str(a_track))

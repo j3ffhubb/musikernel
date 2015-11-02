@@ -7975,9 +7975,6 @@ def global_open_mixer():
             else:
                 f_plugin_obj = None
                 f_plugin_uid = 0
-                #if f_plugin_obj.plugin_index == 0: # or \
-                #f_send.output == -1:  # None
-                #    continue
             f_plugin = mkplugins.PluginSettingsMixer(
                 PROJECT.IPC.pydaw_set_plugin, f_plugin_uid,
                 f_track_index, None)

@@ -399,7 +399,7 @@ class AbstractPluginSettings:
         if self.plugin_ui:
             self.vlayout.removeWidget(self.plugin_ui.widget)
         self.plugin_ui = libmk.PLUGIN_UI_DICT.open_plugin_ui(
-            self.plugin_uid, f_index)
+            self.plugin_uid, f_index, a_is_mixer=self.is_mixer)
         self.vlayout.addWidget(self.plugin_ui.widget)
 
 
@@ -436,6 +436,7 @@ class PluginSettingsMixer(AbstractPluginSettings):
             a_save_callback, a_qcbox=True, a_is_mixer=True)
         self.index += 10
         self.vlayout.setParent(None)
+        self.plugin_combobox.setMinimumWidth(120)
 
 
 class PluginSettingsWaveEditor(AbstractPluginSettings):
@@ -590,7 +591,7 @@ class PluginRack:
     def open_plugins(self):
         f_plugins = self.PROJECT.get_track_plugins(self.track_number)
         if f_plugins:
-            for f_plugin in f_plugins.plugins:
+            for f_plugin in f_plugins.plugins[:10]:
                 self.plugins[f_plugin.index].set_value(f_plugin)
 
     def save_callback(self):
@@ -618,17 +619,11 @@ class MixerChannel:
 
     def save_callback(self):
         f_result = self.PROJECT.get_track_plugins(self.track_number)
-        if not f_result:
-            f_result = libmk.pydaw_track_plugins()
-            f_result.plugins = [
-                libmk.pydaw_track_plugin(x, 0, -1) for x in range(14)]
-        elif len(f_result.plugins) < 14:
-            for i in range(len(f_result.plugins), 14):
-                f_result.plugins.append(libmk.pydaw_track_plugin(x, 0, -1))
 
         for index, plugin in (
         (k, v.get_value()) for k, v in self.sends.items()):
-            f_result.plugins[plugin.index] = plugin
+            libmk.pprint(locals())
+            f_result.plugins[index] = plugin
         self.PROJECT.save_track_plugins(self.track_number, f_result)
         self.PROJECT.commit(
             "Update mixer plugins for track {}".format(self.track_number))
@@ -638,10 +633,17 @@ class MixerChannel:
         self.outputs = {}
         self.output_labels = {}
         for i in reversed(range(1, self.grid_layout.count())):
-            f_widget = self.grid_layout.itemAt(i).layout()
+            f_layout = self.grid_layout.itemAt(i).layout()
+            if f_layout:
+                self.grid_layout.removeItem(f_layout)
+                f_layout.setParent(None)
+            f_widget = self.grid_layout.itemAt(i)
             if f_widget:
-                self.grid_layout.removeItem(f_widget)
-                f_widget.setParent(None)
+                f_widget = f_widget.widget()
+                if f_widget:
+                    self.grid_layout.removeWidget(f_widget)
+                    f_widget.setParent(None)
+            libmk.pprint(locals())
 
     def set_name(self, a_name, a_dict):
         self.name_label.setText(a_name)
@@ -650,6 +652,7 @@ class MixerChannel:
                 self.remove_plugin(k)
             else:
                 self.output_labels[k].setText(a_dict[self.outputs[k]])
+        libmk.pprint(locals())
 
     def add_plugin(self, a_index, a_plugin, a_output):
         assert(a_index != -1)
@@ -662,14 +665,20 @@ class MixerChannel:
         self.output_labels[a_index] = f_label
         self.grid_layout.addWidget(f_label, 0, a_index + 1)
         self.grid_layout.addLayout(a_plugin.vlayout, 1, a_index + 1)
+        libmk.pprint(locals())
 
     def remove_plugin(self, a_index):
-        if a_index in self.sends:
-            for f_widget in (
-            self.sends.pop(a_index).widget, self.output_labels.pop(a_index)):
-                self.grid_layout.removeWidget(f_widget)
-                f_widget.setParent(None)
-                f_widget.setHidden(True)
+        assert a_index in self.sends, ""
+        f_layout = self.sends.pop(a_index).vlayout
+        self.grid_layout.removeItem(f_layout)
+        f_widget.setParent(None)
+        f_widget.setHidden(True)
+
+        f_widget = self.output_labels.pop(a_index)
+        self.grid_layout.removeWidget(f_widget)
+        f_widget.setParent(None)
+        f_widget.setHidden(True)
+        libmk.pprint(locals())
 
 MIXER_TOOLTIP = _("""This is the mixer.
 To add volume sliders, etc...  select a mixer plugin for each send on
@@ -694,7 +703,6 @@ class MixerWidget:
         self.PROJECT = a_project
         for f_i in range(self.track_count):
             self.tracks[f_i].PROJECT = a_project
-
 
     def set_tooltips(self, a_enabled):
         if a_enabled:
