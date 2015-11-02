@@ -3125,7 +3125,7 @@ class morph_eq(eq6_widget):
 ROUTING_GRAPH_NODE_GRADIENT = None
 ROUTING_GRAPH_SELECTED_GRADIENT = None
 
-class routing_graph_node(QGraphicsRectItem):
+class RoutingGraphNode(QGraphicsRectItem):
     def __init__(self, a_text, a_width, a_height):
         QGraphicsRectItem.__init__(self, 0, 0, a_width, a_height)
         self.text = QGraphicsSimpleTextItem(a_text, self)
@@ -3138,7 +3138,7 @@ class routing_graph_node(QGraphicsRectItem):
             else ROUTING_GRAPH_NODE_GRADIENT)
 
 
-class routing_graph_widget(QGraphicsView):
+class RoutingGraphWidget(QGraphicsView):
     def __init__(self, a_toggle_callback=None):
         QGraphicsView.__init__(self)
         self.scene = QGraphicsScene(self)
@@ -3233,7 +3233,7 @@ class routing_graph_widget(QGraphicsView):
         self.background_item.setAcceptHoverEvents(True)
         self.background_item.mousePressEvent = self.backgroundMousePressEvent
         for k, f_i in zip(a_track_names, range(len(a_track_names))):
-            f_node_item = routing_graph_node(
+            f_node_item = RoutingGraphNode(
                 k, self.node_width,
                 self.node_height)
             self.node_dict[f_i] = f_node_item

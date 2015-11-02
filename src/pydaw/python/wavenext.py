@@ -325,7 +325,7 @@ class AudioInputWidget:
                 self.inputs[k].set_value(v)
 
 
-class transport_widget(libmk.AbstractTransport):
+class TransportWidget(libmk.AbstractTransport):
     def __init__(self):
         self.suppress_osc = True
         self.copy_path_to_clipboard = True
@@ -1260,7 +1260,7 @@ PROJECT = WaveNextProject(True)
 ALL_PEAK_METERS = {}
 
 WAVE_EDITOR = pydaw_wave_editor_widget()
-TRANSPORT = transport_widget()
+TRANSPORT = TransportWidget()
 MAIN_WINDOW = MainWindow()
 
 if libmk.TOOLTIPS_ENABLED:

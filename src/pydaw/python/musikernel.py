@@ -110,7 +110,7 @@ class MkIpc(libmk.AbstractIPC):
         self.send_configure("cwp", a_msg)
 
 
-class transport_widget:
+class TransportWidget:
     def __init__(self):
         self.suppress_osc = True
         self.last_open_dir = pydaw_util.global_home
@@ -277,7 +277,7 @@ class MkMainWindow(QMainWindow):
                 print("Unable to start OSC with {}".format(19271))
                 libmk.OSC = None
         libmk.IPC = MkIpc()
-        libmk.TRANSPORT = transport_widget()
+        libmk.TRANSPORT = TransportWidget()
         self.setObjectName("mainwindow")
         self.setObjectName("plugin_ui")
         self.setMinimumSize(900, 600)

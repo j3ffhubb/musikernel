@@ -105,7 +105,7 @@ CURRENT_REGION = None
 CURRENT_REGION_NAME = None
 DRAW_SEQUENCER_GRAPHS = True
 
-class region_settings:
+class RegionSettings:
     def __init__(self):
         self.enabled = False
         self.widget = QWidget()
@@ -6835,7 +6835,7 @@ class automation_item(QGraphicsEllipseItem):
 
 AUTOMATION_EDITORS = []
 
-class automation_viewer(QGraphicsView):
+class AutomationEditor(QGraphicsView):
     def __init__(self, a_is_cc=True):
         QGraphicsView.__init__(self)
         self.is_cc = a_is_cc
@@ -7155,7 +7155,7 @@ class automation_viewer(QGraphicsView):
 
 LAST_IPB_VALUE = 18  #For the 'add point' dialog to remember settings
 
-class automation_viewer_widget:
+class AutomationEditorWidget:
     def __init__(self, a_viewer, a_is_cc=True):
         self.is_cc = a_is_cc
         self.widget = QWidget()
@@ -7605,7 +7605,7 @@ class ItemListViewer:
         self.notes_hlayout.addWidget(self.pb_groupbox)
         self.pb_auto_vlayout = QVBoxLayout()
         self.pb_hlayout.addLayout(self.pb_auto_vlayout)
-        self.pb_viewer_widget = automation_viewer_widget(PB_EDITOR, False)
+        self.pb_viewer_widget = AutomationEditorWidget(PB_EDITOR, False)
         self.pb_auto_vlayout.addWidget(self.pb_viewer_widget.widget)
 
         self.tab_widget.addTab(self.notes_tab, _("List Viewers"))
@@ -8362,7 +8362,7 @@ class AudioInputWidget:
 
 MREC_EVENTS = []
 
-class transport_widget(libmk.AbstractTransport):
+class TransportWidget(libmk.AbstractTransport):
     def __init__(self):
         self.recording_timestamp = None
         self.suppress_osc = True
@@ -9037,11 +9037,11 @@ AUDIO_TRACK_COMBOBOXES = []
 
 SEQUENCER = ItemSequencer()
 
-PB_EDITOR = automation_viewer(a_is_cc=False)
-CC_EDITOR = automation_viewer()
-CC_EDITOR_WIDGET = automation_viewer_widget(CC_EDITOR)
+PB_EDITOR = AutomationEditor(a_is_cc=False)
+CC_EDITOR = AutomationEditor()
+CC_EDITOR_WIDGET = AutomationEditorWidget(CC_EDITOR)
 
-REGION_SETTINGS = region_settings()
+REGION_SETTINGS = RegionSettings()
 TRACK_PANEL = TrackPanel()
 
 PIANO_ROLL_EDITOR = PianoRollEditor()
@@ -9060,7 +9060,7 @@ get_mixer_peak_meters()
 MIDI_EDITORS = (PIANO_ROLL_EDITOR, CC_EDITOR, PB_EDITOR)
 
 MIDI_DEVICES_DIALOG = MidiDevicesDialog()
-TRANSPORT = transport_widget()
+TRANSPORT = TransportWidget()
 
 def routing_graph_toggle_callback(a_src, a_dest, a_sidechain):
     f_graph = PROJECT.get_routing_graph()
@@ -9072,7 +9072,7 @@ def routing_graph_toggle_callback(a_src, a_dest, a_sidechain):
         ROUTING_GRAPH_WIDGET.draw_graph(f_graph, TRACK_NAMES)
         PROJECT.commit(_("Update routing"))
 
-ROUTING_GRAPH_WIDGET = pydaw_widgets.routing_graph_widget(
+ROUTING_GRAPH_WIDGET = pydaw_widgets.RoutingGraphWidget(
     routing_graph_toggle_callback)
 
 PLUGIN_RACK = PluginRackTab()
