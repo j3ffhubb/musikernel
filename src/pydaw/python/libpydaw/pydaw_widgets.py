@@ -1709,6 +1709,7 @@ class pydaw_file_select_widget:
 
 class AbstractFileBrowserWidget():
     def __init__(self, a_filter_func=pydaw_util.is_audio_file):
+        self.scroll_dict = {}
         self.filter_func = a_filter_func
         self.hsplitter = QSplitter(QtCore.Qt.Horizontal)
         self.vsplitter = QSplitter(QtCore.Qt.Vertical)
@@ -2050,6 +2051,9 @@ class AbstractFileBrowserWidget():
 
     def set_folder(self, a_folder, a_full_path=False):
         a_folder = str(a_folder)
+        file_pos = self.list_file.currentRow()
+        folder_pos = self.list_folder.currentRow()
+        self.scroll_dict[self.last_open_dir] = (file_pos, folder_pos)
         self.list_file.clear()
         self.list_folder.clear()
         self.folder_filter_lineedit.clear()
@@ -2107,6 +2111,11 @@ class AbstractFileBrowserWidget():
                         f_full_path, "\n".join(pydaw_util.pydaw_bad_chars)))
         self.on_filter_files()
         self.on_filter_folders()
+        if self.last_open_dir in self.scroll_dict:
+            file_pos, folder_pos = self.scroll_dict[self.last_open_dir]
+            self.list_file.setCurrentRow(file_pos)
+            self.list_folder.setCurrentRow(folder_pos)
+
 
     def select_file(self, a_file):
         """ Select the file if present in the list, a_file should be
