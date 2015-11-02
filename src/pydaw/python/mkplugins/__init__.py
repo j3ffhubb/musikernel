@@ -355,7 +355,6 @@ class AbstractPluginSettings:
 
         self.plugin_uid = a_val.plugin_uid
         self.power_checkbox.setChecked(a_val.power == 1)
-        print("O...M...G...")
         self.on_show_ui()
         self.suppress_osc = False
 
@@ -612,8 +611,8 @@ class PluginRack:
                     self.plugins[f_plugin.index].set_value(f_plugin)
 
     def save_callback(self):
-        f_result = libmk.pydaw_track_plugins()
-        f_result.plugins = [x.get_value() for x in self.plugins]
+        f_result = self.PROJECT.get_track_plugins(self.track_number)
+        f_result.plugins[:10] = [x.get_value() for x in self.plugins]
         self.PROJECT.save_track_plugins(self.track_number, f_result)
         self.PROJECT.commit(
             "Update track plugins for track {}".format(self.track_number))
@@ -701,8 +700,6 @@ class MixerChannel:
             hidden = not (i in self.outputs and self.outputs[i] != -1)
             plugin_index = i + 10
             if plugin_index in a_plugin_dict:
-                print(self.track_number, "set_value(",
-                    a_plugin_dict[plugin_index], ")")
                 self.sends[i].set_value(a_plugin_dict[plugin_index])
             else:
                 print(plugin_index, "not in", a_plugin_dict)
