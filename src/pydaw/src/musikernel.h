@@ -98,7 +98,7 @@ int MASTER_OUT_R = 1;
 #define MK_HOST_WAVENEXT 1
 
 
-#define MK_HOST_COUNT 3
+#define MK_HOST_COUNT 2
 
 volatile int exiting = 0;
 float MASTER_VOL __attribute__((aligned(16))) = 1.0f;
@@ -222,8 +222,9 @@ typedef struct
 typedef struct
 {
     float sample_rate;
-    char padding[CACHE_LINE_SIZE - sizeof(float)];
-}t_mk_thread_storage;
+    int current_host;
+    char padding[CACHE_LINE_SIZE - sizeof(float) - sizeof(int)];
+}t_mk_thread_storage __attribute__((aligned(CACHE_LINE_SIZE)));
 
 typedef struct
 {
@@ -685,6 +686,7 @@ void g_musikernel_get(float a_sr, t_midi_device_list * a_midi_devices)
     for(f_i = 0; f_i < MAX_WORKER_THREADS; ++f_i)
     {
         musikernel->thread_storage[f_i].sample_rate = a_sr;
+        musikernel->thread_storage[f_i].current_host = MK_HOST_DAWNEXT;
     }
 
     /* Create OSC thread */
@@ -750,14 +752,21 @@ void v_queue_osc_message(
 
 void v_pydaw_set_host(int a_mode)
 {
+    int f_i;
+
     assert(a_mode >= 0 && a_mode < MK_HOST_COUNT);
 
     pthread_spin_lock(&musikernel->main_lock);
 
     musikernel->current_host = &musikernel->hosts[a_mode];
 
+    for(f_i = 0; f_i < MAX_WORKER_THREADS; ++f_i)
+    {
+        musikernel->thread_storage[f_i].current_host = a_mode;
+    }
+
 #ifndef NO_MIDI
-    int f_i;
+
     t_midi_device * f_device;
 
     if(musikernel->midi_devices)

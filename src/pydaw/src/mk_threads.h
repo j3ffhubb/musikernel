@@ -325,6 +325,8 @@ NO_OPTIMIZATION void v_self_set_thread_affinity()
 void * v_pydaw_worker_thread(void* a_arg)
 {
     t_pydaw_thread_args * f_args = (t_pydaw_thread_args*)(a_arg);
+    t_mk_thread_storage * f_storage =
+        &musikernel->thread_storage[f_args->thread_num];
     v_pre_fault_thread_stack(f_args->stack_size);
 
     int f_thread_num = f_args->thread_num;
@@ -346,7 +348,11 @@ void * v_pydaw_worker_thread(void* a_arg)
             break;
         }
 
-        v_dn_process(f_args);
+        if(f_storage->current_host == MK_HOST_DAWNEXT)
+        {
+            v_dn_process(f_args);
+        }
+        //else if...
 
         pthread_spin_unlock(f_lock);
     }

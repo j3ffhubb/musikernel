@@ -34,6 +34,8 @@ import gc
 import sys
 import subprocess
 
+HOST_INDEX_DAW_NEXT = 0
+HOST_INDEX_WAVE_NEXT = 1
 
 class MkIpc(libmk.AbstractIPC):
     def __init__(self):
@@ -517,7 +519,7 @@ class MkMainWindow(QMainWindow):
             self.suppress_resize_events = False
 
     def open_in_wave_editor(self, a_file):
-        libmk.TRANSPORT.host_combobox.setCurrentIndex(2)
+        libmk.TRANSPORT.host_combobox.setCurrentIndex(HOST_INDEX_WAVE_NEXT)
         self.main_stack.repaint()
         self.wave_editor_module.WAVE_EDITOR.open_file(a_file)
         #self.wave_editor_module.WAVE_EDITOR.sample_graph.repaint()

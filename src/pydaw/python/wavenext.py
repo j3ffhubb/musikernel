@@ -691,7 +691,8 @@ class pydaw_wave_editor_widget:
         self.file_hlayout.addWidget(self.file_lineedit)
         self.vlayout.addLayout(self.file_hlayout)
         self.edit_tab = QWidget()
-        self.file_browser.folders_tab_widget.addTab(self.edit_tab, _("Edit"))
+        self.file_browser.folders_tab_widget.addTab(
+            self.edit_tab, _("Channel"))
         self.edit_hlayout = QHBoxLayout(self.edit_tab)
         self.vol_layout = QVBoxLayout()
         self.edit_hlayout.addLayout(self.vol_layout)
