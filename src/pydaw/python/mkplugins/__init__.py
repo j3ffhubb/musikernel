@@ -524,6 +524,7 @@ class PluginRackTab:
     def initialize(self, a_project):
         self.PROJECT = a_project
         self.track_combobox.currentIndexChanged.connect(self.track_changed)
+        self.track_combobox.setCurrentIndex(0)
 
     def tab_selected(self, a_is_selected):
         """ Call this when the parent tab widget switches to/from this tab """
