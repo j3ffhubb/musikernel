@@ -17,13 +17,15 @@ Install Anaconda (Spyder)
 
 Install NSIS, Notepad++
 
-Install MSYS2 (one install to C:\msys64 , and a separate one at C:\musikernel2
+Install MSYS2:
+    * install to C:\msys64
+    * a separate install at C:\{MAJOR_VERSION}
 	without installing the dependencies below)
 
 ####From MSYS2 shell:
 
-pacman -Sy
-pacman -Su
+pacman -Sy  # Update package database
+pacman -Su  # Update system, restart the terminal after
 
 # Done on separate lines because there is a solid chance of any
 # random pacman run failing.  Don't paste all lines in at once,
@@ -53,10 +55,8 @@ make PREFIX= DESTDIR=/mingw64 install_mingw
 ############# PACKAGING ##########################
 
 # Environment setup
-Create one MSYS2 environment at:  C:\musikernel2
+Create one MSYS2 environment at:  C:\{MAJOR_VERSION}
 Create one MSYS2 environment at C:\msys2 for doing builds
-# Assuming musikernel is already installed
-Run space-saver.py
 
 # From MSYS2
 
@@ -74,8 +74,23 @@ git pull
 ./pkgbuild.sh
 
 # From Windows
-nsis.py
-pacman -U ming[tab]  # for each terminal
-rm ming[tab]
+nsis.py # Follow instructions printed from the script
+
+
+#FIRST INSTALL ONLY
+
+pacman -U mingw-*portaudio*  # for each terminal if building 32 bit also
+
+#END FIRST INSTALL ONLY
+
+pacman -U mingw-*musikernel*  # for each terminal if building 32 bit also
+
+#FIRST INSTALL ONLY
+space-saver.py
+# install a 2nd time, space-saver will remove some it's files
+pacman -U ming[tab]
+#END FIRST INSTALL ONLY
+
+rm *  # delete contents of home folder
 
 [enter]
