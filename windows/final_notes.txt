@@ -17,7 +17,7 @@ Install Anaconda (Spyder)
 
 Install NSIS, Notepad++
 
-Install MSYS2 (one install to C:\msys64 , and a separate one at C:\musikernel 
+Install MSYS2 (one install to C:\msys64 , and a separate one at C:\musikernel2
 	without installing the dependencies below)
 
 ####From MSYS2 shell:
@@ -53,7 +53,7 @@ make PREFIX= DESTDIR=/mingw64 install_mingw
 ############# PACKAGING ##########################
 
 # Environment setup
-Create one MSYS2 environment at:  C:\musikernel
+Create one MSYS2 environment at:  C:\musikernel2
 Create one MSYS2 environment at C:\msys2 for doing builds
 # Assuming musikernel is already installed
 Run space-saver.py
