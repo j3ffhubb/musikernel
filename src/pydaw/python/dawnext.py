@@ -106,6 +106,7 @@ CURRENT_REGION_NAME = None
 DRAW_SEQUENCER_GRAPHS = True
 
 class RegionSettings:
+    """ The widget that holds the sequencer """
     def __init__(self):
         self.enabled = False
         self.widget = QWidget()
@@ -414,6 +415,9 @@ REGION_EDITOR_HEADER_GRADIENT.setColorAt(1.0, QColor.fromRgb(65, 65, 65))
 ALL_PEAK_METERS = {}
 
 class TrackPanel:
+    """ The widget that sits next to the sequencer QGraphicsView and
+        contains the individual tracks
+    """
     def __init__(self):
         self.tracks = {}
         self.plugin_uid_map = {}
@@ -426,7 +430,7 @@ class TrackPanel:
             vPolicy=QSizePolicy.MinimumExpanding))
         self.tracks_layout.setContentsMargins(0, 0, 0, 0)
         for i in range(REGION_EDITOR_TRACK_COUNT):
-            f_track = seq_track(i, TRACK_NAMES[i])
+            f_track = SeqTrack(i, TRACK_NAMES[i])
             self.tracks[i] = f_track
             self.tracks_layout.addWidget(f_track.group_box)
         self.automation_dict = {
@@ -506,7 +510,10 @@ ATM_GRADIENT.setColorAt(0.5, QColor(210, 210, 210))
 
 ATM_REGION = pydaw_atm_region()
 
-class atm_item(QGraphicsEllipseItem):
+class SeqAtmItem(QGraphicsEllipseItem):
+    """ This is an automation point within the ItemSequencer, these are only
+        drawn when "Automation" mode is selected in RegionSettings
+    """
     def __init__(self, a_item, a_save_callback, a_min_y, a_max_y):
         QGraphicsEllipseItem.__init__(
             self, 0, 0, ATM_POINT_DIAMETER, ATM_POINT_DIAMETER)
@@ -596,6 +603,8 @@ def pydaw_seconds_to_beats(a_seconds):
         CURRENT_ITEM_REF.start_beat) / 60.0)
 
 class SequencerItem(QGraphicsRectItem):
+    """ This is an individual sequencer item within the ItemSequencer
+    """
     def __init__(self, a_name, a_audio_item):
         QGraphicsRectItem.__init__(self)
         self.name = str(a_name)
@@ -1327,6 +1336,9 @@ class SequencerItem(QGraphicsRectItem):
 LAST_ITEM_LENGTH = 4
 
 class ItemSequencer(QGraphicsView):
+    """ This is the sequencer QGraphicsView and QGraphicsScene on
+        the "Sequencer" tab
+    """
     def __init__(self):
         QGraphicsView.__init__(self)
 
@@ -2508,7 +2520,7 @@ class ItemSequencer(QGraphicsView):
         f_min = (f_track *
             REGION_EDITOR_TRACK_HEIGHT) + REGION_EDITOR_HEADER_HEIGHT
         f_max = f_min + REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
-        f_item = atm_item(
+        f_item = SeqAtmItem(
             a_point, self.automation_save_callback, f_min, f_max)
         self.scene.addItem(f_item)
         f_item.setPos(self.get_pos_from_point(a_point))
@@ -3187,6 +3199,7 @@ def normalize_dialog():
 PAINTER_PATH_CACHE = {}
 
 class AudioSeqItem(QGraphicsRectItem):
+    """ This is an individual audio item within the AudioItemSeq """
     def __init__(self, a_track_num, a_audio_item, a_graph):
         QGraphicsRectItem.__init__(self)
         self.setFlag(QGraphicsItem.ItemIsMovable)
@@ -4477,6 +4490,9 @@ AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(1.0, QColor.fromRgb(65, 65, 65))
 
 
 class AudioItemSeq(QGraphicsView):
+    """ This is the QGraphicsView and QGraphicsScene for editing audio
+        items within a SequencerItem on the "Items" tab.
+    """
     def __init__(self):
         QGraphicsView.__init__(self)
         self.reset_line_lists()
@@ -5249,6 +5265,9 @@ class FileDragDropper(pydaw_widgets.AbstractFileBrowserWidget):
                 AUDIO_ITEMS_TO_DROP.append(f_path)
 
 class AudioItemSeqWidget(FileDragDropper):
+    """ The parent widget (including the file browser dialog) for the
+        AudioItemSeq
+    """
     def __init__(self):
         FileDragDropper.__init__(self, pydaw_util.is_audio_file)
 
@@ -5566,7 +5585,8 @@ def piano_roll_set_delete_mode(a_enabled):
         QApplication.restoreOverrideCursor()
 
 
-class piano_roll_note_item(QGraphicsRectItem):
+class PianoRollNoteItem(QGraphicsRectItem):
+    """ An individual note in the PianoRollEditor """
     def __init__(
             self, a_length, a_note_height, a_note,
             a_note_item, a_enabled=True):
@@ -5894,7 +5914,9 @@ class piano_roll_note_item(QGraphicsRectItem):
         QApplication.restoreOverrideCursor()
         PIANO_ROLL_EDITOR.click_enabled = True
 
-class piano_key_item(QGraphicsRectItem):
+class PianoKeyItem(QGraphicsRectItem):
+    """ This is a piano key on the PianoRollEditor
+    """
     def __init__(self, a_piano_width, a_note_height, a_parent):
         QGraphicsRectItem.__init__(
             self, 0, 0, a_piano_width, a_note_height, a_parent)
@@ -5912,6 +5934,8 @@ class piano_key_item(QGraphicsRectItem):
         self.setBrush(self.o_brush)
 
 class PianoRollEditor(QGraphicsView):
+    """ This is the QGraphicsView and QGraphicsScene where notes are drawn
+    """
     def __init__(self):
         self.viewer_width = 1000
         self.grid_div = 16
@@ -6239,7 +6263,7 @@ class PianoRollEditor(QGraphicsView):
         QGraphicsView.mouseMoveEvent(self, a_event)
         if PIANO_ROLL_DELETE_MODE:
             for f_item in self.items(a_event.pos()):
-                if isinstance(f_item, piano_roll_note_item):
+                if isinstance(f_item, PianoRollNoteItem):
                     f_item.delete_later()
 
     def hover_restore_cursor_event(self, a_event=None):
@@ -6276,7 +6300,7 @@ class PianoRollEditor(QGraphicsView):
             0, 0, self.piano_width, self.piano_height)
         self.scene.addItem(self.piano)
         self.piano.mapToScene(0.0, PIANO_ROLL_HEADER_HEIGHT)
-        f_key = piano_key_item(self.piano_width, self.note_height, self.piano)
+        f_key = PianoKeyItem(self.piano_width, self.note_height, self.piano)
         f_label = QGraphicsSimpleTextItem("C8", f_key)
         f_label.setPen(QtCore.Qt.black)
         f_label.setFlag(QGraphicsItem.ItemIgnoresTransformations)
@@ -6289,7 +6313,7 @@ class PianoRollEditor(QGraphicsView):
         for i in range(self.end_octave - self.start_octave,
                        self.start_octave - self.start_octave, -1):
             for j in range(self.notes_in_octave, 0, -1):
-                f_key = piano_key_item(
+                f_key = PianoKeyItem(
                     self.piano_width, self.note_height, self.piano)
                 self.piano_keys[f_note_index] = f_key
                 f_note_index += 1
@@ -6437,7 +6461,7 @@ class PianoRollEditor(QGraphicsView):
         f_length = self.beat_width * a_note.length
         f_note = PIANO_ROLL_HEADER_HEIGHT + self.note_height * \
             (PIANO_ROLL_NOTE_COUNT - a_note.note_num)
-        f_note_item = piano_roll_note_item(
+        f_note_item = PianoRollNoteItem(
             f_length, self.note_height, a_note.note_num,
             a_note, a_enabled)
         f_note_item.setPos(f_start, f_note)
@@ -6475,6 +6499,7 @@ class PianoRollEditor(QGraphicsView):
 
 
 class PianoRollEditorWidget:
+    """ This is the parent widget that contains the PianoRollEditor """
     def __init__(self):
         self.widget = QWidget()
         self.vlayout = QVBoxLayout()
@@ -6754,7 +6779,9 @@ global_automation_selected_gradient = QLinearGradient(
 global_automation_selected_gradient.setColorAt(0, QColor(255, 255, 255))
 global_automation_selected_gradient.setColorAt(1, QColor(240, 240, 240))
 
-class automation_item(QGraphicsEllipseItem):
+class AutomationItem(QGraphicsEllipseItem):
+    """ This is a CC or pitchbend event in an AutomationEditor
+    """
     def __init__(self, a_time, a_value, a_cc, a_view, a_is_cc):
         QGraphicsEllipseItem.__init__(
             self, 0, 0, AUTOMATION_POINT_DIAMETER, AUTOMATION_POINT_DIAMETER)
@@ -6836,7 +6863,13 @@ class automation_item(QGraphicsEllipseItem):
 AUTOMATION_EDITORS = []
 
 class AutomationEditor(QGraphicsView):
+    """ This is the class for both the pitchbend and CC
+        QGraphicsView and QGraphicsScene editors on the "Items" tab.
+    """
     def __init__(self, a_is_cc=True):
+        """ @a_is_cc: True to make self a CC editor, False for a pitchbend
+                      editor
+        """
         QGraphicsView.__init__(self)
         self.is_cc = a_is_cc
         self.set_width()
@@ -7139,7 +7172,7 @@ class AutomationEditor(QGraphicsView):
         else:
             f_value = self.axis_size +  self.viewer_height / 2.0 * (1.0 -
                 a_cc.pb_val)
-        f_point = automation_item(
+        f_point = AutomationItem(
             f_time, f_value, a_cc, self, self.is_cc)
         self.automation_points.append(f_point)
         self.scene.addItem(f_point)
@@ -7510,6 +7543,8 @@ LAST_ITEM_REF = None
 CURRENT_ITEM_LEN = 4
 
 class ItemListViewer:
+    """ This is the "Items" tab in MainWindow
+    """
     def __init__(self):
         self.enabled = False
         self.events_follow_default = True
@@ -7888,6 +7923,9 @@ class ItemListViewer:
 
 
 class MidiDevice:
+    """ The controls for an individual MIDI hardware device, as
+        configured in the hardware dialog
+    """
     def __init__(self, a_name, a_index, a_layout, a_save_callback):
         self.suppress_updates = True
         self.name = str(a_name)
@@ -7929,6 +7967,9 @@ class MidiDevice:
         self.suppress_updates = False
 
 class MidiDevicesDialog:
+    """ The container for all of the MidiDevice objects, located in
+        the DAW-Next TransportWidget
+    """
     def __init__(self):
         self.layout = QGridLayout()
         self.devices = []
@@ -7959,6 +8000,7 @@ class MidiDevicesDialog:
 
 
 def global_open_mixer():
+    """ Update the mixer to reflect the current routing and track names """
     f_graph = PROJECT.get_routing_graph()
     f_track_names = {
         f_i:x for f_i, x in zip(range(len(TRACK_NAMES)), TRACK_NAMES)}
@@ -7973,7 +8015,9 @@ def global_open_mixer():
         range(len(TRACK_NAMES)), TRACK_NAMES)})
 
 
-class seq_track:
+class SeqTrack:
+    """ The widget that contains the controls for an individual track
+    """
     def __init__(self, a_track_num, a_track_text=_("track")):
         self.suppress_osc = True
         self.automation_uid = None
@@ -8592,6 +8636,9 @@ class TransportWidget(libmk.AbstractTransport):
 
 
 class MainWindow(QScrollArea):
+    """ The main window for DAW-Next that contains all widgets
+        except TransportWidget
+    """
     def __init__(self):
         QScrollArea.__init__(self)
         self.first_offline_render = True
