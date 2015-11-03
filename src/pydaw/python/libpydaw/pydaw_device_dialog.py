@@ -151,9 +151,6 @@ class pydaw_device_dialog:
         elif pydaw_util.IS_MAC_OSX:
             f_portaudio_so_path = "libportaudio.dylib"
             f_pm_dll = "libportmidi.dylib"
-        elif pydaw_util.IS_CYGWIN:
-            f_portaudio_so_path = "libportaudio-2.dll"
-            f_pm_dll = "libportmidi-0.dll"
         elif pydaw_util.IS_WINDOWS:
             f_pm_dll = os.path.join(
                 pydaw_util.BIN_DIR, "libportmidi.dll")
@@ -573,8 +570,6 @@ class pydaw_device_dialog:
                 f_thread_affinity = \
                     1 if f_thread_affinity_checkbox.isChecked() else 0
                 f_hugepages = 1 if f_hugepages_checkbox.isChecked() else 0
-            elif pydaw_util.IS_CYGWIN:
-                f_audio_engine = 0
             f_audio_inputs = f_audio_in_spinbox.value()
             f_out_tuple = (f_audio_out_spinbox,) + OUT_SPINBOXES
             f_audio_outputs = "|".join(str(x.value()) for x in f_out_tuple)

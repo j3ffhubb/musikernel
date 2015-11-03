@@ -512,11 +512,6 @@ class MkMainWindow(QMainWindow):
         if self.suppress_resize_events:
             return
         QMainWindow.resizeEvent(self, a_event)
-        # Fix the taskbar overlapping the bottom of the window
-        if self.isMaximized() and pydaw_util.IS_CYGWIN:
-            self.suppress_resize_events = True
-            MAIN_WINDOW.setGeometry(libmk.APP.desktop().availableGeometry())
-            self.suppress_resize_events = False
 
     def open_in_wave_editor(self, a_file):
         libmk.TRANSPORT.host_combobox.setCurrentIndex(HOST_INDEX_WAVE_NEXT)
@@ -1394,9 +1389,7 @@ def global_new_project(a_project_file, a_wait=True):
 
 def respawn():
     print("Spawning child UI process {}".format(sys.argv))
-    if pydaw_util.IS_CYGWIN:
-        CHILD_PROC = subprocess.Popen(["/bin/python3.2m"] + sys.argv)
-    elif pydaw_util.IS_WINDOWS:
+    if pydaw_util.IS_WINDOWS:
         CHILD_PROC = subprocess.Popen([
             "python3.exe", pydaw_util.global_pydaw_version_string + ".py",
             "--delay"])
@@ -1411,14 +1404,6 @@ def respawn():
     print("Parent UI process exiting")
 
 #########  Setup and run #########
-
-if pydaw_util.IS_CYGWIN:
-    if not "DISPLAY" in os.environ:
-        os.environ["DISPLAY"] = ":0.0"
-    XSERVER = subprocess.Popen(
-        ["XWin.exe", "-multiwindow", "-silent-dup-error", "-terminate"])
-    print("Waiting for XServer")
-    time.sleep(1.0)
 
 libmk.APP = QApplication(sys.argv)
 MAIN_WINDOW = MkMainWindow()
@@ -1511,16 +1496,6 @@ libmk.APP = None
 time.sleep(0.6)
 final_gc()
 
-if pydaw_util.IS_CYGWIN:
-    import signal
-    try:
-        XSERVER.send_signal(signal.SIGINT)
-        for f_i in range(10):
-            if XSERVER.poll() is None:
-                break
-            time.sleep(0.5)
-    except Exception as ex:
-        print(ex)
 
 if RESPAWN:
     respawn()

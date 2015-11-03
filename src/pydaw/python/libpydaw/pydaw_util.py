@@ -33,7 +33,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
 
 
-IS_CYGWIN = "cygwin" in sys.platform
+assert "cygwin" not in sys.platform, "Cygwin is unsupported"
 IS_WINDOWS = "win32" in sys.platform or "msys" in sys.platform
 IS_LINUX = "linux" in sys.platform
 IS_MAC_OSX = "darwin" in sys.platform
@@ -130,9 +130,7 @@ ICON_PATH = os.path.join(
 
 print("ICON_PATH = '{}'".format(ICON_PATH))
 
-if IS_CYGWIN:
-    DLL_EXT = ".dll"
-elif IS_WINDOWS:
+if IS_WINDOWS:
     DLL_EXT = ".dll"
     ICON_PATH = os.path.join(
         INSTALL_PREFIX, "{}.ico".format(global_pydaw_version_string))
@@ -485,10 +483,6 @@ else:
         INSTALL_PREFIX, "lib", global_pydaw_version_string,
         "sbsms", "bin", "sbsms")
 
-if "cygwin" in sys.platform:
-    pydaw_rubberband_util += ".exe"
-    #this one doesn't get a .exe extension
-    #pydaw_sbsms_util += ".exe"
 
 def pydaw_rubberband(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift,
                      a_crispness, a_preserve_formants=False):
@@ -828,22 +822,6 @@ global_show_create_folder_error = False
 
 global_is_live_mode = False
 global_home = os.path.expanduser("~")
-
-def _set_cygwin_home():
-    if not "USERPROFILE" in os.environ:
-        return
-    f_up = os.environ["USERPROFILE"]
-    f_home = "/cygdrive/{}/{}".format(
-        f_up[0].lower(), f_up[2:].replace("\\", "/"))
-    if os.path.exists(f_home) and os.access(f_home, os.W_OK):
-        global global_home
-        global_home = f_home
-        os.environ["HOME"] = f_home
-    else:
-        print("Could not set HOME to {}".format(f_home))
-
-if IS_CYGWIN:
-    _set_cygwin_home()
 
 global_pydaw_home = os.path.join(global_home, global_pydaw_version_string)
 global_default_project_folder = global_pydaw_home
