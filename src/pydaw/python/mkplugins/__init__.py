@@ -178,7 +178,7 @@ class MkPluginUiDict:
         return self.ui_dict[a_plugin_uid]
 
     def open_plugin_ui(
-            self, a_plugin_uid, a_plugin_type, a_show=False, a_is_mixer=False):
+            self, a_plugin_uid, a_plugin_type, a_is_mixer=False):
         if not a_plugin_uid in self.ui_dict:
             f_plugin = PLUGIN_UI_TYPES[a_plugin_type](
                 self.ctrl_update_callback, self.project, a_plugin_uid,
@@ -187,18 +187,12 @@ class MkPluginUiDict:
                 a_is_mixer)
             pydaw_center_widget_on_screen(f_plugin.widget)
             self.ui_dict[a_plugin_uid] = f_plugin
-            if a_show:
-                assert False, "This code path should be deprecated"
-            else:
-                return f_plugin
+            return f_plugin
         else:
-            if not a_show:
-                retval = self.ui_dict[a_plugin_uid]
-                retval.widget_show()  # Always enable UI messages
-                return retval
-            if self.ui_dict[a_plugin_uid].widget.isHidden():
-                self.ui_dict[a_plugin_uid].widget.show()
-            self.ui_dict[a_plugin_uid].raise_widget()
+            retval = self.ui_dict[a_plugin_uid]
+            retval.widget_show()  # Always enable UI messages
+            return retval
+
 
     def midi_learn_callback(self, a_plugin, a_control):
         self.midi_learn_control = (a_plugin, a_control)
@@ -410,13 +404,9 @@ class AbstractPluginSettings:
     def on_show_ui(self):
         plugin_name = str(self.plugin_combobox.currentText())
         if not plugin_name:
-            print(
-                self.track_num, "'{}'".format(plugin_name),
-                "not plugin_name")
             return
         f_index = get_plugin_uid_by_name(self.plugin_combobox.currentText())
         if f_index == 0 or self.plugin_uid == -1:
-            print(self.track_num, f_index, self.plugin_uid)
             if self.is_mixer:
                 self.vlayout.addItem(self.spacer)
             return
@@ -451,7 +441,25 @@ class PluginSettingsMain(AbstractPluginSettings):
 
         AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback)
+
+        self.hide_checkbox = QCheckBox(_("Hide"))
+        self.layout.addWidget(self.hide_checkbox)
+        self.hide_checkbox.setEnabled(False)
+        self.hide_checkbox.stateChanged.connect(self.hide_checkbox_changed)
+
         self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
+
+    def on_show_ui(self):
+        AbstractPluginSettings.on_show_ui(self)
+        if self.plugin_ui:
+            self.hide_checkbox.setEnabled(True)
+        else:
+            self.hide_checkbox.setChecked(False)
+            self.hide_checkbox.setEnabled(False)
+
+    def hide_checkbox_changed(self, a_val=None):
+        if self.plugin_ui:
+            self.plugin_ui.widget.setHidden(self.hide_checkbox.isChecked())
 
 
 class PluginSettingsMixer(AbstractPluginSettings):
