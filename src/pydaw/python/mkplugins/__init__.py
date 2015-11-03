@@ -551,6 +551,7 @@ class PluginRackTab:
     def track_changed(self, a_val=None):
         if not self.enabled:
             return
+        self.widget.setUpdatesEnabled(False)
         f_index = self.track_combobox.currentIndex()
         if f_index not in self.plugin_racks:
             f_rack = PluginRack(self.PROJECT, f_index)
@@ -561,6 +562,8 @@ class PluginRackTab:
         if self.last_rack_num is not None and self.last_rack_num != f_index:
             self.close_rack(self.last_rack_num)
         self.last_rack_num = f_index
+        self.widget.setUpdatesEnabled(True)
+        self.widget.update()
 
     def set_track_names(self, a_list):
         self.enabled = False
@@ -628,13 +631,16 @@ class PluginRack:
             self.plugins[0:len(f_result)] = f_result
             print(self.plugins, f_result)
             self.save_callback()
-            #self.open_plugins()
+            self.widget.setUpdatesEnabled(False)
             for plugin in self.plugins:
                 self.scroll_vlayout.removeItem(plugin.vlayout)
             for plugin in self.plugins:
                 self.scroll_vlayout.addLayout(plugin.vlayout)
+            self.widget.setUpdatesEnabled(True)
+            self.widget.update()
 
     def open_plugins(self):
+        self.widget.setUpdatesEnabled(False)
         f_plugins = self.PROJECT.get_track_plugins(self.track_number)
         if f_plugins:
             for f_plugin in f_plugins.plugins[:PLUGINS_PER_TRACK]:
@@ -644,6 +650,8 @@ class PluginRack:
                         self.plugins)
                 else:
                     self.plugins[f_plugin.index].set_value(f_plugin)
+        self.widget.setUpdatesEnabled(True)
+        self.widget.update()
 
     def save_callback(self):
         f_result = self.PROJECT.get_track_plugins(self.track_number)
@@ -777,9 +785,12 @@ class MixerWidget:
             @a_plugins: A dict of {track_index:
                         {plugin_index:libmk.pydaw_track_plugin, ...}, ...}
         """
+        self.widget.setUpdatesEnabled(False)
         for i in range(1, len(self.tracks)):
             graph_dict = a_graph.graph[i] if i in a_graph.graph else {}
             self.tracks[i].set_plugin(graph_dict, a_plugins[i])
+        self.widget.setUpdatesEnabled(True)
+        self.widget.update()
 
     def set_tooltips(self, a_enabled):
         self.widget.setToolTip(libpydaw.strings.Mixer if a_enabled else "")
