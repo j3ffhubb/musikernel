@@ -8,7 +8,8 @@ QWidget#plugin_rack
     background-color:rgb(3, 3, 3);
 }
 
-QWidget#mainwindow, QWidget#ccmaptabwidget, QWidget#itemtabwidget, QMessageBox
+QWidget#mainwindow, QWidget#ccmaptabwidget, QWidget#itemtabwidget,
+QMessageBox
 {
     background-color:rgb(93, 93, 93);
 }
@@ -354,10 +355,9 @@ QToolTip
 {
     color: white;
     font-size: 15px;
-    border: 2px solid white;
-    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(120, 120, 120, 255), stop:0.1 rgba(45, 45, 45, 255), stop:0.5 rgba(39, 39, 39, 255),  stop:0.9 rgba(42, 42, 42, 255), stop:1 rgba(10, 10, 10, 255));
+    border: 1px solid white;
+    background-color: rgba(90, 90, 100, 255);
     padding: 6px;
-    border-radius: 9px;
 }
 
 QGroupBox
