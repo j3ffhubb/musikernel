@@ -288,6 +288,7 @@ KC_TIME_DECIMAL = 8
 KC_HZ_DECIMAL = 9
 KC_INT_PITCH = 10
 KC_TENTH = 11
+KC_MILLISECOND = 12
 
 LAST_TEMPO_COMBOBOX_INDEX = 2
 
@@ -362,13 +363,11 @@ class AbstractUiControl:
         retval = None
         if self.val_conversion == KC_NONE:
             pass
-        elif self.val_conversion == KC_DECIMAL or \
-        self.val_conversion == KC_TIME_DECIMAL or \
-        self.val_conversion == KC_HZ_DECIMAL:
+        elif self.val_conversion in (
+        KC_DECIMAL, KC_TIME_DECIMAL,KC_HZ_DECIMAL):
             retval = (str(round(f_value * .01, 2)))
-        elif self.val_conversion == KC_INTEGER or \
-        self.val_conversion == KC_INT_PITCH:
-            retval = (str(int(f_value)))
+        elif self.val_conversion in (KC_INTEGER, KC_INT_PITCH, KC_MILLISECOND):
+            retval = str(int(f_value))
         elif self.val_conversion == KC_PITCH:
             f_val = int(pydaw_util.pydaw_pitch_to_hz(f_value))
             if f_val >= 1000:
@@ -464,6 +463,8 @@ class AbstractUiControl:
                 f_result = round((1.0 / (f_seconds_per_beat * f_frac)) * 100)
             elif self.val_conversion == KC_LOG_TIME:
                 f_result = round(math.sqrt(f_seconds_per_beat * f_frac) * 100)
+            elif self.val_conversion == KC_MILLISECOND:
+                f_result = round(f_seconds_per_beat * f_frac * 1000)
             f_result = pydaw_util.pydaw_clip_value(
                 f_result, self.control.minimum(), self.control.maximum())
             self.control.setValue(f_result)
@@ -703,9 +704,8 @@ class AbstractUiControl:
             f_paste_automation_action.triggered.connect(self.paste_automation)
         f_menu.addSeparator()
 
-        if self.val_conversion == KC_TIME_DECIMAL or \
-        self.val_conversion == KC_HZ_DECIMAL or \
-        self.val_conversion == KC_LOG_TIME:
+        if self.val_conversion in (
+        KC_TIME_DECIMAL, KC_HZ_DECIMAL, KC_LOG_TIME, KC_MILLISECOND):
             f_tempo_sync_action = f_menu.addAction(_("Tempo Sync..."))
             f_tempo_sync_action.triggered.connect(self.tempo_sync_dialog)
         if self.val_conversion == KC_PITCH:

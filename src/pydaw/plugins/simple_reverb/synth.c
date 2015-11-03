@@ -176,10 +176,9 @@ static void v_sreverb_run(
             atm_events[f_i].tick, atm_events[f_i].value, atm_events[f_i].port);
     }
 
-    f_i = 0;
     float f_dry_vol;
 
-    while(f_i < sample_count)
+    for(f_i = 0; f_i < sample_count; ++f_i)
     {
         while(midi_event_pos < plugin_data->midi_event_count &&
                 plugin_data->midi_event_ticks[midi_event_pos] == f_i)
@@ -212,7 +211,7 @@ static void v_sreverb_run(
             f_db_to_linear_fast(
                 plugin_data->mono_modules->reverb_smoother.last_value),
             (*plugin_data->reverb_color),
-            (*plugin_data->reverb_predelay) * 0.01f,
+            (*plugin_data->reverb_predelay) * 0.001f,
             (*plugin_data->reverb_hp));
 
         v_rvb_reverb_run(&plugin_data->mono_modules->reverb,
@@ -225,7 +224,6 @@ static void v_sreverb_run(
         plugin_data->output1[f_i] =
                 (plugin_data->output1[f_i] * f_dry_vol) +
                 plugin_data->mono_modules->reverb.output;
-        ++f_i;
     }
 }
 
@@ -237,7 +235,7 @@ PYFX_Descriptor *sreverb_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, SREVERB_REVERB_WET, -120.0f, -500.0f, 0.0f);
     pydaw_set_pyfx_port(f_result, SREVERB_REVERB_COLOR, 90.0f, 48.0f, 120.0f);
     pydaw_set_pyfx_port(f_result, SREVERB_REVERB_DRY, 0.0f, -500.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, SREVERB_REVERB_PRE_DELAY, 1.0f, 0.0f, 100.0f);
+    pydaw_set_pyfx_port(f_result, SREVERB_REVERB_PRE_DELAY, 10.0f, 0.0f, 1000.0f);
     pydaw_set_pyfx_port(f_result, SREVERB_REVERB_HP, 50.0f, 20.0f, 96.0f);
 
 

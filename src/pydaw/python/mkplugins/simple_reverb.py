@@ -89,7 +89,7 @@ class sreverb_plugin_ui(pydaw_abstract_plugin_ui):
         self.reverb_predelay_knob = pydaw_knob_control(
             f_knob_size, _("PreDelay"), SREVERB_REVERB_PRE_DELAY,
             self.plugin_rel_callback, self.plugin_val_callback,
-            0, 100, 1, KC_TIME_DECIMAL, self.port_dict, self.preset_manager)
+            0, 1000, 10, KC_MILLISECOND, self.port_dict, self.preset_manager)
         self.reverb_predelay_knob.add_to_grid_layout(
             self.reverb_groupbox_gridlayout, 21)
 
