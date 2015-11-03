@@ -169,7 +169,8 @@ class EngineLibThread(QtCore.QThread):
         global ENGINE_RETCODE
         myargv = ctypes.c_char_p * 5
         argv = myargv(
-            b"/usr/bin/musikernel1-engine", INSTALL_PREFIX.encode("ascii"),
+            "/usr/bin/{}-engine".format(
+                global_pydaw_version_string).encode("ascii"),
             PROJECT_DIR.encode("ascii"), b"0",
             str(USE_HUGEPAGES).encode("ascii"))
         ENGINE_RETCODE = ENGINE_LIB.main(5, ctypes.byref(argv))
