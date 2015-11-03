@@ -556,8 +556,12 @@ class PluginRackTab:
         self.last_rack_num = f_index
 
     def set_track_names(self, a_list):
+        self.enabled = False
+        index = self.track_combobox.currentIndex()
         self.track_combobox.clear()
         self.track_combobox.addItems(a_list)
+        self.track_combobox.setCurrentIndex(index)
+        self.enabled = True
 
     def set_track_order(self, a_dict):
         self.enabled = False
