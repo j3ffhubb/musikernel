@@ -21,6 +21,7 @@ libmk.mkplugins = sys.modules[__name__]
 from libmk.mk_project import *
 from libpydaw.translate import _
 from libpydaw import pydaw_widgets
+import libpydaw.strings
 
 import mkplugins.euphoria
 import mkplugins.rayv
@@ -510,6 +511,11 @@ class PluginRackTab:
         self.plugin_racks = {}
         self.last_rack_num = None
 
+    def set_tooltips(self, a_enabled):
+        self.widget.setToolTip(
+            libpydaw.strings.PluginRack if a_enabled else "")
+
+
     def set_plugin_order(self):
         index = self.track_combobox.currentIndex()
         rack = self.plugin_racks[index]
@@ -741,11 +747,6 @@ class MixerChannel:
         for i in range(SENDS_PER_TRACK):
             self.add_plugin(i)
 
-
-MIXER_TOOLTIP = _("""This is the mixer.
-To add volume sliders, etc...  select a mixer plugin for each send on
-each track that you wish to be able to control""")
-
 class MixerWidget:
     def __init__(self, a_track_count):
         self.widget = QScrollArea()
@@ -780,10 +781,7 @@ class MixerWidget:
             self.tracks[i].set_plugin(graph_dict, a_plugins[i])
 
     def set_tooltips(self, a_enabled):
-        if a_enabled:
-            self.widget.setToolTip(MIXER_TOOLTIP)
-        else:
-            self.widget.setToolTip("")
+        self.widget.setToolTip(libpydaw.strings.Mixer if a_enabled else "")
 
     def update_track_names(self, a_track_names_dict):
         for k, v in a_track_names_dict.items():

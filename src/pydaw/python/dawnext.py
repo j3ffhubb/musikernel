@@ -82,7 +82,7 @@ def set_tooltips_enabled(a_enabled):
     f_list = [
         AUDIO_SEQ_WIDGET, PIANO_ROLL_EDITOR, MAIN_WINDOW,
         AUDIO_SEQ, TRANSPORT, MIXER_WIDGET,
-        SEQUENCER, TRACK_PANEL] + list(AUTOMATION_EDITORS)
+        SEQUENCER, TRACK_PANEL, PLUGIN_RACK] + list(AUTOMATION_EDITORS)
     for f_widget in f_list:
         f_widget.set_tooltips(a_enabled)
 

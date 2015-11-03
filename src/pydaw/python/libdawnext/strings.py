@@ -52,7 +52,6 @@ Shift+click+drag to cut/delete automation points
 
 See the right-click context menu for additional actions and keyboard shortcuts.
 
-Toggle collapsing the file browser with CTRL+right_arrow
 """)
 
 sequencer_item = _(
