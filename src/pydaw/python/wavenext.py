@@ -844,10 +844,6 @@ class pydaw_wave_editor_widget:
             self.sample_graph.setToolTip(
                 _("Load samples here by using the browser on the left "
                 "and clicking the  'Load' button"))
-            self.fx_button.setToolTip(
-                _("This button shows the Modulex effects window.  "
-                "Export the audio (using the menu button) to "
-                "permanently apply effects."))
             self.menu_button.setToolTip(
                 _("This menu can export the audio or perform "
                 "various operations."))
@@ -856,7 +852,6 @@ class pydaw_wave_editor_widget:
                 "were previously opened during this session."))
         else:
             self.sample_graph.setToolTip("")
-            self.fx_button.setToolTip("")
             self.menu_button.setToolTip("")
             self.history_button.setToolTip("")
 
