@@ -275,22 +275,18 @@ class AbstractPluginSettings:
         self.track_num = a_track_num
         self.index = a_index
         self.plugin_index = None
-        # Qt 5.5.0 completely breaks PluginComboBox's use of QMenu,
-        # so not using it for now, unfortunately.
+
         self.qcbox = a_qcbox
-        if a_qcbox or True:
+        if a_qcbox:
             self.plugin_combobox = QComboBox()
         else:
             self.plugin_combobox = PluginComboBox(self.on_plugin_change)
         self.plugin_combobox.setMinimumWidth(150)
         self.plugin_combobox.wheelEvent = self.wheel_event
+
+        self.plugin_combobox.addItems(self.plugin_list)
+
         if a_qcbox:
-            self.plugin_combobox.addItems(self.plugin_list)
-        else:
-            self.plugin_combobox.addItems(["None"])
-            self.plugin_combobox.addItems(
-                y for x in self.plugin_list for y in x[1])
-        if a_qcbox or True:
             self.plugin_combobox.currentIndexChanged.connect(
                 self.on_plugin_change)
 
@@ -347,14 +343,14 @@ class AbstractPluginSettings:
             @a_val:  A libmk.pydaw_track_plugin
         """
         self.suppress_osc = True
-        # More Qt 5.5.0 regression work-around
+
         if self.qcbox:
-            assert False, "Codepath should not be in use"
-            self.plugin_combobox.setCurrentIndex(a_val.plugin_index)
-        else:
             f_name = PLUGIN_UIDS_REVERSE[a_val.plugin_index]
             index = self.plugin_combobox.findText(f_name)
             self.plugin_combobox.setCurrentIndex(index)
+        else:
+            self.plugin_combobox.setCurrentIndex(a_val.plugin_index)
+
         self.plugin_index = a_val.plugin_index
 
         self.plugin_uid = a_val.plugin_uid
@@ -441,7 +437,8 @@ class PluginSettingsMain(AbstractPluginSettings):
         f_clear_action.triggered.connect(self.clear)
 
         AbstractPluginSettings.__init__(
-            self, a_set_plugin_func, a_index, a_track_num, a_save_callback)
+            self, a_set_plugin_func, a_index, a_track_num, a_save_callback,
+            a_qcbox=False)
 
         self.hide_checkbox = QCheckBox(_("Hide"))
         self.layout.addWidget(self.hide_checkbox)
@@ -466,10 +463,10 @@ class PluginSettingsMain(AbstractPluginSettings):
 class PluginSettingsMixer(AbstractPluginSettings):
     def __init__(
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback):
-        self.plugin_list = MIXER_PLUGIN_NAMES
+        self.plugin_list = ["None"] + PLUGINS_MIXER # MIXER_PLUGIN_NAMES
         AbstractPluginSettings.__init__(
             self, a_set_plugin_func, a_index, a_track_num,
-            a_save_callback, a_is_mixer=True)
+            a_save_callback, a_qcbox=True, a_is_mixer=True)
         self.index += PLUGINS_PER_TRACK
         self.vlayout.setParent(None)
         self.plugin_combobox.setMinimumWidth(120)
@@ -480,7 +477,8 @@ class PluginSettingsWaveEditor(AbstractPluginSettings):
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback):
         self.plugin_list = WAVE_EDITOR_PLUGIN_NAMES
         AbstractPluginSettings.__init__(
-            self, a_set_plugin_func, a_index, a_track_num, a_save_callback)
+            self, a_set_plugin_func, a_index, a_track_num,
+            a_save_callback, a_qcbox=False)
         self.layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding))
 
 
