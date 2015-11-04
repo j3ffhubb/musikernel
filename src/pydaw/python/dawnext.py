@@ -611,6 +611,7 @@ class AbstractItemEditor(QGraphicsView):
     def __init__(self, a_cursor_offset=0.0):
         QGraphicsView.__init__(self)
         self.playback_cursor = None
+        self.header = None
         self.cursor_offset = a_cursor_offset
         self.px_per_beat = None
         self.total_height = 2000
@@ -624,13 +625,27 @@ class AbstractItemEditor(QGraphicsView):
         f_pos = (self.playback_pos * self.px_per_beat) + self.cursor_offset
         self.playback_cursor.setPos(f_pos, 0.0)
 
-    def draw_header(self):
+    def draw_header(self, a_header_width, a_header_height):
+        self.header = QGraphicsRectItem(
+            0, 0, a_header_width, a_header_height)
         if not CURRENT_ITEM_REF:
             return
         self.playback_cursor = self.scene.addLine(
             0.0, 0.0, 0.0, self.total_height, QPen(QtCore.Qt.red, 2.0))
         self.playback_cursor.setZValue(1000.0)
+        self.header.mousePressEvent = self.header_click_event
         self.set_playback_pos()
+
+    def header_click_event(self, a_event):
+        if not CURRENT_ITEM_REF:
+            return
+        if not libmk.IS_PLAYING and \
+        a_event.button() != QtCore.Qt.RightButton:
+            f_beat = int((a_event.scenePos().x() - self.cursor_offset)
+                / self.px_per_beat) + CURRENT_ITEM_REF.start_beat
+            self.set_playback_pos(f_beat)
+            SEQUENCER.set_playback_pos(f_beat)
+            TRANSPORT.set_time(f_beat)
 
 
 class SequencerItem(QGraphicsRectItem):
@@ -1408,7 +1423,7 @@ class ItemSequencer(QGraphicsView):
         self.reset_line_lists()
         self.h_zoom = 1.0
         self.v_zoom = 1.0
-        self.ruler_y_pos = 0.0
+        self.header_y_pos = 0.0
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
         #self.scene.setItemIndexMethod(QGraphicsScene.BspTreeIndex)
@@ -1689,9 +1704,9 @@ class ItemSequencer(QGraphicsView):
                 return f_item
         return None
 
-    def check_ruler(self, a_pos):
+    def check_header(self, a_pos):
         for f_item in self.scene.items(a_pos):
-            if f_item == self.ruler:
+            if f_item == self.header:
                 return True
         return False
 
@@ -1704,7 +1719,7 @@ class ItemSequencer(QGraphicsView):
         if f_pos.x() > self.max_x:
             return
 
-        if self.check_ruler(f_pos):
+        if self.check_header(f_pos):
             if a_event.button() == QtCore.Qt.LeftButton:
                 f_beat = int(f_pos.x() / SEQUENCER_PX_PER_BEAT)
                 self.set_playback_pos(f_beat)
@@ -1959,10 +1974,10 @@ class ItemSequencer(QGraphicsView):
             QGraphicsView.keyPressEvent(self, a_event)
         QApplication.restoreOverrideCursor()
 
-    def set_ruler_y_pos(self, a_y=None):
+    def set_header_y_pos(self, a_y=None):
         if a_y is not None:
-            self.ruler_y_pos = a_y
-        self.ruler.setPos(0.0, self.ruler_y_pos - 2.0)
+            self.header_y_pos = a_y
+        self.header.setPos(0.0, self.header_y_pos - 2.0)
 
     def get_selected(self):
         return [x for x in self.audio_items if x.isSelected()]
@@ -2164,7 +2179,7 @@ class ItemSequencer(QGraphicsView):
         pass
         #pydaw_set_SEQUENCER_zoom(self.h_zoom, self.v_zoom)
 
-    def ruler_click_event(self, a_event):
+    def header_click_event(self, a_event):
         if not libmk.IS_PLAYING and \
         a_event.button() != QtCore.Qt.RightButton:
             f_beat = int(a_event.scenePos().x() / SEQUENCER_PX_PER_BEAT)
@@ -2202,10 +2217,10 @@ class ItemSequencer(QGraphicsView):
             for f_num in self.text_list:
                 f_num.setVisible(True)
 
-    def ruler_time_modify(self):
+    def header_time_modify(self):
         def ok_handler():
             f_marker = project.pydaw_tempo_marker(
-                self.ruler_event_pos, f_tempo.value(),
+                self.header_event_pos, f_tempo.value(),
                 f_tsig_num.value(), int(str(f_tsig_den.currentText())))
             CURRENT_REGION.set_marker(f_marker)
             PROJECT.save_region(CURRENT_REGION)
@@ -2214,8 +2229,8 @@ class ItemSequencer(QGraphicsView):
             f_window.close()
 
         def cancel_handler():
-            f_marker = CURRENT_REGION.has_marker(self.ruler_event_pos, 2)
-            if f_marker and self.ruler_event_pos:
+            f_marker = CURRENT_REGION.has_marker(self.header_event_pos, 2)
+            if f_marker and self.header_event_pos:
                 CURRENT_REGION.delete_marker(f_marker)
                 PROJECT.save_region(CURRENT_REGION)
                 PROJECT.commit(_("Delete tempo marker"))
@@ -2227,7 +2242,7 @@ class ItemSequencer(QGraphicsView):
         f_layout = QGridLayout()
         f_window.setLayout(f_layout)
 
-        f_marker = CURRENT_REGION.has_marker(self.ruler_event_pos, 2)
+        f_marker = CURRENT_REGION.has_marker(self.header_event_pos, 2)
 
         f_tempo = QSpinBox()
         f_tempo.setRange(30, 240)
@@ -2259,7 +2274,7 @@ class ItemSequencer(QGraphicsView):
         f_ok = QPushButton(_("Save"))
         f_ok.pressed.connect(ok_handler)
         f_layout.addWidget(f_ok, 6, 0)
-        if self.ruler_event_pos:
+        if self.header_event_pos:
             f_cancel = QPushButton(_("Delete"))
         else:
             f_cancel = QPushButton(_("Cancel"))
@@ -2267,10 +2282,10 @@ class ItemSequencer(QGraphicsView):
         f_layout.addWidget(f_cancel, 6, 1)
         f_window.exec_()
 
-    def ruler_marker_modify(self):
+    def header_marker_modify(self):
         def ok_handler():
             f_marker = project.pydaw_sequencer_marker(
-                self.ruler_event_pos, f_text.text())
+                self.header_event_pos, f_text.text())
             CURRENT_REGION.set_marker(f_marker)
             PROJECT.save_region(CURRENT_REGION)
             PROJECT.commit(_("Add text marker"))
@@ -2278,7 +2293,7 @@ class ItemSequencer(QGraphicsView):
             f_window.close()
 
         def cancel_handler():
-            f_marker = CURRENT_REGION.has_marker(self.ruler_event_pos, 3)
+            f_marker = CURRENT_REGION.has_marker(self.header_event_pos, 3)
             if f_marker:
                 CURRENT_REGION.delete_marker(f_marker)
                 PROJECT.save_region(CURRENT_REGION)
@@ -2291,7 +2306,7 @@ class ItemSequencer(QGraphicsView):
         f_layout = QGridLayout()
         f_window.setLayout(f_layout)
 
-        f_marker = CURRENT_REGION.has_marker(self.ruler_event_pos, 3)
+        f_marker = CURRENT_REGION.has_marker(self.header_event_pos, 3)
 
         f_text = QLineEdit()
         f_text.setMaxLength(21)
@@ -2306,7 +2321,7 @@ class ItemSequencer(QGraphicsView):
         f_ok = QPushButton(_("Save"))
         f_ok.pressed.connect(ok_handler)
         f_ok_cancel_layout.addWidget(f_ok)
-        if CURRENT_REGION.has_marker(self.ruler_event_pos, 3):
+        if CURRENT_REGION.has_marker(self.header_event_pos, 3):
             f_cancel = QPushButton(_("Delete"))
         else:
             f_cancel = QPushButton(_("Cancel"))
@@ -2314,25 +2329,25 @@ class ItemSequencer(QGraphicsView):
         f_ok_cancel_layout.addWidget(f_cancel)
         f_window.exec_()
 
-    def ruler_loop_start(self):
-        f_tsig_beats = CURRENT_REGION.get_tsig_at_pos(self.ruler_event_pos)
+    def header_loop_start(self):
+        f_tsig_beats = CURRENT_REGION.get_tsig_at_pos(self.header_event_pos)
         if CURRENT_REGION.loop_marker:
             f_end = pydaw_util.pydaw_clip_min(
                 CURRENT_REGION.loop_marker.beat,
-                self.ruler_event_pos + f_tsig_beats)
+                self.header_event_pos + f_tsig_beats)
         else:
-            f_end = self.ruler_event_pos + f_tsig_beats
+            f_end = self.header_event_pos + f_tsig_beats
 
-        f_marker = project.pydaw_loop_marker(f_end, self.ruler_event_pos)
+        f_marker = project.pydaw_loop_marker(f_end, self.header_event_pos)
         CURRENT_REGION.set_loop_marker(f_marker)
         PROJECT.save_region(CURRENT_REGION)
         PROJECT.commit(_("Set region start"))
         REGION_SETTINGS.open_region()
 
-    def ruler_loop_end(self):
-        f_tsig_beats = CURRENT_REGION.get_tsig_at_pos(self.ruler_event_pos)
+    def header_loop_end(self):
+        f_tsig_beats = CURRENT_REGION.get_tsig_at_pos(self.header_event_pos)
         CURRENT_REGION.loop_marker.beat = pydaw_util.pydaw_clip_min(
-            self.ruler_event_pos, f_tsig_beats)
+            self.header_event_pos, f_tsig_beats)
         CURRENT_REGION.loop_marker.start_beat = pydaw_util.pydaw_clip_max(
             CURRENT_REGION.loop_marker.start_beat,
             CURRENT_REGION.loop_marker.beat - f_tsig_beats)
@@ -2340,20 +2355,20 @@ class ItemSequencer(QGraphicsView):
         PROJECT.commit(_("Set region end"))
         REGION_SETTINGS.open_region()
 
-    def rulerContextMenuEvent(self, a_event):
+    def headerContextMenuEvent(self, a_event):
         self.context_menu_enabled = False
-        self.ruler_event_pos = int(a_event.pos().x() / SEQUENCER_PX_PER_BEAT)
+        self.header_event_pos = int(a_event.pos().x() / SEQUENCER_PX_PER_BEAT)
         f_menu = QMenu(self)
         f_marker_action = f_menu.addAction(_("Text Marker..."))
-        f_marker_action.triggered.connect(self.ruler_marker_modify)
+        f_marker_action.triggered.connect(self.header_marker_modify)
         f_time_modify_action = f_menu.addAction(_("Time/Tempo Marker..."))
-        f_time_modify_action.triggered.connect(self.ruler_time_modify)
+        f_time_modify_action.triggered.connect(self.header_time_modify)
         f_menu.addSeparator()
         f_loop_start_action = f_menu.addAction(_("Set Region Start"))
-        f_loop_start_action.triggered.connect(self.ruler_loop_start)
+        f_loop_start_action.triggered.connect(self.header_loop_start)
         if CURRENT_REGION.loop_marker:
             f_loop_end_action = f_menu.addAction(_("Set Region End"))
-            f_loop_end_action.triggered.connect(self.ruler_loop_end)
+            f_loop_end_action.triggered.connect(self.header_loop_end)
             f_select_region = f_menu.addAction(_("Select Items in Region"))
             f_select_region.triggered.connect(self.select_region_items)
             f_copy_region_action = f_menu.addAction(_("Copy Region"))
@@ -2379,12 +2394,12 @@ class ItemSequencer(QGraphicsView):
         f_region_length, f_list, f_atm_list = self.region_clipboard
         f_list = [x.clone() for x in f_list]
         f_atm_list = [x.clone() for x in f_atm_list]
-        CURRENT_REGION.insert_space(self.ruler_event_pos, f_region_length)
+        CURRENT_REGION.insert_space(self.header_event_pos, f_region_length)
         for f_item in f_list:
-            f_item.start_beat += self.ruler_event_pos
+            f_item.start_beat += self.header_event_pos
             CURRENT_REGION.add_item_ref_by_uid(f_item)
         for f_point in f_atm_list:
-            f_point.beat += self.ruler_event_pos
+            f_point.beat += self.header_event_pos
             ATM_REGION.add_point(f_point)
         self.automation_save_callback()
         PROJECT.save_region(CURRENT_REGION)
@@ -2415,7 +2430,7 @@ class ItemSequencer(QGraphicsView):
                 QMessageBox.warning(
                     self, _("Error"),
                     _("You must set the region markers first by "
-                    "right-clicking on the scene ruler"))
+                    "right-clicking on the scene header"))
             return None
         else:
             return self.loop_start, self.loop_end
@@ -2427,30 +2442,30 @@ class ItemSequencer(QGraphicsView):
         self.max_x = f_size
         self.setSceneRect(
             -3.0, 0.0, f_size + self.width() + 3.0, REGION_EDITOR_TOTAL_HEIGHT)
-        self.ruler = QGraphicsRectItem(
+        self.header = QGraphicsRectItem(
             0, 0, f_size, REGION_EDITOR_HEADER_HEIGHT)
-        self.ruler.setZValue(1500.0)
-        self.ruler.setBrush(REGION_EDITOR_HEADER_GRADIENT)
-        self.ruler.mousePressEvent = self.ruler_click_event
-        self.ruler.contextMenuEvent = self.rulerContextMenuEvent
-        self.scene.addItem(self.ruler)
+        self.header.setZValue(1500.0)
+        self.header.setBrush(REGION_EDITOR_HEADER_GRADIENT)
+        self.header.mousePressEvent = self.header_click_event
+        self.header.contextMenuEvent = self.headerContextMenuEvent
+        self.scene.addItem(self.header)
         for f_marker in CURRENT_REGION.get_markers():
             if f_marker.type == 1:
                 self.loop_start = f_marker.start_beat
                 self.loop_end = f_marker.beat
                 f_x = f_marker.start_beat * SEQUENCER_PX_PER_BEAT
                 f_start = QGraphicsLineItem(
-                    f_x, 0, f_x, REGION_EDITOR_HEADER_HEIGHT, self.ruler)
+                    f_x, 0, f_x, REGION_EDITOR_HEADER_HEIGHT, self.header)
                 f_start.setPen(START_PEN)
 
                 f_x = f_marker.beat * SEQUENCER_PX_PER_BEAT
                 f_end = QGraphicsLineItem(
-                    f_x, 0, f_x, REGION_EDITOR_HEADER_HEIGHT, self.ruler)
+                    f_x, 0, f_x, REGION_EDITOR_HEADER_HEIGHT, self.header)
                 f_end.setPen(END_PEN)
             elif f_marker.type == 2:
                 f_text = "{} : {}/{}".format(
                     f_marker.tempo, f_marker.tsig_num, f_marker.tsig_den)
-                f_item = QGraphicsSimpleTextItem(f_text, self.ruler)
+                f_item = QGraphicsSimpleTextItem(f_text, self.header)
                 f_item.setBrush(QtCore.Qt.white)
                 f_item.setPos(
                     f_marker.beat * SEQUENCER_PX_PER_BEAT,
@@ -2458,7 +2473,7 @@ class ItemSequencer(QGraphicsView):
                 self.draw_region(f_marker)
             elif f_marker.type == 3:
                 f_item = QGraphicsSimpleTextItem(
-                    f_marker.text, self.ruler)
+                    f_marker.text, self.header)
                 f_item.setBrush(QtCore.Qt.white)
                 f_item.setPos(
                     f_marker.beat * SEQUENCER_PX_PER_BEAT,
@@ -2474,7 +2489,7 @@ class ItemSequencer(QGraphicsView):
 
         self.set_playback_pos(self.playback_pos)
         self.check_line_count()
-        self.set_ruler_y_pos()
+        self.set_header_y_pos()
 
     def draw_region(self, a_marker):
         f_region_length = pydaw_get_current_region_length()
@@ -2492,7 +2507,7 @@ class ItemSequencer(QGraphicsView):
         for i in range(int(a_marker.length)):
             if i % a_marker.tsig_num == 0:
                 f_number = QGraphicsSimpleTextItem(
-                    str((i // a_marker.tsig_num) + 1), self.ruler)
+                    str((i // a_marker.tsig_num) + 1), self.header)
                 f_number.setFlag(
                     QGraphicsItem.ItemIgnoresTransformations)
                 f_number.setBrush(QtCore.Qt.white)
@@ -4544,7 +4559,6 @@ class AudioItemSeq(AbstractItemEditor):
         self.track = 0
         self.gradient_index = 0
         self.playback_px = 0.0
-        self.draw_header()
         self.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
         self.setDragMode(QGraphicsView.RubberBandDrag)
         self.is_playing = False
@@ -4571,11 +4585,11 @@ class AudioItemSeq(AbstractItemEditor):
 
     def scrollContentsBy(self, x, y):
         QGraphicsView.scrollContentsBy(self, x, y)
-        self.set_ruler_y_pos()
+        self.set_header_y_pos()
 
-    def set_ruler_y_pos(self):
+    def set_header_y_pos(self):
         f_point = self.get_scene_pos()
-        self.ruler.setPos(0.0, f_point.y())
+        self.header.setPos(0.0, f_point.y())
         self.verticalScrollBar().setMinimum(0)
 
     def get_scene_pos(self):
@@ -4816,31 +4830,30 @@ class AudioItemSeq(AbstractItemEditor):
     def draw_header(self):
         f_region_length = CURRENT_ITEM_LEN
         f_size = AUDIO_PX_PER_BEAT * f_region_length
-        self.ruler = QGraphicsRectItem(0, 0, f_size, AUDIO_RULER_HEIGHT)
-        self.ruler.setZValue(1500.0)
-        self.ruler.setBrush(AUDIO_ITEMS_HEADER_GRADIENT)
-        self.scene.addItem(self.ruler)
+        self.total_height = (AUDIO_ITEM_LANE_COUNT *
+            (AUDIO_ITEM_HEIGHT)) + AUDIO_RULER_HEIGHT
+        AbstractItemEditor.draw_header(self, f_size, AUDIO_RULER_HEIGHT)
+        self.header.setZValue(1500.0)
+        self.header.setBrush(AUDIO_ITEMS_HEADER_GRADIENT)
+        self.scene.addItem(self.header)
         if ITEM_REF_POS:
             f_start, f_end = ITEM_REF_POS
             f_start_x = f_start * AUDIO_PX_PER_BEAT
             f_end_x = f_end * AUDIO_PX_PER_BEAT
             f_start_line = QGraphicsLineItem(
-                f_start_x, 0.0, f_start_x, AUDIO_RULER_HEIGHT, self.ruler)
+                f_start_x, 0.0, f_start_x, AUDIO_RULER_HEIGHT, self.header)
             f_start_line.setPen(START_PEN)
             f_end_line = QGraphicsLineItem(
-                f_end_x, 0.0, f_end_x, AUDIO_RULER_HEIGHT, self.ruler)
+                f_end_x, 0.0, f_end_x, AUDIO_RULER_HEIGHT, self.header)
             f_end_line.setPen(END_PEN)
         f_v_pen = QPen(QtCore.Qt.black)
         #f_beat_pen = QPen(QColor(210, 210, 210))
         f_16th_pen = QPen(QColor(120, 120, 120))
         f_reg_pen = QPen(QtCore.Qt.white)
-        self.total_height = (AUDIO_ITEM_LANE_COUNT *
-            (AUDIO_ITEM_HEIGHT)) + AUDIO_RULER_HEIGHT
-        AbstractItemEditor.draw_header(self)
         i3 = 0.0
         for i in range(int(f_region_length)):
             f_number = QGraphicsSimpleTextItem(
-                "{}".format(i + 1), self.ruler)
+                "{}".format(i + 1), self.header)
             f_number.setFlag(QGraphicsItem.ItemIgnoresTransformations)
             f_number.setBrush(QtCore.Qt.white)
             f_number.setZValue(1000.0)
@@ -4873,7 +4886,7 @@ class AudioItemSeq(AbstractItemEditor):
             f_y = ((AUDIO_ITEM_HEIGHT) * (i2 + 1)) + AUDIO_RULER_HEIGHT
             self.scene.addLine(0, f_y, f_size, f_y)
         self.check_line_count()
-        self.set_ruler_y_pos()
+        self.set_header_y_pos()
 
     def clear_drawn_items(self):
         if self.is_playing:
@@ -5990,9 +6003,6 @@ class PianoRollEditor(AbstractItemEditor):
         self.setAlignment(QtCore.Qt.AlignLeft)
         self.setScene(self.scene)
         self.first_open = True
-        self.draw_header()
-        self.draw_piano()
-        self.draw_grid()
 
         self.has_selected = False
 
@@ -6303,9 +6313,8 @@ class PianoRollEditor(AbstractItemEditor):
         QApplication.restoreOverrideCursor()
 
     def draw_header(self):
-        AbstractItemEditor.draw_header(self)
-        self.header = QGraphicsRectItem(
-            0, 0, self.viewer_width, PIANO_ROLL_HEADER_HEIGHT)
+        AbstractItemEditor.draw_header(
+            self, self.viewer_width, PIANO_ROLL_HEADER_HEIGHT)
         self.header.hoverEnterEvent = self.hover_restore_cursor_event
         self.header.setBrush(PIANO_ROLL_HEADER_GRADIENT)
         self.scene.addItem(self.header)
@@ -6928,8 +6937,6 @@ class AutomationEditor(AbstractItemEditor):
         self.scene.mouseDoubleClickEvent = self.sceneMouseDoubleClickEvent
         self.setAlignment(QtCore.Qt.AlignLeft)
         self.setScene(self.scene)
-        self.draw_header()
-        self.draw_grid()
         self.setDragMode(QGraphicsView.RubberBandDrag)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
@@ -7063,11 +7070,10 @@ class AutomationEditor(AbstractItemEditor):
         global_save_and_reload_items()
 
     def draw_header(self):
-        AbstractItemEditor.draw_header(self)
-        self.x_axis = QGraphicsRectItem(
-            0, 0, self.automation_width, self.axis_size)
-        self.x_axis.setPos(self.axis_size, 0)
-        self.scene.addItem(self.x_axis)
+        AbstractItemEditor.draw_header(
+            self, self.automation_width, self.axis_size)
+        self.header.setPos(self.axis_size, 0)
+        self.scene.addItem(self.header)
         self.y_axis = QGraphicsRectItem(
             0, 0, self.axis_size, self.viewer_height)
         self.y_axis.setPos(0, self.axis_size)
@@ -7077,10 +7083,10 @@ class AutomationEditor(AbstractItemEditor):
             f_start_x = f_start * self.px_per_beat
             f_end_x = f_end * self.px_per_beat
             f_start_line = QGraphicsLineItem(
-                f_start_x, 0.0, f_start_x, self.axis_size, self.x_axis)
+                f_start_x, 0.0, f_start_x, self.axis_size, self.header)
             f_start_line.setPen(START_PEN)
             f_end_line = QGraphicsLineItem(
-                f_end_x, 0.0, f_end_x, self.axis_size, self.x_axis)
+                f_end_x, 0.0, f_end_x, self.axis_size, self.header)
             f_end_line.setPen(END_PEN)
 
 
@@ -7109,7 +7115,7 @@ class AutomationEditor(AbstractItemEditor):
             f_beat = QGraphicsLineItem(
                 0, 0, 0,
                 self.viewer_height + self.axis_size - f_beat_pen.width(),
-                self.x_axis)
+                self.header)
             f_beat.setPos(self.px_per_beat * i, 0.5 * f_beat_pen.width())
             f_beat.setFlag(QGraphicsItem.ItemIgnoresTransformations)
 
@@ -7117,14 +7123,14 @@ class AutomationEditor(AbstractItemEditor):
             f_beat.setFlag(QGraphicsItem.ItemIgnoresTransformations)
 
             f_number = QGraphicsSimpleTextItem(
-                str(i + 1), self.x_axis)
+                str(i + 1), self.header)
             f_number.setFlag(
                 QGraphicsItem.ItemIgnoresTransformations)
             f_number.setPos(self.px_per_beat * i + 5, 2)
             f_number.setBrush(QtCore.Qt.white)
 #                for j in range(0, 16):
 #                    f_line = QGraphicsLineItem(
-#                        0, 0, 0, self.viewer_height, self.x_axis)
+#                        0, 0, 0, self.viewer_height, self.header)
 #                    if float(j) == 8:
 #                        f_line.setLine(0, 0, 0, self.viewer_height)
 #                        f_line.setPos(
@@ -8973,7 +8979,7 @@ class MainWindow(QScrollArea):
     def midi_scrollContentsBy(self, x, y):
         QScrollArea.scrollContentsBy(self.midi_scroll_area, x, y)
         f_y = self.midi_scroll_area.verticalScrollBar().value()
-        SEQUENCER.set_ruler_y_pos(f_y)
+        SEQUENCER.set_header_y_pos(f_y)
 
     def configure_callback(self, path, arr):
         f_pc_dict = {}
