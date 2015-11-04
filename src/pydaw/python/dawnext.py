@@ -602,6 +602,37 @@ def pydaw_seconds_to_beats(a_seconds):
     return a_seconds * (CURRENT_REGION.get_tempo_at_pos(
         CURRENT_ITEM_REF.start_beat) / 60.0)
 
+
+class AbstractItemEditor(QGraphicsView):
+    """ Base class for things on the "Items" tab.  Over time, more
+        functionality should be absorbed into here and standardized
+        across the different editors.
+    """
+    def __init__(self, a_cursor_offset=0.0):
+        QGraphicsView.__init__(self)
+        self.playback_cursor = None
+        self.cursor_offset = a_cursor_offset
+        self.px_per_beat = None
+        self.total_height = 2000
+
+    def set_playback_pos(self, a_beat=0.0):
+        if not all((CURRENT_ITEM_REF, self.playback_cursor)):
+            return
+        start = CURRENT_ITEM_REF.start_beat
+        self.playback_pos = pydaw_util.pydaw_clip_value(
+            float(a_beat) - start, 0.0, CURRENT_ITEM_REF.length_beats)
+        f_pos = (self.playback_pos * self.px_per_beat) + self.cursor_offset
+        self.playback_cursor.setPos(f_pos, 0.0)
+
+    def draw_header(self):
+        if not CURRENT_ITEM_REF:
+            return
+        self.playback_cursor = self.scene.addLine(
+            0.0, 0.0, 0.0, self.total_height, QPen(QtCore.Qt.red, 2.0))
+        self.playback_cursor.setZValue(1000.0)
+        self.set_playback_pos()
+
+
 class SequencerItem(QGraphicsRectItem):
     """ This is an individual sequencer item within the ItemSequencer
     """
@@ -1396,7 +1427,7 @@ class ItemSequencer(QGraphicsView):
         self.track = 0
         self.gradient_index = 0
         self.playback_px = 0.0
-        #self.draw_headers(0)
+        #self.draw_header(0)
         self.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
         self.setDragMode(QGraphicsView.RubberBandDrag)
         self.is_playing = False
@@ -2389,7 +2420,7 @@ class ItemSequencer(QGraphicsView):
         else:
             return self.loop_start, self.loop_end
 
-    def draw_headers(self, a_cursor_pos=None):
+    def draw_header(self, a_cursor_pos=None):
         self.loop_start = self.loop_end = None
         f_region_length = pydaw_get_current_region_length()
         f_size = SEQUENCER_PX_PER_BEAT * f_region_length
@@ -2503,7 +2534,7 @@ class ItemSequencer(QGraphicsView):
         self.ignore_selection_change = True
         self.scene.clear()
         self.ignore_selection_change = False
-        self.draw_headers()
+        self.draw_header()
 
     def draw_item(self, a_name, a_item):
         f_item = SequencerItem(a_name, a_item)
@@ -3068,6 +3099,7 @@ def pydaw_set_audio_seq_zoom(a_horizontal, a_vertical):
     f_region_scale = f_width / f_region_px
 
     AUDIO_PX_PER_BEAT = 100.0 * a_horizontal * f_region_scale
+    AUDIO_SEQ.px_per_beat = AUDIO_PX_PER_BEAT
     pydaw_set_audio_snap(AUDIO_SNAP_VAL)
     AUDIO_ITEM_HEIGHT = 75.0 * a_vertical
 
@@ -4489,12 +4521,12 @@ AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(0.6, QColor.fromRgb(43, 43, 43))
 AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(1.0, QColor.fromRgb(65, 65, 65))
 
 
-class AudioItemSeq(QGraphicsView):
+class AudioItemSeq(AbstractItemEditor):
     """ This is the QGraphicsView and QGraphicsScene for editing audio
         items within a SequencerItem on the "Items" tab.
     """
     def __init__(self):
-        QGraphicsView.__init__(self)
+        AbstractItemEditor.__init__(self)
         self.reset_line_lists()
         self.h_zoom = 1.0
         self.v_zoom = 1.0
@@ -4512,7 +4544,7 @@ class AudioItemSeq(QGraphicsView):
         self.track = 0
         self.gradient_index = 0
         self.playback_px = 0.0
-        self.draw_headers(0)
+        self.draw_header()
         self.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
         self.setDragMode(QGraphicsView.RubberBandDrag)
         self.is_playing = False
@@ -4781,7 +4813,7 @@ class AudioItemSeq(QGraphicsView):
                 f_num.setVisible(True)
 
 
-    def draw_headers(self, a_cursor_pos=None):
+    def draw_header(self):
         f_region_length = CURRENT_ITEM_LEN
         f_size = AUDIO_PX_PER_BEAT * f_region_length
         self.ruler = QGraphicsRectItem(0, 0, f_size, AUDIO_RULER_HEIGHT)
@@ -4802,8 +4834,9 @@ class AudioItemSeq(QGraphicsView):
         #f_beat_pen = QPen(QColor(210, 210, 210))
         f_16th_pen = QPen(QColor(120, 120, 120))
         f_reg_pen = QPen(QtCore.Qt.white)
-        f_total_height = (AUDIO_ITEM_LANE_COUNT *
+        self.total_height = (AUDIO_ITEM_LANE_COUNT *
             (AUDIO_ITEM_HEIGHT)) + AUDIO_RULER_HEIGHT
+        AbstractItemEditor.draw_header(self)
         i3 = 0.0
         for i in range(int(f_region_length)):
             f_number = QGraphicsSimpleTextItem(
@@ -4812,30 +4845,30 @@ class AudioItemSeq(QGraphicsView):
             f_number.setBrush(QtCore.Qt.white)
             f_number.setZValue(1000.0)
             self.text_list.append(f_number)
-            self.scene.addLine(i3, 0.0, i3, f_total_height, f_v_pen)
+            self.scene.addLine(i3, 0.0, i3, self.total_height, f_v_pen)
             f_number.setPos(i3 + 3.0, 2)
             if AUDIO_LINES_ENABLED:
                 for f_i4 in range(1, AUDIO_SNAP_RANGE):
                     f_sub_x = i3 + (AUDIO_QUANTIZE_PX * f_i4)
                     f_line = self.scene.addLine(
                         f_sub_x, AUDIO_RULER_HEIGHT,
-                        f_sub_x, f_total_height, f_16th_pen)
+                        f_sub_x, self.total_height, f_16th_pen)
                     self.beat_line_list.append(f_line)
 #            for f_beat_i in range(1, 4):
 #                f_beat_x = i3 + (AUDIO_PX_PER_BEAT * f_beat_i)
 #                f_line = self.scene.addLine(
-#                    f_beat_x, 0.0, f_beat_x, f_total_height, f_beat_pen)
+#                    f_beat_x, 0.0, f_beat_x, self.total_height, f_beat_pen)
 #                self.beat_line_list.append(f_line)
 #                if AUDIO_LINES_ENABLED:
 #                    for f_i4 in range(1, AUDIO_SNAP_RANGE):
 #                        f_sub_x = f_beat_x + (AUDIO_QUANTIZE_PX * f_i4)
 #                        f_line = self.scene.addLine(
 #                            f_sub_x, AUDIO_RULER_HEIGHT,
-#                            f_sub_x, f_total_height, f_16th_pen)
+#                            f_sub_x, self.total_height, f_16th_pen)
 #                        self.beat_line_list.append(f_line)
             i3 += AUDIO_PX_PER_BEAT
         self.scene.addLine(
-            i3, AUDIO_RULER_HEIGHT, i3, f_total_height, f_reg_pen)
+            i3, AUDIO_RULER_HEIGHT, i3, self.total_height, f_reg_pen)
         for i2 in range(AUDIO_ITEM_LANE_COUNT):
             f_y = ((AUDIO_ITEM_HEIGHT) * (i2 + 1)) + AUDIO_RULER_HEIGHT
             self.scene.addLine(0, f_y, f_size, f_y)
@@ -4851,7 +4884,7 @@ class AudioItemSeq(QGraphicsView):
         self.reset_line_lists()
         self.audio_items = []
         self.scene.clear()
-        self.draw_headers()
+        self.draw_header()
         if f_was_playing:
             self.is_playing = True
 
@@ -5933,7 +5966,7 @@ class PianoKeyItem(QGraphicsRectItem):
         QGraphicsRectItem.hoverLeaveEvent(self, a_event)
         self.setBrush(self.o_brush)
 
-class PianoRollEditor(QGraphicsView):
+class PianoRollEditor(AbstractItemEditor):
     """ This is the QGraphicsView and QGraphicsScene where notes are drawn
     """
     def __init__(self):
@@ -5948,7 +5981,7 @@ class PianoRollEditor(QGraphicsView):
 
         self.update_note_height()
 
-        QGraphicsView.__init__(self)
+        AbstractItemEditor.__init__(self, PIANO_KEYS_WIDTH)
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
         self.scene.setBackgroundBrush(QColor(100, 100, 100))
@@ -6270,19 +6303,20 @@ class PianoRollEditor(QGraphicsView):
         QApplication.restoreOverrideCursor()
 
     def draw_header(self):
+        AbstractItemEditor.draw_header(self)
         self.header = QGraphicsRectItem(
             0, 0, self.viewer_width, PIANO_ROLL_HEADER_HEIGHT)
         self.header.hoverEnterEvent = self.hover_restore_cursor_event
         self.header.setBrush(PIANO_ROLL_HEADER_GRADIENT)
         self.scene.addItem(self.header)
         #self.header.mapToScene(self.piano_width + self.padding, 0.0)
-        self.beat_width = self.viewer_width / CURRENT_ITEM_LEN
-        self.value_width = self.beat_width / self.grid_div
+        self.px_per_beat = self.viewer_width / CURRENT_ITEM_LEN
+        self.value_width = self.px_per_beat / self.grid_div
         self.header.setZValue(1003.0)
         if ITEM_REF_POS:
             f_start, f_end = ITEM_REF_POS
-            f_start_x = f_start * self.beat_width
-            f_end_x = f_end * self.beat_width
+            f_start_x = f_start * self.px_per_beat
+            f_end_x = f_end * self.px_per_beat
             f_start_line = QGraphicsLineItem(
                 f_start_x, 0.0, f_start_x,
                 PIANO_ROLL_HEADER_HEIGHT, self.header)
@@ -6386,11 +6420,12 @@ class PianoRollEditor(QGraphicsView):
         f_beat_pen = QPen()
         f_beat_pen.setWidth(2)
         f_line_pen = QPen(QColor(0, 0, 0))
-        f_beat_y = \
+        self.total_height = \
             self.piano_height + PIANO_ROLL_HEADER_HEIGHT + self.note_height
         for i in range(0, int(CURRENT_ITEM_LEN) + 1):
-            f_beat_x = (self.beat_width * i) + self.piano_width
-            f_beat = self.scene.addLine(f_beat_x, 0, f_beat_x, f_beat_y)
+            f_beat_x = (self.px_per_beat * i) + self.piano_width
+            f_beat = self.scene.addLine(
+                f_beat_x, 0, f_beat_x, self.total_height)
             f_beat_number = i
             f_beat.setPen(f_beat_pen)
             if i < CURRENT_ITEM_LEN:
@@ -6398,13 +6433,13 @@ class PianoRollEditor(QGraphicsView):
                     str(f_beat_number + 1), self.header)
                 f_number.setFlag(
                     QGraphicsItem.ItemIgnoresTransformations)
-                f_number.setPos((self.beat_width * i), 24)
+                f_number.setPos((self.px_per_beat * i), 24)
                 f_number.setBrush(QtCore.Qt.white)
                 for j in range(0, self.grid_div):
-                    f_x = (self.beat_width * i) + (self.value_width *
+                    f_x = (self.px_per_beat * i) + (self.value_width *
                         j) + self.piano_width
                     f_line = self.scene.addLine(
-                        f_x, PIANO_ROLL_HEADER_HEIGHT, f_x, f_beat_y)
+                        f_x, PIANO_ROLL_HEADER_HEIGHT, f_x, self.total_height)
                     if float(j) != self.grid_div * 0.5:
                         f_line.setPen(f_line_pen)
 
@@ -6457,8 +6492,8 @@ class PianoRollEditor(QGraphicsView):
     def draw_note(self, a_note, a_enabled=True, a_offset=0.0):
         """ a_note is an instance of the pydaw_note class"""
         f_start = (self.piano_width + self.padding +
-            self.beat_width * (a_note.start - a_offset))
-        f_length = self.beat_width * a_note.length
+            self.px_per_beat * (a_note.start - a_offset))
+        f_length = self.px_per_beat * a_note.length
         f_note = PIANO_ROLL_HEADER_HEIGHT + self.note_height * \
             (PIANO_ROLL_NOTE_COUNT - a_note.note_num)
         f_note_item = PianoRollNoteItem(
@@ -6862,7 +6897,7 @@ class AutomationItem(QGraphicsEllipseItem):
 
 AUTOMATION_EDITORS = []
 
-class AutomationEditor(QGraphicsView):
+class AutomationEditor(AbstractItemEditor):
     """ This is the class for both the pitchbend and CC
         QGraphicsView and QGraphicsScene editors on the "Items" tab.
     """
@@ -6870,7 +6905,7 @@ class AutomationEditor(QGraphicsView):
         """ @a_is_cc: True to make self a CC editor, False for a pitchbend
                       editor
         """
-        QGraphicsView.__init__(self)
+        AbstractItemEditor.__init__(self, AUTOMATION_RULER_WIDTH)
         self.is_cc = a_is_cc
         self.set_width()
         self.set_scale()
@@ -6882,8 +6917,8 @@ class AutomationEditor(QGraphicsView):
 
         self.axis_size = AUTOMATION_RULER_WIDTH
 
-        self.beat_width = self.automation_width / CURRENT_ITEM_LEN
-        self.value_width = self.beat_width / 16.0
+        self.px_per_beat = self.automation_width / CURRENT_ITEM_LEN
+        self.value_width = self.px_per_beat / 16.0
         self.lines = []
 
         self.setMinimumHeight(370)
@@ -6893,7 +6928,7 @@ class AutomationEditor(QGraphicsView):
         self.scene.mouseDoubleClickEvent = self.sceneMouseDoubleClickEvent
         self.setAlignment(QtCore.Qt.AlignLeft)
         self.setScene(self.scene)
-        self.draw_axis()
+        self.draw_header()
         self.draw_grid()
         self.setDragMode(QGraphicsView.RubberBandDrag)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -7011,7 +7046,7 @@ class AutomationEditor(QGraphicsView):
             return
         f_pos_x = a_event.scenePos().x() - AUTOMATION_POINT_RADIUS
         f_pos_y = a_event.scenePos().y() - AUTOMATION_POINT_RADIUS
-        f_cc_start = (f_pos_x - AUTOMATION_MIN_HEIGHT) / self.beat_width
+        f_cc_start = (f_pos_x - AUTOMATION_MIN_HEIGHT) / self.px_per_beat
         f_cc_start = pydaw_clip_min(f_cc_start, 0.0)
         if self.is_cc:
             f_cc_val = int(127.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
@@ -7027,7 +7062,8 @@ class AutomationEditor(QGraphicsView):
         self.selected_str = []
         global_save_and_reload_items()
 
-    def draw_axis(self):
+    def draw_header(self):
+        AbstractItemEditor.draw_header(self)
         self.x_axis = QGraphicsRectItem(
             0, 0, self.automation_width, self.axis_size)
         self.x_axis.setPos(self.axis_size, 0)
@@ -7038,8 +7074,8 @@ class AutomationEditor(QGraphicsView):
         self.scene.addItem(self.y_axis)
         if ITEM_REF_POS:
             f_start, f_end = ITEM_REF_POS
-            f_start_x = f_start * self.beat_width
-            f_end_x = f_end * self.beat_width
+            f_start_x = f_start * self.px_per_beat
+            f_end_x = f_end * self.px_per_beat
             f_start_line = QGraphicsLineItem(
                 f_start_x, 0.0, f_start_x, self.axis_size, self.x_axis)
             f_start_line.setPen(START_PEN)
@@ -7074,7 +7110,7 @@ class AutomationEditor(QGraphicsView):
                 0, 0, 0,
                 self.viewer_height + self.axis_size - f_beat_pen.width(),
                 self.x_axis)
-            f_beat.setPos(self.beat_width * i, 0.5 * f_beat_pen.width())
+            f_beat.setPos(self.px_per_beat * i, 0.5 * f_beat_pen.width())
             f_beat.setFlag(QGraphicsItem.ItemIgnoresTransformations)
 
             f_beat.setPen(f_beat_pen)
@@ -7084,7 +7120,7 @@ class AutomationEditor(QGraphicsView):
                 str(i + 1), self.x_axis)
             f_number.setFlag(
                 QGraphicsItem.ItemIgnoresTransformations)
-            f_number.setPos(self.beat_width * i + 5, 2)
+            f_number.setPos(self.px_per_beat * i + 5, 2)
             f_number.setBrush(QtCore.Qt.white)
 #                for j in range(0, 16):
 #                    f_line = QGraphicsLineItem(
@@ -7092,10 +7128,10 @@ class AutomationEditor(QGraphicsView):
 #                    if float(j) == 8:
 #                        f_line.setLine(0, 0, 0, self.viewer_height)
 #                        f_line.setPos(
-#                            (self.beat_width * i) + (self.value_width * j),
+#                            (self.px_per_beat * i) + (self.value_width * j),
 #                            self.axis_size)
 #                    else:
-#                        f_line.setPos((self.beat_width * i) +
+#                        f_line.setPos((self.px_per_beat * i) +
 #                            (self.value_width * j), self.axis_size)
 #                        f_line.setPen(f_line_pen)
 
@@ -7104,7 +7140,7 @@ class AutomationEditor(QGraphicsView):
         self.scene.clear()
         self.automation_points = []
         self.lines = []
-        self.draw_axis()
+        self.draw_header()
         self.draw_grid()
         self.selection_enabled = True
 
@@ -7129,8 +7165,8 @@ class AutomationEditor(QGraphicsView):
         self.set_width()
         self.setUpdatesEnabled(False)
         self.set_scale()
-        self.beat_width = self.automation_width / CURRENT_ITEM_LEN
-        self.value_width = self.beat_width / 16.0
+        self.px_per_beat = self.automation_width / CURRENT_ITEM_LEN
+        self.value_width = self.px_per_beat / 16.0
         self.grid_max_start_time = (self.automation_width +
             AUTOMATION_RULER_WIDTH - AUTOMATION_POINT_DIAMETER)
         self.clear_drawn_items()
@@ -7149,8 +7185,8 @@ class AutomationEditor(QGraphicsView):
                 self.draw_point(f_pb)
         for f_note in CURRENT_ITEM.notes:
             f_note_start = (f_note.start *
-                self.beat_width) + AUTOMATION_RULER_WIDTH
-            f_note_end = f_note_start + (f_note.length * self.beat_width)
+                self.px_per_beat) + AUTOMATION_RULER_WIDTH
+            f_note_end = f_note_start + (f_note.length * self.px_per_beat)
             f_note_y = AUTOMATION_RULER_WIDTH + (127.0 -
                 f_note.note_num) * f_note_height
             f_note_item = QGraphicsLineItem(
@@ -7165,7 +7201,7 @@ class AutomationEditor(QGraphicsView):
 
     def draw_point(self, a_cc, a_select=True):
         """ a_cc is an instance of the pydaw_cc class"""
-        f_time = self.axis_size + (a_cc.start * self.beat_width)
+        f_time = self.axis_size + (a_cc.start * self.px_per_beat)
         if self.is_cc:
             f_value = self.axis_size +  self.viewer_height / 127.0 * (127.0 -
                 a_cc.cc_val)
@@ -8954,7 +8990,9 @@ class MainWindow(QScrollArea):
                 if libmk.IS_PLAYING:
                     f_beat = float(a_val)
                     TRANSPORT.set_pos_from_cursor(f_beat)
-                    for f_editor in (SEQUENCER,): #AUDIO_SEQ,):
+                    for f_editor in (
+                            SEQUENCER, AUDIO_SEQ, PIANO_ROLL_EDITOR,
+                            PB_EDITOR, CC_EDITOR):
                         f_editor.set_playback_pos(f_beat)
             elif a_key == "peak":
                 global_update_peak_meters(a_val)
