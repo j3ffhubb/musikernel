@@ -602,6 +602,14 @@ def pydaw_seconds_to_beats(a_seconds):
     return a_seconds * (CURRENT_REGION.get_tempo_at_pos(
         CURRENT_ITEM_REF.start_beat) / 60.0)
 
+class ItemEditorHeader(QGraphicsRectItem):
+    """ The horizontal header at the top of an item editor.
+        Inherits from QGraphicsRectItem so that
+        AbstractItemEditor.get_item_at_pos() can find it
+    """
+    def __init__(self, *args, **kwargs):
+        QGraphicsRectItem.__init__(self, *args, **kwargs)
+
 
 class AbstractItemEditor(QGraphicsView):
     """ Base class for things on the "Items" tab.  Over time, more
@@ -626,17 +634,28 @@ class AbstractItemEditor(QGraphicsView):
         self.playback_cursor.setPos(f_pos, 0.0)
 
     def draw_header(self, a_header_width, a_header_height):
-        self.header = QGraphicsRectItem(
+        self.header = ItemEditorHeader(
             0, 0, a_header_width, a_header_height)
         if not CURRENT_ITEM_REF:
             return
         self.playback_cursor = self.scene.addLine(
             0.0, 0.0, 0.0, self.total_height, QPen(QtCore.Qt.red, 2.0))
         self.playback_cursor.setZValue(1000.0)
-        self.header.mousePressEvent = self.header_click_event
+        self.header.mousePressEvent = self.header_mousePressEvent
         self.set_playback_pos()
 
-    def header_click_event(self, a_event):
+    def get_item_at_pos(self, a_pos, a_type):
+        """
+            @a_pos:  QPointF to enumerate items from in the QGraphicsScene
+            @a_type: The type to look for
+            @return: The item found, or None if not found
+        """
+        for f_item in self.scene.items(a_pos):
+            if isinstance(f_item, a_type):
+                return f_item
+        return None
+
+    def header_mousePressEvent(self, a_event):
         if not CURRENT_ITEM_REF:
             return
         if not libmk.IS_PLAYING and \
@@ -6259,6 +6278,11 @@ class PianoRollEditor(AbstractItemEditor):
             pass
         elif self.click_enabled and ITEM_EDITOR.enabled:
             self.scene.clearSelection()
+            f_pos = a_event.scenePos()
+            if self.get_item_at_pos(f_pos, ItemEditorHeader):
+                a_event.setAccepted(True)
+                QGraphicsScene.mousePressEvent(self.scene, a_event)
+                return
             f_pos_x = a_event.scenePos().x()
             f_pos_y = a_event.scenePos().y()
             if f_pos_x > PIANO_KEYS_WIDTH and \
