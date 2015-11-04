@@ -238,6 +238,11 @@ void v_pydaw_we_export(t_wavenext * self, const char * a_file_out)
     pthread_spin_lock(&musikernel->main_lock);
     musikernel->is_offline_rendering = 0;
     pthread_spin_unlock(&musikernel->main_lock);
+
+#ifdef __linux__
+    chown_file(a_file_out);
+#endif
+
 }
 
 

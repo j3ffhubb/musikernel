@@ -21,6 +21,24 @@ GNU General Public License for more details.
 #include <sys/stat.h>
 #include <assert.h>
 
+#ifdef __linux__
+#include <sys/types.h>
+#include <unistd.h>
+
+/* Change file ownership if running as as a setuid binary
+ * changed ownership to root  */
+void chown_file(const char *file_name)
+{
+    if(!geteuid())
+    {
+        uid_t user_id = getuid();
+        gid_t group_id = getgid();
+        chown(file_name, user_id, group_id);
+    }
+}
+
+#endif
+
 #define MUSIKERNEL_VERSION "musikernel2"
 
 /*Standard string sizes*/
