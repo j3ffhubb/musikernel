@@ -153,10 +153,10 @@ inline void v_pydaw_run_main_loop(int sample_count,
 
     if(unlikely(musikernel->is_previewing))
     {
-        register int f_i = 0;
+        register int f_i;
         t_pydaw_audio_item * f_audio_item = musikernel->preview_audio_item;
         t_wav_pool_item * f_wav_item = musikernel->preview_wav_item;
-        while(f_i < sample_count)
+        for(f_i = 0; f_i < sample_count; ++f_i)
         {
             if(f_audio_item->sample_read_heads[0].whole_number >=
                 f_wav_item->length)
@@ -166,7 +166,7 @@ inline void v_pydaw_run_main_loop(int sample_count,
             }
             else
             {
-                v_adsr_run_db(&f_audio_item->adsrs[0]);
+                v_adsr_run(&f_audio_item->adsrs[0]);
                 if(f_wav_item->channels == 1)
                 {
                     float f_tmp_sample = f_cubic_interpolate_ptr_ifh(
@@ -214,7 +214,6 @@ inline void v_pydaw_run_main_loop(int sample_count,
                     break;
                 }
             }
-            ++f_i;
         }
     }
 
