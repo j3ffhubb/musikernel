@@ -624,12 +624,12 @@ class AbstractItemEditor(QGraphicsView):
         self.px_per_beat = None
         self.total_height = 2000
 
-    def set_playback_pos(self, a_beat=0.0):
+    def set_playback_pos(self, a_ignored=None):
         if not all((CURRENT_ITEM_REF, self.playback_cursor)):
             return
         start = CURRENT_ITEM_REF.start_beat
         self.playback_pos = pydaw_util.pydaw_clip_value(
-            float(a_beat) - start, 0.0, CURRENT_ITEM_REF.length_beats)
+            PLAYBACK_POS - start, 0.0, CURRENT_ITEM_REF.length_beats)
         f_pos = (self.playback_pos * self.px_per_beat) + self.cursor_offset
         self.playback_cursor.setPos(f_pos, 0.0)
 
@@ -662,9 +662,7 @@ class AbstractItemEditor(QGraphicsView):
         a_event.button() != QtCore.Qt.RightButton:
             f_beat = int((a_event.scenePos().x() - self.cursor_offset)
                 / self.px_per_beat) + CURRENT_ITEM_REF.start_beat
-            self.set_playback_pos(f_beat)
-            SEQUENCER.set_playback_pos(f_beat)
-            TRANSPORT.set_time(f_beat)
+            global_set_playback_pos(f_beat)
 
 
 class SequencerItem(QGraphicsRectItem):
@@ -1741,8 +1739,7 @@ class ItemSequencer(QGraphicsView):
         if self.check_header(f_pos):
             if a_event.button() == QtCore.Qt.LeftButton:
                 f_beat = int(f_pos.x() / SEQUENCER_PX_PER_BEAT)
-                self.set_playback_pos(f_beat)
-                TRANSPORT.set_time(f_beat)
+                global_set_playback_pos(f_beat)
             return
 
         if a_event.button() == QtCore.Qt.RightButton:
@@ -2179,7 +2176,7 @@ class ItemSequencer(QGraphicsView):
 
     def stop_playback(self):
         self.reset_selection()
-        self.set_playback_pos(self.playback_pos_orig)
+        global_set_playback_pos(self.playback_pos_orig)
 
     def reset_selection(self):
         for f_item in self.audio_items:
@@ -2202,8 +2199,7 @@ class ItemSequencer(QGraphicsView):
         if not libmk.IS_PLAYING and \
         a_event.button() != QtCore.Qt.RightButton:
             f_beat = int(a_event.scenePos().x() / SEQUENCER_PX_PER_BEAT)
-            self.set_playback_pos(f_beat)
-            TRANSPORT.set_time(f_beat)
+            global_set_playback_pos(f_beat)
 
     def check_line_count(self):
         """ Check that there are not too many vertical
@@ -9019,11 +9015,7 @@ class MainWindow(QScrollArea):
             elif a_key == "cur":
                 if libmk.IS_PLAYING:
                     f_beat = float(a_val)
-                    TRANSPORT.set_pos_from_cursor(f_beat)
-                    for f_editor in (
-                            SEQUENCER, AUDIO_SEQ, PIANO_ROLL_EDITOR,
-                            PB_EDITOR, CC_EDITOR):
-                        f_editor.set_playback_pos(f_beat)
+                    global_set_playback_pos(f_beat)
             elif a_key == "peak":
                 global_update_peak_meters(a_val)
             elif a_key == "cc":
@@ -9072,6 +9064,15 @@ class MainWindow(QScrollArea):
             print("Exception thrown while attempting to close DAW-Next")
             print("Exception:  {}".format(ex))
 
+PLAYBACK_POS = 0.0
+
+def global_set_playback_pos(a_beat):
+    global PLAYBACK_POS
+    PLAYBACK_POS = float(a_beat)
+    TRANSPORT.set_pos_from_cursor(PLAYBACK_POS)
+    for f_editor in (
+    SEQUENCER, AUDIO_SEQ, PIANO_ROLL_EDITOR, PB_EDITOR, CC_EDITOR):
+        f_editor.set_playback_pos(PLAYBACK_POS)
 
 def global_update_peak_meters(a_val):
     for f_val in a_val.split("|"):
