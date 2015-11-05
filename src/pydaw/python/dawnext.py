@@ -8502,17 +8502,17 @@ class TransportWidget(libmk.AbstractTransport):
         self.last_open_dir = global_home
         self.group_box = QGroupBox()
         self.group_box.setObjectName("transport_panel")
-        self.vlayout = QVBoxLayout()
-        self.group_box.setLayout(self.vlayout)
-        self.hlayout1 = QHBoxLayout()
-        self.vlayout.addLayout(self.hlayout1)
+        self.hlayout1 = QHBoxLayout(self.group_box)
         self.playback_menu_button = QPushButton("")
         self.playback_menu_button.setMaximumWidth(21)
         self.playback_menu_button.setSizePolicy(
             QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.hlayout1.addWidget(self.playback_menu_button)
-        self.grid_layout1 = QGridLayout()
-        self.hlayout1.addLayout(self.grid_layout1)
+        self.vlayout = QVBoxLayout()
+        self.hlayout1.addLayout(self.vlayout)
+
+        self.hlayout2 = QHBoxLayout()
+        self.vlayout.addLayout(self.hlayout2)
 
         self.playback_menu = QMenu(self.playback_menu_button)
         self.playback_menu_button.setMenu(self.playback_menu)
@@ -8522,26 +8522,24 @@ class TransportWidget(libmk.AbstractTransport):
         self.playback_vlayout = QVBoxLayout(self.playback_widget)
         self.playback_menu.addAction(self.playback_widget_action)
 
-        self.grid_layout1.addWidget(QLabel(_("Loop Mode:")), 0, 30)
+        self.hlayout2.addWidget(QLabel(_("Loop Mode:")))
         self.loop_mode_combobox = QComboBox()
         self.loop_mode_combobox.addItems([_("Off"), _("Region")])
         self.loop_mode_combobox.setMinimumWidth(90)
         self.loop_mode_combobox.currentIndexChanged.connect(
             self.on_loop_mode_changed)
-        self.grid_layout1.addWidget(self.loop_mode_combobox, 1, 30)
+        self.hlayout2.addWidget(self.loop_mode_combobox)
 
-        self.grid_layout1.addItem(
-            QSpacerItem(1, 1, QSizePolicy.Expanding), 1, 60)
-
-        self.grid_layout2 = QGridLayout()
-        self.hlayout1.addLayout(self.grid_layout2)
-        self.grid_layout2.setContentsMargins(-3, 1, -3, 1)
+        self.hlayout3 = QHBoxLayout()
+        self.vlayout.addLayout(self.hlayout3)
+        self.hlayout3.addItem(QSpacerItem(0, 0, QSizePolicy.Expanding))
+        self.hlayout3.setContentsMargins(-3, 1, -3, 1)
 
         # Mouse tools
         self.tool_select_rb = QRadioButton()
         self.tool_select_rb.setObjectName("tool_select")
         self.tool_select_rb.setToolTip(_("Select (hotkey: a)"))
-        self.grid_layout2.addWidget(self.tool_select_rb, 0, 0)
+        self.hlayout3.addWidget(self.tool_select_rb)
         self.tool_select_rb.clicked.connect(self.tool_select_clicked)
         self.tool_select_rb.setChecked(True)
 
@@ -8549,19 +8547,19 @@ class TransportWidget(libmk.AbstractTransport):
         self.tool_draw_rb.setObjectName("tool_draw")
         self.tool_draw_rb.setToolTip(_("Draw (hotkey: s)"))
         self.tool_draw_rb.clicked.connect(self.tool_draw_clicked)
-        self.grid_layout2.addWidget(self.tool_draw_rb, 0, 1)
+        self.hlayout3.addWidget(self.tool_draw_rb)
 
         self.tool_erase_rb = QRadioButton()
         self.tool_erase_rb.setObjectName("tool_erase")
         self.tool_erase_rb.setToolTip(_("Erase (hotkey: d)"))
         self.tool_erase_rb.clicked.connect(self.tool_erase_clicked)
-        self.grid_layout2.addWidget(self.tool_erase_rb, 1, 0)
+        self.hlayout3.addWidget(self.tool_erase_rb)
 
         self.tool_split_rb = QRadioButton()
         self.tool_split_rb.setObjectName("tool_split")
         self.tool_split_rb.setToolTip(_("Split (hotkey: f)"))
         self.tool_split_rb.clicked.connect(self.tool_split_clicked)
-        self.grid_layout2.addWidget(self.tool_split_rb, 1, 1)
+        self.hlayout3.addWidget(self.tool_split_rb)
 
         self.overdub_checkbox = QCheckBox(_("Overdub"))
         self.overdub_checkbox.clicked.connect(self.on_overdub_changed)
