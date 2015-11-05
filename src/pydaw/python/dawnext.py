@@ -48,6 +48,15 @@ TAB_ROUTING = 3
 TAB_MIXER = 4
 TAB_NOTES = 5
 
+
+# Used by the transport tool selector radio buttons
+EDITOR_MODE_SELECT = 0
+EDITOR_MODE_DRAW = 1
+EDITOR_MODE_ERASE = 2
+EDITOR_MODE_SPLIT = 3
+# The global variable that editors reference on mousePressEvent
+EDITOR_MODE = EDITOR_MODE_SELECT
+
 START_PEN = QPen(QColor.fromRgb(120, 120, 255), 6.0)
 END_PEN = QPen(QColor.fromRgb(255, 60, 60), 6.0)
 
@@ -8514,6 +8523,36 @@ class TransportWidget(libmk.AbstractTransport):
         self.grid_layout1.addItem(
             QSpacerItem(1, 1, QSizePolicy.Expanding), 1, 60)
 
+        self.grid_layout2 = QGridLayout()
+        self.hlayout1.addLayout(self.grid_layout2)
+        self.grid_layout2.setContentsMargins(-3, 1, -3, 1)
+
+        # Mouse tools
+        self.tool_select_rb = QRadioButton()
+        self.tool_select_rb.setObjectName("tool_select")
+        self.tool_select_rb.setToolTip(_("Select"))
+        self.grid_layout2.addWidget(self.tool_select_rb, 0, 0)
+        self.tool_select_rb.clicked.connect(self.tool_select_clicked)
+        self.tool_select_rb.setChecked(True)
+
+        self.tool_draw_rb = QRadioButton()
+        self.tool_draw_rb.setObjectName("tool_draw")
+        self.tool_draw_rb.setToolTip(_("Draw"))
+        self.tool_draw_rb.clicked.connect(self.tool_draw_clicked)
+        self.grid_layout2.addWidget(self.tool_draw_rb, 0, 1)
+
+        self.tool_erase_rb = QRadioButton()
+        self.tool_erase_rb.setObjectName("tool_erase")
+        self.tool_erase_rb.setToolTip(_("Erase"))
+        self.tool_erase_rb.clicked.connect(self.tool_erase_clicked)
+        self.grid_layout2.addWidget(self.tool_erase_rb, 1, 0)
+
+        self.tool_split_rb = QRadioButton()
+        self.tool_split_rb.setObjectName("tool_split")
+        self.tool_split_rb.setToolTip(_("Split"))
+        self.tool_split_rb.clicked.connect(self.tool_split_clicked)
+        self.grid_layout2.addWidget(self.tool_split_rb, 1, 1)
+
         self.overdub_checkbox = QCheckBox(_("Overdub"))
         self.overdub_checkbox.clicked.connect(self.on_overdub_changed)
         #self.playback_vlayout.addWidget(self.overdub_checkbox)
@@ -8526,6 +8565,22 @@ class TransportWidget(libmk.AbstractTransport):
         self.playback_vlayout.addWidget(self.audio_inputs.widget)
 
         self.suppress_osc = False
+
+    def tool_select_clicked(self, a_val=None):
+        global EDITOR_MODE
+        EDITOR_MODE = EDITOR_MODE_SELECT
+
+    def tool_draw_clicked(self, a_val=None):
+        global EDITOR_MODE
+        EDITOR_MODE = EDITOR_MODE_DRAW
+
+    def tool_erase_clicked(self, a_val=None):
+        global EDITOR_MODE
+        EDITOR_MODE = EDITOR_MODE_ERASE
+
+    def tool_split_clicked(self, a_val=None):
+        global EDITOR_MODE
+        EDITOR_MODE = EDITOR_MODE_SPLIT
 
     def open_project(self):
         self.audio_inputs.open_project()

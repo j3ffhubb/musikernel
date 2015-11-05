@@ -63,6 +63,66 @@ QSplitter::handle:horizontal
     background-color: rgba(240, 240, 240, 190);
 }
 
+/* Transport tool selector */
+
+QRadioButton#tool_select,
+QRadioButton#tool_draw,
+QRadioButton#tool_erase,
+QRadioButton#tool_split
+{
+    spacing: 1px;
+}
+
+QRadioButton#tool_select::indicator,
+QRadioButton#tool_draw::indicator,
+QRadioButton#tool_erase::indicator,
+QRadioButton#tool_split::indicator
+{
+    width: 24px;
+    height: 24px;
+    outline: none;
+    border: 1px solid #dddddd;
+    border-radius: 1px;
+}
+
+QRadioButton#tool_select::indicator::checked,
+QRadioButton#tool_draw::indicator::checked,
+QRadioButton#tool_erase::indicator::checked,
+QRadioButton#tool_split::indicator::checked
+{
+    background-color: #dddddd;
+}
+
+QRadioButton#tool_select::indicator::unchecked,
+QRadioButton#tool_draw::indicator::unchecked,
+QRadioButton#tool_erase::indicator::unchecked,
+QRadioButton#tool_split::indicator::unchecked
+{
+    background-color: #666666;
+}
+
+QRadioButton#tool_select::indicator
+{
+    image: url($STYLE_FOLDER/select.svg);
+}
+
+QRadioButton#tool_draw::indicator
+{
+    image: url($STYLE_FOLDER/draw.svg);
+}
+
+QRadioButton#tool_erase::indicator
+{
+    image: url($STYLE_FOLDER/erase.svg);
+}
+
+QRadioButton#tool_split::indicator
+{
+    image: url($STYLE_FOLDER/split.svg);
+}
+
+/* Transport and track panel radio buttons  */
+
 QCheckBox#solo_checkbox::indicator::unchecked,
 QCheckBox#mute_checkbox::indicator::unchecked,
 QRadioButton#rec_arm_radiobutton::indicator::unchecked,
