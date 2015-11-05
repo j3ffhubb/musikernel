@@ -224,8 +224,6 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/python/__pycache__/wavenext.cpython-34.pyo
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/__init__.cpython-34.pyc
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/__init__.cpython-34.pyo
-%{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/gradients.cpython-34.pyc
-%{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/gradients.cpython-34.pyo
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/osc.cpython-34.pyc
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/osc.cpython-34.pyo
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/project.cpython-34.pyc
