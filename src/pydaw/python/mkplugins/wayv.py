@@ -611,7 +611,7 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
         self.oscillator_layout.addLayout(self.hlayout0)
         self.hlayout0.addItem(
             QSpacerItem(1, 1, QSizePolicy.Expanding))
-        f_knob_size = 48
+        f_knob_size = 39
 
         for f_i in range(1, 7):
             f_hlayout1 = QHBoxLayout()
