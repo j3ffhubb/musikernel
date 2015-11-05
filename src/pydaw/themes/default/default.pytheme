@@ -85,6 +85,9 @@ QRadioButton#tool_split::indicator
     border-radius: 1px;
 }
 
+QRadioButton#play_button::indicator::checked,
+QRadioButton#rec_button::indicator::checked,
+QRadioButton#stop_button::indicator::checked,
 QRadioButton#tool_select::indicator::checked,
 QRadioButton#tool_draw::indicator::checked,
 QRadioButton#tool_erase::indicator::checked,
@@ -93,6 +96,9 @@ QRadioButton#tool_split::indicator::checked
     background-color: #dddddd;
 }
 
+QRadioButton#play_button::indicator::unchecked,
+QRadioButton#rec_button::indicator::unchecked,
+QRadioButton#stop_button::indicator::unchecked,
 QRadioButton#tool_select::indicator::unchecked,
 QRadioButton#tool_draw::indicator::unchecked,
 QRadioButton#tool_erase::indicator::unchecked,
@@ -121,7 +127,7 @@ QRadioButton#tool_split::indicator
     image: url($STYLE_FOLDER/split.svg);
 }
 
-/* Transport and track panel radio buttons  */
+/* Track panel radio buttons  */
 
 QCheckBox#solo_checkbox::indicator::unchecked,
 QCheckBox#mute_checkbox::indicator::unchecked,
@@ -195,43 +201,27 @@ QRadioButton#stop_button::indicator
 {
     outline: none;
     border: none;
-    border-radius: 24px;
     width:48px;
     height:48px;
+    border: 1px solid #dddddd;
 }
 
-QRadioButton#play_button::indicator::unchecked
+QRadioButton#play_button::indicator
 {
-    image: url($STYLE_FOLDER/play-off.png);
+    image: url($STYLE_FOLDER/play.svg);
 }
 
-QRadioButton#play_button::indicator::checked
+
+QRadioButton#stop_button::indicator
 {
-    image: url($STYLE_FOLDER/play-on.png);
+    image: url($STYLE_FOLDER/stop.svg);
 }
 
-
-QRadioButton#stop_button::indicator::unchecked
+QRadioButton#rec_button::indicator
 {
-    image: url($STYLE_FOLDER/stop-off.png);
+    image: url($STYLE_FOLDER/rec.svg);
 }
 
-QRadioButton#stop_button::indicator::checked
-{
-    image: url($STYLE_FOLDER/stop-off.png);
-}
-
-QRadioButton#rec_button::indicator::unchecked
-{
-    image: url($STYLE_FOLDER/rec-off.png);
-}
-
-QRadioButton#rec_button::indicator::checked
-{
-    image: url($STYLE_FOLDER/rec-on.png);
-}
-
-/*End Rec button*/
 
 QSpinBox, QDoubleSpinBox
 {
