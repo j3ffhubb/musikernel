@@ -6916,7 +6916,7 @@ class AutomationItem(QGraphicsEllipseItem):
             if f_point.isSelected():
                 f_pos_x = f_point.pos().x()
                 f_cc_start = (f_pos_x -
-                    AUTOMATION_MIN_HEIGHT) / self.parent_view.beat_width
+                    AUTOMATION_MIN_HEIGHT) / self.parent_view.px_per_beat
                 f_cc_start = pydaw_clip_min(f_cc_start, 0.0)
                 f_cc_start = round(f_cc_start, 6)
                 if self.is_cc:
@@ -6977,7 +6977,7 @@ class AutomationEditor(AbstractItemEditor):
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
         self.scene.setBackgroundBrush(QColor(100, 100, 100))
-        self.scene.mouseDoubleClickEvent = self.sceneMouseDoubleClickEvent
+        self.scene.mousePressEvent = self.sceneMousePressEvent
         self.setAlignment(QtCore.Qt.AlignLeft)
         self.setScene(self.scene)
         self.setDragMode(QGraphicsView.RubberBandDrag)
@@ -7090,27 +7090,28 @@ class AutomationEditor(AbstractItemEditor):
         global_save_and_reload_items()
         self.selection_enabled = True
 
-    def sceneMouseDoubleClickEvent(self, a_event):
+    def sceneMousePressEvent(self, a_event):
         if not ITEM_EDITOR.enabled:
             ITEM_EDITOR.show_not_enabled_warning()
             return
-        f_pos_x = a_event.scenePos().x() - AUTOMATION_POINT_RADIUS
-        f_pos_y = a_event.scenePos().y() - AUTOMATION_POINT_RADIUS
-        f_cc_start = (f_pos_x - AUTOMATION_MIN_HEIGHT) / self.px_per_beat
-        f_cc_start = pydaw_clip_min(f_cc_start, 0.0)
-        if self.is_cc:
-            f_cc_val = int(127.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
-                self.viewer_height) * 127.0))
-            f_cc_val = pydaw_clip_value(f_cc_val, 0, 127)
-            ITEM_EDITOR.add_cc(pydaw_cc(f_cc_start, self.cc_num, f_cc_val))
-        else:
-            f_cc_val = 1.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
-                self.viewer_height) * 2.0)
-            f_cc_val = pydaw_clip_value(f_cc_val, -1.0, 1.0)
-            ITEM_EDITOR.add_pb(pydaw_pitchbend(f_cc_start, f_cc_val))
-        QGraphicsScene.mouseDoubleClickEvent(self.scene, a_event)
-        self.selected_str = []
-        global_save_and_reload_items()
+        if EDITOR_MODE == EDITOR_MODE_DRAW:
+            f_pos_x = a_event.scenePos().x() - AUTOMATION_POINT_RADIUS
+            f_pos_y = a_event.scenePos().y() - AUTOMATION_POINT_RADIUS
+            f_cc_start = (f_pos_x - AUTOMATION_MIN_HEIGHT) / self.px_per_beat
+            f_cc_start = pydaw_clip_min(f_cc_start, 0.0)
+            if self.is_cc:
+                f_cc_val = int(127.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
+                    self.viewer_height) * 127.0))
+                f_cc_val = pydaw_clip_value(f_cc_val, 0, 127)
+                ITEM_EDITOR.add_cc(pydaw_cc(f_cc_start, self.cc_num, f_cc_val))
+            else:
+                f_cc_val = 1.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
+                    self.viewer_height) * 2.0)
+                f_cc_val = pydaw_clip_value(f_cc_val, -1.0, 1.0)
+                ITEM_EDITOR.add_pb(pydaw_pitchbend(f_cc_start, f_cc_val))
+            self.selected_str = []
+            global_save_and_reload_items()
+        QGraphicsScene.mousePressEvent(self.scene, a_event)
 
     def draw_header(self):
         AbstractItemEditor.draw_header(
