@@ -266,7 +266,9 @@ class pydaw_device_dialog:
                 if a_splash_screen:
                     a_splash_screen.hide()
                 self.show_device_dialog(
-                    _("Device not found: {}").format(f_device_str),
+                    _("Device not found: {}\n\n"
+                    "If this is not expected, then another application "
+                    "may be using the device").format(f_device_str),
                     a_exit_on_cancel=True)
                 if a_splash_screen:
                     a_splash_screen.show()
