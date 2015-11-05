@@ -3,6 +3,11 @@ QWidget:focus
     outline: none;
 }
 
+QMenu::item
+{
+    background-color: #545c64;
+}
+
 QWidget#plugin_rack
 {
     background-color: #303841;
@@ -225,7 +230,7 @@ QRadioButton#rec_button::indicator
 
 QSpinBox, QDoubleSpinBox
 {
-    color: white;
+    color: #000000;
     border: 1px solid gray;
     font-size: 18px;
 }
@@ -514,7 +519,7 @@ QPushButton
     border-width: 1px;
     border-color: #1e1e1e;
     border-style: solid;
-    border-radius: 6;
+    border-radius: 3px;
     padding: 3px;
     font-size: 12px;
     padding-left: 3px;
@@ -544,7 +549,7 @@ QPushButton#plugin_menu::menu-indicator
 QComboBox, QPushButton#plugin_menu
 {
     color: black;
-    border: 1px solid white;
+    border: 1px solid #000000;
     border-radius: 3px;
     background-color: QLinearGradient(
         x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fafafa, stop: 0.1 #ffffff,
@@ -617,7 +622,7 @@ QScrollBar::handle:horizontal, QScrollBar::add-line:horizontal,
 QScrollBar::sub-line:horizontal, QScrollBar::handle:vertical,
 QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical,
 QComboBox:enabled, QPushButton#plugin_menu,
-QTabBar::tab:selected, QTabBar::tab:!selected:hover
+QTabBar::tab:!selected:hover
 {
     background-color: QLinearGradient(
         x1:0, y1:0, x2:0, y2:1, stop:1 #969696, stop:.4 #636363);
@@ -752,10 +757,7 @@ QToolBar::handle
 QMenu::separator
 {
     height: 6px;
-    background-color: QLinearGradient(
-        x1:0, y1:0, x2:0, y2:1, stop:0 #161616,
-        stop: 0.5 #cccccc, stop:1 #343434);
-    margin: 6px;
+    background-color: #afb4ba;
 }
 
 QProgressBar
@@ -814,12 +816,14 @@ QTabBar::tab:!selected
     color: #dddddd;
     border-bottom-style: solid;
     margin-top: 3px;
-    background-color: QLinearGradient(
-        x1:0, y1:0, x2:0, y2:1, stop:1 #212121, stop:.4 #343434);
-    background-color: QLinearGradient(
-        x1:0, y1:0, x2:1, y2:1, stop:1 #515151, stop:.4 #454545);
+    background-color: #303841;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+}
+
+QTabBar::tab:selected
+{
+    background-color: #afb4ba;
 }
 
 QTabBar::tab:selected,QTabBar::tab:!selected:hover
@@ -838,7 +842,9 @@ QTableWidget
     alternate-background-color: QLinearGradient(
         x1:0, y1:0, x2:1, y2:1, stop:0 #3a3a3a, stop: .5 #464646,
         stop: 1 #2f2f2f);
-    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #464646, stop: .5 #3a3a3a, stop: 1 #464646);
+    background-color: QLinearGradient(
+        x1:0, y1:0, x2:0, y2:1, stop:0 #464646, stop: .5 #3a3a3a,
+        stop: 1 #464646);
 }
 
 QRadioButton::indicator:checked, QRadioButton::indicator:unchecked
@@ -851,12 +857,12 @@ QRadioButton::indicator:checked, QRadioButton::indicator:unchecked
 QRadioButton::indicator:checked
 {
     background-color: qradialgradient(
-    cx: 0.5, cy: 0.5,
-    fx: 0.5, fy: 0.5,
-    radius: 1.0,
-    stop: 0.25 #ffffff,
-    stop: 0.3 #323232
-    );
+        cx: 0.5, cy: 0.5,
+        fx: 0.5, fy: 0.5,
+        radius: 1.0,
+        stop: 0.25 #ffffff,
+        stop: 0.3 #323232
+        );
 }
 
 QCheckBox::indicator
