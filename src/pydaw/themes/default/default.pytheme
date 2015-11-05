@@ -11,7 +11,7 @@ QWidget#plugin_rack
 QWidget#mainwindow, QWidget#ccmaptabwidget, QWidget#itemtabwidget,
 QMessageBox
 {
-    background-color:rgb(93, 93, 93);
+    background-color:rgb(33, 33, 33);
 }
 
 QLabel
@@ -33,12 +33,7 @@ QWidget
 QWidget#plugin_ui, QDialog, QScrollArea, QMainWindow, QMenu,
 QSpinBox, QDoubleSpinBox
 {
-    background-color: QLinearGradient(
-        x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 #2d2d2d, stop: 0.5 #323232, stop: 1 #2d2d2d);
-    background-color: QLinearGradient(
-        x1: 0, y1: 0, x2: 1, y2: 1,
-        stop: 0 #3d3d3d, stop: 0.5 #424649 stop: 1 #3d3d3d);
+    background-color: #2d2d2d;
     border: 1px solid #7a7a7a;
 }
 
@@ -49,7 +44,7 @@ QScrollArea
     padding: 2px;
 }
 
-QCheckBox,QRadiobutton
+QCheckBox, QRadiobutton
 {
     padding: 0px;
     background-color: rgba(255, 255, 255, 21);
@@ -58,18 +53,14 @@ QCheckBox,QRadiobutton
 
 QSplitter::handle:vertical
 {
-    height: 9px;
-    background-color: QLinearGradient(
-        x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #444444, stop: 0.4 #cccccc,
-        stop: 0.6 #cccccc, stop: 1 #444444);
+    height: 6px;
+    background-color: rgba(240, 240, 240, 190);
 }
 
 QSplitter::handle:horizontal
 {
-    width:  9px;
-    background-color: QLinearGradient(
-        x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #444444, stop: 0.4 #cccccc,
-        stop: 0.6 #cccccc, stop: 1 #444444);
+    width:  6px;
+    background-color: rgba(240, 240, 240, 190);
 }
 
 QCheckBox#solo_checkbox::indicator::unchecked,
@@ -391,22 +382,17 @@ QToolTip
 QGroupBox
 {
     color: white;
-    border: 2px solid gray;
-    border-radius: 9px;
+    border: 2px solid #666666;
+    border-radius: 4px;
     margin-top: 1ex;
 }
 
 
 QGroupBox#plugin_groupbox
 {
-    background-color : qlineargradient(
-        x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #3a3a3a, stop: 0.2 #333333,
-        stop: 0.5 #2a2a2a, stop: 0.7 #333333, stop: 1 #151515);
-    background-color : qlineargradient(
-        x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #3a3a3a, stop: 0.5 #50595f,
-        stop: 1 #3a3a3a);
-    border: 2px solid white;
-    border-radius: 9px;
+    background-color : #2a2a2a;
+    border: 2px solid 666666;
+    border-radius: 6px;
     margin-top: 1ex;
     padding-left: 6px;
     padding-right: 6px;
@@ -416,28 +402,18 @@ QGroupBox#plugin_groupbox
 
 QWidget#plugin_widget
 {
-    background-color : qlineargradient(
-        x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #3a3a3a, stop: 0.2 #333333,
-        stop: 0.5 #2a2a2a, stop: 0.7 #333333, stop: 1 #151515);
-    background-color : qlineargradient(
-        x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #3a3a3a, stop: 0.5 #50595f,
-        stop: 1 #3a3a3a);
+    background-color : #333333;
     border: none;
 }
 
-QWidget#track_panel,QWidget#transport_panel
+QWidget#track_panel, QWidget#transport_panel
 {
-    background-color : qlineargradient(
-        x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #454545, stop: 0.2 #333333,
-        stop: 0.5 #2a2a2a, stop: 0.7 #333333, stop: 1 #454545);
-    background-color : qlineargradient(
-        x1: 0, y1: 0, x2: 1, y2: 1,
-        stop: 0 #5c5c5c, stop: 0.5 #73797d, stop: 1 #5c5c5c);
+    background-color : #333333;
 }
 
 QWidget#transport_panel
 {
-    border: 2px solid #cccccc;
+    border: 2px solid #666666;
 }
 
 QGroupBox::title
@@ -585,24 +561,30 @@ QComboBox::down-arrow
 
 QGroupBox:focus,QTextEdit:focus
 {
-    border: 2px solid QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ffffff, stop: 1 #dddddd);
+    border: 2px solid QLinearGradient(
+        x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ffffff, stop: 1 #dddddd);
 }
 
 QScrollBar:horizontal
 {
     border: 1px solid #222222;
-    background: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0.0 #121212, stop: 0.2 #282828, stop: 1 #484848);
+    background: QLinearGradient(
+        x1: 0, y1: 0, x2: 0, y2: 1, stop: 0.0 #121212,
+        stop: 0.2 #282828, stop: 1 #484848);
     height: 15px;
     margin: 0px 16px 0 16px;
 }
 
-QScrollBar::handle:horizontal,QScrollBar::add-line:horizontal,QScrollBar::sub-line:horizontal,
-QScrollBar::handle:vertical,QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical,
+QScrollBar::handle:horizontal, QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal, QScrollBar::handle:vertical,
+QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical,
 QComboBox:enabled, QPushButton#plugin_menu,
-QTabBar::tab:selected,QTabBar::tab:!selected:hover
+QTabBar::tab:selected, QTabBar::tab:!selected:hover
 {
-    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:1 #969696, stop:.4 #636363);
-    background-color: QLinearGradient(x1:0, y1:0, x2:1, y2:1, stop:1 #dddddd, stop:.4 #aaaaaa);
+    background-color: QLinearGradient(
+        x1:0, y1:0, x2:0, y2:1, stop:1 #969696, stop:.4 #636363);
+    background-color: QLinearGradient(
+        x1:0, y1:0, x2:1, y2:1, stop:1 #dddddd, stop:.4 #aaaaaa);
 }
 
 QScrollBar::handle:horizontal
@@ -645,7 +627,9 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
 
 QScrollBar:vertical
 {
-    background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0, stop: 0.0 #121212, stop: 0.2 #282828, stop: 1 #484848);
+    background: QLinearGradient(
+        x1: 0, y1: 0, x2: 1, y2: 0, stop: 0.0 #121212,
+        stop: 0.2 #282828, stop: 1 #484848);
     width: 15px;
     margin: 16px 0 16px 0;
     border: 1px solid #222222;
@@ -701,7 +685,9 @@ QPlainTextEdit
 
 QHeaderView::section
 {
-    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #616161, stop: 0.5 #505050, stop: 0.6 #434343, stop:1 #656565);
+    background-color: QLinearGradient(
+        x1:0, y1:0, x2:0, y2:1, stop:0 #616161, stop: 0.5 #505050,
+        stop: 0.6 #434343, stop:1 #656565);
     color: white;
     padding-left: 4px;
     border: 1px solid #6c6c6c;
@@ -714,7 +700,9 @@ QCheckBox:disabled
 
 QMainWindow::separator
 {
-    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #161616, stop: 0.5 #151515, stop: 0.6 #212121, stop:1 #343434);
+    background-color: QLinearGradient(
+        x1:0, y1:0, x2:0, y2:1, stop:0 #161616, stop: 0.5 #151515,
+        stop: 0.6 #212121, stop:1 #343434);
     color: white;
     padding-left: 4px;
     border: 1px solid #4c4c4c;
@@ -723,7 +711,9 @@ QMainWindow::separator
 
 QMainWindow::separator:hover
 {
-    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #dddddd, stop:0.5 #b56c17 stop:1 #ffffff);
+    background-color: QLinearGradient(
+        x1:0, y1:0, x2:0, y2:1, stop:0 #dddddd,
+        stop:0.5 #b56c17 stop:1 #ffffff);
     color: white;
     padding-left: 4px;
     border: 1px solid #6c6c6c;
