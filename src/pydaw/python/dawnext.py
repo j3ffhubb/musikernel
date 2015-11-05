@@ -1128,7 +1128,7 @@ class SequencerItem(QGraphicsRectItem):
             SEQUENCER.scene.clearSelection()
             self.setSelected(True)
 
-        if a_event.modifiers() == QtCore.Qt.ShiftModifier:
+        if EDITOR_MODE == EDITOR_MODE_SPLIT:
             f_item = self.audio_item
             f_item_old = f_item.clone()
             CURRENT_REGION.add_item(f_item_old)
@@ -1166,7 +1166,7 @@ class SequencerItem(QGraphicsRectItem):
         self.quantize_offset = f_item_pos - self.quantize_all(f_item_pos)
 
     def hoverMoveEvent(self, a_event):
-        if a_event.modifiers() == QtCore.Qt.ShiftModifier:
+        if EDITOR_MODE == EDITOR_MODE_SPLIT:
             if not self.split_line_is_shown:
                 self.split_line_is_shown = True
                 self.split_line.show()
@@ -1765,7 +1765,16 @@ class ItemSequencer(QGraphicsView):
         elif REGION_EDITOR_MODE == 0:
             self.current_item = self.get_item(f_pos)
             self.setDragMode(QGraphicsView.RubberBandDrag)
-            if a_event.modifiers() == QtCore.Qt.ControlModifier:
+            if EDITOR_MODE == EDITOR_MODE_SELECT:
+                f_item = self.get_item(f_pos)
+                if f_item:
+                    if not f_item.isSelected():
+                        self.scene.clearSelection()
+                    f_item.setSelected(True)
+                    self.selected_item_strings = {f_item.get_selected_string()}
+                    QGraphicsView.mousePressEvent(self, a_event)
+                    return
+            elif EDITOR_MODE == EDITOR_MODE_DRAW:
                 f_item = self.get_item(f_pos)
                 if f_item:
                     if not f_item.isSelected():
@@ -1789,11 +1798,9 @@ class ItemSequencer(QGraphicsView):
                 PROJECT.commit(_("Add new item"))
                 REGION_SETTINGS.open_region()
                 return
-            elif a_event.modifiers() == QtCore.Qt.ShiftModifier:
-                f_item = self.get_item(f_pos)
-                if not f_item:
-                    self.deleted_items = []
-                    region_editor_set_delete_mode(True)
+            elif EDITOR_MODE == EDITOR_MODE_ERASE:
+                self.deleted_items = []
+                region_editor_set_delete_mode(True)
             else:
                 f_item = self.get_item(f_pos)
                 if f_item:
@@ -1806,8 +1813,8 @@ class ItemSequencer(QGraphicsView):
             self.setDragMode(QGraphicsView.NoDrag)
             self.atm_select_pos_x = None
             self.atm_select_track = None
-            if a_event.modifiers() == QtCore.Qt.ControlModifier or \
-            a_event.modifiers() == QtCore.Qt.ShiftModifier:
+            if EDITOR_MODE == EDITOR_MODE_SELECT or \
+            EDITOR_MODE == EDITOR_MODE_ERASE:
                 self.current_coord = self.get_item_coord(f_pos, True)
                 self.scene.clearSelection()
                 self.atm_select_pos_x = f_pos.x()
@@ -1817,7 +1824,8 @@ class ItemSequencer(QGraphicsView):
                     return
             elif a_event.button() == QtCore.Qt.RightButton:
                 pass
-            elif self.current_coord is not None:
+            elif EDITOR_MODE == EDITOR_MODE_DRAW and \
+            self.current_coord is not None:
                 f_port, f_index = TRACK_PANEL.has_automation(
                     self.current_coord[0])
                 if f_port is not None:
@@ -4117,7 +4125,7 @@ class AudioSeqItem(QGraphicsRectItem):
             self.show_context_menu()
             return
 
-        if a_event.modifiers() == QtCore.Qt.ShiftModifier:
+        if EDITOR_MODE == EDITOR_MODE_SPLIT:
             f_item = self.audio_item
             f_item_old = f_item.clone()
             f_item.fade_in = 0.0
@@ -4212,7 +4220,7 @@ class AudioSeqItem(QGraphicsRectItem):
         self.quantize_offset = f_item_pos - self.quantize_all(f_item_pos)
 
     def hoverMoveEvent(self, a_event):
-        if a_event.modifiers() == QtCore.Qt.ShiftModifier:
+        if EDITOR_MODE == EDITOR_MODE_SPLIT:
             if not self.split_line_is_shown:
                 self.split_line_is_shown = True
                 self.split_line.show()
@@ -5784,7 +5792,7 @@ class PianoRollNoteItem(QGraphicsRectItem):
         if not self.isSelected():
             PIANO_ROLL_EDITOR.scene.clearSelection()
             self.setSelected(True)
-        if a_event.modifiers() == QtCore.Qt.ShiftModifier:
+        if EDITOR_MODE == EDITOR_MODE_ERASE:
             piano_roll_set_delete_mode(True)
             self.delete_later()
         elif a_event.modifiers() == \
@@ -6269,11 +6277,11 @@ class PianoRollEditor(AbstractItemEditor):
             ITEM_EDITOR.show_not_enabled_warning()
         elif a_event.button() == QtCore.Qt.RightButton:
             return
-        elif a_event.modifiers() == QtCore.Qt.ControlModifier:
+        elif EDITOR_MODE == EDITOR_MODE_SELECT:
             if self.click_enabled:
                 self.scene.clearSelection()
             self.hover_restore_cursor_event()
-        elif a_event.modifiers() == QtCore.Qt.ShiftModifier:
+        elif EDITOR_MODE == EDITOR_MODE_ERASE:
             piano_roll_set_delete_mode(True)
             return
         elif a_event.modifiers() == (
@@ -6281,7 +6289,8 @@ class PianoRollEditor(AbstractItemEditor):
         a_event.modifiers() == (
         QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
             pass
-        elif self.click_enabled and ITEM_EDITOR.enabled:
+        elif self.click_enabled and ITEM_EDITOR.enabled and \
+        EDITOR_MODE == EDITOR_MODE_DRAW:
             self.scene.clearSelection()
             f_pos = a_event.scenePos()
             if self.get_item_at_pos(f_pos, ItemEditorHeader):
