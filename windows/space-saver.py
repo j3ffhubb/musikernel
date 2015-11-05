@@ -51,7 +51,7 @@ DELETE_FILES = (
 
 QT_DLLS = set([
     "Qt5Core.dll", "Qt5Widgets.dll", "Qt5Gui.dll",
-    "Qt5WinExtras.dll", "Qt5OpenGL.dll"
+    "Qt5WinExtras.dll", "Qt5OpenGL.dll", "Qt5Svg.dll"
 ])
 
 SAFE_EXES = (
