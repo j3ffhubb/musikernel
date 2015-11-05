@@ -51,6 +51,8 @@ DEFAULT_TRACK_COLORS = [
 
 SELECTED_ITEM_COLOR = QBrush(QColor("#cccccc"))
 
+SCENE_BACKGROUND_BRUSH = QBrush(QColor("#424242"))
+
 TAB_SEQUENCER = 0
 TAB_PLUGIN_RACK = 1
 TAB_ITEM_EDITOR = 2
@@ -1462,7 +1464,7 @@ class ItemSequencer(QGraphicsView):
         self.scene.dragEnterEvent = self.sceneDragEnterEvent
         self.scene.dragMoveEvent = self.sceneDragMoveEvent
         self.scene.contextMenuEvent = self.sceneContextMenuEvent
-        self.scene.setBackgroundBrush(QColor(90, 90, 90))
+        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
         #self.scene.selectionChanged.connect(self.highlight_selected)
         self.scene.mouseMoveEvent = self.sceneMouseMoveEvent
         self.scene.mouseReleaseEvent = self.sceneMouseReleaseEvent
@@ -4588,7 +4590,7 @@ class AudioItemSeq(AbstractItemEditor):
         self.scene.dragEnterEvent = self.sceneDragEnterEvent
         self.scene.dragMoveEvent = self.sceneDragMoveEvent
         self.scene.contextMenuEvent = self.sceneContextMenuEvent
-        self.scene.setBackgroundBrush(QColor(90, 90, 90))
+        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
         self.scene.selectionChanged.connect(self.scene_selection_changed)
         self.setAcceptDrops(True)
         self.setScene(self.scene)
@@ -6034,7 +6036,7 @@ class PianoRollEditor(AbstractItemEditor):
         AbstractItemEditor.__init__(self, PIANO_KEYS_WIDTH)
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        self.scene.setBackgroundBrush(QColor(100, 100, 100))
+        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
         self.scene.mousePressEvent = self.sceneMousePressEvent
         self.scene.mouseReleaseEvent = self.sceneMouseReleaseEvent
         self.setAlignment(QtCore.Qt.AlignLeft)
@@ -6981,7 +6983,7 @@ class AutomationEditor(AbstractItemEditor):
         self.setMinimumHeight(370)
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        self.scene.setBackgroundBrush(QColor(100, 100, 100))
+        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
         self.scene.mousePressEvent = self.sceneMousePressEvent
         self.setAlignment(QtCore.Qt.AlignLeft)
         self.setScene(self.scene)
@@ -7228,7 +7230,7 @@ class AutomationEditor(AbstractItemEditor):
         if not ITEM_EDITOR.enabled:
             self.setUpdatesEnabled(True)
             return
-        f_pen = QPen(pydaw_note_gradient, 2.0)
+        f_pen = QPen(QtCore.Qt.black, 2.0)
         f_note_height = (self.viewer_height / 127.0)
 
         if self.is_cc:
