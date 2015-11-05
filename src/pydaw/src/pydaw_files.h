@@ -97,7 +97,11 @@ void get_string_from_file(const char * a_file, int a_size, char * a_buf)
     //pydaw_write_log(log_buff);
     FILE * f_file;
     f_file = fopen(a_file, "r");
-    assert(f_file);
+    if(!f_file)
+    {
+        printf("Failed to open '%s'\n", a_file);
+        assert(f_file);
+    }
     size_t f_char_count =
         fread(a_buf, sizeof(char), sizeof(char) * a_size, f_file);
     assert((int)f_char_count < a_size);
