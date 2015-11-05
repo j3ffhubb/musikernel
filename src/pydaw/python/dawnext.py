@@ -8500,7 +8500,7 @@ class TransportWidget(libmk.AbstractTransport):
         self.recording_timestamp = None
         self.suppress_osc = True
         self.last_open_dir = global_home
-        self.group_box = QGroupBox()
+        self.group_box = QWidget()
         self.group_box.setObjectName("transport_panel")
         self.hlayout1 = QHBoxLayout(self.group_box)
         self.playback_menu_button = QPushButton("")

@@ -332,7 +332,7 @@ class TransportWidget(libmk.AbstractTransport):
         self.start_region = 0
         self.last_bar = 0
         self.last_open_dir = global_home
-        self.group_box = QGroupBox()
+        self.group_box = QWidget()
         self.group_box.setObjectName("transport_panel")
         self.vlayout = QVBoxLayout(self.group_box)
         self.hlayout1 = QHBoxLayout()

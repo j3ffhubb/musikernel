@@ -116,7 +116,7 @@ class TransportWidget:
     def __init__(self):
         self.suppress_osc = True
         self.last_open_dir = pydaw_util.global_home
-        self.group_box = QGroupBox()
+        self.group_box = QWidget()
         self.group_box.setObjectName("transport_panel")
         self.vlayout = QVBoxLayout()
         self.group_box.setLayout(self.vlayout)
