@@ -136,7 +136,7 @@ def delete_it_all(a_path):
     if os.path.isdir(pkg_dir) and os.listdir(pkg_dir):
         print("Warning:  '{}' is not empty".format(pkg_dir))
 
-for bits in ("64",): #"32",
+for bits in ("64", "32"):
     base_dir = r'C:\musikernel'
     mingw_dir = r'{0}\mingw{1}'.format(base_dir, bits)
     bin_dir = r'{0}\bin'.format(mingw_dir)

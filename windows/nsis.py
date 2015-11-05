@@ -95,21 +95,24 @@ with open(os.path.join(CWD, "..", "src", "minor-version.txt")) as fh:
 with open(os.path.join(CWD, "..", "src", "major-version.txt")) as fh:
     MAJOR_VERSION = fh.read().strip()
 
-#mingw-w64-i686-portaudio-19_20140130-2-any.pkg.tar.xz
-
 shutil.copy(
     os.path.join(CWD, "mingw-w64-portaudio",
         "mingw-w64-x86_64-portaudio-19_20140130-2-any.pkg.tar.xz"),
     r"C:\musikernel\home\pydaw")
 
+shutil.copy(
+    os.path.join(CWD, "mingw-w64-portaudio",
+        "mingw-w64-i686-portaudio-19_20140130-2-any.pkg.tar.xz"),
+    r"C:\musikernel\home\pydaw")
+
+dest = r"C:\musikernel\home\pydaw"
+if not os.path.isdir(dest):
+    os.makedirs(dest)
+
 for arch, bits in (("x86_64", "64"),): # ("i686", "32"),
     src = ("mingw-w64-{arch}-{MAJOR_VERSION}-{MINOR_VERSION}"
         "-1-any.pkg.tar.xz".format(
         arch=arch, MAJOR_VERSION=MAJOR_VERSION, MINOR_VERSION=MINOR_VERSION))
-    dest = r"C:\musikernel\home\pydaw".format(
-        bits=bits, MAJOR_VERSION=MAJOR_VERSION)
-    if not os.path.isdir(dest):
-        os.makedirs(dest)
     shutil.copy(src, dest)
 
 shell = r"C:\musikernel\mingw64_shell.bat"
@@ -122,11 +125,12 @@ rm *  # remove all package files to save space
 """)
 input("Press 'enter' to continue")
 
-shutil.copy(os.path.join(CWD, "musikernel1.bat"), r"C:\musikernel\mingw64\bin")
-
 NSIS = r"C:\Program Files (x86)\NSIS\Bin\makensis.exe"
 
-for bits in ("64",): # "32",
+for bits in ("64", "32"):
+    shutil.copy(
+        os.path.join(CWD, "musikernel1.bat"),
+        r"C:\musikernel\mingw{0}\bin".format(bits))
     template = TEMPLATE.format(
         bits=bits, MINOR_VERSION=MINOR_VERSION, MAJOR_VERSION=MAJOR_VERSION)
     template_name = "{0}-{1}.nsi".format(MAJOR_VERSION, bits)
