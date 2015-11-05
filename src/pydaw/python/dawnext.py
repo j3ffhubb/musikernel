@@ -8540,26 +8540,26 @@ class TransportWidget(libmk.AbstractTransport):
         # Mouse tools
         self.tool_select_rb = QRadioButton()
         self.tool_select_rb.setObjectName("tool_select")
-        self.tool_select_rb.setToolTip(_("Select"))
+        self.tool_select_rb.setToolTip(_("Select (hotkey: a)"))
         self.grid_layout2.addWidget(self.tool_select_rb, 0, 0)
         self.tool_select_rb.clicked.connect(self.tool_select_clicked)
         self.tool_select_rb.setChecked(True)
 
         self.tool_draw_rb = QRadioButton()
         self.tool_draw_rb.setObjectName("tool_draw")
-        self.tool_draw_rb.setToolTip(_("Draw"))
+        self.tool_draw_rb.setToolTip(_("Draw (hotkey: s)"))
         self.tool_draw_rb.clicked.connect(self.tool_draw_clicked)
         self.grid_layout2.addWidget(self.tool_draw_rb, 0, 1)
 
         self.tool_erase_rb = QRadioButton()
         self.tool_erase_rb.setObjectName("tool_erase")
-        self.tool_erase_rb.setToolTip(_("Erase"))
+        self.tool_erase_rb.setToolTip(_("Erase (hotkey: d)"))
         self.tool_erase_rb.clicked.connect(self.tool_erase_clicked)
         self.grid_layout2.addWidget(self.tool_erase_rb, 1, 0)
 
         self.tool_split_rb = QRadioButton()
         self.tool_split_rb.setObjectName("tool_split")
-        self.tool_split_rb.setToolTip(_("Split"))
+        self.tool_split_rb.setToolTip(_("Split (hotkey: f)"))
         self.tool_split_rb.clicked.connect(self.tool_split_clicked)
         self.grid_layout2.addWidget(self.tool_split_rb, 1, 1)
 
@@ -8579,18 +8579,26 @@ class TransportWidget(libmk.AbstractTransport):
     def tool_select_clicked(self, a_val=None):
         global EDITOR_MODE
         EDITOR_MODE = EDITOR_MODE_SELECT
+        if not self.tool_select_rb.isChecked():
+            self.tool_select_rb.setChecked(True)
 
     def tool_draw_clicked(self, a_val=None):
         global EDITOR_MODE
         EDITOR_MODE = EDITOR_MODE_DRAW
+        if not self.tool_draw_rb.isChecked():
+            self.tool_draw_rb.setChecked(True)
 
     def tool_erase_clicked(self, a_val=None):
         global EDITOR_MODE
         EDITOR_MODE = EDITOR_MODE_ERASE
+        if not self.tool_erase_rb.isChecked():
+            self.tool_erase_rb.setChecked(True)
 
     def tool_split_clicked(self, a_val=None):
         global EDITOR_MODE
         EDITOR_MODE = EDITOR_MODE_SPLIT
+        if not self.tool_split_rb.isChecked():
+            self.tool_split_rb.setChecked(True)
 
     def open_project(self):
         self.audio_inputs.open_project()
@@ -8790,11 +8798,38 @@ class MainWindow(QScrollArea):
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.widget.setLayout(self.main_layout)
 
+        # Transport shortcuts (added here so they will work
+        # when the transport is hidden)
+
         self.loop_mode_action = QAction(self)
         self.addAction(self.loop_mode_action)
         self.loop_mode_action.setShortcut(
             QKeySequence.fromString("CTRL+L"))
         self.loop_mode_action.triggered.connect(TRANSPORT.toggle_loop_mode)
+
+        self.select_mode_action = QAction(self)
+        self.addAction(self.select_mode_action)
+        self.select_mode_action.setShortcut(QKeySequence.fromString("A"))
+        self.select_mode_action.triggered.connect(
+            TRANSPORT.tool_select_clicked)
+
+        self.draw_mode_action = QAction(self)
+        self.addAction(self.draw_mode_action)
+        self.draw_mode_action.setShortcut(QKeySequence.fromString("S"))
+        self.draw_mode_action.triggered.connect(
+            TRANSPORT.tool_draw_clicked)
+
+        self.erase_mode_action = QAction(self)
+        self.addAction(self.erase_mode_action)
+        self.erase_mode_action.setShortcut(QKeySequence.fromString("D"))
+        self.erase_mode_action.triggered.connect(
+            TRANSPORT.tool_erase_clicked)
+
+        self.split_mode_action = QAction(self)
+        self.addAction(self.split_mode_action)
+        self.split_mode_action.setShortcut(QKeySequence.fromString("F"))
+        self.split_mode_action.triggered.connect(
+            TRANSPORT.tool_split_clicked)
 
         #The tabs
         self.main_tabwidget = QTabWidget()
