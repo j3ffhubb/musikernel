@@ -6472,6 +6472,11 @@ class PianoRollEditor(AbstractItemEditor):
                     if float(j) != self.grid_div * 0.5:
                         f_line.setPen(f_line_pen)
 
+    def default_vposition(self):
+        scrollbar = self.verticalScrollBar()
+        new_val = int(self.piano_height * 0.5)
+        scrollbar.setSliderPosition(new_val)
+
     def resizeEvent(self, a_event):
         QGraphicsView.resizeEvent(self, a_event)
         ITEM_EDITOR.tab_changed()
@@ -9131,6 +9136,7 @@ def global_open_project(a_project_file):
     TRANSPORT.open_project()
     PLUGIN_RACK.initialize(PROJECT)
     MIXER_WIDGET.set_project(PROJECT)
+    PIANO_ROLL_EDITOR.default_vposition()
 
 def global_new_project(a_project_file):
     global PROJECT
@@ -9145,6 +9151,7 @@ def global_new_project(a_project_file):
     REGION_SETTINGS.snap_combobox.setCurrentIndex(1)
     PLUGIN_RACK.initialize(PROJECT)
     MIXER_WIDGET.set_project(PROJECT)
+    PIANO_ROLL_EDITOR.default_vposition()
 
 PROJECT = DawNextProject(global_pydaw_with_audio)
 
