@@ -12,5 +12,4 @@ GNU General Public License for more details.
 """
 
 from libdawnext.project import *
-from libdawnext.gradients import *
 

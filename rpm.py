@@ -212,7 +212,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{{_usr}}/lib/{0}/pydaw/python/dawnext.py
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/libdawnext/gradients.py
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/osc.py
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/project.py
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/strings.py

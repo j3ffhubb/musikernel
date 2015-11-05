@@ -41,6 +41,16 @@ from libmk import mk_project
 from libdawnext import *
 import mkplugins
 
+DEFAULT_TRACK_COLORS = [
+    QBrush(QColor("#cc3333")),
+    QBrush(QColor("#cccc33")),
+    QBrush(QColor("#cc33cc")),
+    QBrush(QColor("#33cc33")),
+    QBrush(QColor("#3333cc")),
+    ]
+
+SELECTED_ITEM_COLOR = QBrush(QColor("#cccccc"))
+
 TAB_SEQUENCER = 0
 TAB_PLUGIN_RACK = 1
 TAB_ITEM_EDITOR = 2
@@ -386,11 +396,6 @@ REGION_EDITOR_HEADER_HEIGHT = REGION_EDITOR_HEADER_ROW_HEIGHT * 3
 REGION_EDITOR_TOTAL_HEIGHT = (REGION_EDITOR_TRACK_COUNT *
     REGION_EDITOR_TRACK_HEIGHT)
 REGION_EDITOR_QUANTIZE_INDEX = 4
-
-SELECTED_ITEM_GRADIENT = QLinearGradient(
-    QtCore.QPointF(0, 0), QtCore.QPointF(0, 12))
-SELECTED_ITEM_GRADIENT.setColorAt(0, QColor(180, 172, 100))
-SELECTED_ITEM_GRADIENT.setColorAt(1, QColor(240, 240, 240))
 
 REGION_EDITOR_MODE = 0
 SEQUENCER_PX_PER_BEAT = 24
@@ -925,7 +930,7 @@ class SequencerItem(QGraphicsRectItem):
 
     def set_brush(self, a_index=None):
         if self.isSelected():
-            self.setBrush(pydaw_selected_gradient)
+            self.setBrush(SELECTED_ITEM_COLOR)
             self.start_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
             self.length_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
             self.stretch_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
@@ -954,11 +959,11 @@ class SequencerItem(QGraphicsRectItem):
             self.length_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             self.stretch_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             if a_index is None:
-                self.setBrush(pydaw_track_gradients[
-                self.audio_item.track_num % len(pydaw_track_gradients)])
+                self.setBrush(DEFAULT_TRACK_COLORS[
+                self.audio_item.track_num % len(DEFAULT_TRACK_COLORS)])
             else:
-                self.setBrush(pydaw_track_gradients[
-                    a_index % len(pydaw_track_gradients)])
+                self.setBrush(DEFAULT_TRACK_COLORS[
+                    a_index % len(DEFAULT_TRACK_COLORS)])
 
     def pos_to_musical_time(self, a_pos):
         return a_pos / SEQUENCER_PX_PER_BEAT
@@ -3573,7 +3578,7 @@ class AudioSeqItem(QGraphicsRectItem):
 
     def set_brush(self, a_index=None):
         if self.isSelected():
-            self.setBrush(pydaw_selected_gradient)
+            self.setBrush(SELECTED_ITEM_COLOR)
             self.start_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
             self.length_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
             self.fade_in_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
@@ -3614,11 +3619,11 @@ class AudioSeqItem(QGraphicsRectItem):
             self.fade_out_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             self.stretch_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             if a_index is None:
-                self.setBrush(pydaw_track_gradients[
-                self.audio_item.lane_num % len(pydaw_track_gradients)])
+                self.setBrush(DEFAULT_TRACK_COLORS[
+                self.audio_item.lane_num % len(DEFAULT_TRACK_COLORS)])
             else:
-                self.setBrush(pydaw_track_gradients[
-                    a_index % len(pydaw_track_gradients)])
+                self.setBrush(DEFAULT_TRACK_COLORS[
+                    a_index % len(DEFAULT_TRACK_COLORS)])
 
     def pos_to_musical_time(self, a_pos):
         return a_pos / AUDIO_PX_PER_BEAT
