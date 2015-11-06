@@ -170,6 +170,8 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/themes/default/stop.svg
 %{{_usr}}/lib/{0}/themes/default/default.pytheme
 %{{_usr}}/lib/{0}/themes/default/v-fader.png
+%{{_usr}}/lib/{0}/themes/default/hide.svg
+%{{_usr}}/lib/{0}/themes/default/power.svg
 %{{_usr}}/share/applications/{0}.desktop
 %{{_usr}}/share/doc/{0}/copyright
 %{{_usr}}/share/pixmaps/{0}.png

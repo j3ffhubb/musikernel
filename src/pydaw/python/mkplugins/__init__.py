@@ -290,7 +290,8 @@ class AbstractPluginSettings:
             self.plugin_combobox.currentIndexChanged.connect(
                 self.on_plugin_change)
 
-        self.power_checkbox = QCheckBox("Power")
+        self.power_checkbox = QCheckBox()
+        self.power_checkbox.setObjectName("button_power")
         self.power_checkbox.setChecked(True)
 
         if self.is_mixer:
@@ -440,7 +441,9 @@ class PluginSettingsMain(AbstractPluginSettings):
             self, a_set_plugin_func, a_index, a_track_num, a_save_callback,
             a_qcbox=False)
 
-        self.hide_checkbox = QCheckBox(_("Hide"))
+        self.hide_checkbox = QCheckBox()
+        self.hide_checkbox.setObjectName("button_hide")
+        self.hide_checkbox.setToolTip(_("Hide"))
         self.layout.addWidget(self.hide_checkbox)
         self.hide_checkbox.setEnabled(False)
         self.hide_checkbox.stateChanged.connect(self.hide_checkbox_changed)

@@ -72,15 +72,20 @@ QSplitter::handle:horizontal
 QRadioButton#tool_select,
 QRadioButton#tool_draw,
 QRadioButton#tool_erase,
-QRadioButton#tool_split
+QRadioButton#tool_split,
+QCheckBox#button_hide,
+QCheckBox#button_power
 {
-    spacing: 1px;
+    spacing: 1px; /* Removes that junk on the right side where the
+                     text would've been */
 }
 
 QRadioButton#tool_select::indicator,
 QRadioButton#tool_draw::indicator,
 QRadioButton#tool_erase::indicator,
-QRadioButton#tool_split::indicator
+QRadioButton#tool_split::indicator,
+QCheckBox#button_hide::indicator,
+QCheckBox#button_power::indicator
 {
     width: 24px;
     height: 24px;
@@ -95,7 +100,9 @@ QRadioButton#stop_button::indicator::checked,
 QRadioButton#tool_select::indicator::checked,
 QRadioButton#tool_draw::indicator::checked,
 QRadioButton#tool_erase::indicator::checked,
-QRadioButton#tool_split::indicator::checked
+QRadioButton#tool_split::indicator::checked,
+QCheckBox#button_hide::indicator::checked,
+QCheckBox#button_power::indicator::checked
 {
     background-color: #dddddd;
 }
@@ -106,9 +113,21 @@ QRadioButton#stop_button::indicator::unchecked,
 QRadioButton#tool_select::indicator::unchecked,
 QRadioButton#tool_draw::indicator::unchecked,
 QRadioButton#tool_erase::indicator::unchecked,
-QRadioButton#tool_split::indicator::unchecked
+QRadioButton#tool_split::indicator::unchecked,
+QCheckBox#button_hide::indicator::unchecked,
+QCheckBox#button_power::indicator::unchecked
 {
     background-color: #666666;
+}
+
+QCheckBox#button_power::indicator
+{
+    image: url($STYLE_FOLDER/power.svg);
+}
+
+QCheckBox#button_hide::indicator
+{
+    image: url($STYLE_FOLDER/hide.svg);
 }
 
 QRadioButton#tool_select::indicator
