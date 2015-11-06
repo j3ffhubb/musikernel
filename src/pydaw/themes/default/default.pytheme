@@ -229,7 +229,7 @@ QRadioButton#rec_button::indicator
 
 QSpinBox, QDoubleSpinBox
 {
-    color: #000000;
+    color: #ffffff;
     border: 1px solid gray;
     font-size: 18px;
 }
