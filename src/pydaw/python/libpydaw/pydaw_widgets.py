@@ -3134,8 +3134,9 @@ class morph_eq(eq6_widget):
         pass
 
 
-ROUTING_GRAPH_NODE_GRADIENT = None
-ROUTING_GRAPH_SELECTED_GRADIENT = None
+ROUTING_GRAPH_NODE_BRUSH = None
+ROUTING_GRAPH_TO_BRUSH = None
+ROUTING_GRAPH_FROM_BRUSH = None
 
 class RoutingGraphNode(QGraphicsRectItem):
     def __init__(self, a_text, a_width, a_height):
@@ -3145,9 +3146,14 @@ class RoutingGraphNode(QGraphicsRectItem):
         self.setPen(QtCore.Qt.black)
         self.set_brush()
 
-    def set_brush(self, a_highlighted=False):
-        self.setBrush(ROUTING_GRAPH_SELECTED_GRADIENT if a_highlighted
-            else ROUTING_GRAPH_NODE_GRADIENT)
+    def set_brush(self, a_to=False, a_from=False):
+        if a_to:
+            brush = ROUTING_GRAPH_TO_BRUSH
+        elif a_from:
+            brush = ROUTING_GRAPH_FROM_BRUSH
+        else:
+            brush = ROUTING_GRAPH_NODE_BRUSH
+        self.setBrush(brush)
 
 
 class RoutingGraphWidget(QGraphicsView):
@@ -3187,14 +3193,14 @@ class RoutingGraphWidget(QGraphicsView):
             self.clear_selection()
             return
         for k, v in self.node_dict.items():
-            v.set_brush(k in (f_x, f_y))
+            v.set_brush(k == f_x, k == f_y)
 
     def backgroundHoverLeaveEvent(self, a_event):
         self.clear_selection()
 
     def clear_selection(self):
         for v in self.node_dict.values():
-            v.set_brush(False)
+            v.set_brush()
 
     def draw_graph(self, a_graph, a_track_names):
         self.graph_height = self.height() - 36.0
@@ -3208,23 +3214,11 @@ class RoutingGraphWidget(QGraphicsView):
 
         f_line_pen = QPen(QColor(105, 105, 105))
 
-        global ROUTING_GRAPH_NODE_GRADIENT, ROUTING_GRAPH_SELECTED_GRADIENT
-        ROUTING_GRAPH_NODE_GRADIENT = QLinearGradient(
-            0.0, 0.0, 0.0, self.node_height)
-        ROUTING_GRAPH_NODE_GRADIENT.setColorAt(0.0, QColor(255, 255, 0))
-        ROUTING_GRAPH_NODE_GRADIENT.setColorAt(0.1, QColor(231, 231, 0))
-        ROUTING_GRAPH_NODE_GRADIENT.setColorAt(0.8, QColor(180, 180, 0))
-        ROUTING_GRAPH_NODE_GRADIENT.setColorAt(1.0, QColor(150, 150, 90))
-        ROUTING_GRAPH_SELECTED_GRADIENT = QLinearGradient(
-            0.0, 0.0, 0.0, self.node_height)
-        ROUTING_GRAPH_SELECTED_GRADIENT.setColorAt(
-            0.0, QColor(255, 160, 160))
-        ROUTING_GRAPH_SELECTED_GRADIENT.setColorAt(
-            0.1, QColor(231, 160, 160))
-        ROUTING_GRAPH_SELECTED_GRADIENT.setColorAt(
-            0.8, QColor(180, 160, 180))
-        ROUTING_GRAPH_SELECTED_GRADIENT.setColorAt(
-            1.0, QColor(150, 140, 150))
+        global ROUTING_GRAPH_NODE_BRUSH, ROUTING_GRAPH_TO_BRUSH, \
+            ROUTING_GRAPH_FROM_BRUSH
+        ROUTING_GRAPH_NODE_BRUSH = QBrush(QColor(231, 231, 0))
+        ROUTING_GRAPH_TO_BRUSH = QBrush(QColor(231, 160, 160))
+        ROUTING_GRAPH_FROM_BRUSH = QBrush(QColor(160, 160, 231))
 
         self.node_dict = {}
         f_wire_gradient = QLinearGradient(
