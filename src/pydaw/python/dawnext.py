@@ -8105,6 +8105,7 @@ def global_open_mixer():
         {f_i:x for f_i, x in zip(
         range(len(TRACK_NAMES)), TRACK_NAMES)})
 
+TRACK_COLOR_CLIPBOARD = None
 
 class SeqTrack:
     """ The widget that contains the controls for an individual track
@@ -8228,12 +8229,35 @@ class SeqTrack:
         self.menu_gridlayout.addWidget(QLabel(_("In Use:")), 10, 20)
         self.menu_gridlayout.addWidget(self.ccs_in_use_combobox, 10, 21)
 
-        self.color_button = QPushButton(_("Color..."))
+        self.menu_gridlayout.addWidget(QLabel(_("Color")), 28, 21)
+        self.color_button = QPushButton(_("Custom..."))
         self.color_button.pressed.connect(self.on_color_change)
-        self.menu_gridlayout.addWidget(self.color_button, 15, 21)
+        self.menu_gridlayout.addWidget(self.color_button, 30, 21)
+
+        self.color_copy_button = QPushButton(_("Copy"))
+        self.color_copy_button.pressed.connect(self.on_color_copy)
+        self.menu_gridlayout.addWidget(self.color_copy_button, 33, 21)
+
+        self.color_paste_button = QPushButton(_("Paste"))
+        self.color_paste_button.pressed.connect(self.on_color_paste)
+        self.menu_gridlayout.addWidget(self.color_paste_button, 36, 21)
 
     def on_color_change(self):
         if TRACK_COLORS.pick_color(self.track_number):
+            PROJECT.save_track_colors(TRACK_COLORS)
+            SEQUENCER.open_region()
+
+    def on_color_copy(self):
+        global TRACK_COLOR_CLIPBOARD
+        TRACK_COLOR_CLIPBOARD = TRACK_COLORS.get_brush(self.track_number)
+
+    def on_color_paste(self):
+        if not TRACK_COLOR_CLIPBOARD:
+            QMessageBox.warning(
+                libmk.MAIN_WINDOW, _("Error"),
+                _("Nothing copied to clipboard"))
+        else:
+            TRACK_COLORS.set_color(self.track_number, TRACK_COLOR_CLIPBOARD)
             PROJECT.save_track_colors(TRACK_COLORS)
             SEQUENCER.open_region()
 

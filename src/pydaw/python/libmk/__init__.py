@@ -266,7 +266,8 @@ class TrackColors:
             @a_track_num: int, the track number
             @a_color:     QColor
         """
-        assert isinstance(a_color, QColor), "Must be a QColor"
+        assert isinstance(a_color, QColor), "Must be a QColor '{}'".format(
+            type(a_color))
 
         self.colors[int(a_track_num)] = a_color.name()
         self.brushes[int(a_track_num)] = a_color
