@@ -328,7 +328,7 @@ class AudioInputWidget:
 class TransportWidget(libmk.AbstractTransport):
     def __init__(self):
         self.suppress_osc = True
-        self.copy_path_to_clipboard = True
+        self.open_rec_dir = True
         self.start_region = 0
         self.last_bar = 0
         self.last_open_dir = global_home
@@ -436,10 +436,10 @@ class TransportWidget(libmk.AbstractTransport):
                         shutil.move(f_path, f_new_path)
                     else:
                         print("Error, path did not exist: {}".format(f_path))
-            self.copy_path_to_clipboard = f_copy_path_checkbox.isChecked()
-            if self.copy_path_to_clipboard:
-                f_clipboard = libmk.APP.clipboard()
-                f_clipboard.setText(libmk.PROJECT.audio_rec_folder)
+            self.open_rec_dir = f_open_rec_dir_checkbox.isChecked()
+            if self.open_rec_dir:
+                WAVE_EDITOR.file_browser.set_folder(
+                    libmk.PROJECT.audio_rec_folder)
             f_window.close()
 
         def on_cancel():
@@ -465,11 +465,11 @@ class TransportWidget(libmk.AbstractTransport):
         f_name_lineedit = QLineEdit()
         f_name_lineedit.setMinimumWidth(330)
         f_hlayout.addWidget(f_name_lineedit)
-        f_copy_path_checkbox = QRadioButton(
-            _("Copy directory to clipboard?"))
-        f_layout.addWidget(f_copy_path_checkbox)
-        if self.copy_path_to_clipboard:
-            f_copy_path_checkbox.setChecked(True)
+        f_open_rec_dir_checkbox = QRadioButton(
+            _("Open recording directory in the file browser when finished?"))
+        f_layout.addWidget(f_open_rec_dir_checkbox)
+        if self.open_rec_dir:
+            f_open_rec_dir_checkbox.setChecked(True)
         f_ok_button = QPushButton(_("OK"))
         f_ok_cancel_layout = QHBoxLayout()
         f_layout.addLayout(f_ok_cancel_layout)
