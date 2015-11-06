@@ -713,6 +713,12 @@ class SequencerItem(QGraphicsRectItem):
                 f_pixmap_item.setZValue(1900.0)
                 self.pixmap_items.append(f_pixmap_item)
 
+        self.label_bg = QGraphicsRectItem(parent=self)
+        self.label_bg.setPen(NO_PEN)
+        self.label_bg.setPos(1.0, 1.0)
+        self.label_bg.setFlag(QGraphicsItem.ItemIgnoresTransformations)
+        self.label_bg.setZValue(2050.00)
+
         self.label = QGraphicsSimpleTextItem(str(a_name), parent=self)
         self.label.setPen(NO_PEN)
         self.label.setBrush(QtCore.Qt.white)
@@ -720,6 +726,8 @@ class SequencerItem(QGraphicsRectItem):
         self.label.setPos(1.0, 1.0)
         self.label.setFlag(QGraphicsItem.ItemIgnoresTransformations)
         self.label.setZValue(2100.00)
+
+        self.label_bg.setRect(self.label.boundingRect())
 
         self.start_handle = QGraphicsRectItem(parent=self)
         self.start_handle.setZValue(2200.0)
@@ -926,6 +934,7 @@ class SequencerItem(QGraphicsRectItem):
     def set_brush(self, a_index=None):
         if self.isSelected():
             self.setBrush(SELECTED_ITEM_COLOR)
+            self.label_bg.setBrush(SELECTED_ITEM_COLOR)
             self.start_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
             self.length_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
             self.stretch_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
@@ -954,6 +963,7 @@ class SequencerItem(QGraphicsRectItem):
             self.length_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             self.stretch_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             brush = TRACK_COLORS.get_brush(self.audio_item.track_num)
+            self.label_bg.setBrush(brush)
             self.setBrush(brush)
 
     def pos_to_musical_time(self, a_pos):

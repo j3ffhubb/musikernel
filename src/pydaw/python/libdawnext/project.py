@@ -1456,6 +1456,7 @@ class pydaw_item:
 
         f_note_brush = QColor.fromRgb(210, 210, 210, 220)
         f_audio_brush = QColor.fromRgb(90, 90, 90, 120)
+        f_note_pen = QPen(f_note_brush)
         f_pen = QPen(f_audio_brush)
         f_pen.setCosmetic(True)
 
@@ -1468,7 +1469,7 @@ class pydaw_item:
             f_painter.setPen(f_pen)
             f_painter.setBrush(f_audio_brush)
             f_painter.drawPath(f_audio_path)
-            f_painter.setPen(f_pen)
+            f_painter.setPen(f_note_pen)
             f_painter.setBrush(f_note_brush)
             f_painter.drawPath(f_notes_path)
             f_painter.end()
