@@ -1755,9 +1755,17 @@ class AbstractFileBrowserWidget():
         self.bookmark_button = QPushButton(_("Bookmark"))
         self.bookmark_button.pressed.connect(self.bookmark_button_pressed)
         self.folder_buttons_hlayout.addWidget(self.bookmark_button)
-        self.paste_button = QPushButton(_("Paste"))
-        self.paste_button.pressed.connect(self.paste_button_pressed)
-        self.folder_buttons_hlayout.addWidget(self.paste_button)
+
+        self.menu_button = QPushButton(_("Menu"))
+        self.menu_button_menu = QMenu()
+        self.menu_button.setMenu(self.menu_button_menu)
+        self.folder_buttons_hlayout.addWidget(self.menu_button)
+
+        self.copy_action = self.menu_button_menu.addAction(_("Copy"))
+        self.copy_action.triggered.connect(self.copy_button_pressed)
+
+        self.paste_action = self.menu_button_menu.addAction(_("Paste"))
+        self.paste_action.triggered.connect(self.paste_button_pressed)
 
         self.bookmarks_tab = QWidget()
         self.bookmarks_tab_vlayout = QVBoxLayout()
@@ -1978,6 +1986,10 @@ class AbstractFileBrowserWidget():
         f_cancel_button.pressed.connect(on_cancel)
         f_hlayout2.addWidget(f_cancel_button)
         f_window.exec_()
+
+    def copy_button_pressed(self):
+        f_clipboard = libmk.APP.clipboard()
+        f_clipboard.setText(self.last_open_dir)
 
     def paste_button_pressed(self):
         f_clipboard = QApplication.clipboard()
