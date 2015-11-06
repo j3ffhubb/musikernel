@@ -7286,7 +7286,6 @@ class AutomationEditorWidget:
         self.vlayout = QVBoxLayout()
         self.widget.setLayout(self.vlayout)
         self.automation_viewer = a_viewer
-        self.vlayout.addWidget(self.automation_viewer)
         self.hlayout = QHBoxLayout()
 
         if a_is_cc:
@@ -7306,6 +7305,8 @@ class AutomationEditorWidget:
             self.hlayout.addWidget(self.ccs_in_use_combobox)
 
         self.vlayout.addLayout(self.hlayout)
+        self.vlayout.addWidget(self.automation_viewer)
+
         self.smooth_button = QPushButton(_("Smooth"))
         self.smooth_button.setToolTip(
             _("By default, the control points are steppy, "
