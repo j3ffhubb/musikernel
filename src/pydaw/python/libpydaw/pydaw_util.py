@@ -1145,10 +1145,10 @@ global_default_stylesheet_file = os.path.join(
     INSTALL_PREFIX, "lib", global_pydaw_version_string,
     "themes", "default", "default.pytheme")
 
-global_user_style_file = os.path.join(global_pydaw_home, "default-style.txt")
 
-if os.path.isfile(global_user_style_file):
-    global_stylesheet_file = pydaw_read_file_text(global_user_style_file)
+global_stylesheet_file = get_file_setting("default-style", str, None)
+if global_stylesheet_file and os.path.isfile(global_stylesheet_file):
+    global_stylesheet_file = pydaw_read_file_text(global_stylesheet_file)
     if os.path.isfile(global_stylesheet_file):
         global_stylesheet = pydaw_read_file_text(global_stylesheet_file)
     else:
