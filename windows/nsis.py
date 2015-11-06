@@ -109,7 +109,7 @@ dest = r"C:\musikernel\home\pydaw"
 if not os.path.isdir(dest):
     os.makedirs(dest)
 
-for arch, bits in (("x86_64", "64"),): # ("i686", "32"),
+for arch, bits in (("x86_64", "64"), ("i686", "32")): 
     src = ("mingw-w64-{arch}-{MAJOR_VERSION}-{MINOR_VERSION}"
         "-1-any.pkg.tar.xz".format(
         arch=arch, MAJOR_VERSION=MAJOR_VERSION, MINOR_VERSION=MINOR_VERSION))
@@ -127,10 +127,13 @@ input("Press 'enter' to continue")
 
 NSIS = r"C:\Program Files (x86)\NSIS\Bin\makensis.exe"
 
+BAT = """\
+start /wait /b /REALTIME /D C:\musikernel\mingw{bits}\bin \
+python3.exe musikernel1.py"""
+
 for bits in ("64", "32"):
-    shutil.copy(
-        os.path.join(CWD, "musikernel1.bat"),
-        r"C:\musikernel\mingw{0}\bin".format(bits))
+    with open(os.path.join(CWD, "musikernel1.bat"), "w") as fh:
+        fh.write(BAT.format(bits=bits))
     template = TEMPLATE.format(
         bits=bits, MINOR_VERSION=MINOR_VERSION, MAJOR_VERSION=MAJOR_VERSION)
     template_name = "{0}-{1}.nsi".format(MAJOR_VERSION, bits)
