@@ -142,7 +142,7 @@ class DawNextProject(libmk.AbstractProject):
             os.path.basename(a_project_file))[0]
         self.items_folder = os.path.join(
             self.project_folder, pydaw_folder_items)
-        self.dawnext_folder = os.path.join(
+        self.host_folder = os.path.join(
             self.project_folder, pydaw_folder_dawnext)
         self.track_pool_folder = os.path.join(
             self.project_folder, pydaw_folder_tracks)

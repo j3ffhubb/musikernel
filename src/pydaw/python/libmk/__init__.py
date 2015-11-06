@@ -12,6 +12,7 @@ GNU General Public License for more details.
 
 """
 
+import ast
 import datetime
 import os
 import traceback
@@ -196,6 +197,19 @@ class AbstractProject:
         else:
             return None
 
+    def get_track_colors(self):
+        path = os.path.join(self.host_folder, "track_colors.txt")
+        if os.path.isfile(path):
+            with open(path) as fh:
+                return TrackColors.from_str(fh.read())
+        else:
+            return TrackColors()
+
+    def save_track_colors(self, a_colors):
+        path = os.path.join(self.host_folder, "track_colors.txt")
+        with open(path, "w") as fh:
+            fh.write(str(a_colors))
+
     def get_plugin_wav_pool_uids(self):
         result = set()
         for plugins in (
@@ -209,6 +223,63 @@ class AbstractProject:
 
 class AbstractTransport:
     pass
+
+DEFAULT_TRACK_COLORS = [
+    QColor("#cc3333"),
+    QColor("#cccc33"),
+    QColor("#cc33cc"),
+    QColor("#33cc33"),
+    QColor("#3333cc"),
+    ]
+
+class TrackColors:
+    def __init__(self):
+        self.colors = {}
+        self.brushes = {}
+
+    def pick_color(self, a_track_num):
+        color = QColorDialog.getColor(QColor(self.get_color(a_track_num)))
+        if color.isValid():
+            self.set_color(a_track_num, color)
+            return True
+        else:
+            return False
+
+    def _check_color(self, a_track_num):
+        a_track_num = int(a_track_num)
+        if a_track_num not in self.colors:
+            index = a_track_num % len(DEFAULT_TRACK_COLORS)
+            self.colors[a_track_num] = DEFAULT_TRACK_COLORS[index].name()
+            self.brushes[a_track_num] = DEFAULT_TRACK_COLORS[index]
+
+    def get_color(self, a_track_num):
+        self._check_color(a_track_num)
+        return self.colors[int(a_track_num)]
+
+    def get_brush(self, a_track_num):
+        self._check_color(a_track_num)
+        return self.brushes[int(a_track_num)]
+
+    def set_color(self, a_track_num, a_color):
+        """ Associate a track number with a color
+
+            @a_track_num: int, the track number
+            @a_color:     QColor
+        """
+        assert isinstance(a_color, QColor), "Must be a QColor"
+
+        self.colors[int(a_track_num)] = a_color.name()
+        self.brushes[int(a_track_num)] = a_color
+
+    def __str__(self):
+        return str(self.colors)
+
+    @staticmethod
+    def from_str(a_str):
+        result = TrackColors()
+        result.colors = ast.literal_eval(a_str)
+        result.brushes = {k:QColor(v) for k, v in result.colors.items()}
+        return result
 
 
 class pydaw_track_plugin:

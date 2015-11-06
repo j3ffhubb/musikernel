@@ -121,6 +121,8 @@ def global_update_hidden_rows(a_val=None):
 #    REGION_EDITOR.setUpdatesEnabled(True)
 #    REGION_EDITOR.update()
 
+TRACK_COLORS = None
+
 
 CURRENT_REGION = None
 CURRENT_REGION_NAME = None
@@ -960,12 +962,8 @@ class SequencerItem(QGraphicsRectItem):
             self.start_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             self.length_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             self.stretch_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
-            if a_index is None:
-                self.setBrush(DEFAULT_TRACK_COLORS[
-                self.audio_item.track_num % len(DEFAULT_TRACK_COLORS)])
-            else:
-                self.setBrush(DEFAULT_TRACK_COLORS[
-                    a_index % len(DEFAULT_TRACK_COLORS)])
+            brush = TRACK_COLORS.get_brush(self.audio_item.track_num)
+            self.setBrush(brush)
 
     def pos_to_musical_time(self, a_pos):
         return a_pos / SEQUENCER_PX_PER_BEAT
@@ -8230,6 +8228,15 @@ class SeqTrack:
         self.menu_gridlayout.addWidget(QLabel(_("In Use:")), 10, 20)
         self.menu_gridlayout.addWidget(self.ccs_in_use_combobox, 10, 21)
 
+        self.color_button = QPushButton(_("Color..."))
+        self.color_button.pressed.connect(self.on_color_change)
+        self.menu_gridlayout.addWidget(self.color_button, 15, 21)
+
+    def on_color_change(self):
+        if TRACK_COLORS.pick_color(self.track_number):
+            PROJECT.save_track_colors(TRACK_COLORS)
+            SEQUENCER.open_region()
+
     def refresh(self):
         self.track_name_lineedit.setText(TRACK_NAMES[self.track_number])
         if self.menu_created:
@@ -9220,10 +9227,11 @@ def global_ui_refresh_callback(a_restore_all=False):
 
 #Opens or creates a new project
 def global_open_project(a_project_file):
-    global PROJECT, TRACK_NAMES
+    global PROJECT, TRACK_NAMES, TRACK_COLORS
     PROJECT = DawNextProject(global_pydaw_with_audio)
     PROJECT.suppress_updates = True
     PROJECT.open_project(a_project_file, False)
+    TRACK_COLORS = PROJECT.get_track_colors()
     TRACK_PANEL.open_tracks()
     PROJECT.suppress_updates = False
     f_scale = PROJECT.get_midi_scale()
@@ -9244,9 +9252,10 @@ def global_open_project(a_project_file):
     PIANO_ROLL_EDITOR.default_vposition()
 
 def global_new_project(a_project_file):
-    global PROJECT
+    global PROJECT, TRACK_COLORS
     PROJECT = DawNextProject(global_pydaw_with_audio)
     PROJECT.new_project(a_project_file)
+    TRACK_COLORS = PROJECT.get_track_colors()
     global_update_track_comboboxes()
     MAIN_WINDOW.last_offline_dir = libmk.PROJECT.user_folder
     MAIN_WINDOW.notes_tab.setText("")
