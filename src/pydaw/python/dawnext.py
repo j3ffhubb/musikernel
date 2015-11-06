@@ -49,7 +49,7 @@ DEFAULT_TRACK_COLORS = [
     QBrush(QColor("#3333cc")),
     ]
 
-SELECTED_ITEM_COLOR = QBrush(QColor("#cccccc"))
+SELECTED_ITEM_COLOR = QBrush(QColor("#eeeeee"))
 
 TAB_SEQUENCER = 0
 TAB_PLUGIN_RACK = 1
