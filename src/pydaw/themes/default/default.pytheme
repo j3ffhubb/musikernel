@@ -38,7 +38,7 @@ QWidget
 QWidget#plugin_ui, QDialog, QScrollArea, QMainWindow, QMenu,
 QSpinBox, QDoubleSpinBox
 {
-    background-color: #afb4ba;
+    background-color: #252b2d;
     border: 1px solid #7a7a7a;
 }
 

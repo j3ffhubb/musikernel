@@ -419,15 +419,8 @@ def region_editor_set_delete_mode(a_enabled):
 
 
 REGION_EDITOR_MIN_NOTE_LENGTH = REGION_EDITOR_GRID_WIDTH / 128.0
-
 REGION_EDITOR_DELETE_MODE = False
-
-REGION_EDITOR_HEADER_GRADIENT = QLinearGradient(
-    0.0, 0.0, 0.0, REGION_EDITOR_HEADER_HEIGHT)
-REGION_EDITOR_HEADER_GRADIENT.setColorAt(0.0, QColor.fromRgb(61, 61, 61))
-REGION_EDITOR_HEADER_GRADIENT.setColorAt(0.5, QColor.fromRgb(50,50, 50))
-REGION_EDITOR_HEADER_GRADIENT.setColorAt(0.6, QColor.fromRgb(43, 43, 43))
-REGION_EDITOR_HEADER_GRADIENT.setColorAt(1.0, QColor.fromRgb(65, 65, 65))
+SEQUENCER_HEADER_BRUSH = QBrush(QColor("#1d1e22"))
 
 
 ALL_PEAK_METERS = {}
@@ -2482,7 +2475,7 @@ class ItemSequencer(QGraphicsView):
         self.header = QGraphicsRectItem(
             0, 0, f_size, REGION_EDITOR_HEADER_HEIGHT)
         self.header.setZValue(1500.0)
-        self.header.setBrush(REGION_EDITOR_HEADER_GRADIENT)
+        self.header.setBrush(SEQUENCER_HEADER_BRUSH)
         self.header.mousePressEvent = self.header_click_event
         self.header.contextMenuEvent = self.headerContextMenuEvent
         self.scene.addItem(self.header)
@@ -4565,13 +4558,6 @@ class AudioSeqItem(QGraphicsRectItem):
             PROJECT.commit(_("Update audio items"))
         global_open_audio_items(f_reset_selection)
 
-AUDIO_ITEMS_HEADER_GRADIENT = QLinearGradient(
-    0.0, 0.0, 0.0, AUDIO_RULER_HEIGHT)
-AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(0.0, QColor.fromRgb(61, 61, 61))
-AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(0.5, QColor.fromRgb(50,50, 50))
-AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(0.6, QColor.fromRgb(43, 43, 43))
-AUDIO_ITEMS_HEADER_GRADIENT.setColorAt(1.0, QColor.fromRgb(65, 65, 65))
-
 
 class AudioItemSeq(AbstractItemEditor):
     """ This is the QGraphicsView and QGraphicsScene for editing audio
@@ -4871,7 +4857,7 @@ class AudioItemSeq(AbstractItemEditor):
             (AUDIO_ITEM_HEIGHT)) + AUDIO_RULER_HEIGHT
         AbstractItemEditor.draw_header(self, f_size, AUDIO_RULER_HEIGHT)
         self.header.setZValue(1500.0)
-        self.header.setBrush(AUDIO_ITEMS_HEADER_GRADIENT)
+        self.header.setBrush(SEQUENCER_HEADER_BRUSH)
         self.scene.addItem(self.header)
         if ITEM_REF_POS:
             f_start, f_end = ITEM_REF_POS
@@ -5643,12 +5629,6 @@ PIANO_NOTE_GRADIENT_TUPLE = \
 PIANO_ROLL_DELETE_MODE = False
 PIANO_ROLL_DELETED_NOTES = []
 
-PIANO_ROLL_HEADER_GRADIENT = QLinearGradient(
-    0.0, 0.0, 0.0, PIANO_ROLL_HEADER_HEIGHT)
-PIANO_ROLL_HEADER_GRADIENT.setColorAt(0.0, QColor.fromRgb(61, 61, 61))
-PIANO_ROLL_HEADER_GRADIENT.setColorAt(0.5, QColor.fromRgb(50,50, 50))
-PIANO_ROLL_HEADER_GRADIENT.setColorAt(0.6, QColor.fromRgb(43, 43, 43))
-PIANO_ROLL_HEADER_GRADIENT.setColorAt(1.0, QColor.fromRgb(65, 65, 65))
 
 def piano_roll_set_delete_mode(a_enabled):
     global PIANO_ROLL_DELETE_MODE, PIANO_ROLL_DELETED_NOTES
@@ -6359,7 +6339,7 @@ class PianoRollEditor(AbstractItemEditor):
         AbstractItemEditor.draw_header(
             self, self.viewer_width, PIANO_ROLL_HEADER_HEIGHT)
         self.header.hoverEnterEvent = self.hover_restore_cursor_event
-        self.header.setBrush(PIANO_ROLL_HEADER_GRADIENT)
+        self.header.setBrush(SEQUENCER_HEADER_BRUSH)
         self.scene.addItem(self.header)
         #self.header.mapToScene(self.piano_width + self.padding, 0.0)
         self.px_per_beat = self.viewer_width / CURRENT_ITEM_LEN
@@ -8230,18 +8210,21 @@ class SeqTrack:
         self.menu_gridlayout.addWidget(QLabel(_("In Use:")), 10, 20)
         self.menu_gridlayout.addWidget(self.ccs_in_use_combobox, 10, 21)
 
+        self.color_hlayout = QHBoxLayout()
         self.menu_gridlayout.addWidget(QLabel(_("Color")), 28, 21)
+        self.menu_gridlayout.addLayout(self.color_hlayout, 29, 21)
+
         self.color_button = QPushButton(_("Custom..."))
         self.color_button.pressed.connect(self.on_color_change)
-        self.menu_gridlayout.addWidget(self.color_button, 30, 21)
+        self.color_hlayout.addWidget(self.color_button)
 
         self.color_copy_button = QPushButton(_("Copy"))
         self.color_copy_button.pressed.connect(self.on_color_copy)
-        self.menu_gridlayout.addWidget(self.color_copy_button, 33, 21)
+        self.color_hlayout.addWidget(self.color_copy_button)
 
         self.color_paste_button = QPushButton(_("Paste"))
         self.color_paste_button.pressed.connect(self.on_color_paste)
-        self.menu_gridlayout.addWidget(self.color_paste_button, 36, 21)
+        self.color_hlayout.addWidget(self.color_paste_button)
 
     def on_color_change(self):
         if TRACK_COLORS.pick_color(self.track_number):
