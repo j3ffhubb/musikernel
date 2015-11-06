@@ -61,7 +61,7 @@ with open(os.path.join(CWD, "..", "src", "major-version.txt")) as fh:
     MAJOR_VERSION = fh.read().strip()
 
 file_name = os.path.join(CWD, "{major_version}.zip".format(
-    major_version=MAJOR_VERSION)
+    major_version=MAJOR_VERSION))
 
 with open(file_name, "rb") as fh:
     MD5_ZIP = hashlib.md5(fh.read()).hexdigest()
