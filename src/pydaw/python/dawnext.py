@@ -51,8 +51,6 @@ DEFAULT_TRACK_COLORS = [
 
 SELECTED_ITEM_COLOR = QBrush(QColor("#cccccc"))
 
-SCENE_BACKGROUND_BRUSH = QBrush(QColor("#424242"))
-
 TAB_SEQUENCER = 0
 TAB_PLUGIN_RACK = 1
 TAB_ITEM_EDITOR = 2
@@ -1455,7 +1453,7 @@ class ItemSequencer(QGraphicsView):
         self.scene.dragEnterEvent = self.sceneDragEnterEvent
         self.scene.dragMoveEvent = self.sceneDragMoveEvent
         self.scene.contextMenuEvent = self.sceneContextMenuEvent
-        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
+        self.scene.setBackgroundBrush(pydaw_widgets.SCENE_BACKGROUND_BRUSH)
         #self.scene.selectionChanged.connect(self.highlight_selected)
         self.scene.mouseMoveEvent = self.sceneMouseMoveEvent
         self.scene.mouseReleaseEvent = self.sceneMouseReleaseEvent
@@ -4574,7 +4572,7 @@ class AudioItemSeq(AbstractItemEditor):
         self.scene.dragEnterEvent = self.sceneDragEnterEvent
         self.scene.dragMoveEvent = self.sceneDragMoveEvent
         self.scene.contextMenuEvent = self.sceneContextMenuEvent
-        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
+        self.scene.setBackgroundBrush(pydaw_widgets.SCENE_BACKGROUND_BRUSH)
         self.scene.selectionChanged.connect(self.scene_selection_changed)
         self.setAcceptDrops(True)
         self.setScene(self.scene)
@@ -6014,7 +6012,7 @@ class PianoRollEditor(AbstractItemEditor):
         AbstractItemEditor.__init__(self, PIANO_KEYS_WIDTH)
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
+        self.scene.setBackgroundBrush(pydaw_widgets.SCENE_BACKGROUND_BRUSH)
         self.scene.mousePressEvent = self.sceneMousePressEvent
         self.scene.mouseReleaseEvent = self.sceneMouseReleaseEvent
         self.setAlignment(QtCore.Qt.AlignLeft)
@@ -6961,7 +6959,7 @@ class AutomationEditor(AbstractItemEditor):
         self.setMinimumHeight(370)
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
+        self.scene.setBackgroundBrush(pydaw_widgets.SCENE_BACKGROUND_BRUSH)
         self.scene.mousePressEvent = self.sceneMousePressEvent
         self.setAlignment(QtCore.Qt.AlignLeft)
         self.setScene(self.scene)

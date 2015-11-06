@@ -30,6 +30,9 @@ from PyQt5.QtWidgets import *
 
 import numpy
 
+# Default background color for QGraphicsScene
+SCENE_BACKGROUND_BRUSH = QBrush(QColor("#424242"))
+
 # This is for plugins to consume, it's not a default value anywhere
 DEFAULT_KNOB_SIZE = 48
 
@@ -942,7 +945,7 @@ class OrderedTable(QGraphicsView):
         self.total_height = self.item_height * len(a_item_labels)
         self.total_width = a_item_width
         self.scene = QGraphicsScene(self)
-        self.scene.setBackgroundBrush(QtCore.Qt.darkGray)
+        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
         self.setScene(self.scene)
         self.setFixedSize(
             self.item_width + 20,
@@ -3152,7 +3155,7 @@ class RoutingGraphWidget(QGraphicsView):
         QGraphicsView.__init__(self)
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
-        self.scene.setBackgroundBrush(QtCore.Qt.darkGray)
+        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.node_dict = {}
         self.setMouseTracking(True)
@@ -4018,7 +4021,7 @@ class pydaw_audio_item_viewer_widget(QGraphicsView):
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
         self.setRenderHint(QPainter.Antialiasing)
-        self.scene.setBackgroundBrush(QtCore.Qt.darkGray)
+        self.scene.setBackgroundBrush(SCENE_BACKGROUND_BRUSH)
         self.scene.mousePressEvent = self.scene_mousePressEvent
         self.scene.mouseMoveEvent = self.scene_mouseMoveEvent
         self.scene.mouseReleaseEvent = self.scene_mouseReleaseEvent
@@ -4238,11 +4241,12 @@ class pydaw_audio_item_viewer_widget(QGraphicsView):
             for f_path in self.path_list:
                 f_pixmap = QPixmap(AUDIO_ITEM_SCENE_WIDTH, f_path_inc)
                 f_painter = QPainter(f_pixmap)
+                f_painter.setRenderHint(QPainter.HighQualityAntialiasing)
                 f_painter.setPen(self.waveform_pen)
                 f_painter.setBrush(self.waveform_brush)
                 f_painter.fillRect(
                     0, 0, AUDIO_ITEM_SCENE_WIDTH, f_path_inc,
-                    QtCore.Qt.darkGray)
+                    SCENE_BACKGROUND_BRUSH)
                 f_painter.drawPath(f_path)
                 f_painter.end()
                 self.pixmaps.append(f_pixmap)
