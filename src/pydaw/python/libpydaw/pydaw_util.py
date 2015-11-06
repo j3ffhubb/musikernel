@@ -171,6 +171,7 @@ class EngineLibThread(QtCore.QThread):
         argv = myargv(
             "/usr/bin/{}-engine".format(
                 global_pydaw_version_string).encode("ascii"),
+            INSTALL_PREFIX.encode("ascii"),
             PROJECT_DIR.encode("ascii"), b"0",
             str(USE_HUGEPAGES).encode("ascii"))
         ENGINE_RETCODE = ENGINE_LIB.main(5, ctypes.byref(argv))
