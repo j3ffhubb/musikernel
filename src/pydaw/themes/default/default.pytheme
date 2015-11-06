@@ -23,7 +23,6 @@ QLabel
 {
     background-color: #545c64;
     padding: 2px;
-    border-radius: 2px;
     border: none;
 }
 
@@ -438,7 +437,6 @@ QGroupBox
 {
     color: white;
     border: 2px solid #666666;
-    border-radius: 2px;
     padding-top: 3ex;
 }
 
@@ -447,7 +445,6 @@ QGroupBox#plugin_groupbox
 {
     background-color : #2a2a2a;
     border: 2px solid 666666;
-    border-radius: 4px;
 }
 
 QWidget#plugin_widget
@@ -504,9 +501,7 @@ QLineEdit, QLineEdit:disabled
     color:white;
     background-color: #303841;
     padding: 1px;
-    border-style: solid;
     border: 1px solid #1e1e1e;
-    border-radius: 2px;
 }
 
 QPushButton
@@ -519,7 +514,6 @@ QPushButton
     border-width: 1px;
     border-color: #1e1e1e;
     border-style: solid;
-    border-radius: 3px;
     padding: 3px;
     font-size: 12px;
     padding-left: 3px;
@@ -550,7 +544,6 @@ QComboBox, QPushButton#plugin_menu
 {
     color: black;
     border: 1px solid #000000;
-    border-radius: 3px;
     background-color: QLinearGradient(
         x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fafafa, stop: 0.1 #ffffff,
         stop: 0.7 #ffffff, stop: 0.9 #fafafa, stop: 1 #666666);
@@ -560,8 +553,7 @@ QComboBox:hover, QLineEdit:hover, QSlider:hover, QSpinBox:hover,
     QDoubleSpinBox:hover, QSlider::handle:horizontal:hover,
     QSlider::handle:vertical:hover, QPushButton#plugin_menu:hover
 {
-    border: 2px solid QLinearGradient(
-         x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ffffff, stop: 1 #dddddd);
+    border: 2px solid #ffffff;
 }
 
 QComboBox:off
@@ -634,13 +626,11 @@ QScrollBar::handle:horizontal
 {
 
     min-height: 20px;
-    border-radius: 2px;
 }
 
 QScrollBar::add-line:horizontal
 {
     border: 1px solid #1b1b19;
-    border-radius: 2px;
     width: 14px;
     subcontrol-position: right;
     subcontrol-origin: margin;
@@ -649,7 +639,6 @@ QScrollBar::add-line:horizontal
 QScrollBar::sub-line:horizontal
 {
     border: 1px solid #1b1b19;
-    border-radius: 2px;
     width: 14px;
     subcontrol-position: left;
     subcontrol-origin: margin;
@@ -681,13 +670,11 @@ QScrollBar:vertical
 QScrollBar::handle:vertical
 {
     min-height: 20px;
-    border-radius: 2px;
 }
 
 QScrollBar::add-line:vertical
 {
     border: 1px solid #1b1b19;
-    border-radius: 2px;
     height: 14px;
     subcontrol-position: bottom;
     subcontrol-origin: margin;
@@ -696,7 +683,6 @@ QScrollBar::add-line:vertical
 QScrollBar::sub-line:vertical
 {
     border: 1px solid #1b1b19;
-    border-radius: 2px;
     height: 14px;
     subcontrol-position: top;
     subcontrol-origin: margin;
@@ -763,7 +749,6 @@ QMenu::separator
 QProgressBar
 {
     border: 2px solid grey;
-    border-radius: 5px;
     text-align: center;
 }
 QProgressBar::chunk
@@ -802,13 +787,11 @@ QTabWidget::pane
 QTabBar::tab:last
 {
     margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
-    border-top-right-radius: 3px;
 }
 
 QTabBar::tab:first:!selected
 {
     margin-left: 0px; /* the last selected tab has nothing to overlap with on the right */
-    border-top-left-radius: 3px;
 }
 
 QTabBar::tab:!selected
@@ -817,8 +800,6 @@ QTabBar::tab:!selected
     border-bottom-style: solid;
     margin-top: 3px;
     background-color: #303841;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
 }
 
 QTabBar::tab:selected
@@ -829,8 +810,6 @@ QTabBar::tab:selected
 QTabBar::tab:selected,QTabBar::tab:!selected:hover
 {
     color: #151515;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
     margin-bottom: 0px;
 }
 
