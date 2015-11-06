@@ -1146,17 +1146,11 @@ STYLESHEET_FILE = get_file_setting("default-style", str, None)
 
 if STYLESHEET_FILE and os.path.isfile(STYLESHEET_FILE):
     print("Using stylesheet " + STYLESHEET_FILE)
-    STYLESHEET_FILE = pydaw_read_file_text(STYLESHEET_FILE)
-    if os.path.isfile(STYLESHEET_FILE):
-        global_stylesheet = pydaw_read_file_text(STYLESHEET_FILE)
-    else:
-        global_stylesheet = pydaw_read_file_text(DEFAULT_STYLESHEET_FILE)
-        STYLESHEET_FILE = DEFAULT_STYLESHEET_FILE
 else:
     print("Using stylesheet " + DEFAULT_STYLESHEET_FILE)
-    global_stylesheet = pydaw_read_file_text(DEFAULT_STYLESHEET_FILE)
     STYLESHEET_FILE = DEFAULT_STYLESHEET_FILE
 
+global_stylesheet = pydaw_read_file_text(DEFAULT_STYLESHEET_FILE)
 global_stylesheet = pydaw_escape_stylesheet(global_stylesheet, STYLESHEET_FILE)
 global_stylesheet_dir = os.path.dirname(STYLESHEET_FILE)
 
