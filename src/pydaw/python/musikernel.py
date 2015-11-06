@@ -837,7 +837,7 @@ class MkMainWindow(QMainWindow):
                 f_style = pydaw_read_file_text(f_file)
                 f_dir = os.path.dirname(f_file)
                 f_style = pydaw_escape_stylesheet(f_style, f_dir)
-                pydaw_write_file_text(USER_STYLE_FILE, f_file)
+                pydaw_util.set_file_setting("default-style", f_file)
                 QMessageBox.warning(
                     MAIN_WINDOW, _("Theme Applied..."),
                     _("Please restart MusiKernel to update the UI"))

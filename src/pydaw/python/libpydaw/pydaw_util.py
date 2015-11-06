@@ -1137,33 +1137,28 @@ class sfz_file:
             f_result += "\n\n{}\n\n".format(f_sample)
         return f_result
 
-#if IS_WINDOWS:
-#    global_default_stylesheet_file = os.path.join(
-#        INSTALL_PREFIX, "themes", "default", "default.pytheme")
-#else:
-global_default_stylesheet_file = os.path.join(
+
+DEFAULT_STYLESHEET_FILE = os.path.join(
     INSTALL_PREFIX, "lib", global_pydaw_version_string,
     "themes", "default", "default.pytheme")
 
-USER_STYLE_FILE = os.path.join(CONFIG_DIR, "default-style.txt")
-global_stylesheet_file = get_file_setting("default-style", str, None)
+STYLESHEET_FILE = get_file_setting("default-style", str, None)
 
-if global_stylesheet_file and os.path.isfile(global_stylesheet_file):
-    global_stylesheet_file = pydaw_read_file_text(global_stylesheet_file)
-    if os.path.isfile(global_stylesheet_file):
-        global_stylesheet = pydaw_read_file_text(global_stylesheet_file)
+if STYLESHEET_FILE and os.path.isfile(STYLESHEET_FILE):
+    print("Using stylesheet " + STYLESHEET_FILE)
+    STYLESHEET_FILE = pydaw_read_file_text(STYLESHEET_FILE)
+    if os.path.isfile(STYLESHEET_FILE):
+        global_stylesheet = pydaw_read_file_text(STYLESHEET_FILE)
     else:
-        global_stylesheet = pydaw_read_file_text(
-            global_default_stylesheet_file)
-        global_stylesheet_file = global_default_stylesheet_file
+        global_stylesheet = pydaw_read_file_text(DEFAULT_STYLESHEET_FILE)
+        STYLESHEET_FILE = DEFAULT_STYLESHEET_FILE
 else:
-    global_stylesheet = pydaw_read_file_text(global_default_stylesheet_file)
-    global_stylesheet_file = global_default_stylesheet_file
+    print("Using stylesheet " + DEFAULT_STYLESHEET_FILE)
+    global_stylesheet = pydaw_read_file_text(DEFAULT_STYLESHEET_FILE)
+    STYLESHEET_FILE = DEFAULT_STYLESHEET_FILE
 
-global_stylesheet = pydaw_escape_stylesheet(
-    global_stylesheet, global_stylesheet_file)
-
-global_stylesheet_dir = os.path.dirname(global_stylesheet_file)
+global_stylesheet = pydaw_escape_stylesheet(global_stylesheet, STYLESHEET_FILE)
+global_stylesheet_dir = os.path.dirname(STYLESHEET_FILE)
 
 
 def pydaw_rgb_minus(a_rgb, a_amt):
