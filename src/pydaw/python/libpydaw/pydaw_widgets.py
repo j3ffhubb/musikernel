@@ -42,9 +42,8 @@ KNOB_BACKGROUND_PEN = QPen(QColor.fromRgb(30, 30, 30, 255), 5.0)
 class QGraphicsRectItemNDL(QGraphicsRectItem):
     """ QGraphicsRectItem without that awful dotted line when selected """
     def paint(self, painter, option, arg4=None):
-        new_option = QStyleOptionGraphicsItem(option)
-        new_option.state &= ~QStyle.State_Selected
-        QGraphicsRectItem.paint(self, painter, new_option)
+        option.state &= ~QStyle.State_Selected
+        QGraphicsRectItem.paint(self, painter, option)
 
 class pydaw_plugin_file:
     """ Abstracts an instrument state file.  Plugins are not required
