@@ -475,6 +475,7 @@ QWidget#plugin_widget
 QWidget#track_panel
 {
     background-color : #545c64;
+    border: 1px solid #333333;
 }
 
 QWidget#transport_panel
