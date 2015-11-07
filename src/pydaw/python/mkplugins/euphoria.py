@@ -800,32 +800,14 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             self.sample_table, QtCore.Qt.AlignCenter)
 
         menubar = QPushButton(_("Menu"))
-        self.menubar_layout = QHBoxLayout()
         self.main_bottom_layout = QVBoxLayout()
         self.main_bottom_hlayout = QHBoxLayout()
+        self.main_bottom_hlayout.addWidget(menubar)
         self.main_bottom_hlayout.addLayout(self.main_bottom_layout)
-        self.main_bottom_layout.addLayout(self.menubar_layout)
         self.main_bottom_layout.addLayout(self.file_selector.layout)
-        self.menubar_layout.addWidget(menubar)
-        self.menubar_layout.addItem(QSpacerItem(
-            1, 1, QSizePolicy.Expanding))
         self.smp_tab_main_verticalLayout.addLayout(self.main_bottom_hlayout)
 
         libmk.APP.processEvents()
-
-        f_logo_label = QLabel()
-        f_pixmap = QPixmap(
-            os.path.join(
-                pydaw_util.INSTALL_PREFIX, "lib",
-                pydaw_util.global_pydaw_version_string,
-                "themes", "default", "euphoria.png")
-            ).scaled(80, 80, transformMode=QtCore.Qt.SmoothTransformation)
-        f_logo_label.setPixmap(f_pixmap)
-        f_logo_label.setAlignment(QtCore.Qt.AlignCenter)
-        f_logo_label.setSizePolicy(
-            QSizePolicy.Minimum, QSizePolicy.Minimum)
-        self.main_bottom_hlayout.addWidget(
-            f_logo_label, alignment=QtCore.Qt.AlignRight)
 
         menuFile = QMenu("Menu", menubar)
         action_open_in_browser = menuFile.addAction(

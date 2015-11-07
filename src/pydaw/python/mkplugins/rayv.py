@@ -114,18 +114,8 @@ class rayv_plugin_ui(pydaw_abstract_plugin_ui):
         self.hlayout0.addWidget(self.preset_manager.group_box)
         self.hlayout0.addItem(
             QSpacerItem(1, 1, QSizePolicy.Expanding))
-        f_logo_label = QLabel()
-        f_pixmap = QPixmap(
-            os.path.join(
-                pydaw_util.INSTALL_PREFIX, "lib",
-                pydaw_util.global_pydaw_version_string,
-                "themes", "default", "rayv.png")
-            ).scaled(120, 60, transformMode=QtCore.Qt.SmoothTransformation)
-        f_logo_label.setMinimumSize(90, 30)
-        f_logo_label.setPixmap(f_pixmap)
         f_knob_size = 55
 
-        self.hlayout0.addWidget(f_logo_label)
         self.hlayout1 = QHBoxLayout()
         self.main_layout.addLayout(self.hlayout1)
         self.osc1 = pydaw_osc_widget(
