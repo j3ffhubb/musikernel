@@ -280,7 +280,8 @@ class AbstractPluginSettings:
         if a_qcbox:
             self.plugin_combobox = QComboBox()
         else:
-            self.plugin_combobox = PluginComboBox(self.on_plugin_change)
+            self.plugin_combobox = PluginComboBox(
+                self.on_plugin_combobox_change)
         self.plugin_combobox.setMinimumWidth(150)
         self.plugin_combobox.wheelEvent = self.wheel_event
 
@@ -288,7 +289,7 @@ class AbstractPluginSettings:
 
         if a_qcbox:
             self.plugin_combobox.currentIndexChanged.connect(
-                self.on_plugin_change)
+                self.on_plugin_combobox_change)
 
         self.power_checkbox = QCheckBox()
         self.power_checkbox.setObjectName("button_power")
@@ -365,6 +366,13 @@ class AbstractPluginSettings:
                 self.plugin_combobox.currentText()),
             self.plugin_uid,
             a_power=1 if self.power_checkbox.isChecked() else 0)
+
+    def on_plugin_combobox_change(self, a_val=None):
+        if self.suppress_osc:
+            return
+        libmk.APP.setOverrideCursor(QtCore.Qt.WaitCursor)
+        self.on_plugin_change(a_val)
+        libmk.APP.restoreOverrideCursor()
 
     def on_plugin_change(self, a_val=None, a_save=True):
         if self.suppress_osc:
