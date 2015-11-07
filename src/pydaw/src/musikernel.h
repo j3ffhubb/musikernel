@@ -100,6 +100,9 @@ int MASTER_OUT_R = 1;
 
 #define MK_HOST_COUNT 2
 
+// 1/128th note resolution
+#define MK_AUTOMATION_RESOLUTION (1.0f / 32.0f)
+
 volatile int exiting = 0;
 float MASTER_VOL __attribute__((aligned(16))) = 1.0f;
 
@@ -156,6 +159,8 @@ typedef struct
     int count;
     int pos;
     t_mk_seq_event * events;
+    // Each tick of the automation clock happens in this many cycles
+    double atm_clock;
     float tempo;
     float playback_inc;
     float samples_per_beat;
@@ -1521,6 +1526,7 @@ void v_mk_set_tempo(t_mk_seq_event_list * self, float a_tempo)
     self->tempo = a_tempo;
     self->playback_inc = (1.0f / f_sample_rate) / (60.0f / a_tempo);
     self->samples_per_beat = (f_sample_rate) / (a_tempo / 60.0f);
+    self->atm_clock = self->samples_per_beat * MK_AUTOMATION_RESOLUTION;
 }
 
 void v_mk_set_playback_pos(t_mk_seq_event_list * self, double a_beat)

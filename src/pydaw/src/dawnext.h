@@ -114,8 +114,16 @@ typedef struct
 
 typedef struct
 {
+    int atm_pos;  //position within the automation region
     t_dn_atm_point * points;
     int point_count;
+    int port;
+}t_dn_atm_port;
+
+typedef struct
+{
+    t_dn_atm_port * ports;
+    int port_count;
     char padding[CACHE_LINE_SIZE - sizeof(int) - sizeof(void*)];
 }t_dn_atm_plugin;
 
@@ -719,7 +727,7 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
         int a_thread_num, int a_sample_count, int a_playback_mode,
         t_dn_thread_storage * a_ts)
 {
-    int f_i;
+    int f_i, f_i2;
     double f_current_beat, f_next_beat;
     t_pytrack * f_track = self->track_pool[a_global_track_num];
     t_dn_track_seq * f_seq =
@@ -840,11 +848,19 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
                 (a_ts->ml_current_beat - f_item_ref[0]->start));
         }
 
+        t_dn_atm_plugin * atm_plugins = self->en_song->regions_atm->plugins;
+        t_dn_atm_plugin * current_atm_plugin;
+
         for(f_i = 0; f_i < MAX_PLUGIN_TOTAL_COUNT; ++f_i)
         {
             if(f_track->plugins[f_i])
             {
-                f_track->plugins[f_i]->atm_pos = 0;
+                current_atm_plugin =
+                    &atm_plugins[f_track->plugins[f_i]->pool_uid];
+                for(f_i2 = 0; f_i2 < current_atm_plugin->port_count; ++f_i2)
+                {
+                    current_atm_plugin->ports[f_i2].atm_pos = 0;
+                }
             }
         }
     }
@@ -927,9 +943,7 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
         }
     }
 
-    f_i = 0;
-
-    while(f_i < MAX_PLUGIN_COUNT)
+    for(f_i = 0; f_i < MAX_PLUGIN_COUNT; ++f_i)
     {
         f_plugin = f_track->plugins[f_i];
         if(f_plugin && f_plugin->power)
@@ -941,7 +955,6 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
                 f_track->event_list,
                 f_plugin->atm_buffer, f_plugin->atm_count);
         }
-        ++f_i;
     }
 
     if(a_global_track_num)
@@ -1026,6 +1039,7 @@ inline void v_dn_process_atm(
     t_dawnext * self, int f_track_num, int f_index, int sample_count,
     int a_playback_mode, t_dn_thread_storage * a_ts)
 {
+    int f_i;
     t_pytrack * f_track = self->track_pool[f_track_num];
     t_pydaw_plugin * f_plugin = f_track->plugins[f_index];
     float f_track_current_period_beats = a_ts->ml_current_beat;
@@ -1041,62 +1055,67 @@ inline void v_dn_process_atm(
         return;
     }
 
-    if(!self->en_song->regions_atm ||
-    !self->en_song->regions_atm->plugins[f_pool_index].point_count)
+    t_dn_atm_plugin * f_current_item =
+        &self->en_song->regions_atm->plugins[f_pool_index];
+    t_dn_atm_port * current_port;
+
+    if(!self->en_song->regions_atm || !f_current_item->port_count)
     {
         return;
     }
 
-    while(1)
+    for(f_i = 0; f_i < f_current_item->port_count; ++f_i)
     {
-        t_dn_atm_plugin * f_current_item =
-            &self->en_song->regions_atm->plugins[f_pool_index];
+        current_port = &f_current_item->ports[f_i];
 
-        if((f_plugin->atm_pos) >= (f_current_item->point_count))
+        while(1)
         {
-            break;
-        }
-
-        t_dn_atm_point * f_point =
-            &f_current_item->points[f_plugin->atm_pos];
-
-        if(f_point->beat < f_track_current_period_beats)
-        {
-            ++f_plugin->atm_pos;
-            continue;
-        }
-
-        if((f_point->beat >= f_track_current_period_beats) &&
-            (f_point->beat < f_track_next_period_beats))
-        {
-            t_pydaw_seq_event * f_buff_ev =
-                &f_plugin->atm_buffer[f_plugin->atm_count];
-
-            int f_note_sample_offset = 0;
-            float f_note_start_diff =
-                ((f_point->beat) - f_track_current_period_beats) +
-                f_track_beats_offset;
-            float f_note_start_frac =
-                f_note_start_diff / a_ts->ml_sample_period_inc_beats;
-            f_note_sample_offset =
-                (int)(f_note_start_frac * (float)sample_count);
-
-            if(f_plugin->uid == f_point->plugin)
+            if((current_port->atm_pos) >= (current_port->point_count))
             {
-                float f_val = f_atm_to_ctrl_val(
-                    f_plugin->descriptor, f_point->port, f_point->val);
-                v_pydaw_ev_clear(f_buff_ev);
-                v_pydaw_ev_set_atm(f_buff_ev, f_point->port, f_val);
-                f_buff_ev->tick = f_note_sample_offset;
-                v_pydaw_set_control_from_atm(
-                    f_buff_ev, f_plugin->pool_uid, f_track);
-                ++f_plugin->atm_count;
+                break;
             }
-            ++f_plugin->atm_pos;
-        }
-        else
-        {
-            break;
+
+            t_dn_atm_point * f_point =
+                &current_port->points[current_port->atm_pos];
+
+            if(f_point->beat < f_track_current_period_beats)
+            {
+                ++current_port->atm_pos;
+                continue;
+            }
+
+            if((f_point->beat >= f_track_current_period_beats) &&
+                (f_point->beat < f_track_next_period_beats))
+            {
+                t_pydaw_seq_event * f_buff_ev =
+                    &f_plugin->atm_buffer[f_plugin->atm_count];
+
+                int f_note_sample_offset = 0;
+                float f_note_start_diff =
+                    ((f_point->beat) - f_track_current_period_beats) +
+                    f_track_beats_offset;
+                float f_note_start_frac =
+                    f_note_start_diff / a_ts->ml_sample_period_inc_beats;
+                f_note_sample_offset =
+                    (int)(f_note_start_frac * (float)sample_count);
+
+                if(f_plugin->uid == f_point->plugin)
+                {
+                    float f_val = f_atm_to_ctrl_val(
+                        f_plugin->descriptor, f_point->port, f_point->val);
+                    v_pydaw_ev_clear(f_buff_ev);
+                    v_pydaw_ev_set_atm(f_buff_ev, f_point->port, f_val);
+                    f_buff_ev->tick = f_note_sample_offset;
+                    v_pydaw_set_control_from_atm(
+                        f_buff_ev, f_plugin->pool_uid, f_track);
+                    ++f_plugin->atm_count;
+                }
+                ++current_port->atm_pos;
+            }
+            else
+            {
+                break;
+            }
         }
     }
 }
@@ -1944,6 +1963,8 @@ void v_dn_open_project(int a_first_load)
 t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
 {
     t_dn_atm_region * f_result = NULL;
+    t_dn_atm_plugin * current_plugin = NULL;
+    t_dn_atm_port * current_port = NULL;
 
     char f_file[1024] = "\0";
     sprintf(f_file, "%s%sautomation.txt", self->project_folder, PATH_SEP);
@@ -1955,14 +1976,18 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
         int f_i2;
         for(f_i2 = 0; f_i2 < MAX_PLUGIN_POOL_COUNT; ++f_i2)
         {
-            f_result->plugins[f_i2].point_count = 0;
-            f_result->plugins[f_i2].points = NULL;
+            f_result->plugins[f_i2].port_count = 0;
+            f_result->plugins[f_i2].ports = NULL;
         }
 
-        t_2d_char_array * f_current_string = g_get_2d_array_from_file(f_file,
-            PYDAW_XLARGE_STRING); //TODO:  1MB big enough???
+        t_2d_char_array * f_current_string = g_get_2d_array_from_file(
+            f_file, PYDAW_XLARGE_STRING); //TODO:  1MB big enough???
 
         int f_pos = 0;
+        /* Port position in the array, since port num does not map
+         * to array index. */
+        int f_port_pos = 0;
+        int f_plugin_uid = -1;
 
         while(1)
         {
@@ -1975,17 +2000,51 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
             if(f_current_string->current_str[0] == 'p')
             {
                 v_iterate_2d_char_array(f_current_string);
-                int f_index = atoi(f_current_string->current_str);
+                f_plugin_uid = atoi(f_current_string->current_str);
 
                 v_iterate_2d_char_array(f_current_string);
-                int f_count = atoi(f_current_string->current_str);
+                int f_port_count = atoi(f_current_string->current_str);
 
-                assert(f_count >= 1 && f_count < 100000);  //sanity check
+                //sanity check
+                assert(f_port_count >= 1 && f_port_count < 100000);
 
-                f_result->plugins[f_index].point_count = f_count;
+                current_plugin = &f_result->plugins[f_plugin_uid];
+                current_plugin->port_count = f_port_count;
+
                 lmalloc(
-                    (void**)&f_result->plugins[f_index].points,
-                    sizeof(t_dn_atm_point) * f_count);
+                    (void**)&current_plugin->ports,
+                    sizeof(t_dn_atm_port) * f_port_count);
+
+                for(f_i2 = 0; f_i2 < f_port_count; ++f_i2)
+                {
+                    current_plugin->ports[f_i2].atm_pos = 0;
+                    current_plugin->ports[f_i2].point_count = 0;
+                    current_plugin->ports[f_i2].points = NULL;
+                    current_plugin->ports[f_i2].port = -1;
+                }
+
+                f_pos = 0;
+                f_port_pos = 0;
+            }
+            else if(f_current_string->current_str[0] == 'q')
+            {
+                v_iterate_2d_char_array(f_current_string);
+                int f_port_num = atoi(f_current_string->current_str);
+
+                v_iterate_2d_char_array(f_current_string);
+                int f_point_count = atoi(f_current_string->current_str);
+
+                //sanity check
+                assert(f_point_count >= 1 && f_point_count < 100000);
+                assert(f_port_pos < current_plugin->port_count);
+                current_port = &current_plugin->ports[f_port_pos];
+
+                current_port->port = f_port_num;
+                current_port->point_count = f_point_count;
+                lmalloc(
+                    (void**)&current_port->points,
+                    sizeof(t_dn_atm_point) * f_point_count);
+                ++f_port_pos;
                 f_pos = 0;
             }
             else
@@ -2004,12 +2063,11 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                 v_iterate_2d_char_array(f_current_string);
                 int f_plugin = atoi(f_current_string->current_str);
 
-                assert(f_pos < f_result->plugins[f_index].point_count);
+                assert(f_port == current_port->port);
+                assert(f_pos < current_port->point_count);
+                assert(current_port->points);
 
-                assert(f_result->plugins[f_index].points);
-
-                t_dn_atm_point * f_point =
-                    &f_result->plugins[f_index].points[f_pos];
+                t_dn_atm_point * f_point = &current_port->points[f_pos];
 
                 f_point->beat = f_beat;
                 f_point->port = f_port;
@@ -2029,14 +2087,28 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
 
 void v_dn_atm_region_free(t_dn_atm_region * self)
 {
-    int f_i2 = 0;
-    while(f_i2 < MAX_PLUGIN_TOTAL_COUNT)
+    int f_i, f_i2;
+    t_dn_atm_plugin * current_plugin = NULL;
+    t_dn_atm_port * current_port = NULL;
+
+    for(f_i = 0; f_i < MAX_PLUGIN_TOTAL_COUNT; ++f_i)
     {
-        if(self->plugins[f_i2].point_count)
+        current_plugin = &self->plugins[f_i];
+
+        if(current_plugin->ports)
         {
-            free(self->plugins[f_i2].points);
+            for(f_i2 = 0; f_i2 < current_plugin->port_count; ++f_i2)
+            {
+                current_port = &self->plugins[f_i].ports[f_i2];
+
+                if(current_port->points)
+                {
+                    free(current_port->points);
+                }
+            }
+
+            free(current_plugin->ports);
         }
-        ++f_i2;
     }
 
     free(self);

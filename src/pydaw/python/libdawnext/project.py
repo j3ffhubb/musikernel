@@ -1318,19 +1318,27 @@ class pydaw_atm_region:
         f_result.append(f_end)
 
     def __str__(self):
+        # New file format:
+        # lines starting with 'p':  p|plugin_uid|port_count
+        # lines starting with 'n':  n|port_num|point_count
+        # other lines:  pydaw_atm_point
         f_result = []
         for f_index in sorted(self.plugins):
-            f_point_list = []
-            for f_port in self.plugins[f_index].values():
-                f_point_list.extend(f_port)
-            f_point_len = len(f_point_list)
-            if f_point_len == 0:
+            port_dict = self.plugins[f_index]
+            if not port_dict:
                 continue
+            port_len = len(port_dict)
             f_result.append(
                 "|".join(str(x) for x in
-                ("p", f_index, f_point_len)))
-            for f_point in sorted(f_point_list):
-                f_result.append(str(f_point))
+                ("p", f_index, port_len)))
+            for port_num in sorted(port_dict):
+                port_list = port_dict[port_num]
+                port_list.sort()
+                f_result.append(
+                    "|".join(str(x) for x in
+                    ("q", port_num, len(port_list))))
+                for f_point in port_list:
+                    f_result.append(str(f_point))
         f_result.append(pydaw_terminating_char)
         return "\n".join(f_result)
 
@@ -1340,7 +1348,7 @@ class pydaw_atm_region:
         for f_line in str(a_str).split("\n"):
             if f_line == pydaw_terminating_char:
                 break
-            if f_line[0] == "p":
+            if f_line[0] in ("p", "q"):
                 continue
             f_point = pydaw_atm_point.from_str(f_line)
             f_result.add_point(f_point)
