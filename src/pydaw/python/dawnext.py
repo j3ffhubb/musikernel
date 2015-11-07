@@ -1825,7 +1825,7 @@ class ItemSequencer(QGraphicsView):
                 self.scene.clearSelection()
                 self.atm_select_pos_x = f_pos.x()
                 self.atm_select_track = self.current_coord[0]
-                if a_event.modifiers() == QtCore.Qt.ShiftModifier:
+                if EDITOR_MODE == EDITOR_MODE_ERASE:
                     self.atm_delete = True
                     return
             elif a_event.button() == QtCore.Qt.RightButton:
