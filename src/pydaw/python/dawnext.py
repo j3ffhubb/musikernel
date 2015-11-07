@@ -8193,10 +8193,11 @@ class SeqTrack:
         self.action_widget.setDefaultWidget(self.menu_widget)
         self.button_menu.addAction(self.action_widget)
 
-        self.plugins_button = QPushButton(_("Plugins"))
+        self.plugins_button = QPushButton(_("Show Plugins"))
         self.menu_gridlayout.addWidget(self.plugins_button, 0, 21)
         self.plugins_button.pressed.connect(self.open_plugins)
 
+        self.menu_gridlayout.addWidget(QLabel(_("Automation")), 3, 21)
         self.automation_combobox = QComboBox()
         self.automation_combobox.setMinimumWidth(240)
         self.menu_gridlayout.addWidget(QLabel(_("Plugin:")), 5, 20)
@@ -8206,7 +8207,7 @@ class SeqTrack:
 
         self.control_combobox = QComboBox()
         self.control_combobox.setMinimumWidth(240)
-        self.menu_gridlayout.addWidget(QLabel(_("Automation:")), 9, 20)
+        self.menu_gridlayout.addWidget(QLabel(_("Control:")), 9, 20)
         self.menu_gridlayout.addWidget(self.control_combobox, 9, 21)
         self.control_combobox.currentIndexChanged.connect(
             self.control_changed)
