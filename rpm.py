@@ -153,13 +153,11 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/themes/default/slice.svg
 %{{_usr}}/lib/{0}/themes/default/split.svg
 %{{_usr}}/lib/{0}/themes/default/drop-down.png
-%{{_usr}}/lib/{0}/themes/default/euphoria.png
 %{{_usr}}/lib/{0}/themes/default/h-fader.png
 %{{_usr}}/lib/{0}/themes/default/mute-off.png
 %{{_usr}}/lib/{0}/themes/default/mute-on.png
 %{{_usr}}/lib/{0}/themes/default/play.svg
 %{{_usr}}/lib/{0}/themes/default/pydaw-knob.png
-%{{_usr}}/lib/{0}/themes/default/rayv.png
 %{{_usr}}/lib/{0}/themes/default/rec.svg
 %{{_usr}}/lib/{0}/themes/default/record-off.png
 %{{_usr}}/lib/{0}/themes/default/record-on.png
