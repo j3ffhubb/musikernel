@@ -509,13 +509,10 @@ class TrackPanel:
         return f_result
 
 
-ATM_POINT_DIAMETER = 6.0
+ATM_POINT_DIAMETER = 10.0
 ATM_POINT_RADIUS = ATM_POINT_DIAMETER * 0.5
 
-ATM_GRADIENT = QLinearGradient(
-    0, 0, ATM_POINT_DIAMETER, ATM_POINT_DIAMETER)
-ATM_GRADIENT.setColorAt(0, QColor(255, 255, 255))
-ATM_GRADIENT.setColorAt(0.5, QColor(210, 210, 210))
+ATM_GRADIENT = QtCore.Qt.white
 
 ATM_REGION = pydaw_atm_region()
 
@@ -526,6 +523,7 @@ class SeqAtmItem(QGraphicsEllipseItem):
     def __init__(self, a_item, a_save_callback, a_min_y, a_max_y):
         QGraphicsEllipseItem.__init__(
             self, 0, 0, ATM_POINT_DIAMETER, ATM_POINT_DIAMETER)
+        self.setPen(NO_PEN)
         self.save_callback = a_save_callback
         self.item = a_item
         self.setFlag(QGraphicsItem.ItemIsMovable)
@@ -2617,7 +2615,7 @@ class ItemSequencer(QGraphicsView):
         f_track_height = REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
         f_track = TRACK_PANEL.plugin_uid_map[a_point.index]
         return QtCore.QPointF(
-            (a_point.beat * SEQUENCER_PX_PER_BEAT),
+            (a_point.beat * SEQUENCER_PX_PER_BEAT) - ATM_POINT_RADIUS,
             (f_track_height * (1.0 - (a_point.cc_val / 127.0))) +
             (REGION_EDITOR_TRACK_HEIGHT * f_track) +
             REGION_EDITOR_HEADER_HEIGHT)
