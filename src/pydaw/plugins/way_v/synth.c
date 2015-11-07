@@ -1060,7 +1060,7 @@ static void v_wayv_process_midi_event(
 static void v_run_wayv(
         PYFX_Handle instance, int sample_count,
         struct ShdsList * midi_events,
-        t_pydaw_seq_event *atm_events, int atm_event_count)
+        struct ShdsList * atm_events)
 {
     t_wayv *plugin_data = (t_wayv*) instance;
 
@@ -1090,12 +1090,13 @@ static void v_run_wayv(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    while(f_i < atm_event_count)
+    t_pydaw_seq_event * ev_tmp;
+    for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
+        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
-            &plugin_data->atm_queue, atm_events[f_i].type,
-            atm_events[f_i].tick, atm_events[f_i].value, atm_events[f_i].port);
-        ++f_i;
+            &plugin_data->atm_queue, ev_tmp->type,
+            ev_tmp->tick, ev_tmp->value, ev_tmp->port);
     }
 
     int i_iterator = 0;

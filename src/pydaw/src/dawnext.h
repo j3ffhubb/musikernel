@@ -669,8 +669,7 @@ void v_dn_sum_track_outputs(t_dawnext * self, t_pytrack * a_track,
 
                 f_plugin->descriptor->run_mixing(
                     f_plugin->PYFX_handle, a_sample_count,
-                    f_buff, 2, a_track->event_list,
-                    f_plugin->atm_buffer, f_plugin->atm_count);
+                    f_buff, 2, a_track->event_list, f_plugin->atm_list);
             }
             else
             {
@@ -952,8 +951,7 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
                 f_i, a_sample_count, a_playback_mode, a_ts);
             f_plugin->descriptor->run_replacing(
                 f_plugin->PYFX_handle, a_sample_count,
-                f_track->event_list,
-                f_plugin->atm_buffer, f_plugin->atm_count);
+                f_track->event_list, f_plugin->atm_list);
         }
     }
 
@@ -1118,6 +1116,14 @@ inline void v_dn_process_atm(
             }
         }
     }
+
+    f_plugin->atm_list->len = f_plugin->atm_count;
+    for(f_i = 0; f_i < f_plugin->atm_count; ++f_i)
+    {
+        f_plugin->atm_list->data[f_i] = &f_plugin->atm_buffer[f_i];
+    }
+
+    shds_list_isort(f_plugin->atm_list, seq_event_cmpfunc);
 }
 
 void v_dn_process_midi(t_dawnext * self, t_dn_item_ref * a_item_ref,

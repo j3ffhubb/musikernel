@@ -51,6 +51,7 @@ typedef struct
     int pool_uid;
     int atm_count;
     t_pydaw_seq_event * atm_buffer;
+    struct ShdsList * atm_list;
     PYFX_Descriptor_Function descfn;
     int mute;
     int solo;
@@ -92,7 +93,12 @@ NO_OPTIMIZATION void g_pydaw_plugin_init(
     f_result->pool_uid = a_plugin_uid;
     f_result->atm_count = 0;
 
-    hpalloc((void**)&f_result->atm_buffer, sizeof(t_pydaw_seq_event) * 512);
+    int buff_max = 512;
+
+    f_result->atm_list = shds_list_new(buff_max, NULL);
+
+    hpalloc(
+        (void**)&f_result->atm_buffer, sizeof(t_pydaw_seq_event) * buff_max);
 
     f_result->descfn = PLUGIN_DESC_FUNCS[a_index];
 

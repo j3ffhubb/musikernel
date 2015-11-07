@@ -121,26 +121,28 @@ static void v_sfader_process_midi_event(
 
 
 static void v_sfader_process_midi(
-    PYFX_Handle instance,
-    t_pydaw_seq_event **events, int event_count,
-    t_pydaw_seq_event *atm_events, int atm_event_count)
+        PYFX_Handle instance, struct ShdsList * events,
+        struct ShdsList * atm_events)
 {
     t_sfader *plugin_data = (t_sfader*)instance;
     register int f_i = 0;
     v_plugin_event_queue_reset(&plugin_data->midi_queue);
 
-    for(f_i = 0; f_i < event_count; ++f_i)
+    for(f_i = 0; f_i < events->len; ++f_i)
     {
-        v_sfader_process_midi_event(plugin_data, events[f_i]);
+        v_sfader_process_midi_event(
+            plugin_data, (t_pydaw_seq_event*)events->data[f_i]);
     }
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    for(f_i = 0; f_i < atm_event_count; ++f_i)
+    t_pydaw_seq_event * ev_tmp;
+    for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
+        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
-            &plugin_data->atm_queue, atm_events[f_i].type,
-            atm_events[f_i].tick, atm_events[f_i].value, atm_events[f_i].port);
+            &plugin_data->atm_queue, ev_tmp->type,
+            ev_tmp->tick, ev_tmp->value, ev_tmp->port);
     }
 }
 
@@ -148,16 +150,11 @@ static void v_sfader_process_midi(
 static void v_sfader_run_mixing(
         PYFX_Handle instance, int sample_count,
         float ** output_buffers, int output_count,
-        struct ShdsList * midi_events,
-        t_pydaw_seq_event *atm_events, int atm_event_count)
+        struct ShdsList * midi_events, struct ShdsList * atm_events)
 {
     t_sfader *plugin_data = (t_sfader*)instance;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
-    int event_count = midi_events->len;
-
-    v_sfader_process_midi(instance, events, event_count,
-        atm_events, atm_event_count);
+    v_sfader_process_midi(instance, midi_events, atm_events);
 
     int midi_event_pos = 0;
     register int f_i = 0;
@@ -207,16 +204,11 @@ static void v_sfader_run_mixing(
 
 static void v_sfader_run(
         PYFX_Handle instance, int sample_count,
-        struct ShdsList * midi_events,
-        t_pydaw_seq_event *atm_events, int atm_event_count)
+        struct ShdsList * midi_events, struct ShdsList * atm_events)
 {
     t_sfader *plugin_data = (t_sfader*)instance;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
-    int event_count = midi_events->len;
-
-    v_sfader_process_midi(instance, events, event_count,
-        atm_events, atm_event_count);
+    v_sfader_process_midi(instance, midi_events, atm_events);
 
     t_plugin_event_queue_item * f_midi_item;
     int midi_event_pos = 0;

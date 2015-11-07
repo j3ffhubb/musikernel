@@ -251,8 +251,7 @@ static void v_triggerfx_process_midi_event(
 
 static void v_triggerfx_run(
         PYFX_Handle instance, int sample_count,
-        struct ShdsList * midi_events,
-        t_pydaw_seq_event *atm_events, int atm_event_count)
+        struct ShdsList * midi_events, struct ShdsList * atm_events)
 {
     t_triggerfx *plugin_data = (t_triggerfx*)instance;
 
@@ -273,11 +272,13 @@ static void v_triggerfx_run(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    for(f_i = 0; f_i < atm_event_count; ++f_i)
+    t_pydaw_seq_event * ev_tmp;
+    for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
+        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
-            &plugin_data->atm_queue, atm_events[f_i].type,
-            atm_events[f_i].tick, atm_events[f_i].value, atm_events[f_i].port);
+            &plugin_data->atm_queue, ev_tmp->type,
+            ev_tmp->tick, ev_tmp->value, ev_tmp->port);
     }
 
     f_i = 0;

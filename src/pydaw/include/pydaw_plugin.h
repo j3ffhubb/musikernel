@@ -140,7 +140,7 @@ typedef struct _PYFX_Descriptor {
     void (*run_replacing)(
         PYFX_Handle Instance, int SampleCount,
         struct ShdsList * midi_events,
-        t_pydaw_seq_event *AtmEvents, int AtmEventCount);
+        struct ShdsList * atm_events);
 
     // Plugins that ARE part of a send channel will always call this,
     // any plugin that isn't a fader/channel type plugin do not need
@@ -149,7 +149,7 @@ typedef struct _PYFX_Descriptor {
         PYFX_Handle Instance, int SampleCount,
         float ** output_buffers, int output_count,
         struct ShdsList * midi_events,
-        t_pydaw_seq_event *AtmEvents, int AtmEventCount);
+        struct ShdsList * atm_events);
 
     /* Do anything like warming up oscillators, etc...  in preparation
      * for offline rendering.  This must be called after loading
