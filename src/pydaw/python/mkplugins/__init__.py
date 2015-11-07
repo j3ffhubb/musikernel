@@ -552,6 +552,9 @@ class PluginRackTab:
     def track_changed(self, a_val=None):
         if not self.enabled:
             return
+        libmk.APP.setOverrideCursor(QtCore.Qt.WaitCursor)
+        self.stacked_widget.setHidden(True)
+        self.widget.update()
         self.widget.setUpdatesEnabled(False)
         f_index = self.track_combobox.currentIndex()
         if f_index not in self.plugin_racks:
@@ -563,8 +566,10 @@ class PluginRackTab:
         if self.last_rack_num is not None and self.last_rack_num != f_index:
             self.close_rack(self.last_rack_num)
         self.last_rack_num = f_index
+        self.stacked_widget.setHidden(False)
         self.widget.setUpdatesEnabled(True)
         self.widget.update()
+        libmk.APP.restoreOverrideCursor()
 
     def set_track_names(self, a_list):
         self.enabled = False
