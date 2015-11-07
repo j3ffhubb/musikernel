@@ -105,11 +105,13 @@ typedef struct
 
 typedef struct
 {
-    double beat; // the beat position within the song 0-N
-    int port;    // the port number for this control in this plugin 0-N
-    float val;   // control value, 0-127
-    int index;   // wth is this for?   it does nothing
-    int plugin;  // plugin uid 0-N
+    double beat;  // the beat position within the song 0-N
+    double recip; // 1.0 / self->beat - next->beat
+    int tick;     // self->beat / MK_AUTOMATION_RESOLUTION
+    int port;     // the port number for this control in this plugin 0-N
+    float val;    // control value, 0-127
+    int index;    // the plugin type, not used by the engine
+    int plugin;   // plugin uid 0-N
 }t_dn_atm_point;
 
 typedef struct
@@ -167,9 +169,9 @@ typedef struct
     float * input_buffer;
     int input_count;
     int * input_index;
-    char padding[(CACHE_LINE_SIZE * 2) - (5 * sizeof(int)) -
-        (3 * sizeof(float)) - (3 * sizeof(double)) - (2 * sizeof(long)) -
-        (sizeof(void*) * 2)];
+    // This also pads the cache line, since most of these
+    // bytes will never be used
+    t_atm_tick atm_ticks[ATM_TICK_BUFFER_SIZE];
 }t_dn_thread_storage;
 
 typedef struct
@@ -1968,9 +1970,12 @@ void v_dn_open_project(int a_first_load)
 
 t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
 {
+    int f_i2;
     t_dn_atm_region * f_result = NULL;
     t_dn_atm_plugin * current_plugin = NULL;
     t_dn_atm_port * current_port = NULL;
+    t_dn_atm_point * f_point = NULL;
+    t_dn_atm_point * last_point = NULL;
 
     char f_file[1024] = "\0";
     sprintf(f_file, "%s%sautomation.txt", self->project_folder, PATH_SEP);
@@ -1979,7 +1984,6 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
     {
         lmalloc((void**)&f_result, sizeof(t_dn_atm_region));
 
-        int f_i2;
         for(f_i2 = 0; f_i2 < MAX_PLUGIN_POOL_COUNT; ++f_i2)
         {
             f_result->plugins[f_i2].port_count = 0;
@@ -2073,13 +2077,27 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                 assert(f_pos < current_port->point_count);
                 assert(current_port->points);
 
-                t_dn_atm_point * f_point = &current_port->points[f_pos];
+                f_point = &current_port->points[f_pos];
 
                 f_point->beat = f_beat;
+                f_point->recip =
+                f_point->tick = (int)(f_beat / MK_AUTOMATION_RESOLUTION);
                 f_point->port = f_port;
                 f_point->val = f_val;
                 f_point->index = f_index;
                 f_point->plugin = f_plugin;
+
+                if(f_pos == current_port->point_count - 1)
+                {
+                    f_point->recip = 0.0f;
+                }
+                else if(f_pos > 0)
+                {
+                    last_point = &current_port->points[f_pos - 1];
+                    last_point->recip =
+                        1.0f / (f_point->beat - last_point->beat);
+
+                }
 
                 ++f_pos;
             }

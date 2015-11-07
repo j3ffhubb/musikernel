@@ -100,8 +100,9 @@ int MASTER_OUT_R = 1;
 
 #define MK_HOST_COUNT 2
 
-// 1/128th note resolution
+// 1/128th note resolution, 0.03125f beats
 #define MK_AUTOMATION_RESOLUTION (1.0f / 32.0f)
+#define ATM_TICK_BUFFER_SIZE 16
 
 volatile int exiting = 0;
 float MASTER_VOL __attribute__((aligned(16))) = 1.0f;
@@ -111,6 +112,15 @@ float **pluginOutputBuffers;
 #ifdef	__cplusplus
 extern "C" {
 #endif
+
+/* An automation clock event */
+typedef struct
+{
+    /* (int)(song_pos_in_beats / MK_AUTOMATION_RESOLUTION) */
+    int tick;
+    /* the sample number in the current buffer that the event happens on */
+    int sample;
+}t_atm_tick;
 
 typedef struct
 {
@@ -122,6 +132,8 @@ typedef struct
     float * buffers[2];
     float * sc_buffers[2];
     float * input_buffer;
+    int atm_tick_count;
+    t_atm_tick atm_ticks[ATM_TICK_BUFFER_SIZE];
 }t_sample_period;
 
 typedef struct
@@ -161,6 +173,7 @@ typedef struct
     t_mk_seq_event * events;
     // Each tick of the automation clock happens in this many cycles
     double atm_clock;
+    double atm_pos;
     float tempo;
     float playback_inc;
     float samples_per_beat;
@@ -418,6 +431,8 @@ void v_default_mix()
 
 void g_sample_period_init(t_sample_period *self)
 {
+    int f_i;
+
     self->buffers[0] = NULL;
     self->buffers[1] = NULL;
     self->sc_buffers[0] = NULL;
@@ -427,6 +442,13 @@ void g_sample_period_init(t_sample_period *self)
     self->sample_count = 0;
     self->end_beat = 0.0;
     self->start_beat = 0.0;
+    self->atm_tick_count = 0;
+
+    for(f_i = 0; f_i < ATM_TICK_BUFFER_SIZE; ++f_i)
+    {
+        self->atm_ticks[f_i].sample = -1;
+        self->atm_ticks[f_i].tick = -1;
+    }
 }
 
 void g_mk_seq_event_list_init(t_mk_seq_event_list * self)
@@ -1472,6 +1494,29 @@ t_pydaw_seq_event * g_pypitchbend_get(float a_start, float a_value)
     return f_result;
 }
 
+void v_sample_period_set_atm_events(t_sample_period * self,
+    t_mk_seq_event_list * a_event_list)
+{
+    double pos;
+    self->atm_tick_count = 0;
+
+    for(;
+        a_event_list->atm_pos < self->end_beat;
+        a_event_list->atm_pos += a_event_list->atm_clock)
+    {
+        assert(self->atm_tick_count < ATM_TICK_BUFFER_SIZE);
+
+        self->atm_ticks[self->atm_tick_count].tick =
+            (int)(a_event_list->atm_pos / MK_AUTOMATION_RESOLUTION);
+
+        pos = (a_event_list->atm_pos - self->start_beat) *
+            a_event_list->samples_per_beat;
+        self->atm_ticks[self->atm_tick_count].sample = (int)(pos);
+
+        ++self->atm_tick_count;
+    }
+}
+
 void v_mk_set_time_params(t_sample_period * self)
 {
     self->start_beat = self->end_beat;
@@ -1534,6 +1579,7 @@ void v_mk_set_playback_pos(t_mk_seq_event_list * self, double a_beat)
     t_mk_seq_event * f_ev;
     self->period.start_beat = a_beat;
     self->period.end_beat = a_beat;
+    self->atm_pos = a_beat;
     int f_found_tempo = 0;
     int f_i;
     self->pos = 0;
@@ -1774,6 +1820,13 @@ void v_mk_seq_event_list_set(t_mk_seq_event_list * self,
         {
             assert(0);
         }
+    }
+
+    // Calculate automation clock ticks
+    for(f_i = 0; f_i < a_result->count; ++f_i)
+    {
+        v_sample_period_set_atm_events(
+            &a_result->sample_periods[f_i].period, self);
     }
 }
 
