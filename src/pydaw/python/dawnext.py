@@ -674,7 +674,7 @@ class AbstractItemEditor(QGraphicsView):
             global_set_playback_pos(f_beat)
 
 
-class SequencerItem(QGraphicsRectItem):
+class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
     """ This is an individual sequencer item within the ItemSequencer
     """
     def __init__(self, a_name, a_audio_item):
@@ -3283,7 +3283,7 @@ def normalize_dialog():
 
 PAINTER_PATH_CACHE = {}
 
-class AudioSeqItem(QGraphicsRectItem):
+class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
     """ This is an individual audio item within the AudioItemSeq """
     def __init__(self, a_track_num, a_audio_item, a_graph):
         QGraphicsRectItem.__init__(self)
@@ -5656,7 +5656,7 @@ def piano_roll_set_delete_mode(a_enabled):
         QApplication.restoreOverrideCursor()
 
 
-class PianoRollNoteItem(QGraphicsRectItem):
+class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
     """ An individual note in the PianoRollEditor """
     def __init__(
             self, a_length, a_note_height, a_note,

@@ -105,11 +105,11 @@ typedef struct
 
 typedef struct
 {
-    double beat;
-    int port;
-    float val;
-    int index;
-    int plugin;
+    double beat; // the beat position within the song 0-N
+    int port;    // the port number for this control in this plugin 0-N
+    float val;   // control value, 0-127
+    int index;   // wth is this for?   it does nothing
+    int plugin;  // plugin uid 0-N
 }t_dn_atm_point;
 
 typedef struct
