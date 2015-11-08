@@ -1083,7 +1083,7 @@ inline void v_dn_process_atm(
 
                 if(!is_last_tick &&
                    f_point->tick < tick->tick &&
-                   f_point->tick >=
+                   tick->tick >=
                        current_port->points[current_port->atm_pos + 1].tick
                   )
                 {
@@ -1100,16 +1100,19 @@ inline void v_dn_process_atm(
                   (tick->tick == f_point->tick))
                 {
                     val = f_point->val;
+                    assert(val >= 0.0f && val <= 127.0f);
                 }
                 else
                 {
                     next_point =
                         &current_port->points[current_port->atm_pos + 1];
                     float interpolate_pos =
-                        (tick->beat - f_point->beat) * f_point->recip;
+                        (tick->beat - f_point->beat)
+                        // / (next_point->beat - f_point->beat);
+                        * f_point->recip;
                     val = f_linear_interpolate(
                         f_point->val, next_point->val, interpolate_pos);
-
+                    assert(val >= 0.0f && val <= 127.0f);
                 }
 
                 if(f_plugin->uid == f_point->plugin)
@@ -2094,7 +2097,6 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                 f_point = &current_port->points[f_pos];
 
                 f_point->beat = f_beat;
-                f_point->recip =
                 f_point->tick = (int)(f_beat / MK_AUTOMATION_RESOLUTION);
                 f_point->port = f_port;
                 f_point->val = f_val;
@@ -2110,7 +2112,6 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                     last_point = &current_port->points[f_pos - 1];
                     last_point->recip =
                         1.0f / (f_point->beat - last_point->beat);
-
                 }
 
                 ++f_pos;
