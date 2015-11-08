@@ -29,14 +29,13 @@ more audio files.
 
 Items:
 
-CTRL+click to add a new item
+Set the edit mode to "Items" from the sequencer menu, then select,
+draw or delete using the mouse tools in the transport.
 
-Select multiple items or automation points using CTRL+click+drag
-(automation points only allow selecting from one track at a time)
+Double click an item to open it in the item editor, or right-click to
+see context menu actions.
 
-Double click an item to open it in the item editor
-
-The term 'unlink' means to create a new copy of the item that does not
+The term 'take' means to create a new copy of the item that does not
 change it's parent item when edited. (by default all items are
 'ghost items' that update all items with the same name)
 
@@ -44,11 +43,9 @@ See the right-click context menu for additional actions and keyboard shortcuts.
 
 Automation:
 
-An automation point moves a control on a plugin.  The automation points are
-steppy, you must smooth the points to get a continuous line by selecting
-points using CTRL+drag and pressing ALT+s.
-
-Shift+click+drag to cut/delete automation points
+An automation point moves a control on a plugin.  Set the edit mode to
+"Automation" from the sequencer menu, then select, draw or delete using
+the mouse tools in the transport.
 
 See the right-click context menu for additional actions and keyboard shortcuts.
 
@@ -56,8 +53,7 @@ See the right-click context menu for additional actions and keyboard shortcuts.
 
 sequencer_item = _(
 """Right click on an item to see the various tools and actions available.
-Click and drag selected to move.
-SHIFT+Click to split items
+Set the mouse tool to "select", and click and drag selected to move.
 CTRL+drag to copy selected items
 
 You can glue together multiple items by selecting items and pressing CTRL+G
@@ -70,5 +66,9 @@ The MIDI controllers and audio inputs used for recording can be
 configured in the dropdown
 
 The 'Loop Mode' combobox can be used to loop a region.
+
+There are 4 mouse editing modes {select,draw,erase,split}, click on one or
+press it's hotkey to use it.  The hotkeys can be seen by hovering the mouse
+over the tool button.
 """)
 
