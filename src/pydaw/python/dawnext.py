@@ -548,14 +548,14 @@ class SeqAtmItem(QGraphicsEllipseItem):
     def mousePressEvent(self, a_event):
         a_event.setAccepted(True)
         QGraphicsEllipseItem.mousePressEvent(self, a_event)
-        self.quantize()
+        self.quantize(a_event.scenePos())
 
     def mouseMoveEvent(self, a_event):
         QGraphicsEllipseItem.mouseMoveEvent(self, a_event)
-        self.quantize()
+        self.quantize(a_event.scenePos())
 
-    def quantize(self):
-        f_pos = self.pos()
+    def quantize(self, a_pos):
+        f_pos = a_pos
         f_x = f_pos.x()
         if SEQ_QUANTIZE:
             f_x = round(f_x / SEQUENCER_QUANTIZE_PX) * SEQUENCER_QUANTIZE_PX
@@ -569,11 +569,17 @@ class SeqAtmItem(QGraphicsEllipseItem):
     def mouseReleaseEvent(self, a_event):
         a_event.setAccepted(True)
         QGraphicsEllipseItem.mouseReleaseEvent(self, a_event)
+        self.quantize(a_event.scenePos())
+        self.set_point_value()
+        self.save_callback()
+
+    def set_point_value(self):
         f_pos = self.pos()
         f_point = self.item
-        f_point.track, f_point.beat, f_point.cc_val = \
-            SEQUENCER.get_item_coord(f_pos, a_clip=True)
-        self.save_callback()
+        (track, beat, cc_val) = SEQUENCER.get_item_coord(f_pos, a_clip=True)
+        beat = pydaw_util.pydaw_clip_min(beat, 0.0)
+        cc_val = pydaw_util.pydaw_clip_value(cc_val, 0.0, 127.0, True)
+        f_point.beat, f_point.cc_val = (beat, cc_val)
 
     def __lt__(self, other):
         return self.pos().x() < other.pos().x()
@@ -1422,7 +1428,7 @@ class ItemSequencer(QGraphicsView):
         self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
         self.setOptimizationFlag(QGraphicsView.DontSavePainterState)
         self.setOptimizationFlag(QGraphicsView.DontAdjustForAntialiasing)
-        #self.setRenderHint(QPainter.HighQualityAntialiasing)
+        self.setRenderHint(QPainter.HighQualityAntialiasing)
 
         # The below code is broken on Qt5.3.<=2, so not using it for
         # now, but this will obviously be quite desirable some day
@@ -1442,6 +1448,8 @@ class ItemSequencer(QGraphicsView):
         self.clipboard = []
         self.automation_points = []
         self.region_clipboard = None
+
+        self.current_atm_point = None
 
         self.atm_select_pos_x = None
         self.atm_select_track = None
@@ -1834,15 +1842,16 @@ class ItemSequencer(QGraphicsView):
                     self.current_coord[0])
                 if f_port is not None:
                     f_track, f_beat, f_val = self.current_coord
+                    f_beat = self.quantize(f_beat)
                     f_point = pydaw_atm_point(
                         f_beat, f_port, f_val,
                         *TRACK_PANEL.get_atm_params(f_track))
                     ATM_REGION.add_point(f_point)
                     point_item = self.draw_point(f_point)
-                    point_item.setPos(
-                        f_pos.x() - ATM_POINT_RADIUS,
-                        f_pos.y() - ATM_POINT_RADIUS)
-                    self.automation_save_callback()
+                    point_item.setSelected(True)
+                    self.current_atm_point = point_item
+                    QGraphicsView.mousePressEvent(self, a_event)
+                    return
         a_event.accept()
         QGraphicsView.mousePressEvent(self, a_event)
 
@@ -1884,6 +1893,10 @@ class ItemSequencer(QGraphicsView):
             if self.atm_delete:
                 self.delete_selected_atm(self.atm_select_track)
             elif EDITOR_MODE == EDITOR_MODE_DRAW:
+                if self.current_atm_point:
+                    self.current_atm_point.set_point_value()
+                    self.current_atm_point = None
+                self.automation_save_callback()
                 self.open_region()
             QGraphicsScene.mouseReleaseEvent(self.scene, a_event)
         else:
