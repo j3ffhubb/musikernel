@@ -36,9 +36,9 @@ inline float f_linear_interpolate_ptr_ifh(float * a_table, int a_whole_number,
  * float a_b, //item 1
  * float a_position)  //position between the 2, range:  0 to 1
  */
-inline float f_linear_interpolate(float a_a, float a_b, float a_position)
+inline float f_linear_interpolate(float a_a, float a_b, float a_pos)
 {
-    return (((a_a - a_b) * a_position) + a_b);
+    return ((1.0f - a_pos) * a_a) + (a_pos * a_b);
 }
 
 
