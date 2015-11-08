@@ -984,12 +984,20 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         f_knob_size = 42
 
         self.polyfx_tab_layout = QVBoxLayout(self.poly_fx_tab)
+        self.polyfx_tabs_control = QTabWidget()
+        self.polyfx_tab_layout.addWidget(self.polyfx_tabs_control)
         self.polyfx_tab_layout.setContentsMargins(0, 0, 0, 0)
         self.polyfx_tab_widget = QWidget()
-        self.polyfx_tab_layout.addWidget(
-            self.polyfx_tab_widget,
-            alignment=QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.polyfx_tabs_control.addTab(self.polyfx_tab_widget, _("FX"))
+        self.polyfx_modulation_tab_widget = QWidget()
+        self.polyfx_tabs_control.addTab(
+            self.polyfx_modulation_tab_widget, _("Modulation"))
         self.main_layout = QVBoxLayout(self.polyfx_tab_widget)
+        self.main_layout.setAlignment(
+            QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.modulation_layout = QVBoxLayout(self.polyfx_modulation_tab_widget)
+        self.modulation_layout.setAlignment(
+            QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
 
         self.hlayout0 = QHBoxLayout()
         self.main_layout.addLayout(self.hlayout0)
@@ -1060,11 +1068,12 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     self.mod_matrix.setCellWidget(f_i_src, f_x, f_ctrl.control)
                     f_port_num += 1
 
-        self.main_layout.addWidget(self.mod_matrix)
+        self.modulation_layout.addWidget(self.mod_matrix)
         self.mod_matrix.resizeColumnsToContents()
 
         self.hlayout2 = QHBoxLayout()
-        self.main_layout.addLayout(self.hlayout2)
+        self.hlayout2.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.modulation_layout.addLayout(self.hlayout2)
 
         self.adsr_amp = pydaw_adsr_widget(
             f_knob_size, True, EUPHORIA_ATTACK,
@@ -1194,16 +1203,13 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.eq6 = eq6_widget(
             0, self.eq6_rel_callback, self.eq6_val_callback, a_vlayout=False)
-        self.eq6_tab = QWidget()
-        self.monofx_sub_tab.addTab(self.eq6_tab, _("EQ"))
-        self.eq6_layout = QVBoxLayout(self.eq6_tab)
-        self.eq6_layout.addWidget(
-            self.eq6.widget,
-            alignment=QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.monofx_sub_tab.addTab(self.eq6.widget, _("EQ"))
+        self.eq6.hlayout.setAlignment(
+            QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
 
         self.open_plugin_file()
         self.set_midi_learn(EUPHORIA_PORT_MAP)
-        self.widget.setMinimumHeight(690)
+        self.widget.setMinimumHeight(600)
         self.widget.setUpdatesEnabled(True)
         self.widget.update()
 
