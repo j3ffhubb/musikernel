@@ -14,7 +14,6 @@ GNU General Public License for more details.
 #ifndef LMALLOC_H
 #define	LMALLOC_H
 
-#include <malloc.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <stdlib.h>

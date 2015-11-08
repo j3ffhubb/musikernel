@@ -20,8 +20,9 @@ clang:
 	OPTIMIZE_FLAGS= CC=clang make
 
 mac_osx:
-	OPTIMIZE_FLAGS= CC=clang PREFIX=/usr/local make deps && make -C pydaw mac_osx
-
+	OPTIMIZE_FLAGS= CC=clang PREFIX=/usr/local make deps
+	OPTIMIZE_FLAGS= CC=clang make -C pydaw_render
+	OPTIMIZE_FLAGS= CC=clang make -C pydaw mac_osx
 native:
 	make PLAT_FLAGS=" -march=native " CFLAGS+=" -O2 "
 
@@ -68,6 +69,9 @@ install:
 	make -C pydaw PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) install
 	install sbsms/cli/sbsms $(MK_DIR)/sbsms/bin
 	make -C pydaw_render DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) install
+
+install_mac_osx:
+	PREFIX=/usr/local DESTDIR= make install_non_linux
 
 install_non_linux:
 	install -d $(MK_DIR)
