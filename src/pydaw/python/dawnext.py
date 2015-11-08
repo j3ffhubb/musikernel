@@ -1838,7 +1838,10 @@ class ItemSequencer(QGraphicsView):
                         f_beat, f_port, f_val,
                         *TRACK_PANEL.get_atm_params(f_track))
                     ATM_REGION.add_point(f_point)
-                    self.draw_point(f_point)
+                    point_item = self.draw_point(f_point)
+                    point_item.setPos(
+                        f_pos.x() - ATM_POINT_RADIUS,
+                        f_pos.y() - ATM_POINT_RADIUS)
                     self.automation_save_callback()
         a_event.accept()
         QGraphicsView.mousePressEvent(self, a_event)
@@ -1996,21 +1999,22 @@ class ItemSequencer(QGraphicsView):
             if f_port is not None:
                 points = ATM_REGION.get_points(f_index, f_port)
                 if points:
-                    for f_point in points:
-                        self.draw_point(f_point)
-                    self.draw_atm_lines(f_track, points)
+                    point_items = [self.draw_point(x) for x in points]
+                    self.draw_atm_lines(f_track, point_items)
 
     def draw_atm_lines(self, a_track_num, a_points):
         path = QPainterPath()
         point = a_points[0]
-        x, y = point.get_point(
-            SEQUENCER_PX_PER_BEAT, REGION_EDITOR_TRACK_HEIGHT)
+        pos = point.scenePos()
+        x = pos.x() + ATM_POINT_RADIUS
+        y = pos.y() + ATM_POINT_RADIUS
         path.moveTo(0.0, y)
         path.lineTo(x, y)
 
         for point in a_points[1:]:
-            x, y = point.get_point(
-            SEQUENCER_PX_PER_BEAT, REGION_EDITOR_TRACK_HEIGHT)
+            pos = point.scenePos()
+            x = pos.x() + ATM_POINT_RADIUS
+            y = pos.y() + ATM_POINT_RADIUS
             path.lineTo(x, y)
 
         path.lineTo(self.sceneRect().right(), y)
@@ -2019,9 +2023,6 @@ class ItemSequencer(QGraphicsView):
         path_item.setPen(QtCore.Qt.white)
         #path_item.setBrush(QtCore.Qt.white)
         self.scene.addItem(path_item)
-        y = (REGION_EDITOR_TRACK_HEIGHT *
-            a_track_num) + REGION_EDITOR_HEADER_HEIGHT
-        path_item.setPos(0.0, y)
 
     def reset_line_lists(self):
         self.text_list = []
@@ -2643,7 +2644,7 @@ class ItemSequencer(QGraphicsView):
         f_track_height = REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
         f_track = TRACK_PANEL.plugin_uid_map[a_point.index]
         return QtCore.QPointF(
-            (a_point.beat * SEQUENCER_PX_PER_BEAT) - ATM_POINT_RADIUS,
+            (a_point.beat * SEQUENCER_PX_PER_BEAT),
             (f_track_height * (1.0 - (a_point.cc_val / 127.0))) +
             (REGION_EDITOR_TRACK_HEIGHT * f_track) +
             REGION_EDITOR_HEADER_HEIGHT)
