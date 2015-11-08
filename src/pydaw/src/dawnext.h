@@ -2679,7 +2679,8 @@ void v_dn_set_playback_cursor(t_dawnext * self, double a_beat)
     self->ts[0].ml_next_beat = a_beat;
     t_dn_region * f_region = self->en_song->regions;
 
-    v_mk_set_playback_pos(&f_region->events, a_beat);
+    v_mk_set_playback_pos(
+        &f_region->events, a_beat, self->ts[0].current_sample);
 
     register int f_i;
 

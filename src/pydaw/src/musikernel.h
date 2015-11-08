@@ -1586,12 +1586,13 @@ void v_mk_set_tempo(t_mk_seq_event_list * self, float a_tempo)
     self->atm_clock_samples = self->samples_per_beat * MK_AUTOMATION_RESOLUTION;
 }
 
-void v_mk_set_playback_pos(t_mk_seq_event_list * self, double a_beat)
+void v_mk_set_playback_pos(
+        t_mk_seq_event_list * self, double a_beat, long a_current_sample)
 {
     t_mk_seq_event * f_ev;
     self->period.start_beat = a_beat;
     self->period.end_beat = a_beat;
-    self->atm_pos = a_beat;
+    self->atm_pos = (double)a_current_sample;
     int f_found_tempo = 0;
     int f_i;
     self->pos = 0;
