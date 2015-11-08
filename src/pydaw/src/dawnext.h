@@ -169,6 +169,7 @@ typedef struct
     float * input_buffer;
     int input_count;
     int * input_index;
+    int atm_tick_count;
     // This also pads the cache line, since most of these
     // bytes will never be used
     t_atm_tick atm_ticks[ATM_TICK_BUFFER_SIZE];
@@ -1039,12 +1040,11 @@ inline void v_dn_process_atm(
     t_dawnext * self, int f_track_num, int f_index, int sample_count,
     int a_playback_mode, t_dn_thread_storage * a_ts)
 {
-    int f_i;
+    int f_i, f_i2;
     t_pytrack * f_track = self->track_pool[f_track_num];
     t_pydaw_plugin * f_plugin = f_track->plugins[f_index];
-    float f_track_current_period_beats = a_ts->ml_current_beat;
-    float f_track_next_period_beats = a_ts->ml_next_beat;
-    float f_track_beats_offset = 0.0f;
+    t_atm_tick * tick;
+
     int f_pool_index = f_plugin->pool_uid;
 
     f_plugin->atm_count = 0;
@@ -1064,56 +1064,66 @@ inline void v_dn_process_atm(
         return;
     }
 
-    for(f_i = 0; f_i < f_current_item->port_count; ++f_i)
+    for(f_i = 0; f_i < a_ts->atm_tick_count; ++f_i)
     {
-        current_port = &f_current_item->ports[f_i];
+        tick = &a_ts->atm_ticks[f_i];
 
-        while(1)
+        for(f_i2 = 0; f_i2 < f_current_item->port_count; ++f_i2)
         {
-            if((current_port->atm_pos) >= (current_port->point_count))
-            {
-                break;
-            }
+            current_port = &f_current_item->ports[f_i2];
 
-            t_dn_atm_point * f_point =
-                &current_port->points[current_port->atm_pos];
-
-            if(f_point->beat < f_track_current_period_beats)
+            while(1)
             {
-                ++current_port->atm_pos;
-                continue;
-            }
+                t_dn_atm_point * f_point =
+                    &current_port->points[current_port->atm_pos];
+                t_dn_atm_point * next_point = NULL;
 
-            if((f_point->beat >= f_track_current_period_beats) &&
-                (f_point->beat < f_track_next_period_beats))
-            {
+                int is_last_tick =
+                    current_port->atm_pos == (current_port->point_count - 1);
+
+                if(!is_last_tick &&
+                   f_point->tick < tick->tick &&
+                   f_point->tick >=
+                       current_port->points[current_port->atm_pos + 1].tick
+                  )
+                {
+                    ++current_port->atm_pos;
+                    continue;
+                }
+
                 t_pydaw_seq_event * f_buff_ev =
                     &f_plugin->atm_buffer[f_plugin->atm_count];
+                float val;
 
-                int f_note_sample_offset = 0;
-                float f_note_start_diff =
-                    ((f_point->beat) - f_track_current_period_beats) +
-                    f_track_beats_offset;
-                float f_note_start_frac =
-                    f_note_start_diff / a_ts->ml_sample_period_inc_beats;
-                f_note_sample_offset =
-                    (int)(f_note_start_frac * (float)sample_count);
+                if(is_last_tick ||
+                  (current_port->atm_pos == 0 && tick->tick < f_point->tick) ||
+                  (tick->tick == f_point->tick))
+                {
+                    val = f_point->val;
+                }
+                else
+                {
+                    next_point =
+                        &current_port->points[current_port->atm_pos + 1];
+                    float interpolate_pos =
+                        (tick->beat - f_point->beat) * f_point->recip;
+                    val = f_linear_interpolate(
+                        f_point->val, next_point->val, interpolate_pos);
+
+                }
 
                 if(f_plugin->uid == f_point->plugin)
                 {
                     float f_val = f_atm_to_ctrl_val(
-                        f_plugin->descriptor, f_point->port, f_point->val);
+                        f_plugin->descriptor, f_point->port, val);
                     v_pydaw_ev_clear(f_buff_ev);
                     v_pydaw_ev_set_atm(f_buff_ev, f_point->port, f_val);
-                    f_buff_ev->tick = f_note_sample_offset;
+                    f_buff_ev->tick = tick->sample;
                     v_pydaw_set_control_from_atm(
                         f_buff_ev, f_plugin->pool_uid, f_track);
                     ++f_plugin->atm_count;
                 }
-                ++current_port->atm_pos;
-            }
-            else
-            {
+
                 break;
             }
         }
@@ -1533,6 +1543,10 @@ inline void v_dn_run_engine(int a_sample_count,
             self->ts[0].ml_current_beat = f_seq_period->period.start_beat;
             self->ts[0].ml_next_beat = f_seq_period->period.end_beat;
         }
+
+        self->ts[0].atm_tick_count = f_seq_period->period.atm_tick_count;
+        memcpy(self->ts[0].atm_ticks, f_seq_period->period.atm_ticks,
+            sizeof(t_atm_tick) * ATM_TICK_BUFFER_SIZE);
 
         for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i)
         {
