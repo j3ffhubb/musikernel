@@ -1625,7 +1625,6 @@ class ItemSequencer(QGraphicsView):
         f_index, f_plugin = TRACK_PANEL.get_atm_params(f_track)
         ATM_REGION.clear_port(f_index, f_track_port_num)
         self.automation_save_callback()
-        self.open_region()
 
     def clear_plugin(self):
         if not self.current_coord:
@@ -1640,7 +1639,6 @@ class ItemSequencer(QGraphicsView):
         f_index, f_plugin = TRACK_PANEL.get_atm_params(f_track)
         ATM_REGION.clear_plugins([f_index])
         self.automation_save_callback()
-        self.open_region()
 
     def clear_track(self):
         if not self.current_coord:
@@ -1651,7 +1649,6 @@ class ItemSequencer(QGraphicsView):
             return
         ATM_REGION.clear_plugins(f_plugins)
         self.automation_save_callback()
-        self.open_region()
 
     def copy_track_region(self):
         if not self.current_coord:
@@ -1667,7 +1664,6 @@ class ItemSequencer(QGraphicsView):
         self.track_atm_clipboard = ATM_REGION.copy_range_by_plugins(
             f_start, f_end, f_plugins)
         self.automation_save_callback()
-        self.open_region()
 
     def paste_track_region(self):
         if not self.current_coord or not self.track_atm_clipboard:
@@ -1677,7 +1673,6 @@ class ItemSequencer(QGraphicsView):
             f_point.beat += f_beat
             ATM_REGION.add_point(f_point)
         self.automation_save_callback()
-        self.open_region()
 
     def clear_track_region(self):
         if not self.current_coord:
@@ -1692,7 +1687,6 @@ class ItemSequencer(QGraphicsView):
             return
         ATM_REGION.clear_range_by_plugins(f_start, f_end, f_plugins)
         self.automation_save_callback()
-        self.open_region()
 
     def takes_menu_triggered(self, a_action):
         f_uid = self.current_item.audio_item.item_uid
@@ -1897,7 +1891,6 @@ class ItemSequencer(QGraphicsView):
                     self.current_atm_point.set_point_value()
                     self.current_atm_point = None
                 self.automation_save_callback()
-                self.open_region()
             QGraphicsScene.mouseReleaseEvent(self.scene, a_event)
         else:
             QGraphicsScene.mouseReleaseEvent(self.scene, a_event)
@@ -1933,7 +1926,6 @@ class ItemSequencer(QGraphicsView):
             self.automation_points.remove(f_point)
             ATM_REGION.remove_point(f_point.item)
         self.automation_save_callback()
-        self.open_region()
 
     def get_selected_items(self):
         return [x for x in self.audio_items if x.isSelected()]
@@ -2077,7 +2069,6 @@ class ItemSequencer(QGraphicsView):
             for f_point in self.get_selected_points():
                 ATM_REGION.remove_point(f_point.item)
             self.automation_save_callback()
-            self.open_region()
 
     def set_tooltips(self, a_on):
         if a_on:
@@ -2664,6 +2655,7 @@ class ItemSequencer(QGraphicsView):
 
     def automation_save_callback(self):
         PROJECT.save_atm_region(ATM_REGION)
+        self.open_region()
 
     def transform_atm_callback(self, a_add, a_mul):
         self.setUpdatesEnabled(False)
@@ -2696,7 +2688,8 @@ class ItemSequencer(QGraphicsView):
             self.atm_selected, self.atm_selected_vals):
                 f_point.item.cc_val = f_val
             self.automation_save_callback()
-        self.open_region()
+        else:
+            self.open_region()
 
     def lfo_atm_callback(
             self, a_phase, a_start_freq, a_start_amp, a_start_center,
@@ -2770,7 +2763,6 @@ class ItemSequencer(QGraphicsView):
             f_index, f_port, f_start_beat, f_end_beat)
         if f_old:
             self.automation_save_callback()
-            self.open_region()
         f_pos = f_start_beat
         self.scene.clearSelection()
         self.atm_selected = []
@@ -2793,7 +2785,8 @@ class ItemSequencer(QGraphicsView):
                 for f_point in f_old:
                     ATM_REGION.add_point(f_point)
             self.automation_save_callback()
-        self.open_region()
+        else:
+            self.open_region()
 
     def smooth_atm_points(self):
         if not self.current_coord:
@@ -2810,7 +2803,6 @@ class ItemSequencer(QGraphicsView):
             f_index, f_port, f_plugin, f_points, f_is_linear)
         self.selected_point_strings = set(str(x) for x in f_points)
         self.automation_save_callback()
-        self.open_region()
 
     def transpose_dialog(self):
         if REGION_EDITOR_MODE != 0:
@@ -3158,7 +3150,6 @@ class ItemSequencer(QGraphicsView):
                         f_point.beat + f_beat, f_track_port_num,
                         f_point.cc_val, *f_track_params))
             self.automation_save_callback()
-            self.open_region()
 
     def paste_atm_point(self):
         if libmk.IS_PLAYING:
