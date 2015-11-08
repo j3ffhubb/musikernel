@@ -57,6 +57,10 @@ lib:
 	mv $(PYDAW_VERSION)-engine.exe $(PYDAW_VERSION).dll || \
 	mv $(PYDAW_VERSION)-engine $(PYDAW_VERSION).so
 
+mac_osx:
+	OPTIMIZE_FLAGS= CC=clang PREFIX=/usr/local make lib
+	mv $(PYDAW_VERSION).so $(PYDAW_VERSION).dylib
+
 # --------------------------------------------------------------
 
 $(PYDAW_VERSION)-engine: $(C_OBJS)
@@ -68,7 +72,7 @@ $(PYDAW_VERSION)-engine: $(C_OBJS)
 	$(CC) -c $< $(BUILD_CFLAGS) -o $@
 
 # --------------------------------------------------------------
-install_mingw:
+install_non_linux:
 	rm -rf python/*.pyc python/libpydaw/*.pyc python/*~ \
 	python/libpydaw/*~ python/core python/*/__pycache__ \
 	python/mkplugins/__pycache__
@@ -81,6 +85,8 @@ install_mingw:
 	install -m 555 $(PYDAW_VERSION).dll \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw/mkengine || \
 	install -m 555 $(PYDAW_VERSION).so \
+		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw/mkengine || \
+	install -m 555 $(PYDAW_VERSION).dylib \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw/mkengine
 	cp -r themes $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	cp -r presets $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)

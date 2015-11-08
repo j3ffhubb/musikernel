@@ -47,7 +47,7 @@ build() {{
 package() {{
   #export PATH="${{MINGW_PREFIX}}:$PATH"
   cd "${{srcdir}}/musikernel-{major_version}/src"
-  make PREFIX=${{MINGW_PREFIX}} DESTDIR="$pkgdir" install_mingw
+  make PREFIX=${{MINGW_PREFIX}} DESTDIR="$pkgdir" install_non_linux
 }}
 
 """

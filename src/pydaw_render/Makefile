@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 PREFIX ?= /usr
-DESTDIR ?= 
+DESTDIR ?=
 CC  ?= gcc
 PYDAW_VERSION = $(shell cat ../major-version.txt)
 PYDAW_FILE = $(PYDAW_VERSION)_render

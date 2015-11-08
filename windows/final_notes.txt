@@ -49,7 +49,7 @@ export PATH="/mingw64/bin:$PATH"
 cd [musikernel git]/src
 CC=/mingw64/bin/gcc /mingw64/bin/mingw32-make
 make mingw
-make PREFIX= DESTDIR=/mingw64 install_mingw
+make PREFIX= DESTDIR=/mingw64 install_non_linux
 
 
 ############# PACKAGING ##########################
