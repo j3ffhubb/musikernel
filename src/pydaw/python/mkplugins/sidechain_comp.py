@@ -46,6 +46,7 @@ class scc_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.widget.setObjectName("plugin_groupbox")
         self.reverb_groupbox_gridlayout = QGridLayout()
+        self.delay_hlayout.addLayout(self.reverb_groupbox_gridlayout)
 
         self.thresh_knob = pydaw_knob_control(
             f_knob_size, _("Thresh"), SCC_THRESHOLD,
