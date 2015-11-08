@@ -1427,8 +1427,8 @@ class ItemSequencer(QGraphicsView):
         self.setCacheMode(QGraphicsView.CacheBackground)
         self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
         self.setOptimizationFlag(QGraphicsView.DontSavePainterState)
-        self.setOptimizationFlag(QGraphicsView.DontAdjustForAntialiasing)
-        self.setRenderHint(QPainter.HighQualityAntialiasing)
+        #self.setOptimizationFlag(QGraphicsView.DontAdjustForAntialiasing)
+        self.setRenderHint(QPainter.Antialiasing)
 
         # The below code is broken on Qt5.3.<=2, so not using it for
         # now, but this will obviously be quite desirable some day
