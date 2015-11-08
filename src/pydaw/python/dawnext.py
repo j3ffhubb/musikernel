@@ -9233,6 +9233,7 @@ def global_set_playback_pos(a_beat):
     for f_editor in (
     SEQUENCER, AUDIO_SEQ, PIANO_ROLL_EDITOR, PB_EDITOR, CC_EDITOR):
         f_editor.set_playback_pos(PLAYBACK_POS)
+    TRANSPORT.set_time(PLAYBACK_POS)
 
 def global_update_peak_meters(a_val):
     for f_val in a_val.split("|"):
