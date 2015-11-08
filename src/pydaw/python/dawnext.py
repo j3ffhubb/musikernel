@@ -633,9 +633,10 @@ class AbstractItemEditor(QGraphicsView):
     def set_playback_pos(self, a_ignored=None):
         if not all((CURRENT_ITEM_REF, self.playback_cursor)):
             return
-        start = CURRENT_ITEM_REF.start_beat
+        start = CURRENT_ITEM_REF.start_beat - CURRENT_ITEM_REF.start_offset
+        length = CURRENT_ITEM_REF.length_beats + CURRENT_ITEM_REF.start_offset
         self.playback_pos = pydaw_util.pydaw_clip_value(
-            PLAYBACK_POS - start, 0.0, CURRENT_ITEM_REF.length_beats)
+            PLAYBACK_POS - start, 0.0, length)
         f_pos = (self.playback_pos * self.px_per_beat) + self.cursor_offset
         self.playback_cursor.setPos(f_pos, 0.0)
 
@@ -667,7 +668,8 @@ class AbstractItemEditor(QGraphicsView):
         if not libmk.IS_PLAYING and \
         a_event.button() != QtCore.Qt.RightButton:
             f_beat = int((a_event.scenePos().x() - self.cursor_offset)
-                / self.px_per_beat) + CURRENT_ITEM_REF.start_beat
+                / self.px_per_beat) + CURRENT_ITEM_REF.start_beat - \
+                CURRENT_ITEM_REF.start_offset
             global_set_playback_pos(f_beat)
 
 
