@@ -615,6 +615,7 @@ class ItemEditorHeader(QGraphicsRectItem):
     """
     def __init__(self, *args, **kwargs):
         QGraphicsRectItem.__init__(self, *args, **kwargs)
+        self.setBrush(SEQUENCER_HEADER_BRUSH)
 
 
 class AbstractItemEditor(QGraphicsView):
@@ -4868,7 +4869,6 @@ class AudioItemSeq(AbstractItemEditor):
             (AUDIO_ITEM_HEIGHT)) + AUDIO_RULER_HEIGHT
         AbstractItemEditor.draw_header(self, f_size, AUDIO_RULER_HEIGHT)
         self.header.setZValue(1500.0)
-        self.header.setBrush(SEQUENCER_HEADER_BRUSH)
         self.scene.addItem(self.header)
         if ITEM_REF_POS:
             f_start, f_end = ITEM_REF_POS
@@ -6350,7 +6350,6 @@ class PianoRollEditor(AbstractItemEditor):
         AbstractItemEditor.draw_header(
             self, self.viewer_width, PIANO_ROLL_HEADER_HEIGHT)
         self.header.hoverEnterEvent = self.hover_restore_cursor_event
-        self.header.setBrush(SEQUENCER_HEADER_BRUSH)
         self.scene.addItem(self.header)
         #self.header.mapToScene(self.piano_width + self.padding, 0.0)
         self.px_per_beat = self.viewer_width / CURRENT_ITEM_LEN
