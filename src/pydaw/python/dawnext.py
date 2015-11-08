@@ -140,10 +140,6 @@ class RegionSettings:
         self.edit_mode_combobox.currentIndexChanged.connect(
             self.edit_mode_changed)
 
-        self.atm_smoothing_combobox = QComboBox()
-        self.atm_smoothing_combobox.setMinimumWidth(132)
-        self.atm_smoothing_combobox.addItems([_("Linear"), _("Curved")])
-
         self.menu_button = QPushButton(_("Menu"))
         self.hlayout0.addWidget(self.menu_button)
         self.menu = QMenu(self.menu_button)
@@ -158,9 +154,6 @@ class RegionSettings:
 
         self.menu_layout.addWidget(QLabel(_("Edit Mode:")), 0, 0)
         self.menu_layout.addWidget(self.edit_mode_combobox, 0, 1)
-
-        self.menu_layout.addWidget(QLabel(_("Automation Smoothing:")), 1, 0)
-        self.menu_layout.addWidget(self.atm_smoothing_combobox, 1, 1)
 
         self.reorder_tracks_action = self.menu.addAction(
             _("Reorder Tracks..."))
@@ -1514,13 +1507,6 @@ class ItemSequencer(QGraphicsView):
             _("Paste Plugin Control"))
         self.paste_ctrl_action.triggered.connect(self.paste_atm_point)
 
-        self.smooth_atm_action = self.atm_menu.addAction(
-            _("Smooth Selected Points"))
-        self.smooth_atm_action.triggered.connect(self.smooth_atm_points)
-        self.smooth_atm_action.setShortcut(
-            QKeySequence.fromString("ALT+S"))
-        self.addAction(self.smooth_atm_action)
-
         self.track_atm_menu = self.atm_menu.addMenu(
             _("All Plugins for Track"))
         self.track_atm_clipboard = []
@@ -2787,22 +2773,6 @@ class ItemSequencer(QGraphicsView):
             self.automation_save_callback()
         else:
             self.open_region()
-
-    def smooth_atm_points(self):
-        if not self.current_coord:
-            return
-        f_track, f_beat, f_val = self.current_coord
-        f_index, f_plugin = TRACK_PANEL.get_atm_params(f_track)
-        if f_index is None:
-            return
-        f_port, f_index = TRACK_PANEL.has_automation(f_track)
-        f_points = [x.item for x in self.get_selected_points()]
-        f_is_linear = \
-            not REGION_SETTINGS.atm_smoothing_combobox.currentIndex()
-        ATM_REGION.smooth_points(
-            f_index, f_port, f_plugin, f_points, f_is_linear)
-        self.selected_point_strings = set(str(x) for x in f_points)
-        self.automation_save_callback()
 
     def transpose_dialog(self):
         if REGION_EDITOR_MODE != 0:
