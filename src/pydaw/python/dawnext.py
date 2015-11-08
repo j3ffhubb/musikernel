@@ -231,9 +231,10 @@ class RegionSettings:
             self.hzoom_slider, self.vzoom_slider, self.menu_button)
 
     def toggle_edit_mode(self):
-        # This relies on the assumption that only 2 modes exist
-        current_mode = self.edit_mode_combobox.currentIndex()
-        self.edit_mode_combobox.setCurrentIndex(int(not current_mode))
+        if not libmk.IS_PLAYING:
+            # This relies on the assumption that only 2 modes exist
+            current_mode = self.edit_mode_combobox.currentIndex()
+            self.edit_mode_combobox.setCurrentIndex(int(not current_mode))
 
     def scrollbar_pressed(self, a_val=None):
         if libmk.IS_PLAYING and self.follow_checkbox.isChecked():
