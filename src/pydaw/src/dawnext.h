@@ -851,17 +851,21 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
         }
 
         t_dn_atm_plugin * atm_plugins = self->en_song->regions_atm->plugins;
-        t_dn_atm_plugin * current_atm_plugin;
 
-        for(f_i = 0; f_i < MAX_PLUGIN_TOTAL_COUNT; ++f_i)
+        if(atm_plugins)
         {
-            if(f_track->plugins[f_i])
+            t_dn_atm_plugin * current_atm_plugin;
+
+            for(f_i = 0; f_i < MAX_PLUGIN_TOTAL_COUNT; ++f_i)
             {
-                current_atm_plugin =
-                    &atm_plugins[f_track->plugins[f_i]->pool_uid];
-                for(f_i2 = 0; f_i2 < current_atm_plugin->port_count; ++f_i2)
+                if(f_track->plugins[f_i])
                 {
-                    current_atm_plugin->ports[f_i2].atm_pos = 0;
+                    current_atm_plugin =
+                        &atm_plugins[f_track->plugins[f_i]->pool_uid];
+                    for(f_i2 = 0; f_i2 < current_atm_plugin->port_count; ++f_i2)
+                    {
+                        current_atm_plugin->ports[f_i2].atm_pos = 0;
+                    }
                 }
             }
         }
