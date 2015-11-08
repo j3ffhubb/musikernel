@@ -1419,7 +1419,7 @@ class ItemSequencer(QGraphicsView):
 
         self.setCacheMode(QGraphicsView.CacheBackground)
         self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
-        self.setOptimizationFlag(QGraphicsView.DontSavePainterState)
+        #self.setOptimizationFlag(QGraphicsView.DontSavePainterState)
         #self.setOptimizationFlag(QGraphicsView.DontAdjustForAntialiasing)
         self.setRenderHint(QPainter.Antialiasing)
 
