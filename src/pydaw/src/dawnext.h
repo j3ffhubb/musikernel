@@ -1053,6 +1053,11 @@ inline void v_dn_process_atm(
 
     f_plugin->atm_count = 0;
 
+    if(a_ts->playback_mode == PYDAW_PLAYBACK_MODE_OFF)
+    {
+        return;
+    }
+
     if((!self->overdub_mode) && (a_playback_mode == 2) &&
         (f_track->extern_midi))
     {
