@@ -23,12 +23,10 @@ XFADE_PORT_MAP = {
     "X-Fade": XFADE_SLIDER,
 }
 
-XFADE_TOOLTIP = _("""To use the crossfader, connect one or more tracks
-to the regular input of this track, and one or more tracks to the
-sidechain input of this track.
-
-When the fader is in the far left position, the regular tracks will pass
-through, at the far right, the sidechain tracks will pass through.
+XFADE_TOOLTIP = _("""\
+Connect one or more tracks to the regular input of this track, and one or
+more tracks to the sidechain input of this track, then use the fader to
+crossfade between them.
 """)
 
 class xfade_plugin_ui(pydaw_abstract_plugin_ui):
