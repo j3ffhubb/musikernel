@@ -1992,8 +1992,34 @@ class ItemSequencer(QGraphicsView):
         for f_track in TRACK_PANEL.tracks:
             f_port, f_index = TRACK_PANEL.has_automation(f_track)
             if f_port is not None:
-                for f_point in ATM_REGION.get_points(f_index, f_port):
-                    self.draw_point(f_point)
+                points = ATM_REGION.get_points(f_index, f_port)
+                if points:
+                    for f_point in points:
+                        self.draw_point(f_point)
+                    self.draw_atm_lines(f_track, points)
+
+    def draw_atm_lines(self, a_track_num, a_points):
+        path = QPainterPath()
+        point = a_points[0]
+        x, y = point.get_point(
+            SEQUENCER_PX_PER_BEAT, REGION_EDITOR_TRACK_HEIGHT)
+        path.moveTo(0.0, y)
+        path.lineTo(x, y)
+
+        for point in a_points[1:]:
+            x, y = point.get_point(
+            SEQUENCER_PX_PER_BEAT, REGION_EDITOR_TRACK_HEIGHT)
+            path.lineTo(x, y)
+
+        path.lineTo(self.sceneRect().right(), y)
+
+        path_item = QGraphicsPathItem(path)
+        path_item.setPen(QtCore.Qt.white)
+        #path_item.setBrush(QtCore.Qt.white)
+        self.scene.addItem(path_item)
+        y = (REGION_EDITOR_TRACK_HEIGHT *
+            a_track_num) + REGION_EDITOR_HEADER_HEIGHT
+        path_item.setPos(0.0, y)
 
     def reset_line_lists(self):
         self.text_list = []

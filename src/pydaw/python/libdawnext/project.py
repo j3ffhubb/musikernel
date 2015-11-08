@@ -1363,6 +1363,11 @@ class pydaw_atm_point:
         self.index = int(a_index) # Now means plugin pool UID
         self.plugin_index = int(a_plugin_index) # UID of the plugin
 
+    def get_point(self, a_px_per_beat, a_track_height_px):
+        x = self.beat * a_px_per_beat
+        y = a_track_height_px - ((self.cc_val / 127.0) * a_track_height_px)
+        return (x, y)
+
     def set_val(self, a_val):
         self.cc_val = pydaw_clip_value(float(a_val), 0.0, 127.0, True)
 
