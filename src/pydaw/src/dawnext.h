@@ -2107,7 +2107,8 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                 {
                     f_point->recip = 0.0f;
                 }
-                else if(f_pos > 0)
+
+                if(f_pos > 0)
                 {
                     last_point = &current_port->points[f_pos - 1];
                     last_point->recip =
