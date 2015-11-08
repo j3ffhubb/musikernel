@@ -1880,6 +1880,8 @@ class ItemSequencer(QGraphicsView):
         elif REGION_EDITOR_MODE == 1:
             if self.atm_delete:
                 self.delete_selected_atm(self.atm_select_track)
+            elif EDITOR_MODE == EDITOR_MODE_DRAW:
+                self.open_region()
             QGraphicsScene.mouseReleaseEvent(self.scene, a_event)
         else:
             QGraphicsScene.mouseReleaseEvent(self.scene, a_event)
