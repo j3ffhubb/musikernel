@@ -150,6 +150,15 @@ class RegionSettings:
         self.action_widget = QWidgetAction(self.menu)
         self.action_widget.setDefaultWidget(self.menu_widget)
         self.menu.addAction(self.action_widget)
+
+        self.toggle_edit_mode_action = QAction(
+            _("Toggle Edit Mode"), self.menu_button)
+        self.menu_button.addAction(self.toggle_edit_mode_action)
+        self.toggle_edit_mode_action.setShortcut(
+            QKeySequence.fromString("CTRL+E"))
+        self.menu.addAction(self.toggle_edit_mode_action)
+        self.toggle_edit_mode_action.triggered.connect(self.toggle_edit_mode)
+
         self.menu.addSeparator()
 
         self.menu_layout.addWidget(QLabel(_("Edit Mode:")), 0, 0)
@@ -220,6 +229,11 @@ class RegionSettings:
 
         self.widgets_to_disable = (
             self.hzoom_slider, self.vzoom_slider, self.menu_button)
+
+    def toggle_edit_mode(self):
+        # This relies on the assumption that only 2 modes exist
+        current_mode = self.edit_mode_combobox.currentIndex()
+        self.edit_mode_combobox.setCurrentIndex(int(not current_mode))
 
     def scrollbar_pressed(self, a_val=None):
         if libmk.IS_PLAYING and self.follow_checkbox.isChecked():
