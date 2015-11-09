@@ -147,6 +147,10 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/python/libpydaw/translate.py
 %{{_usr}}/lib/{0}/major-version.txt
 %{{_usr}}/lib/{0}/minor-version.txt
+
+%{{_usr}}/lib/{0}/themes/default/play_checked.svg
+%{{_usr}}/lib/{0}/themes/default/rec_checked.svg
+%{{_usr}}/lib/{0}/themes/default/stop_checked.svg
 %{{_usr}}/lib/{0}/themes/default/draw.svg
 %{{_usr}}/lib/{0}/themes/default/erase.svg
 %{{_usr}}/lib/{0}/themes/default/select.svg
