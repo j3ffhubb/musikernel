@@ -1554,11 +1554,20 @@ inline void v_dn_run_engine(int a_sample_count,
                 f_seq_period->period.period_inc_beats;
             self->ts[0].ml_current_beat = f_seq_period->period.start_beat;
             self->ts[0].ml_next_beat = f_seq_period->period.end_beat;
+
+            v_sample_period_set_atm_events(
+                &f_seq_period->period, &self->en_song->regions->events,
+                dawnext->ts[0].current_sample, sample_count);
+
+            self->ts[0].atm_tick_count = f_seq_period->period.atm_tick_count;
+            memcpy(self->ts[0].atm_ticks, f_seq_period->period.atm_ticks,
+                sizeof(t_atm_tick) * ATM_TICK_BUFFER_SIZE);
+        }
+        else
+        {
+            self->ts[0].atm_tick_count = 0;
         }
 
-        self->ts[0].atm_tick_count = f_seq_period->period.atm_tick_count;
-        memcpy(self->ts[0].atm_ticks, f_seq_period->period.atm_ticks,
-            sizeof(t_atm_tick) * ATM_TICK_BUFFER_SIZE);
 
         for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i)
         {

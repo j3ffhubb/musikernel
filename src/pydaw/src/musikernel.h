@@ -1834,14 +1834,6 @@ void v_mk_seq_event_list_set(t_mk_seq_event_list * self,
             assert(0);
         }
     }
-
-    // Calculate automation clock ticks
-    for(f_i = 0; f_i < a_result->count; ++f_i)
-    {
-        v_sample_period_set_atm_events(
-            &a_result->sample_periods[f_i].period, self,
-            a_current_sample, a_sample_count);
-    }
 }
 
 
