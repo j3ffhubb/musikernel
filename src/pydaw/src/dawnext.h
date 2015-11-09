@@ -120,6 +120,7 @@ typedef struct
     t_dn_atm_point * points;
     int point_count;
     int port;
+    float last_val;
 }t_dn_atm_port;
 
 typedef struct
@@ -1124,8 +1125,10 @@ inline void v_dn_process_atm(
                     assert(val >= 0.0f && val <= 127.0f);
                 }
 
-                if(f_plugin->uid == f_point->plugin)
+                if(f_plugin->uid == f_point->plugin &&
+                  (current_port->last_val != val || a_ts->is_first_period))
                 {
+                    current_port->last_val = val;
                     float f_val = f_atm_to_ctrl_val(
                         f_plugin->descriptor, f_point->port, val);
                     v_pydaw_ev_clear(f_buff_ev);
@@ -2066,6 +2069,7 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                     current_plugin->ports[f_i2].point_count = 0;
                     current_plugin->ports[f_i2].points = NULL;
                     current_plugin->ports[f_i2].port = -1;
+                    current_plugin->ports[f_i2].last_val = 0.0f;
                 }
 
                 f_pos = 0;
