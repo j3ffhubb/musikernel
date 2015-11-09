@@ -225,11 +225,8 @@ class AbstractTransport:
     pass
 
 DEFAULT_TRACK_COLORS = [
-    QColor("#cc3333"),
-    QColor("#cccc33"),
-    QColor("#cc33cc"),
-    QColor("#33cc33"),
-    QColor("#3333cc"),
+    QColor(x) for x in
+    ("#cc3333", "#cccc33", "#cc33cc", "#33cc33", "#3333cc")
     ]
 
 class TrackColors:
