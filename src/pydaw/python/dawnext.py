@@ -2657,9 +2657,10 @@ class ItemSequencer(QGraphicsView):
             (REGION_EDITOR_TRACK_HEIGHT * f_track) +
             REGION_EDITOR_HEADER_HEIGHT)
 
-    def automation_save_callback(self):
+    def automation_save_callback(self, a_open=True):
         PROJECT.save_atm_region(ATM_REGION)
-        self.open_region()
+        if a_open:
+            self.open_region()
 
     def transform_atm_callback(self, a_add, a_mul):
         self.setUpdatesEnabled(False)
@@ -2707,7 +2708,7 @@ class ItemSequencer(QGraphicsView):
         f_length_beats = f_end_beat - f_start_beat
         two_pi = 2.0 * math.pi
         f_start_radians_p64, f_end_radians_p64 = (
-            (x * two_pi) / 64.0 for x in (a_start_freq, a_end_freq))
+            (x * two_pi) / 8.0 for x in (a_start_freq, a_end_freq))
         f_length_beats_recip = 1.0 / f_length_beats
 
         self.setUpdatesEnabled(False)
@@ -2754,7 +2755,7 @@ class ItemSequencer(QGraphicsView):
         f_scrollbar = self.horizontalScrollBar()
         f_scrollbar.setValue(SEQUENCER_PX_PER_BEAT * f_start_beat)
         self.set_playback_pos(f_start_beat)
-        f_step = 1.0 / 64.0
+        f_step = 1.0 / 16.0
         f_track, f_beat, f_val = self.current_coord
         f_index, f_plugin = TRACK_PANEL.get_atm_params(f_track)
         if f_index is None:
@@ -2780,7 +2781,8 @@ class ItemSequencer(QGraphicsView):
             f_pos += f_step
 
         f_result = pydaw_widgets.lfo_dialog(
-            self.lfo_atm_callback, self.automation_save_callback)
+            self.lfo_atm_callback,
+            lambda : self.automation_save_callback(a_open=False))
 
         if not f_result:
             for f_point in self.atm_selected:
