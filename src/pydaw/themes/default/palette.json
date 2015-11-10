@@ -1,0 +1,10 @@
+# This isn't really JSON, it's Python, but the data can be represented
+# just like JSON, but you can also include comments
+{
+    # Default colors for each track, this can be 1 to 32 different values
+    # , which will be repeated
+    "DEFAULT_TRACK_COLORS":
+        ["#ac1c1c", "#acac1c", "#ac1cac", "#1cac1c", "#1c1cac"],
+    # The background color for most of the QGraphicsScene's
+    "SCENE_BACKGROUND_BRUSH": "#424242"
+}

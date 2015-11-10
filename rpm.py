@@ -171,6 +171,7 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/themes/default/spinbox-up.png
 %{{_usr}}/lib/{0}/themes/default/stop.svg
 %{{_usr}}/lib/{0}/themes/default/default.pytheme
+%{{_usr}}/lib/{0}/themes/default/palette.json
 %{{_usr}}/lib/{0}/themes/default/v-fader.png
 %{{_usr}}/lib/{0}/themes/default/hide.svg
 %{{_usr}}/lib/{0}/themes/default/power.svg

@@ -1417,7 +1417,7 @@ if pydaw_util.ICON_PATH:
 
 QPixmapCache.setCacheLimit(1024 * 1024 * 1024)
 libmk.APP.setStyle(QStyleFactory.create("Fusion"))
-libmk.APP.setStyleSheet(global_stylesheet)
+libmk.APP.setStyleSheet(STYLESHEET)
 QtCore.QTextCodec.setCodecForLocale(QtCore.QTextCodec.codecForName("UTF-8"))
 global_check_device()
 MAIN_WINDOW.setup()

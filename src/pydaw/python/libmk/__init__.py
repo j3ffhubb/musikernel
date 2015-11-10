@@ -225,9 +225,7 @@ class AbstractTransport:
     pass
 
 DEFAULT_TRACK_COLORS = [
-    QColor(x) for x in
-    ("#cc3333", "#cccc33", "#cc33cc", "#33cc33", "#3333cc")
-    ]
+    QColor(x) for x in pydaw_util.COLOR_PALETTE["DEFAULT_TRACK_COLORS"]]
 
 class TrackColors:
     def __init__(self):

@@ -41,14 +41,6 @@ from libmk import mk_project
 from libdawnext import *
 import mkplugins
 
-DEFAULT_TRACK_COLORS = [
-    QBrush(QColor("#cc3333")),
-    QBrush(QColor("#cccc33")),
-    QBrush(QColor("#cc33cc")),
-    QBrush(QColor("#33cc33")),
-    QBrush(QColor("#3333cc")),
-    ]
-
 SELECTED_ITEM_COLOR = QBrush(QColor("#eeeeee"))
 
 TAB_SEQUENCER = 0
@@ -3641,11 +3633,11 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.fade_out_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             self.stretch_handle.setBrush(AUDIO_ITEM_HANDLE_BRUSH)
             if a_index is None:
-                self.setBrush(DEFAULT_TRACK_COLORS[
-                self.audio_item.lane_num % len(DEFAULT_TRACK_COLORS)])
+                self.setBrush(libmk.DEFAULT_TRACK_COLORS[
+                self.audio_item.lane_num % len(libmk.DEFAULT_TRACK_COLORS)])
             else:
-                self.setBrush(DEFAULT_TRACK_COLORS[
-                    a_index % len(DEFAULT_TRACK_COLORS)])
+                self.setBrush(libmk.DEFAULT_TRACK_COLORS[
+                    a_index % len(libmk.DEFAULT_TRACK_COLORS)])
 
     def pos_to_musical_time(self, a_pos):
         return a_pos / AUDIO_PX_PER_BEAT

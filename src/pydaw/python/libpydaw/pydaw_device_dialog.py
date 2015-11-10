@@ -299,7 +299,7 @@ class pydaw_device_dialog:
 
         f_window.closeEvent = f_close_event
         f_window.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        f_window.setStyleSheet(pydaw_util.global_stylesheet)
+        f_window.setStyleSheet(pydaw_util.STYLESHEET)
         f_window.setWindowTitle(_("Hardware Settings..."))
         f_main_layout = QVBoxLayout(f_window)
         f_tab_widget = QTabWidget()

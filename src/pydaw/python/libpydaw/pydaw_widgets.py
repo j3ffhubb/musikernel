@@ -179,7 +179,7 @@ class PixmapKnobCache:
         return f_cache[a_size]
 
 DEFAULT_KNOB_PIXMAP_CACHE = PixmapKnobCache(
-    os.path.join(pydaw_util.global_stylesheet_dir, "pydaw-knob.png"))
+    os.path.join(pydaw_util.STYLESHEET_DIR, "pydaw-knob.png"))
 
 
 CC_CLIPBOARD = None
@@ -2708,9 +2708,7 @@ EQ_OCTAVE_PX = (EQ_WIDTH / (100.0 / 12.0))
 EQ_LOW_PITCH = 4
 EQ_HIGH_PITCH = 123
 
-EQ_GRADIENT = QLinearGradient(0, 0, EQ_POINT_DIAMETER, EQ_POINT_DIAMETER)
-EQ_GRADIENT.setColorAt(0, QColor(255, 255, 255))
-EQ_GRADIENT.setColorAt(1, QColor(240, 240, 240))
+EQ_POINT_BRUSH = QColor("#ffffff")
 
 EQ_FILL = QLinearGradient(0.0, 0.0, 0.0, EQ_HEIGHT)
 
@@ -2722,12 +2720,7 @@ EQ_FILL.setColorAt(0.5714, QColor(0, 123, 255, 90)) #blue
 EQ_FILL.setColorAt(0.71425, QColor(0, 0, 255, 90)) #indigo
 EQ_FILL.setColorAt(0.8571, QColor(255, 0, 255, 90)) #violet
 
-EQ_BACKGROUND = QLinearGradient(0.0, 0.0, 0.0, EQ_HEIGHT)
-
-EQ_BACKGROUND.setColorAt(0.0, QColor(40, 40, 40))
-EQ_BACKGROUND.setColorAt(0.1, QColor(20, 20, 20))
-EQ_BACKGROUND.setColorAt(0.9, QColor(30, 30, 30))
-EQ_BACKGROUND.setColorAt(1.0, QColor(40, 40, 40))
+EQ_BACKGROUND = QColor("#0f0f0f")
 
 class eq_item(QGraphicsEllipseItem):
     def __init__(self, a_eq, a_num, a_val_callback):
@@ -2737,7 +2730,7 @@ class eq_item(QGraphicsEllipseItem):
         self.eq = a_eq
         self.num = a_num
         self.setToolTip("EQ{}".format(self.num))
-        self.setBrush(EQ_GRADIENT)
+        self.setBrush(EQ_POINT_BRUSH)
         self.mapToScene(0.0, 0.0)
         self.path_item = None
         self.setFlag(QGraphicsItem.ItemIsMovable)

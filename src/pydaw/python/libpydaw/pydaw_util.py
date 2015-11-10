@@ -12,10 +12,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
-import random
+import ast
 import os
 import sys
 import ctypes
+import random
 import re
 import subprocess
 import time
@@ -1148,9 +1149,44 @@ if not (STYLESHEET_FILE and os.path.isfile(STYLESHEET_FILE)):
     STYLESHEET_FILE = DEFAULT_STYLESHEET_FILE
 
 print("Using stylesheet " + STYLESHEET_FILE)
-global_stylesheet = pydaw_read_file_text(STYLESHEET_FILE)
-global_stylesheet = pydaw_escape_stylesheet(global_stylesheet, STYLESHEET_FILE)
-global_stylesheet_dir = os.path.dirname(STYLESHEET_FILE)
+STYLESHEET = pydaw_read_file_text(STYLESHEET_FILE)
+STYLESHEET = pydaw_escape_stylesheet(STYLESHEET, STYLESHEET_FILE)
+STYLESHEET_DIR = os.path.dirname(STYLESHEET_FILE)
+
+COLOR_PALETTE = {
+    "DEFAULT_TRACK_COLORS":
+        ["#ac1c1c", "#acac1c", "#ac1cac", "#1cac1c", "#1c1cac"],
+    "SCENE_BACKGROUND_BRUSH": "#424242"
+}
+
+
+def load_color_palette():
+    css_hex_color_regex = re.compile("#(?:[0-9a-fA-F]{6})$")
+
+    def test_value(a_val):
+        if len(a_val) != 7 or not css_hex_color_regex.match(a_val):
+            raise Exception("Invalid value '{}'".format(a_val))
+
+    filename = os.path.join(STYLESHEET_DIR, "palette.json")
+    if os.path.isfile(filename):
+        print("Attempting to load '{}'".format(filename))
+        with open(filename) as fh:
+            try:
+                tmp_palette = ast.literal_eval(fh.read())
+                for k, v in tmp_palette.items():
+                    if k not in COLOR_PALETTE:
+                        print("Unknown key '{}'".format(k))
+                        continue
+                    if isinstance(v, list):
+                        for val in v:
+                            test_value(val)
+                    else:
+                        test_value(v)
+                    COLOR_PALETTE[k] = v
+            except Exception as ex:
+                print("Error loading color palette: {}".format(ex))
+
+load_color_palette()
 
 
 def pydaw_rgb_minus(a_rgb, a_amt):

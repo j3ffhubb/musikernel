@@ -104,7 +104,7 @@ class project_history_widget(QTreeWidget):
 
 def project_recover_dialog(a_file):
     f_window = QMainWindow()
-    f_window.setStyleSheet(pydaw_util.global_stylesheet)
+    f_window.setStyleSheet(pydaw_util.STYLESHEET)
     f_window.setWindowState(QtCore.Qt.WindowMaximized)
     f_window.setWindowTitle("Project History")
     if a_file is None:
