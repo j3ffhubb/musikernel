@@ -1156,7 +1156,8 @@ STYLESHEET_DIR = os.path.dirname(STYLESHEET_FILE)
 COLOR_PALETTE = {
     "DEFAULT_TRACK_COLORS":
         ["#ac1c1c", "#acac1c", "#ac1cac", "#1cac1c", "#1c1cac"],
-    "SCENE_BACKGROUND_BRUSH": "#424242"
+    "SCENE_BACKGROUND_BRUSH": "#424242",
+    "SEQUENCER_HEADER_BRUSH": "#1d1e22",
 }
 
 

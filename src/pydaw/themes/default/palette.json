@@ -6,5 +6,7 @@
     "DEFAULT_TRACK_COLORS":
         ["#ac1c1c", "#acac1c", "#ac1cac", "#1cac1c", "#1c1cac"],
     # The background color for most of the QGraphicsScene's
-    "SCENE_BACKGROUND_BRUSH": "#424242"
+    "SCENE_BACKGROUND_BRUSH": "#424242",
+    # The timeline/ruler at the top of the sequencer and item editors
+    "SEQUENCER_HEADER_BRUSH": "#1d1e22",
 }
