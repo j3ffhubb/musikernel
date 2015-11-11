@@ -103,7 +103,7 @@ int osc_debug_handler(const char *path, const char *types, lo_arg **argv, int
 		      argc, void *data, void *user_data) ;
 #endif
 
-
+/* Does this still serve a purpose?  TODO:  try deleting it */
 #if defined(_WIN32)
 int main(int argc, char **argv);
 int v_configure(const char * path, const char * key, const char * value);
@@ -479,7 +479,7 @@ NO_OPTIMIZATION int main(int argc, char **argv)
     char f_device_name[256];
     f_device_name[0] = '\0';
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
     char f_input_name[256];
     f_input_name[0] = '\0';
 #endif
@@ -521,7 +521,7 @@ NO_OPTIMIZATION int main(int argc, char **argv)
                     f_device_file_path, PYDAW_LARGE_STRING);
             f_device_name[0] = '\0';
             f_host_api_index = -1;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
             f_input_name[0] = '\0';
 #endif
             while(1)
@@ -559,7 +559,7 @@ NO_OPTIMIZATION int main(int argc, char **argv)
                     snprintf(f_device_name, 256, "%s", f_value_char);
                     printf("device name: \"%s\"\n", f_device_name);
                 }
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
                 else if(!strcmp(f_key_char, "inputName"))
                 {
                     snprintf(f_input_name, 256, "%s", f_value_char);
@@ -745,7 +745,7 @@ NO_OPTIMIZATION int main(int argc, char **argv)
         outputParameters.suggestedLatency =
             f_device_info->defaultLowOutputLatency;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
         if(f_input_name[0] == '\0')
         {
             inputParameters.channelCount = 0;
