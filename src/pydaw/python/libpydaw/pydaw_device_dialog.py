@@ -341,7 +341,7 @@ class pydaw_device_dialog:
         f_latency_label = QLabel("")
         f_window_layout.addWidget(f_latency_label, 20, 2)
 
-        if any((pydaw_util.IS_LINUX, pydaw_util.IS_MAC_OSX)):
+        if pydaw_util.IS_LINUX:
             f_window_layout.addWidget(QLabel(_("Audio Engine")), 40, 0)
             f_audio_engine_combobox = QComboBox()
             f_audio_engine_combobox.addItems(
@@ -563,10 +563,8 @@ class pydaw_device_dialog:
                     "please de-select some devices"))
                 return
             f_worker_threads = f_worker_threads_combobox.currentIndex()
-            if pydaw_util.IS_WINDOWS:
+            if pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX:
                 f_audio_engine = 8
-            elif pydaw_util.IS_MAC_OSX:
-                f_audio_engine = f_audio_engine_combobox.currentIndex()
             elif pydaw_util.IS_LINUX:
                 f_audio_engine = f_audio_engine_combobox.currentIndex()
                 f_thread_affinity = \
