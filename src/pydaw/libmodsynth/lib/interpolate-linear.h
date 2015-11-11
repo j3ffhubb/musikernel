@@ -79,8 +79,7 @@ float f_linear_interpolate_ptr_wrap(float * a_table, int a_table_size,
 
     float pos = a_ptr - int_pos;
 
-    return (((a_table[int_pos]) - (a_table[int_pos_plus_1])) *
-            pos) + (a_table[int_pos_plus_1]);
+    return f_linear_interpolate(a_table[int_pos], a_table[int_pos_plus_1], pos);
 }
 
 /* inline float f_linear_interpolate_ptr_wrap(
@@ -100,8 +99,7 @@ inline float f_linear_interpolate_ptr(float * a_table, float a_ptr)
 
     float pos = a_ptr - int_pos;
 
-    return (((a_table[int_pos]) - (a_table[int_pos_plus_1])) *
-            pos) + (a_table[int_pos_plus_1]);
+    return f_linear_interpolate(a_table[int_pos], a_table[int_pos_plus_1], pos);
 }
 
 /* inline float f_linear_interpolate_ptr_ifh(
@@ -121,8 +119,7 @@ inline float f_linear_interpolate_ptr_ifh(float * a_table, int a_whole_number,
 
     float pos = a_frac;
 
-    return (((a_table[int_pos]) - (a_table[int_pos_plus_1])) *
-            pos) + (a_table[int_pos_plus_1]);
+    return f_linear_interpolate(a_table[int_pos], a_table[int_pos_plus_1], pos);
 }
 
 #endif	/* INTERPOLATE_LINEAR_H */
