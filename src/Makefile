@@ -71,7 +71,7 @@ install:
 	make -C pydaw_render DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) install
 
 install_mac_osx:
-	PREFIX=/usr/local DESTDIR= make install_non_linux
+	PREFIX=/usr/local make install_non_linux
 
 install_non_linux:
 	install -d $(MK_DIR)
