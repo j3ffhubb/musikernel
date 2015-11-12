@@ -681,7 +681,7 @@ def seconds_to_beats(a_tempo, a_seconds):
     return float(a_seconds) / f_seconds_per_beat
 
 def linear_interpolate(a_point1, a_point2, a_frac):
-    return ((a_point2 - a_point1) * a_frac) + a_point1
+    return ((1.0 - a_frac) * a_point1) + (a_frac * a_point2)
 
 def cosine_interpolate(y1, y2, mu):
    mu2 = (1.0 - math.cos(mu * math.pi)) / 2
