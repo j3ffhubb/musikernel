@@ -547,6 +547,7 @@ class SeqAtmItem(QGraphicsEllipseItem):
             self.setBrush(ATM_GRADIENT)
 
     def mousePressEvent(self, a_event):
+        SEQUENCER.remove_atm_path(self.item.index)
         a_event.setAccepted(True)
         QGraphicsEllipseItem.mousePressEvent(self, a_event)
         self.quantize(a_event.scenePos())
@@ -1996,6 +1997,7 @@ class ItemSequencer(QGraphicsView):
         self.enabled = True
 
     def open_atm_region(self):
+        self.atm_paths = {}
         for f_track in TRACK_PANEL.tracks:
             f_port, f_index = TRACK_PANEL.has_automation(f_track)
             if f_port is not None:
@@ -2005,6 +2007,7 @@ class ItemSequencer(QGraphicsView):
                     self.draw_atm_lines(f_track, point_items)
 
     def draw_atm_lines(self, a_track_num, a_points):
+        plugin_uid = a_points[0].item.index
         path = QPainterPath()
         point = a_points[0]
         pos = point.scenePos()
@@ -2025,6 +2028,10 @@ class ItemSequencer(QGraphicsView):
         path_item.setPen(QtCore.Qt.white)
         #path_item.setBrush(QtCore.Qt.white)
         self.scene.addItem(path_item)
+        self.atm_paths[plugin_uid] = path_item
+
+    def remove_atm_path(self, a_plugin_uid):
+        self.scene.removeItem(self.atm_paths.pop(a_plugin_uid))
 
     def reset_line_lists(self):
         self.text_list = []
