@@ -551,11 +551,9 @@ void v_dn_sum_track_outputs(t_dawnext * self, t_pytrack * a_track,
     float ** f_buff;
     float ** f_track_buff = a_track->buffers;
 
-    if((dawnext->routing_graph->bus_count[a_track->track_num])
-        ||
-        ((!a_track->mute) && (!self->is_soloed))
-        ||
-        ((self->is_soloed) && (a_track->solo)))
+    if((!a_track->mute)
+       &&
+       ((!self->is_soloed) || (self->is_soloed && a_track->solo)))
     {
         if(a_track->fade_state == FADE_STATE_FADED)
         {
