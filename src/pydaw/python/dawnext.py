@@ -2062,6 +2062,7 @@ class ItemSequencer(QGraphicsView):
             return
         if REGION_EDITOR_MODE == 0:
             f_item_list = self.get_selected()
+            self.clear_selected_item_strings()
             if f_item_list:
                 for f_item in f_item_list:
                     CURRENT_REGION.remove_item_ref(f_item.audio_item)
