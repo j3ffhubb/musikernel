@@ -92,8 +92,9 @@ void v_scc_run_comp(t_scc_sidechain_comp *self,
     if(f_gain < 0.0f)
     {
         f_gain *= self->ratio;
-        f_gain = v_svf_run_2_pole_lp(&self->filter, f_gain);
         f_gain = f_db_to_linear_fast(f_gain);
+        f_gain = v_svf_run_4_pole_lp(&self->filter, f_gain);
+
         self->output0 = f_axf_run_xfade(
             &self->xfade, a_output0, a_output0 * f_gain);
         self->output1 = f_axf_run_xfade(

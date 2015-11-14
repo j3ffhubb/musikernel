@@ -98,8 +98,8 @@ void v_cmp_run(t_cmp_compressor * self, float a_in0, float a_in1)
     if(f_db > self->thresh)
     {
         f_gain = (f_db - self->thresh) * self->ratio_recip;
-        f_gain = v_svf_run_2_pole_lp(&self->filter, f_gain);
         f_vol = f_db_to_linear_fast(f_gain);
+        f_vol = v_svf_run_4_pole_lp(&self->filter, f_vol);
         self->output0 = a_in0 * f_vol;
         self->output1 = a_in1 * f_vol;
     }
@@ -108,8 +108,8 @@ void v_cmp_run(t_cmp_compressor * self, float a_in0, float a_in1)
         float f_diff = (f_db - self->knee_thresh);
         float f_percent = f_diff / self->knee;
         float f_ratio = ((self->ratio - 1.0f) * f_percent) + 1.0f;
-        f_gain = v_svf_run_2_pole_lp(&self->filter, f_diff / f_ratio);
-        f_vol = f_db_to_linear_fast(f_gain);
+        f_vol = f_db_to_linear_fast(f_diff / f_ratio);
+        f_vol = v_svf_run_4_pole_lp(&self->filter, f_vol);
         self->output0 = a_in0 * f_vol;
         self->output1 = a_in1 * f_vol;
     }
@@ -152,8 +152,8 @@ void v_cmp_run_rms(t_cmp_compressor * self, float a_in0, float a_in1)
     if(f_db > self->thresh)
     {
         f_gain = (f_db - self->thresh) * self->ratio_recip;
-        f_gain = v_svf_run_2_pole_lp(&self->filter, f_gain);
         f_vol = f_db_to_linear_fast(f_gain);
+        f_vol = v_svf_run_4_pole_lp(&self->filter, f_vol);
         self->output0 = a_in0 * f_vol;
         self->output1 = a_in1 * f_vol;
     }
@@ -163,8 +163,8 @@ void v_cmp_run_rms(t_cmp_compressor * self, float a_in0, float a_in1)
         float f_percent = f_diff / self->knee;
         float f_ratio = ((self->ratio - 1.0f) * f_percent) + 1.0f;
         f_gain = f_diff / f_ratio;
-        f_gain = v_svf_run_2_pole_lp(&self->filter, f_gain);
         f_vol = f_db_to_linear_fast(f_gain);
+        f_vol = v_svf_run_4_pole_lp(&self->filter, f_vol);
         self->output0 = a_in0 * f_vol;
         self->output1 = a_in1 * f_vol;
     }
