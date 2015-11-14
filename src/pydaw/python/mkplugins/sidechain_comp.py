@@ -65,14 +65,14 @@ class scc_plugin_ui(pydaw_abstract_plugin_ui):
         self.attack_knob = pydaw_knob_control(
             f_knob_size, _("Attack"), SCC_ATTACK,
             self.plugin_rel_callback, self.plugin_val_callback,
-            10, 100, 20, KC_INTEGER, self.port_dict, self.preset_manager)
+            0, 100, 20, KC_INTEGER, self.port_dict, self.preset_manager)
         self.attack_knob.add_to_grid_layout(
             self.reverb_groupbox_gridlayout, 15)
 
         self.release_knob = pydaw_knob_control(
             f_knob_size, _("Release"), SCC_RELEASE,
             self.plugin_rel_callback, self.plugin_val_callback,
-            30, 300, 50, KC_INTEGER, self.port_dict, self.preset_manager)
+            20, 300, 50, KC_INTEGER, self.port_dict, self.preset_manager)
         self.release_knob.add_to_grid_layout(
             self.reverb_groupbox_gridlayout, 18)
 

@@ -194,8 +194,8 @@ static void v_mk_comp_run(
 
         v_cmp_set(f_cmp,
             *plugin_data->threshold * 0.1f, (*plugin_data->ratio) * 0.1f,
-            *plugin_data->knee * 0.1f, *plugin_data->attack * 0.01f,
-            *plugin_data->release * 0.01f, *plugin_data->gain * 0.1f);
+            *plugin_data->knee * 0.1f, *plugin_data->attack * 0.001f,
+            *plugin_data->release * 0.001f, *plugin_data->gain * 0.1f);
 
         if(f_is_rms)
         {
@@ -234,9 +234,9 @@ PYFX_Descriptor *mk_comp_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, MK_COMP_THRESHOLD, -240.0f, -360.0f, -60.0f);
     pydaw_set_pyfx_port(f_result, MK_COMP_RATIO, 20.0f, 10.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, MK_COMP_KNEE, 0.0f, 0.0f, 120.0f);
-    pydaw_set_pyfx_port(f_result, MK_COMP_ATTACK, 20.0f, 10.0f, 50.0f);
-    pydaw_set_pyfx_port(f_result, MK_COMP_RELEASE, 50.0f, 20.0f, 300.0f);
-    pydaw_set_pyfx_port(f_result, MK_COMP_GAIN, 0.0f, -240.0f, 240.0f);
+    pydaw_set_pyfx_port(f_result, MK_COMP_ATTACK, 50.0f, 0.0f, 500.0f);
+    pydaw_set_pyfx_port(f_result, MK_COMP_RELEASE, 100.0f, 10.0f, 500.0f);
+    pydaw_set_pyfx_port(f_result, MK_COMP_GAIN, 0.0f, -360.0f, 360.0f);
     pydaw_set_pyfx_port(f_result, MK_COMP_MODE, 0.0f, 0.0f, 1.0f);
     pydaw_set_pyfx_port(f_result, MK_COMP_RMS_TIME, 2.0f, 1.0f, 5.0f);
     pydaw_set_pyfx_port(f_result, MK_COMP_UI_MSG_ENABLED, 0.0f, 0.0f, 1.0f);

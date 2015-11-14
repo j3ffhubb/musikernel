@@ -235,8 +235,8 @@ PYFX_Descriptor *scc_PYFX_descriptor()
 
     pydaw_set_pyfx_port(f_result, SCC_THRESHOLD, -24.0f, -36.0f, -6.0f);
     pydaw_set_pyfx_port(f_result, SCC_RATIO, 20.0f, 1.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, SCC_ATTACK, 20.0f, 10.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, SCC_RELEASE, 50.0f, 30.0f, 300.0f);
+    pydaw_set_pyfx_port(f_result, SCC_ATTACK, 20.0f, 0.0f, 100.0f);
+    pydaw_set_pyfx_port(f_result, SCC_RELEASE, 50.0f, 20.0f, 300.0f);
     pydaw_set_pyfx_port(f_result, SCC_WET, 100.0f, 0.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, SCC_UI_MSG_ENABLED, 0.0f, 0.0f, 1.0f);
 

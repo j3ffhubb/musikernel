@@ -69,19 +69,19 @@ class mk_comp_plugin_ui(pydaw_abstract_plugin_ui):
         self.attack_knob = pydaw_knob_control(
             f_knob_size, _("Attack"), MK_COMP_ATTACK,
             self.plugin_rel_callback, self.plugin_val_callback,
-            10, 50, 20, KC_DECIMAL, self.port_dict, self.preset_manager)
+            0, 500, 50, KC_MILLISECOND, self.port_dict, self.preset_manager)
         self.attack_knob.add_to_grid_layout(self.groupbox_gridlayout, 21)
 
         self.release_knob = pydaw_knob_control(
             f_knob_size, _("Release"), MK_COMP_RELEASE,
             self.plugin_rel_callback, self.plugin_val_callback,
-            20, 300, 50, KC_DECIMAL, self.port_dict, self.preset_manager)
+            10, 500, 100, KC_MILLISECOND, self.port_dict, self.preset_manager)
         self.release_knob.add_to_grid_layout(self.groupbox_gridlayout, 22)
 
         self.gain_knob = pydaw_knob_control(
             f_knob_size, _("Gain"), MK_COMP_GAIN,
             self.plugin_rel_callback, self.plugin_val_callback,
-            -240, 240, 0, KC_TENTH, self.port_dict, self.preset_manager)
+            -360, 360, 0, KC_TENTH, self.port_dict, self.preset_manager)
         self.gain_knob.add_to_grid_layout(self.groupbox_gridlayout, 30)
 
         self.mono_combobox = pydaw_combobox_control(
