@@ -1324,7 +1324,7 @@ class pydaw_atm_region:
         # other lines:  pydaw_atm_point
         f_result = []
         for f_index in sorted(self.plugins):
-            port_dict = self.plugins[f_index]
+            port_dict = {k:v for k, v in self.plugins[f_index].items() if v}
             if not port_dict:
                 continue
             port_len = len(port_dict)
