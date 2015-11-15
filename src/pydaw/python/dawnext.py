@@ -2722,7 +2722,8 @@ class ItemSequencer(QGraphicsView):
         self.atm_selected_vals = [x.item.cc_val for x in self.atm_selected]
 
         f_result = pydaw_widgets.add_mul_dialog(
-            self.transform_atm_callback, self.automation_save_callback)
+            self.transform_atm_callback,
+            lambda : self.automation_save_callback(a_open=False))
 
         if not f_result:
             for f_point, f_val in zip(
