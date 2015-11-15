@@ -3286,10 +3286,12 @@ class RoutingGraphWidget(QGraphicsView):
                     f_wire_height = ((f_dest_pos - f_i) *
                         self.node_height) - f_y_wire_offset
                     f_dest_y = f_src_y + f_wire_height
-                    self.scene.addLine( # horizontal wire
+                    line = self.scene.addLine( # horizontal wire
                         f_src_x, f_src_y, f_v_wire_x, f_src_y, f_pen)
-                    self.scene.addLine( # vertical wire
+                    line.setZValue(2000)
+                    line = self.scene.addLine( # vertical wire
                         f_v_wire_x, f_src_y, f_v_wire_x, f_dest_y, f_pen)
+                    line.setZValue(2000)
                 else:
                     f_src_x = f_x
                     f_y_wire_offset = (f_wire_index *
@@ -3305,10 +3307,12 @@ class RoutingGraphWidget(QGraphicsView):
                     f_wire_height = ((f_i - f_dest_pos - 1) *
                         self.node_height) + f_y_wire_offset
                     f_dest_y = f_src_y - f_wire_height
-                    self.scene.addLine( # horizontal wire
+                    line = self.scene.addLine( # horizontal wire
                         f_v_wire_x, f_src_y, f_src_x, f_src_y, f_pen)
-                    self.scene.addLine( # vertical wire
+                    line.setZValue(2000)
+                    line = self.scene.addLine( # vertical wire
                         f_v_wire_x, f_dest_y, f_v_wire_x, f_src_y, f_pen)
+                    line.setZValue(2000)
 
         self.setUpdatesEnabled(True)
         self.update()
