@@ -9139,6 +9139,7 @@ class MainWindow(QScrollArea):
             global_open_mixer()
 
         PLUGIN_RACK.tab_selected(f_index == TAB_PLUGIN_RACK)
+        QApplication.restoreOverrideCursor()
 
     def on_edit_notes(self, a_event=None):
         QTextEdit.leaveEvent(self.notes_tab, a_event)
