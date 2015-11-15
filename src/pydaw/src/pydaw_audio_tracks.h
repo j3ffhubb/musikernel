@@ -922,7 +922,8 @@ void v_pydaw_audio_item_set_fade_vol(t_pydaw_audio_item *self,
         {
             self->fade_vols[a_send_num] =
                 ((float)(self->sample_read_heads[a_send_num].whole_number) -
-                self->sample_fade_in_end) * self->sample_fade_in_divisor;
+                self->sample_fade_in_end - PYDAW_AUDIO_ITEM_PADDING_DIV2)
+                * self->sample_fade_in_divisor;
 
             if(self->is_linear_fade_in)
             {
@@ -973,7 +974,8 @@ void v_pydaw_audio_item_set_fade_vol(t_pydaw_audio_item *self,
            self->sample_fade_in_divisor != 0.0f)
         {
             self->fade_vols[a_send_num] =
-                ((float)(self->sample_fade_in_end - read_head->whole_number))
+                ((float)(self->sample_fade_in_end -
+                read_head->whole_number - PYDAW_AUDIO_ITEM_PADDING_DIV2))
                 * self->sample_fade_in_divisor;
 
             if(self->is_linear_fade_in)
@@ -999,8 +1001,8 @@ void v_pydaw_audio_item_set_fade_vol(t_pydaw_audio_item *self,
                 self->sample_fade_out_divisor != 0.0f)
         {
             self->fade_vols[a_send_num] =
-                ((float)(self->sample_read_heads[a_send_num].whole_number) -
-                self->sample_fade_out_start) * self->sample_fade_out_divisor;
+                ((float)(self->sample_read_heads[a_send_num].whole_number -
+                self->sample_fade_out_start)) * self->sample_fade_out_divisor;
 
             if(self->is_linear_fade_out)
             {
