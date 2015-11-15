@@ -1320,7 +1320,7 @@ class pydaw_atm_region:
     def __str__(self):
         # New file format:
         # lines starting with 'p':  p|plugin_uid|port_count
-        # lines starting with 'n':  n|port_num|point_count
+        # lines starting with 'q':  n|port_num|point_count
         # other lines:  pydaw_atm_point
         f_result = []
         for f_index in sorted(self.plugins):
@@ -1356,12 +1356,15 @@ class pydaw_atm_region:
 
 class pydaw_atm_point:
     def __init__(
-            self, a_beat, a_port_num, a_cc_val, a_index, a_plugin_index):
+            self, a_beat, a_port_num, a_cc_val, a_index, a_plugin_index,
+            a_break_after=0):
         self.beat = round(float(a_beat), 4)
         self.port_num = int(a_port_num)
         self.cc_val = round(float(a_cc_val), 4)
         self.index = int(a_index) # Now means plugin pool UID
         self.plugin_index = int(a_plugin_index) # UID of the plugin
+        self.break_after = int(a_break_after)
+        assert self.break_after in (0, 1), str(a_break_after)
 
     def set_val(self, a_val):
         self.cc_val = pydaw_clip_value(float(a_val), 0.0, 127.0, True)
@@ -1381,7 +1384,7 @@ class pydaw_atm_point:
     def __str__(self):
         return "|".join(str(x) for x in (
             self.beat, self.port_num, self.cc_val,
-            self.index, self.plugin_index))
+            self.index, self.plugin_index, self.break_after))
 
     @staticmethod
     def from_arr(a_arr):

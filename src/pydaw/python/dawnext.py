@@ -1561,6 +1561,21 @@ class ItemSequencer(QGraphicsView):
 
         self.atm_menu.addSeparator()
 
+        self.break_atm_action = self.atm_menu.addAction(
+            _("Break after selected automation point(s)"))
+        self.break_atm_action.triggered.connect(self.break_atm)
+        self.break_atm_action.setShortcut(QKeySequence.fromString("CTRL+B"))
+        self.addAction(self.break_atm_action)
+
+        self.unbreak_atm_action = self.atm_menu.addAction(
+            _("Un-break after selected automation point(s)"))
+        self.unbreak_atm_action.triggered.connect(self.unbreak_atm)
+        self.unbreak_atm_action.setShortcut(
+            QKeySequence.fromString("CTRL+SHIFT+B"))
+        self.addAction(self.unbreak_atm_action)
+
+        self.atm_menu.addSeparator()
+
         self.delete_action = self.menu.addAction(_("Delete"))
         self.delete_action.triggered.connect(self.delete_selected)
         self.delete_action.setShortcut(QKeySequence.Delete)
@@ -1609,6 +1624,19 @@ class ItemSequencer(QGraphicsView):
             QKeySequence.fromString("CTRL+G"))
         self.addAction(self.glue_action)
         self.context_menu_enabled = True
+
+    def break_atm(self, checked=False, new_val=1):
+        if REGION_EDITOR_MODE != 1:
+            return
+        assert new_val in (0, 1), "Unexpected value '{}'".format(new_val)
+        points = [x.item for x in self.get_selected_points()]
+        if points:
+            for point in points:
+                point.break_after = new_val
+            self.automation_save_callback()
+
+    def unbreak_atm(self):
+        self.break_atm(new_val=0)
 
     def clear_port(self):
         if not self.current_coord:
@@ -2015,14 +2043,20 @@ class ItemSequencer(QGraphicsView):
         y = pos.y() + ATM_POINT_RADIUS
         path.moveTo(0.0, y)
         path.lineTo(x, y)
+        break_after = point.item.break_after
 
         for point in a_points[1:]:
             pos = point.scenePos()
             x = pos.x() + ATM_POINT_RADIUS
             y = pos.y() + ATM_POINT_RADIUS
-            path.lineTo(x, y)
+            if break_after:
+                path.moveTo(x, y)
+            else:
+                path.lineTo(x, y)
+            break_after = point.item.break_after
 
-        path.lineTo(self.sceneRect().right(), y)
+        if not break_after:
+            path.lineTo(self.sceneRect().right(), y)
 
         path_item = QGraphicsPathItem(path)
         path_item.setPen(QtCore.Qt.white)
@@ -2031,7 +2065,8 @@ class ItemSequencer(QGraphicsView):
         self.atm_paths[plugin_uid] = path_item
 
     def remove_atm_path(self, a_plugin_uid):
-        self.scene.removeItem(self.atm_paths.pop(a_plugin_uid))
+        if a_plugin_uid in self.atm_paths:
+            self.scene.removeItem(self.atm_paths.pop(a_plugin_uid))
 
     def reset_line_lists(self):
         self.text_list = []

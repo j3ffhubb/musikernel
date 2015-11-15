@@ -105,13 +105,14 @@ typedef struct
 
 typedef struct
 {
-    double beat;  // the beat position within the song 0-N
-    double recip; // 1.0 / self->beat - next->beat
-    int tick;     // self->beat / MK_AUTOMATION_RESOLUTION
-    int port;     // the port number for this control in this plugin 0-N
-    float val;    // control value, 0-127
-    int index;    // the plugin type, not used by the engine
-    int plugin;   // plugin uid 0-N
+    double beat;      // the beat position within the song 0-N
+    double recip;     // 1.0 / self->beat - next->beat
+    int tick;         // self->beat / MK_AUTOMATION_RESOLUTION
+    int port;         // the port number for this control in this plugin 0-N
+    float val;        // control value, 0-127
+    int index;        // the plugin type, not used by the engine
+    int plugin;       // plugin uid 0-N
+    int break_after;  // Don't smooth to the next point
 }t_dn_atm_point;
 
 typedef struct
@@ -1117,6 +1118,7 @@ inline void v_dn_process_atm(
                 float val;
 
                 if(is_last_tick ||
+                   f_point->break_after ||
                   (current_port->atm_pos == 0 && tick->tick < f_point->tick) ||
                   (tick->tick == f_point->tick))
                 {
@@ -2123,9 +2125,13 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                 v_iterate_2d_char_array(f_current_string);
                 int f_plugin = atoi(f_current_string->current_str);
 
+                v_iterate_2d_char_array(f_current_string);
+                int f_break_after = atoi(f_current_string->current_str);
+
                 assert(f_port == current_port->port);
                 assert(f_pos < current_port->point_count);
                 assert(current_port->points);
+                assert(f_break_after == 0 || f_break_after == 1);
 
                 f_point = &current_port->points[f_pos];
 
@@ -2135,6 +2141,7 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                 f_point->val = f_val;
                 f_point->index = f_index;
                 f_point->plugin = f_plugin;
+                f_point->break_after = f_break_after;
 
                 if(f_pos == current_port->point_count - 1)
                 {
