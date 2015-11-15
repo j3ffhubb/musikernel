@@ -310,11 +310,15 @@ typedef struct
     int on;
 }t_pydaw_midi_routing;
 
+#define ROUTE_TYPE_AUDIO 0
+#define ROUTE_TYPE_SIDECHAIN 1
+#define ROUTE_TYPE_MIDI 2
+
 typedef struct
 {
     int output;
     int active;
-    int sidechain;
+    int type;
     char padding[4];
 }t_pytrack_routing;
 
@@ -375,11 +379,10 @@ void v_ui_send(char * a_path, char * a_msg)
 
 #endif
 
-void v_pytrack_routing_set(t_pytrack_routing * self, int a_output,
-        int a_sidechain)
+void v_pytrack_routing_set(t_pytrack_routing * self, int a_output, int a_type)
 {
     self->output = a_output;
-    self->sidechain = a_sidechain;
+    self->type = a_type;
 
     if(a_output >= 0)
     {

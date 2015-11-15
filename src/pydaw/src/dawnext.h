@@ -637,6 +637,23 @@ void v_dn_sum_track_outputs(t_dawnext * self, t_pytrack * a_track,
             continue;
         }
 
+        f_bus = self->track_pool[f_bus_num];
+
+        if(f_route->type == ROUTE_TYPE_MIDI)
+        {
+            for(f_i2 = 0; f_i2 < a_track->event_list->len; ++f_i2)
+            {
+                shds_list_append(
+                    f_bus->event_list, a_track->event_list->data[f_i2]);
+            }
+
+            pthread_spin_lock(&f_bus->lock);
+            --f_bus->bus_counter;
+            pthread_spin_unlock(&f_bus->lock);
+
+            continue;
+        }
+
         int f_plugin_index = MAX_PLUGIN_COUNT + f_i3;
 
         if(a_track->plugins[f_plugin_index])
@@ -648,9 +665,7 @@ void v_dn_sum_track_outputs(t_dawnext * self, t_pytrack * a_track,
             f_plugin = 0;
         }
 
-        f_bus = self->track_pool[f_bus_num];
-
-        if(f_route->sidechain)
+        if(f_route->type == ROUTE_TYPE_SIDECHAIN)
         {
             f_buff = f_bus->sc_buffers;
             f_bus->sc_buffers_dirty = 1;
@@ -892,8 +907,6 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
             }
         }
     }
-
-    f_track->event_list->len = 0;
 
     if(a_ts->playback_mode == PYDAW_PLAYBACK_MODE_PLAY || !f_is_recording)
     {
@@ -1569,12 +1582,12 @@ inline void v_dn_run_engine(int a_sample_count,
             self->ts[0].atm_tick_count = 0;
         }
 
-
         for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i)
         {
             self->track_pool[f_i]->status = STATUS_NOT_PROCESSED;
             self->track_pool[f_i]->bus_counter =
                 self->routing_graph->bus_count[f_i];
+            self->track_pool[f_i]->event_list->len = 0;
         }
 
         //unleash the hounds

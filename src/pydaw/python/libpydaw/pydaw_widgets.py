@@ -3187,9 +3187,13 @@ class RoutingGraphWidget(QGraphicsView):
             f_x, f_y = self.get_coords(a_event.scenePos())
             if f_x == f_y or f_y == 0:
                 return
-            self.toggle_callback(
-                f_y, f_x,
-                1 if a_event.modifiers() == QtCore.Qt.ControlModifier else 0)
+            if a_event.modifiers() == QtCore.Qt.ControlModifier:
+                route_type = 1
+            elif a_event.modifiers() == QtCore.Qt.ShiftModifier:
+                route_type = 2
+            else:
+                route_type = 0
+            self.toggle_callback(f_y, f_x, route_type)
 
     def backgroundHoverEvent(self, a_event):
         QGraphicsRectItem.hoverMoveEvent(self.background_item, a_event)
@@ -3232,6 +3236,8 @@ class RoutingGraphWidget(QGraphicsView):
         f_wire_gradient.setColorAt(1.0, QColor(210, 210, 222))
         f_wire_pen = QPen(f_wire_gradient, self.wire_width_div2)
         f_sc_wire_pen = QPen(QtCore.Qt.red, self.wire_width_div2)
+        f_midi_wire_pen = QPen(QtCore.Qt.blue, self.wire_width_div2)
+        pen_dict = {0: f_wire_pen, 1: f_sc_wire_pen, 2: f_midi_wire_pen}
         self.setUpdatesEnabled(False)
         self.scene.clear()
         self.background_item = QGraphicsRectItem(
@@ -3264,7 +3270,7 @@ class RoutingGraphWidget(QGraphicsView):
             for f_dest_pos, f_wire_index, f_sidechain in f_connections:
                 if f_dest_pos < 0:
                     continue
-                f_pen = f_sc_wire_pen if f_sidechain else f_wire_pen
+                f_pen = pen_dict[f_sidechain]
                 if f_dest_pos > f_i:
                     f_src_x = f_x + self.node_width
                     f_y_wire_offset = (f_wire_index *
