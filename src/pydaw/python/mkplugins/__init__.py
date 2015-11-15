@@ -750,7 +750,8 @@ class MixerChannel:
             @a_plugin_dict: A dictionary of {track_index:
                             {plugin_index: libmk.pydaw_track_plugin}}
         """
-        self.outputs = {k:v.output for k, v in a_graph_dict.items()}
+        self.outputs = {
+            k:v.output for k, v in a_graph_dict.items() if v.sidechain != 2}
         for i in range(len(self.sends)):
             hidden = not (i in self.outputs and self.outputs[i] != -1)
             plugin_index = i + PLUGINS_PER_TRACK
