@@ -891,6 +891,9 @@ class TrackSend:
         self.track_num = int(a_track_num)
         self.index = int(a_index)
         self.output = int(a_output)
+        # This is actually route type now (->type in the C struct)
+        # 0 == normal audio, 1 == sidechain audio, 2 == MIDI
+        # TODO:  Rename
         self.sidechain = int(a_sidechain)
 
     def __str__(self):
