@@ -2128,6 +2128,12 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                 v_iterate_2d_char_array(f_current_string);
                 int f_break_after = atoi(f_current_string->current_str);
 
+                /* Automation curve, this isn't actually implemented yet
+                   , but I'm adding it to the file format to avoid having
+                   to do hackery later to preserve backwards compatibility
+                */
+                v_iterate_2d_char_array(f_current_string);
+
                 assert(f_port == current_port->port);
                 assert(f_pos < current_port->point_count);
                 assert(current_port->points);

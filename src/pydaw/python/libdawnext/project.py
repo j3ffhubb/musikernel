@@ -1357,7 +1357,7 @@ class pydaw_atm_region:
 class pydaw_atm_point:
     def __init__(
             self, a_beat, a_port_num, a_cc_val, a_index, a_plugin_index,
-            a_break_after=0):
+            a_break_after=0, a_curve=0.0):
         self.beat = round(float(a_beat), 4)
         self.port_num = int(a_port_num)
         self.cc_val = round(float(a_cc_val), 4)
@@ -1365,6 +1365,9 @@ class pydaw_atm_point:
         self.plugin_index = int(a_plugin_index) # UID of the plugin
         self.break_after = int(a_break_after)
         assert self.break_after in (0, 1), str(a_break_after)
+        # Doesn't do anything yet, just adding it to the file format now
+        # so I don't have to code around it later
+        self.curve = float(a_curve)
 
     def set_val(self, a_val):
         self.cc_val = pydaw_clip_value(float(a_val), 0.0, 127.0, True)
@@ -1384,7 +1387,7 @@ class pydaw_atm_point:
     def __str__(self):
         return "|".join(str(x) for x in (
             self.beat, self.port_num, self.cc_val,
-            self.index, self.plugin_index, self.break_after))
+            self.index, self.plugin_index, self.break_after, self.curve))
 
     @staticmethod
     def from_arr(a_arr):
