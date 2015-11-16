@@ -1820,7 +1820,8 @@ class ItemSequencer(QGraphicsView):
                 f_pos_y = f_pos.y() - REGION_EDITOR_HEADER_HEIGHT
                 f_beat = float(f_pos_x // SEQUENCER_PX_PER_BEAT)
                 f_track = int(f_pos_y // REGION_EDITOR_TRACK_HEIGHT)
-                f_uid = PROJECT.create_empty_item()
+                f_item_name = "{}-1".format(TRACK_NAMES[f_track])
+                f_uid = PROJECT.create_empty_item(f_item_name)
                 f_item_ref = project.pydaw_sequencer_item(
                     f_track, f_beat, LAST_ITEM_LENGTH, f_uid)
                 CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
