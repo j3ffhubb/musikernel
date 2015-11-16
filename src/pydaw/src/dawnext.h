@@ -2142,7 +2142,8 @@ t_dn_atm_region * g_dn_atm_region_get(t_dawnext * self)
                 f_point = &current_port->points[f_pos];
 
                 f_point->beat = f_beat;
-                f_point->tick = (int)(f_beat / MK_AUTOMATION_RESOLUTION);
+                f_point->tick = (int)(
+                    (f_beat / MK_AUTOMATION_RESOLUTION) + 0.5f);
                 f_point->port = f_port;
                 f_point->val = f_val;
                 f_point->index = f_index;
