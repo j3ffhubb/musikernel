@@ -2851,6 +2851,8 @@ class ItemSequencer(QGraphicsView):
             PROJECT.commit(_("Transpose item(s)"))
             if CURRENT_ITEM:
                 global_open_items(CURRENT_ITEM_NAME)
+            if f_duplicate_notes.isChecked():
+                REGION_SETTINGS.open_region()
             f_window.close()
 
         def transpose_cancel_handler():
