@@ -1525,8 +1525,8 @@ void v_sample_period_set_atm_events(t_sample_period * self,
                 musikernel->thread_storage[0].sample_rate);
         // BUG:  This doesn't quite line up... the result can be off by one
         self->atm_ticks[self->atm_tick_count].tick =
-            (int)(self->atm_ticks[self->atm_tick_count].beat /
-                MK_AUTOMATION_RESOLUTION);
+            (int)((self->atm_ticks[self->atm_tick_count].beat /
+                MK_AUTOMATION_RESOLUTION) + 0.5f);
 
         ++self->atm_tick_count;
     }
