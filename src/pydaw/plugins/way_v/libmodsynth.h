@@ -51,6 +51,7 @@ typedef struct
     t_smoother_linear pitchbend_smoother;
     t_smoother_linear fm_macro_smoother[WAYV_FM_MACRO_COUNT];
     int reset_wavetables;
+    t_svf2_filter aa_filter;
 }t_wayv_mono_modules;
 
 typedef struct
@@ -307,6 +308,12 @@ t_wayv_mono_modules * v_wayv_mono_init(float a_sr)
     a_mono->wavetables = g_wt_wavetables_get();
     //indicates that wavetables must be re-pointered immediately
     a_mono->reset_wavetables = 0;
+    g_svf2_init(&a_mono->aa_filter, a_sr);
+    v_svf2_set_cutoff_base(&a_mono->aa_filter, 120.0f);
+    v_svf2_add_cutoff_mod(&a_mono->aa_filter, 0.0f);
+    v_svf2_set_res(&a_mono->aa_filter, -6.0f);
+    v_svf2_set_cutoff(&a_mono->aa_filter);
+
     return a_mono;
 }
 

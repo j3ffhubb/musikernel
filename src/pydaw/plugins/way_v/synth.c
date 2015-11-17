@@ -1099,10 +1099,10 @@ static void v_run_wayv(
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
     }
 
-    int i_iterator = 0;
+    int i_iterator;
     t_plugin_event_queue_item * f_midi_item;
 
-    while(i_iterator < sample_count)
+    for(i_iterator = 0; i_iterator < sample_count; ++i_iterator)
     {
         while(1)
         {
@@ -1196,8 +1196,14 @@ static void v_run_wayv(
             }
         }
 
+        v_svf2_run_4_pole_lp(&plugin_data->mono_modules->aa_filter,
+            plugin_data->output0[i_iterator], plugin_data->output1[i_iterator]);
+        plugin_data->output0[i_iterator] =
+            plugin_data->mono_modules->aa_filter.output0;
+        plugin_data->output1[i_iterator] =
+            plugin_data->mono_modules->aa_filter.output1;
+
         ++plugin_data->sampleNo;
-        ++i_iterator;
     }
 
     //plugin_data->sampleNo += sample_count;
