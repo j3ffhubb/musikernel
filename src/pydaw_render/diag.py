@@ -32,12 +32,12 @@ else:
 TOOLS = {
     "benchmark": "make clean > /dev/null 2>&1 && "
         "make release > /dev/null 2>&1 && "
-        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 "
+        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0"
         "--no-file",
     "valgrind": "make clean > /dev/null 2>&1 && "
         "make debug > /dev/null 2>&1 && "
         "valgrind --alignment=16 --track-origins=yes "
-        "{BIN}-dbg {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 0 "
+        "{BIN}-dbg {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 0 0"
         "--no-file",
     "perf": "make clean > /dev/null 2>&1 && "
         "make release > /dev/null 2>&1 && "
@@ -45,14 +45,14 @@ TOOLS = {
         "dTLB-load-misses,iTLB-loads,iTLB-load-misses,L1-dcache-loads,"
         "L1-dcache-load-misses,L1-icache-loads,L1-icache-load-misses,"
         "branch-misses,LLC-loads,LLC-load-misses "
-        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 "
+        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0"
         "--no-file",
     "profile": "make clean && make gprof && "
-        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 "
+        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0"
         "&& gprof {BIN} > profile.txt && gedit profile.txt",
     "pahole": "make clean && make debug && pahole {BIN}",
     "gdb": "make debug > /dev/null 2>&1 && "
-        "echo run {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 "
+        "echo run {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0 "
         "--no-file && gdb {BIN}-dbg ",
 }
 
@@ -65,12 +65,10 @@ sys.argv[2] not in TOOLS:
     exit(1)
 
 HOST = {
-    "e":"edmnext",
     "d":"dawnext"
 }[sys.argv[1]]
 
 TIME = {
-    "e":"0 0 3 3",
     "d":"0 96"
 }[sys.argv[1]]
 
@@ -88,9 +86,12 @@ if len(sys.argv) > 4:
 else:
     SR = 44100
 
-result = os.system(
-    TOOLS[TOOL].format(BIN=BIN, HOST=HOST, PROJECT=PROJECT,
-    CORES=CORES, SR=SR, TIME=TIME))
+CMD = TOOLS[TOOL].format(BIN=BIN, HOST=HOST, PROJECT=PROJECT,
+    CORES=CORES, SR=SR, TIME=TIME)
+print("Command:")
+print(CMD)
+print()
+result = os.system(CMD)
 
 if result:
     print("Returned exit code {}".format(result))
