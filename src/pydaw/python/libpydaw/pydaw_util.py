@@ -746,37 +746,6 @@ def window_rms(a_arr, a_window_size):
   window = numpy.ones(a_window_size) / float(a_window_size)
   return numpy.sqrt(numpy.convolve(a2, window, 'valid'))
 
-def rate_env(a_audio_item, a_src_path, a_dest_path):
-    f_rate_diff = float(a_audio_item.timestretch_amt_end -
-        a_audio_item.timestretch_amt)
-    f_start_rate = a_audio_item.timestretch_amt
-
-    with wavefile.WaveReader(a_src_path) as f_reader:
-        with wavefile.WaveWriter(
-        a_dest_path, channels=f_reader.channels) as f_writer:
-            f_shape = (f_reader.channels, f_reader.frames)
-            f_arr = numpy.zeros(f_shape, numpy.float32, order='F')
-            f_reader.read(f_arr)
-            f_block_size = 100000
-            f_output = numpy.zeros((f_reader.channels, f_block_size))
-            f_sample_pos = 0.0
-            while int(f_sample_pos) < f_reader.frames:
-                f_size = 0
-                while f_size < f_block_size:
-                    for f_ch in range(f_arr.shape[0]):
-                        f_output[f_ch][f_size] = cubic_interpolate(
-                            f_arr[f_ch], f_sample_pos)
-                    f_size += 1
-                    f_rate = (f_rate_diff * (f_sample_pos /
-                        float(f_reader.frames))) + f_start_rate
-                    f_sample_pos += f_rate
-                    if int(f_sample_pos) >= f_reader.frames:
-                        break
-                if f_size >= f_block_size:
-                    f_writer.write(f_output)
-                else:
-                    f_writer.write(f_output[:,:f_size])
-
 def pydaw_wait_for_finished_file(a_file):
     """ Wait until a_file exists, then delete it and return.  It should
     already have the .finished extension"""
