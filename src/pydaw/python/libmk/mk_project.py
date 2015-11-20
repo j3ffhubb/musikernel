@@ -527,62 +527,8 @@ class MkProject(libmk.AbstractProject):
             raise Exception("Cannot create sample graph, the "
                 "following do not exist:\n{}\n{}\n".format(
                 a_path, f_sample_dir_path))
-
-        # TODO:  This algorithm is somewhat screwed up in the C code,
-        #  and this is a one-to-one port.  The f_peak_count and so on
-        #  are not consistent with length, need to fix it.
-        with wavefile.WaveReader(f_path) as f_reader:
-            f_result = []
-            f_result.append("meta|filename|{}\n".format(f_path))
-            f_ts = get_unix_timestamp(datetime.datetime.now())
-            f_result.append("meta|timestamp|{}\n".format(f_ts))
-            f_result.append("meta|channels|{}\n".format(f_reader.channels))
-            f_result.append("meta|frame_count|{}\n".format(f_reader.frames))
-            f_result.append(
-                "meta|sample_rate|{}\n".format(int(f_reader.samplerate)))
-            f_length = float(f_reader.frames) / float(f_reader.samplerate)
-            f_length = round(f_length, 6)
-            f_result.append("meta|length|{}\n".format(f_length))
-            #f_peak_count = int(f_length * 32.0)
-            if f_length < 3.0:
-                f_peak_size = 16 #int(f_reader.samplerate * 0.0005)
-                f_chunk_size = int(f_reader.frames / 16) + 1 #3000 * 16
-            elif f_length < 20.0:
-                f_peak_size = int(f_reader.samplerate * 0.005)
-                f_chunk_size = int(f_reader.samplerate * 4) / f_peak_size
-            else:
-                f_peak_size = int(f_reader.samplerate * 0.025)
-                f_chunk_size = int(f_reader.samplerate * 8) / f_peak_size
-            f_chunk_size = int(f_chunk_size)
-            f_count = 0
-            for f_chunk in f_reader.read_iter(size=f_peak_size * f_chunk_size):
-                for f_i2 in range(f_chunk_size):
-                    f_pos = f_i2 * f_peak_size
-                    f_break = False
-                    for f_i in range(f_chunk.shape[0]):
-                        f_frame = f_chunk[f_i][f_pos:f_pos+f_peak_size]
-                        if not len(f_frame):
-                            f_break = True
-                            continue
-                        f_high = pydaw_clip_min(numpy.amax(f_frame), 0.01)
-                        f_low = pydaw_clip_max(numpy.amin(f_frame), -0.01)
-
-                        f_high = round(float(f_high), 2)
-                        f_result.append("|".join(
-                            [str(x) for x in ("p", f_i, "h", f_high)]))
-                        f_low = round(float(f_low), 2)
-                        f_result.append("|".join(
-                            [str(x) for x in ("p", f_i, "l", f_low)]))
-                    f_count += 1
-                    if f_break:
-                        break
-            f_result.append("meta|count|{}".format(f_count))
-            f_result.append("\\")
         libmk.IPC.pydaw_add_to_wav_pool(f_path, f_uid)
-        f_pygraph_file = os.path.join(
-            *(str(x) for x in (self.samplegraph_folder, f_uid)))
-        with open(f_pygraph_file, "w", newline="\n") as f_handle:
-            f_handle.write("\n".join(f_result))
+
 
     def copy_plugin(self, a_old, a_new):
         f_old_path = os.path.join(

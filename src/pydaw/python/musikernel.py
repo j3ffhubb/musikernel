@@ -69,8 +69,10 @@ class MkIpc(libmk.AbstractIPC):
             "cm", "|".join(str(x) for x in (a_plugin_uid, a_str)))
 
     def pydaw_add_to_wav_pool(self, a_file, a_uid):
+        f_wait_file = pydaw_get_wait_file_path(a_out_file)
         a_file = pydaw_util.pi_path(a_file)
         self.send_configure("wp", "|".join(str(x) for x in (a_uid, a_file)))
+        pydaw_wait_for_finished_file(f_wait_file)
 
     def pydaw_rate_env(self, a_in_file, a_out_file, a_start, a_end):
         f_wait_file = pydaw_get_wait_file_path(a_out_file)

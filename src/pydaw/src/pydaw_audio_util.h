@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include <assert.h>
 #include "../libmodsynth/lib/interpolate-cubic.h"
 #include "../libmodsynth/lib/pitch_core.h"
+#include "pydaw_files.h"
 
 #ifdef	__cplusplus
 extern "C" {
@@ -46,14 +47,7 @@ void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
 
     if (!file)
     {
-	const char *filename = strrchr(a_file_in, '/');
-	if (filename) ++filename;
-	else filename = a_file_in;
-
-	if (!file)
-        {
-	    assert(0);
-	}
+        assert(0);
     }
 
     if (info.frames > 100000000)
@@ -160,8 +154,8 @@ void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
 
     sf_close(f_sndfile);
 
-    char f_tmp_finished[256];
-    sprintf(f_tmp_finished, "%s.finished", a_file_out);
+    char f_tmp_finished[2048];
+    snprintf(f_tmp_finished, 2048, "%s.finished", a_file_out);
     FILE * f_finished = fopen(f_tmp_finished, "w");
     fclose(f_finished);
     free(f_output);
@@ -192,14 +186,7 @@ void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
 
     if (!file)
     {
-	const char *filename = strrchr(a_file_in, '/');
-	if (filename) ++filename;
-	else filename = a_file_in;
-
-	if (!file)
-        {
-	    assert(0);
-	}
+        assert(0);
     }
 
     if (info.frames > 100000000)
@@ -312,8 +299,8 @@ void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
 
     sf_close(f_sndfile);
 
-    char f_tmp_finished[256];
-    sprintf(f_tmp_finished, "%s.finished", a_file_out);
+    char f_tmp_finished[2048];
+    snprintf(f_tmp_finished, 2048, "%s.finished", a_file_out);
     FILE * f_finished = fopen(f_tmp_finished, "w");
     fclose(f_finished);
     free(f_output);
