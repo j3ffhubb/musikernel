@@ -578,7 +578,7 @@ class MainWindow(QScrollArea):
                 if libmk.IS_PLAYING:
                     WAVE_EDITOR.set_playback_cursor(float(a_val))
             elif a_key == "ready":
-                pass
+                libmk.on_ready()
         #This prevents multiple events from moving the same control,
         #only the last goes through
         for k, f_val in f_ui_dict.items():
@@ -614,6 +614,7 @@ def global_update_peak_meters(a_val):
 
 class pydaw_wave_editor_widget:
     def __init__(self):
+        self.file_name = None
         self.widget = QWidget()
         self.layout = QVBoxLayout(self.widget)
         self.right_widget = QWidget()
@@ -1096,6 +1097,7 @@ class pydaw_wave_editor_widget:
                 self.widget, _("Error"),
                 _("{} does not exist".format(f_file)))
             return
+        self.file_name = f_file
         libmk.APP.setOverrideCursor(QtCore.Qt.WaitCursor)
         self.clear_sample_graph()
         self.current_file = f_file
@@ -1248,12 +1250,15 @@ def global_new_project(a_project_file):
     MAIN_WINDOW.main_tabwidget.insertTab(
         1, PLUGIN_RACK.widget, _("Plugin Rack"))
 
-def active_wav_pool_uids():
-    """ Wave-Next doesn't participate in the normal wav pool, so
-        just return plugin wav_pool uids
+def on_ready():
+    if WAVE_EDITOR.file_name:
+        WAVE_EDITOR.open_file(WAVE_EDITOR.file_name)
 
-    """
-    return PROJECT.get_plugin_wav_pool_uids()
+def active_wav_pool_uids():
+    result = PROJECT.get_plugin_wav_pool_uids()
+    if WAVE_EDITOR.file_name:
+        result.add(libmk.PROJECT.get_wav_uid_by_name(WAVE_EDITOR.file_name))
+    return result
 
 PROJECT = WaveNextProject(True)
 

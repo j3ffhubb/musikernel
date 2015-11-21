@@ -9265,7 +9265,7 @@ class MainWindow(QScrollArea):
                 libmk.PLUGIN_UI_DICT.midi_learn_control[0].update_cc_map(
                     a_val, libmk.PLUGIN_UI_DICT.midi_learn_control[1])
             elif a_key == "ready":
-                print("Engine sent 'ready' signal to the UI")
+                libmk.on_ready()
         #This prevents multiple events from moving the same control,
         #only the last goes through
         for k, f_val in f_ui_dict.items():
@@ -9406,6 +9406,10 @@ AUDIO_SEQ = AudioItemSeq()
 AUDIO_SEQ_WIDGET = AudioItemSeqWidget()
 ITEM_EDITOR = ItemListViewer()
 MIXER_WIDGET = mkplugins.MixerWidget(TRACK_COUNT_ALL)
+
+def on_ready():
+    """ Called after re-opening the audio engine """
+    pass
 
 def get_mixer_peak_meters():
     for k, v in MIXER_WIDGET.tracks.items():

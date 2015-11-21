@@ -51,6 +51,11 @@ MEMORY_ENTROPY = datetime.timedelta(minutes=0)
 MEMORY_ENTROPY_LIMIT = datetime.timedelta(minutes=30)
 MEMORY_ENTROPY_UIDS = set()
 
+def on_ready():
+    print("Engine sent 'ready' message")
+    for mod in HOST_MODULES:
+        mod.on_ready()
+
 def clean_wav_pool():
     f_result = set()
     for f_host in HOST_MODULES:
