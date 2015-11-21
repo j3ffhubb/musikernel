@@ -756,10 +756,9 @@ class RoutingGraph:
                     self.graph[a_src].pop(k)
         else:
             if self.check_for_feedback(a_src, a_dest):
-                return _("Can't make connection, it would create "
-                    "a feedback loop")
+                return "Can't make connection, it would create a feedback loop"
             if a_src in self.graph and len(self.graph[a_src]) >= 4:
-                return _("All available sends already in use for "
+                return ("All available sends already in use for "
                     "track {}".format(a_src))
             if not a_src in self.graph:
                 f_i = 0
