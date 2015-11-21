@@ -253,7 +253,7 @@ void v_pydaw_set_we_file(t_wavenext * self, const char * a_uid)
     t_wav_pool_item * f_result = g_wav_pool_get_item_by_uid(
         musikernel->wav_pool, uid);
 
-    if(f_result->is_loaded || i_wav_pool_item_load(f_result, 0))
+    if(f_result->is_loaded || i_wav_pool_item_load(f_result, 1))
     {
         pthread_spin_lock(&musikernel->main_lock);
 
