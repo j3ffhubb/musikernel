@@ -9280,12 +9280,17 @@ class MainWindow(QScrollArea):
                     f_port, float(f_val))
         for k, f_val in f_cc_dict.items():
             f_track_num, f_cc = (int(x) for x in k)
+            uids = []
             if f_track_num in PLUGIN_RACK.plugin_racks:
                 rack = PLUGIN_RACK.plugin_racks[f_track_num]
-                for f_plugin_uid in rack.get_plugin_uids():
-                    if f_plugin_uid in libmk.PLUGIN_UI_DICT:
-                        libmk.PLUGIN_UI_DICT[
-                            f_plugin_uid].set_cc_val(f_cc, f_val)
+                uids.extend(rack.get_plugin_uids())
+            if f_track_num in MIXER_WIDGET.tracks:
+                track = MIXER_WIDGET.tracks[f_track_num]
+                uids.extend(track.get_plugin_uids())
+            for f_plugin_uid in uids:
+                if f_plugin_uid in libmk.PLUGIN_UI_DICT:
+                    libmk.PLUGIN_UI_DICT[
+                        f_plugin_uid].set_cc_val(f_cc, f_val)
 
     def prepare_to_quit(self):
         try:

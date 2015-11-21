@@ -718,6 +718,9 @@ class MixerChannel:
             else:
                 self.output_labels[k].setText(a_dict[self.outputs[k]])
 
+    def get_plugin_uids(self):
+        return [x.plugin_uid for x in self.sends.values()]
+
     def add_plugin(self, a_index):
         plugin = PluginSettingsMixer(
             self.PROJECT.IPC.pydaw_set_plugin, a_index,
