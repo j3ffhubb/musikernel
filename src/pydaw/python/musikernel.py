@@ -1341,6 +1341,7 @@ def open_pydaw_engine(a_project_path):
 
 def reopen_pydaw_engine():
     open_pydaw_engine(PROJECT_FILE)
+    libmk.IPC_ENABLED = True
 
 libmk.close_pydaw_engine = close_pydaw_engine
 libmk.reopen_pydaw_engine = reopen_pydaw_engine
