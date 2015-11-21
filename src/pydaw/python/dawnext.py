@@ -2185,25 +2185,51 @@ class ItemSequencer(QGraphicsView):
 
         return f_beat_frac, f_lane_num
 
-    def add_items(self, a_pos, a_item_list):
+    def add_items(self, a_pos, a_item_list, a_single_item=None):
         if self.check_running():
             return
 
-        f_beat_frac, f_lane_num = self.pos_to_beat_and_track(a_pos)
+        if a_single_item is None:
+            if len(a_item_list) > 1:
+                menu = QMenu()
+                multi_action = menu.addAction(
+                    "Add each file to it's own track")
+                multi_action.triggered.connect(
+                    lambda : self.add_items(a_pos, a_item_list, False))
+                single_action = menu.addAction(
+                    "Add all files to one item on one track")
+                single_action.triggered.connect(
+                    lambda : self.add_items(a_pos, a_item_list, True))
+                menu.exec_(QCursor.pos())
+                return
+            else:
+                a_single_item = True
+
+        f_beat_frac, f_track_num = self.pos_to_beat_and_track(a_pos)
 
         f_seconds_per_beat = (60.0 /
             CURRENT_REGION.get_tempo_at_pos(f_beat_frac))
 
         f_restart = False
 
+        if a_single_item:
+            lane_num = 0
+            TRACK_PANEL.tracks[f_track_num].check_output()
+            f_item_name = "{}-1".format(TRACK_NAMES[f_track_num])
+            f_item_uid = PROJECT.create_empty_item(f_item_name)
+            f_items = PROJECT.get_item_by_uid(f_item_uid)
+            f_item_ref = project.pydaw_sequencer_item(
+                f_track_num, f_beat_frac, 1.0, f_item_uid)
+
         for f_file_name in a_item_list:
             libmk.APP.processEvents()
             f_file_name_str = str(f_file_name)
             f_item_name = os.path.basename(f_file_name_str)
             if f_file_name_str:
-                TRACK_PANEL.tracks[f_lane_num].check_output()
-                f_item_uid = PROJECT.create_empty_item(f_item_name)
-                f_items = PROJECT.get_item_by_uid(f_item_uid)
+                if not a_single_item:
+                    TRACK_PANEL.tracks[f_track_num].check_output()
+                    f_item_uid = PROJECT.create_empty_item(f_item_name)
+                    f_items = PROJECT.get_item_by_uid(f_item_uid)
                 f_index = f_items.get_next_index()
 
                 if f_index == -1:
@@ -2219,17 +2245,29 @@ class ItemSequencer(QGraphicsView):
                 if not f_restart and libmk.add_entropy(f_delta):
                     f_restart = True
                 f_length = f_graph.length_in_seconds / f_seconds_per_beat
-                f_item_ref = project.pydaw_sequencer_item(
-                    f_lane_num, f_beat_frac, f_length, f_item_uid)
-                CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
-                f_item = pydaw_audio_item(
-                    f_uid, a_start_bar=0, a_start_beat=0.0, a_lane_num=0)
-                f_items.add_item(f_index, f_item)
-                PROJECT.save_item_by_uid(f_item_uid, f_items)
+                if a_single_item:
+                    f_item = pydaw_audio_item(
+                        f_uid, a_start_bar=0, a_start_beat=0.0,
+                        a_lane_num=lane_num)
+                    lane_num += 1
+                    f_items.add_item(f_index, f_item)
+                    if f_length > f_item_ref.length_beats:
+                        f_item_ref.length_beats = f_length
+                else:
+                    f_item_ref = project.pydaw_sequencer_item(
+                        f_track_num, f_beat_frac, f_length, f_item_uid)
+                    CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
+                    f_item = pydaw_audio_item(
+                        f_uid, a_start_bar=0, a_start_beat=0.0, a_lane_num=0)
+                    f_items.add_item(f_index, f_item)
+                    PROJECT.save_item_by_uid(f_item_uid, f_items)
+                    f_track_num += 1
+                    if f_track_num >= project.TRACK_COUNT_ALL:
+                        break
 
-                f_lane_num += 1
-                if f_lane_num >= project.TRACK_COUNT_ALL:
-                    break
+        if a_single_item:
+            CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
+            PROJECT.save_item_by_uid(f_item_uid, f_items)
 
         PROJECT.save_region(CURRENT_REGION, a_notify=not f_restart)
         PROJECT.commit("Added audio items")
