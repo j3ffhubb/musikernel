@@ -706,7 +706,6 @@ class pydaw_wave_editor_widget:
         self.vol_layout.addWidget(self.vol_label)
         self.peak_meter = pydaw_widgets.peak_meter(28, a_text=True)
         ALL_PEAK_METERS[0] = [self.peak_meter]
-        self.edit_hlayout.addWidget(self.peak_meter.widget)
         self.ctrl_vlayout = QVBoxLayout()
         self.edit_hlayout.addLayout(self.ctrl_vlayout)
         self.fade_in_start = QSpinBox()
@@ -728,7 +727,11 @@ class pydaw_wave_editor_widget:
         self.sample_graph = pydaw_audio_item_viewer_widget(
             self.marker_callback, self.marker_callback,
             self.marker_callback, self.marker_callback)
-        self.vlayout.addWidget(self.sample_graph)
+        self.hlayout = QHBoxLayout()
+
+        self.vlayout.addLayout(self.hlayout)
+        self.hlayout.addWidget(self.sample_graph)
+        self.hlayout.addWidget(self.peak_meter.widget)
 
         self.label_action = QWidgetAction(self.menu_button)
         self.label_action.setDefaultWidget(self.sample_graph.label)
