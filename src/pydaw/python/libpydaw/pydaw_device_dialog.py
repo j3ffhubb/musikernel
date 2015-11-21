@@ -517,6 +517,8 @@ class pydaw_device_dialog:
                     self.subsystem][self.device_name].maxInputChannels
                 f_in_count = pydaw_util.pydaw_clip_value(f_in_count, 0, 128)
                 f_audio_in_spinbox.setMaximum(f_in_count)
+                f_audio_in_spinbox.setValue(
+                    f_in_count if f_in_count < 16 else 16)
 
             f_out_count = f_result_dict[
                 self.subsystem][self.device_name].maxOutputChannels
@@ -537,6 +539,8 @@ class pydaw_device_dialog:
                 self.subsystem][self.input_name].maxInputChannels
             f_in_count = pydaw_util.pydaw_clip_value(f_in_count, 0, 128)
             f_audio_in_spinbox.setMaximum(f_in_count)
+            f_audio_in_spinbox.setValue(
+                    f_in_count if f_in_count < 16 else 16)
 
 
         def on_ok(a_self=None):
