@@ -246,26 +246,22 @@ void v_pydaw_we_export(t_wavenext * self, const char * a_file_out)
 }
 
 
-void v_pydaw_set_we_file(t_wavenext * self, const char * a_file)
+void v_pydaw_set_we_file(t_wavenext * self, const char * a_uid)
 {
-    t_wav_pool_item * f_result = g_wav_pool_item_get(0, a_file,
-        musikernel->thread_storage[0].sample_rate);
+    int uid = atoi(a_uid);
 
-    if(i_wav_pool_item_load(f_result, 0))
+    t_wav_pool_item * f_result = g_wav_pool_get_item_by_uid(
+        musikernel->wav_pool, uid);
+
+    if(f_result->is_loaded || i_wav_pool_item_load(f_result, 0))
     {
         pthread_spin_lock(&musikernel->main_lock);
 
-        t_wav_pool_item * f_old = self->ab_wav_item;
         self->ab_wav_item = f_result;
 
         self->ab_audio_item->ratio = self->ab_wav_item->ratio_orig;
 
         pthread_spin_unlock(&musikernel->main_lock);
-
-        if(f_old)
-        {
-            v_wav_pool_item_free(f_old);
-        }
     }
     else
     {

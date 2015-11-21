@@ -68,8 +68,8 @@ class WaveNextOsc(libmk.AbstractIPC):
     def pydaw_we_export(self, a_file_name):
         self.send_configure("wex", "{}".format(a_file_name))
 
-    def pydaw_ab_open(self, a_file):
-        self.send_configure("abo", str(a_file))
+    def pydaw_ab_open(self, a_uid):
+        self.send_configure("abo", str(a_uid))
 
     def pydaw_we_set(self, a_val):
         self.send_configure("we", str(a_val))
@@ -1112,7 +1112,8 @@ class pydaw_wave_editor_widget:
             f_action = f_menu.addAction(f_path)
             f_action.file_name = f_path
         self.history_button.setMenu(f_menu)
-        PROJECT.IPC.pydaw_ab_open(a_file)
+        PROJECT.IPC.pydaw_ab_open(
+            libmk.PROJECT.get_wav_uid_by_name(a_file))
         self.marker_callback()
         libmk.APP.restoreOverrideCursor()
 
@@ -1202,7 +1203,7 @@ class pydaw_wave_editor_widget:
 
     def set_sample_graph(self, a_file_name):
         self.graph_object = libmk.PROJECT.get_sample_graph_by_name(
-            a_file_name, a_cp=False)
+            a_file_name)
         self.sample_graph.draw_item(
             self.graph_object, 0.0, 1000.0, 0.0, 1000.0)
 
