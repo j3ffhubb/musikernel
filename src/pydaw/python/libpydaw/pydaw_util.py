@@ -94,6 +94,8 @@ TIMESTRETCH_INDEXES = {x:y for x, y in
 
 if IS_WINDOWS:
     TIMESTRETCH_MODES.remove("SBSMS")
+elif IS_MAC_OSX:
+    TIMESTRETCH_MODES.remove("Paulstretch")
 
 CRISPNESS_SETTINGS = [
     "0 (smeared)", "1 (piano)", "2", "3",

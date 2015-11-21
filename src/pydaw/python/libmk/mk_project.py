@@ -23,7 +23,6 @@ import collections
 import shutil
 import tarfile
 import json
-import wavefile
 import datetime
 import os
 import numpy

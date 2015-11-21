@@ -34,7 +34,6 @@ from PyQt5 import QtCore
 
 from libpydaw import pydaw_history
 
-import wavefile
 import mkplugins
 
 TRACK_COUNT_ALL = 32
@@ -480,10 +479,11 @@ class DawNextProject(libmk.AbstractProject):
                         f_new_path += ".wav"
                     shutil.move(f_path, f_new_path)
                     f_uid = libmk.PROJECT.get_wav_uid_by_name(f_new_path)
-                    with wavefile.WaveReader(f_new_path) as f_reader:
-                        f_audio_files_dict[f_i] = (
-                            f_new_path, f_uid, f_reader.frames,
-                            f_val.output, f_val.sidechain)
+                    sg = libmk.PROJECT.get_sample_graph_by_uid(f_uid)
+
+                    f_audio_files_dict[f_i] = (
+                        f_new_path, f_uid, sg.frame_count,
+                        f_val.output, f_val.sidechain)
                 else:
                     print("Error, path did not exist: {}".format(f_path))
 
