@@ -403,7 +403,8 @@ void v_wav_pool_remove_item(t_wav_pool* a_wav_pool, int a_uid)
     }
 }
 
-void v_wav_pool_add_item(t_wav_pool* a_wav_pool, int a_uid, char * a_file_path)
+t_wav_pool_item * v_wav_pool_add_item(
+    t_wav_pool* a_wav_pool, int a_uid, char * a_file_path)
 {
     char f_path[2048];
 
@@ -446,6 +447,7 @@ void v_wav_pool_add_item(t_wav_pool* a_wav_pool, int a_uid, char * a_file_path)
     g_wav_pool_item_init(&a_wav_pool->items[a_uid], a_uid, f_path,
             a_wav_pool->sample_rate);
     ++a_wav_pool->count;
+    return &a_wav_pool->items[a_uid];
 }
 
 /* Load entire pool at startup/open */

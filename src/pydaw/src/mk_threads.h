@@ -55,6 +55,8 @@ void v_open_project(const char* a_project_folder, int a_first_load)
         musikernel->project_folder, PATH_SEP, PATH_SEP, PATH_SEP);
     sprintf(musikernel->samples_folder, "%s%saudio%ssamples",
         musikernel->project_folder, PATH_SEP, PATH_SEP);  //No trailing slash
+    sprintf(musikernel->samplegraph_folder, "%s%saudio%ssamplegraph",
+        musikernel->project_folder, PATH_SEP, PATH_SEP);  //No trailing slash
 
     sprintf(musikernel->wav_pool->samples_folder, "%s",
         musikernel->samples_folder);

@@ -401,15 +401,9 @@ void v_pytrack_routing_free(t_pytrack_routing * self)
     free(self);
 }
 
-float roundto(float input, int digits)
-{
-    return (float)((int)(input * digits)) / (float)digits;
-}
-
 void v_create_sample_graph(t_wav_pool_item * self)
 {
     char str_buff[2048];
-    assert(0);  //musikernel->sample_graph_folder isn't being set anywhere
     snprintf(str_buff, 2048, "%s/%i",
         musikernel->samplegraph_folder, self->uid);
 
@@ -441,7 +435,6 @@ void v_create_sample_graph(t_wav_pool_item * self)
     fwrite(str_buff, 1, len, f_sg);
 
     float f_length = (float)self->length / (float)self->sample_rate;
-    f_length = roundto(f_length, 6);
 
     len = snprintf(str_buff, 2048, "meta|length|%f\n", f_length);
     fwrite(str_buff, 1, len, f_sg);
@@ -485,25 +478,20 @@ void v_create_sample_graph(t_wav_pool_item * self)
                     f_low = f_sample;
             }
 
-            f_high = roundto(f_high, 2);
-
-            len = snprintf(str_buff, 2048, "p|%i|h|%f", f_count, f_high);
+            len = snprintf(str_buff, 2048, "p|%i|h|%f\n", f_i, f_high);
             fwrite(str_buff, 1, len, f_sg);
 
-            f_low = roundto(f_low, 2);
-
-            len = snprintf(str_buff, 2048, "p|%i|l|%f", f_count, f_low);
+            len = snprintf(str_buff, 2048, "p|%i|l|%f\n", f_i, f_low);
             fwrite(str_buff, 1, len, f_sg);
         }
         ++f_count;
     }
 
-    len = snprintf(str_buff, 2048, "meta|count|%i", f_count);
+    len = snprintf(str_buff, 2048, "meta|count|%i\n", f_count);
     fwrite(str_buff, 1, len, f_sg);
 
     len = snprintf(str_buff, 2048, "\\");
     fwrite(str_buff, 1, len, f_sg);
-    //libmk.IPC.pydaw_add_to_wav_pool(f_path, f_uid)
 
     fclose(f_sg);
 
@@ -804,6 +792,7 @@ void g_musikernel_get(float a_sr, t_midi_device_list * a_midi_devices)
     musikernel->audio_folder = (char*)malloc(sizeof(char) * 1024);
     musikernel->audio_tmp_folder = (char*)malloc(sizeof(char) * 1024);
     musikernel->samples_folder = (char*)malloc(sizeof(char) * 1024);
+    musikernel->samplegraph_folder = (char*)malloc(sizeof(char) * 1024);
     musikernel->wav_pool_file = (char*)malloc(sizeof(char) * 1024);
     musikernel->plugins_folder = (char*)malloc(sizeof(char) * 1024);
 
@@ -2056,8 +2045,11 @@ void v_mk_configure(const char* a_key, const char* a_value)
         t_key_value_pair * f_kvp = g_kvp_get(a_value);
         printf("v_wav_pool_add_item(musikernel->wav_pool, %i, \"%s\")\n",
                 atoi(f_kvp->key), f_kvp->value);
-        v_wav_pool_add_item(musikernel->wav_pool, atoi(f_kvp->key),
-                f_kvp->value);
+        t_wav_pool_item * result =
+            v_wav_pool_add_item(musikernel->wav_pool,
+                atoi(f_kvp->key), f_kvp->value);
+        i_wav_pool_item_load(result, 1);
+        v_create_sample_graph(result);
         free(f_kvp);
     }
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_PREVIEW_SAMPLE))
