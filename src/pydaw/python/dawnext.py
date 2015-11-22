@@ -2155,7 +2155,6 @@ class ItemSequencer(QGraphicsView):
 
     def sceneDropEvent(self, a_event):
         f_pos = a_event.scenePos()
-        libmk.APP.setOverrideCursor(QtCore.Qt.WaitCursor)
         if AUDIO_ITEMS_TO_DROP:
             self.add_items(f_pos, AUDIO_ITEMS_TO_DROP)
         elif MIDI_FILES_TO_DROP:
@@ -2165,7 +2164,6 @@ class ItemSequencer(QGraphicsView):
             PROJECT.import_midi_file(f_midi, f_beat, f_lane_num)
             PROJECT.commit("Import MIDI file")
             REGION_SETTINGS.open_region()
-        libmk.APP.restoreOverrideCursor()
 
     def quantize(self, a_beat):
         if SEQ_QUANTIZE:
@@ -2204,6 +2202,8 @@ class ItemSequencer(QGraphicsView):
                 return
             else:
                 a_single_item = True
+
+        libmk.APP.setOverrideCursor(QtCore.Qt.WaitCursor)
 
         f_beat_frac, f_track_num = self.pos_to_beat_and_track(a_pos)
 
@@ -2276,6 +2276,8 @@ class ItemSequencer(QGraphicsView):
 
         if f_restart:
             libmk.restart_engine()
+
+        libmk.APP.restoreOverrideCursor()
 
     def get_beat_value(self):
         return self.playback_pos
