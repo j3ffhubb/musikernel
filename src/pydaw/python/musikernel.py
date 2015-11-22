@@ -1459,20 +1459,19 @@ def splash_screen_opening():
 splash_screen_opening()
 
 if os.path.exists(default_project_file):
-    global_open_project(default_project_file)
-#    try:
-#        global_open_project(default_project_file)
-#    except Exception as ex:
-#        QMessageBox.warning(
-#            MAIN_WINDOW, _("Error"),
-#            _("Error opening project: {}\n{}\n"
-#            "Opening project recovery dialog.  If the problem "
-#            "persists or the project can't be recovered, you may "
-#            "need to delete your settings and/or default project "
-#            "in \n{}".format(
-#            default_project_file, ex, pydaw_util.global_pydaw_home)))
-#        libmk.PROJECT.show_project_history()
-#        MAIN_WINDOW.prepare_to_quit()
+    try:
+        global_open_project(default_project_file)
+    except Exception as ex:
+        QMessageBox.warning(
+            MAIN_WINDOW, _("Error"),
+            _("Error opening project: {}\n{}\n"
+            "Opening project recovery dialog.  If the problem "
+            "persists or the project can't be recovered, you may "
+            "need to delete your settings and/or default project "
+            "in \n{}".format(
+            default_project_file, ex, pydaw_util.global_pydaw_home)))
+        libmk.PROJECT.show_project_history()
+        MAIN_WINDOW.prepare_to_quit()
 else:
     global_new_project(default_project_file)
 
