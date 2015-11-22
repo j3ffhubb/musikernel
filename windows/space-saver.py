@@ -74,13 +74,11 @@ def on_error(func, path, exc_info):
     If the error is for another reason it re-raises the error.
 
     Usage : ``shutil.rmtree(path, onerror=on_error)``
-    """
-    if not os.access(path, os.W_OK):
-        # Is the error an access error ?
-        os.chmod(path, stat.S_IWUSR)
-        func(path)
-    else:
-        raise
+    """    
+    # Is the error an access error ?
+    os.chmod(path, stat.S_IWUSR)
+    func(path)
+    
 
 def delete_path(a_path):
     if os.path.isdir(a_path):
@@ -136,7 +134,7 @@ def delete_it_all(a_path):
     if os.path.isdir(pkg_dir) and os.listdir(pkg_dir):
         print("Warning:  '{}' is not empty".format(pkg_dir))
 
-for bits in ("64",): #"32",
+for bits in ("64", "32"):
     base_dir = r'C:\musikernel2'
     mingw_dir = r'{0}\mingw{1}'.format(base_dir, bits)
     bin_dir = r'{0}\bin'.format(mingw_dir)
