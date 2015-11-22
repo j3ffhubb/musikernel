@@ -72,7 +72,7 @@ Section "install"
   CreateDirectory "$SMPROGRAMS\${{PRODUCT_NAME}} ({bits} bit)"
   SetOutPath "$INSTDIR\bin"
   createShortCut \
-    "$SMPROGRAMS\${{PRODUCT_NAME}} ({bits} bit)\${{PRODUCT_NAME}} ({bits} bit).lnk" \
+    "$SMPROGRAMS\${{PRODUCT_NAME}} ({bits} bit)\${{PRODUCT_NAME}} {MAJOR_VERSION_NUM} ({bits} bit).lnk" \
     "$INSTDIR\bin\{MAJOR_VERSION}.bat" "" \
     "$INSTDIR\{MAJOR_VERSION}.ico" "" SW_SHOWMINIMIZED
 SectionEnd
@@ -130,7 +130,8 @@ for bits in ("64", "32"):
     with open(bat_file, "w") as fh:
         fh.write(bat_script.format(bits=bits))
     template = TEMPLATE.format(
-        bits=bits, MINOR_VERSION=MINOR_VERSION, MAJOR_VERSION=MAJOR_VERSION)
+        bits=bits, MINOR_VERSION=MINOR_VERSION, MAJOR_VERSION=MAJOR_VERSION,
+        MAJOR_VERSION_NUM=MAJOR_VERSION[-1])
     template_name = "{0}-{1}.nsi".format(MAJOR_VERSION, bits)
     with open(template_name, "w") as fh:
         fh.write(template)
