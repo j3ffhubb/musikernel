@@ -757,7 +757,7 @@ PYFX_Descriptor *rayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, RAYV_OSC2_TUNE, 0.0f, -100.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, RAYV_OSC2_VOLUME, -6.0f, -30.0f, 0.0f);
     pydaw_set_pyfx_port(f_result, RAYV_MASTER_VOLUME, -6.0f, -30.0f, 12.0f);
-    pydaw_set_pyfx_port(f_result, RAYV_MASTER_UNISON_VOICES, 4.0f, 1.0f, 7.0f);
+    pydaw_set_pyfx_port(f_result, RAYV_MASTER_UNISON_VOICES, 1.0f, 1.0f, 7.0f);
     pydaw_set_pyfx_port(f_result, RAYV_MASTER_UNISON_SPREAD, 50.0f, 0.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, RAYV_MASTER_GLIDE, 0.0f,  0.0f, 200.0f);
     pydaw_set_pyfx_port(f_result, RAYV_MASTER_PITCHBEND_AMT, 18.0f, 1.0f,  36.0f);

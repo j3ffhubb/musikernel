@@ -1521,7 +1521,7 @@ class pydaw_osc_widget:
         if a_uni_voices_port is not None and a_uni_spread_port is not None:
             self.uni_voices_knob = pydaw_knob_control(
                 a_size, _("Unison"), a_uni_voices_port,
-                a_rel_callback, a_val_callback, 1, 7, 4, KC_INTEGER,
+                a_rel_callback, a_val_callback, 1, 7, 1, KC_INTEGER,
                 a_port_dict, a_preset_mgr)
             self.uni_voices_knob.add_to_grid_layout(self.grid_layout, 10)
             self.uni_spread_knob = pydaw_knob_control(
@@ -2654,7 +2654,7 @@ class pydaw_master_widget:
         if a_uni_voices_port is not None and a_uni_spread_port is not None:
             self.uni_voices_knob = pydaw_knob_control(
                 a_size, _("Unison"), a_uni_voices_port,
-                a_rel_callback, a_val_callback, 1, 7, 4, KC_INTEGER,
+                a_rel_callback, a_val_callback, 1, 7, 1, KC_INTEGER,
                 a_port_dict, a_preset_mgr)
             self.uni_voices_knob.add_to_grid_layout(self.layout, 1)
             self.uni_spread_knob = pydaw_knob_control(
