@@ -120,10 +120,15 @@ input("Press 'enter' to continue")
 
 NSIS = r"C:\Program Files (x86)\NSIS\Bin\makensis.exe"
 
-for bits in ("64", "32"):
-    shutil.copy(
-        os.path.join(CWD, "{}.bat".format(MAJOR_VERSION)),
-        r"C:\{}\mingw{}\bin".format(MAJOR_VERSION, bits))
+bat_script = r"""start /wait /b /REALTIME /D C:\musikernel2\mingw{bits}\bin python3.exe musikernel2.py
+"""
+
+for bits in ("64", "32"):    
+    bat_file = (
+        r"C:\{MAJOR_VERSION}\mingw{bits}\bin\{MAJOR_VERSION}.bat".format(
+        MAJOR_VERSION=MAJOR_VERSION, bits=bits))
+    with open(bat_file, "w") as fh:
+        fh.write(bat_script.format(bits=bits))
     template = TEMPLATE.format(
         bits=bits, MINOR_VERSION=MINOR_VERSION, MAJOR_VERSION=MAJOR_VERSION)
     template_name = "{0}-{1}.nsi".format(MAJOR_VERSION, bits)
