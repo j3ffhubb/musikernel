@@ -806,7 +806,8 @@ class MixerWidget:
         self.widget.setUpdatesEnabled(False)
         for i in range(1, len(self.tracks)):
             graph_dict = a_graph.graph[i] if i in a_graph.graph else {}
-            self.tracks[i].set_plugin(graph_dict, a_plugins[i])
+            if i in a_plugins:
+                self.tracks[i].set_plugin(graph_dict, a_plugins[i])
         self.widget.setUpdatesEnabled(True)
         self.widget.update()
 
