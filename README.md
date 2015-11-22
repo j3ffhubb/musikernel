@@ -1,14 +1,9 @@
-######Important
-
-The master branch is the development branch for the unreleased MusiKernel v2.
-If you're looking for the code for the released MusiKernel v1, use the
-"musikernel1" branch.
-
 - **Twitter** - Follow @musikernel for the latest news and release announcements
 - [**KVR** - See screenshots](http://www.kvraudio.com/product/musikernel-by-musikernel)
 - [**Youtube** - Watch MusiKernel tutorial videos](https://www.youtube.com/channel/UCf_PgsosvLpxkN6bff9NESA/videos)
 - [**How to install**](#how-to-install)
 			- [Windows](#windows)
+			- [Mac OS X](#macosx)
 			- [Fedora](#fedora)
 			- [Ubuntu](#ubuntu)
 - [**How to Build**](#how-to-build)
@@ -22,6 +17,10 @@ If you're looking for the code for the released MusiKernel v1, use the
 ######Windows
 
 Download and run the Windows installer [here](https://github.com/j3ffhubb/musikernel/releases/) (64 bit only)
+
+######MacOSX
+
+[Follow the instructions here](https://github.com/j3ffhubb/homebrew-musikernel)
 
 ######Fedora
 
