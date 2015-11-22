@@ -68,11 +68,11 @@ Section "install"
   SetOutPath $INSTDIR
   writeUninstaller "$INSTDIR\uninstall.exe"
   File /r "C:\{MAJOR_VERSION}\mingw{bits}\*"
-  RMDir /r "$SMPROGRAMS\${{PRODUCT_NAME}} ({bits} bit)"
-  CreateDirectory "$SMPROGRAMS\${{PRODUCT_NAME}} ({bits} bit)"
+  RMDir /r "$SMPROGRAMS\${{PRODUCT_NAME}} {MAJOR_VERSION_NUM} ({bits} bit)"
+  CreateDirectory "$SMPROGRAMS\${{PRODUCT_NAME}} {MAJOR_VERSION_NUM} ({bits} bit)"
   SetOutPath "$INSTDIR\bin"
   createShortCut \
-    "$SMPROGRAMS\${{PRODUCT_NAME}} ({bits} bit)\${{PRODUCT_NAME}} {MAJOR_VERSION_NUM} ({bits} bit).lnk" \
+    "$SMPROGRAMS\${{PRODUCT_NAME}} {MAJOR_VERSION_NUM} ({bits} bit)\${{PRODUCT_NAME}} {MAJOR_VERSION_NUM} ({bits} bit).lnk" \
     "$INSTDIR\bin\{MAJOR_VERSION}.bat" "" \
     "$INSTDIR\{MAJOR_VERSION}.ico" "" SW_SHOWMINIMIZED
 SectionEnd
