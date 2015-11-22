@@ -7315,8 +7315,9 @@ class AutomationEditor(AbstractItemEditor):
         if not ITEM_EDITOR.enabled:
             self.setUpdatesEnabled(True)
             return
-        f_pen = QPen(QtCore.Qt.black, 2.0)
-        f_note_height = (self.viewer_height / 127.0)
+
+        f_note_height = (self.viewer_height / 120.0)
+        f_note_pen = QPen(QtCore.Qt.white, f_note_height)
 
         if self.is_cc:
             for f_cc in CURRENT_ITEM.ccs:
@@ -7329,11 +7330,11 @@ class AutomationEditor(AbstractItemEditor):
             f_note_start = (f_note.start *
                 self.px_per_beat) + AUTOMATION_RULER_WIDTH
             f_note_end = f_note_start + (f_note.length * self.px_per_beat)
-            f_note_y = AUTOMATION_RULER_WIDTH + (127.0 -
+            f_note_y = AUTOMATION_RULER_WIDTH + (120.0 -
                 f_note.note_num) * f_note_height
             f_note_item = QGraphicsLineItem(
                 f_note_start, f_note_y, f_note_end, f_note_y)
-            f_note_item.setPen(f_pen)
+            f_note_item.setPen(f_note_pen)
             self.scene.addItem(f_note_item)
 
         self.setSceneRect(
