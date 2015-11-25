@@ -1826,7 +1826,6 @@ class ItemSequencer(QGraphicsView):
                     f_track, f_beat, LAST_ITEM_LENGTH, f_uid)
                 CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
                 self.selected_item_strings = {str(f_item_ref)}
-                TRACK_PANEL.tracks[f_track].check_output()
                 PROJECT.save_region(CURRENT_REGION)
                 PROJECT.commit(_("Add new item"))
                 REGION_SETTINGS.open_region()
@@ -2214,7 +2213,6 @@ class ItemSequencer(QGraphicsView):
 
         if a_single_item:
             lane_num = 0
-            TRACK_PANEL.tracks[f_track_num].check_output()
             f_item_name = "{}-1".format(TRACK_NAMES[f_track_num])
             f_item_uid = PROJECT.create_empty_item(f_item_name)
             f_items = PROJECT.get_item_by_uid(f_item_uid)
@@ -2227,7 +2225,6 @@ class ItemSequencer(QGraphicsView):
             f_item_name = os.path.basename(f_file_name_str)
             if f_file_name_str:
                 if not a_single_item:
-                    TRACK_PANEL.tracks[f_track_num].check_output()
                     f_item_uid = PROJECT.create_empty_item(f_item_name)
                     f_items = PROJECT.get_item_by_uid(f_item_uid)
                 f_index = f_items.get_next_index()
@@ -8132,7 +8129,7 @@ class MidiDevice:
             self.record_checkbox.isChecked(), self.index,
             track_index)
         if track_index:  # not master
-            TRACK_PANEL.tracks[track_index].check_output()
+            PROJECT.check_output(track_index)
         self.save_callback()
 
     def get_routing(self):
@@ -8446,16 +8443,8 @@ class SeqTrack:
             SEQUENCER.open_region()
 
     def save_callback(self):
-        self.check_output()
+        PROJECT.check_output(self.track_number)
         self.plugin_changed()
-
-    def check_output(self):
-        f_graph = PROJECT.get_routing_graph()
-        if self.track_number != 0 and \
-        f_graph.set_default_output(self.track_number):
-            PROJECT.save_routing_graph(f_graph)
-            PROJECT.commit(_("Set default output "
-                "for track {}".format(self.track_number)))
 
     def name_callback(self):
         return str(self.track_name_lineedit.text())
@@ -8531,7 +8520,7 @@ class AudioInput:
         if not self.suppress_updates and not SUPPRESS_TRACK_COMBOBOX_CHANGES:
             f_track = self.output_track_combobox.currentIndex()
             if f_track in TRACK_PANEL.tracks:
-                TRACK_PANEL.tracks[f_track].check_output()
+                PROJECT.check_output(f_track)
                 self.update_engine()
             else:
                 print("{} not in TRACK_PANEL".format(f_track))

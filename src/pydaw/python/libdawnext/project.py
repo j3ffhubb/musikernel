@@ -245,6 +245,29 @@ class DawNextProject(libmk.AbstractProject):
         if a_notify:
             self.IPC.pydaw_update_track_send()
 
+    def check_output(self, a_track=None):
+        """ Ensure that any track with items or plugins is routed to master
+            if it does not have any routings
+        """
+        if a_track is not None and a_track <= 0:
+            return
+        graph = self.get_routing_graph()
+        region = self.get_region()
+        modified = False
+        tracks = set(x.track_num for x in region.items)
+        if 0 in tracks:
+            tracks.remove(0)
+        if a_track is not None:
+            tracks.add(a_track)
+
+        for i in tracks:
+            if graph.set_default_output(i):
+                modified = True
+
+        if modified:
+            self.save_routing_graph(graph)
+            self.commit("Set default output")
+
     def get_midi_routing(self):
         if os.path.isfile(self.midi_routing_file):
             with open(self.midi_routing_file) as f_handle:
@@ -771,6 +794,7 @@ class DawNextProject(libmk.AbstractProject):
             self.save_file("", FILE_SEQUENCER, str(a_region))
             if a_notify:
                 self.IPC.pydaw_save_region()
+            self.check_output()
 
     def save_tracks(self, a_tracks):
         if not self.suppress_updates:
