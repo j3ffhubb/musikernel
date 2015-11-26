@@ -178,9 +178,11 @@ class PixmapKnobCache:
                 QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         return f_cache[a_size]
 
-DEFAULT_KNOB_PIXMAP_CACHE = PixmapKnobCache(
-    os.path.join(pydaw_util.STYLESHEET_DIR, "pydaw-knob.png"))
+DEFAULT_KNOB_FG_PIXMAP_CACHE = PixmapKnobCache(
+    os.path.join(pydaw_util.STYLESHEET_DIR, "knob-fg.png"))
 
+DEFAULT_KNOB_BG_PIXMAP_CACHE = PixmapKnobCache(
+    os.path.join(pydaw_util.STYLESHEET_DIR, "knob-bg.png"))
 
 CC_CLIPBOARD = None
 TEMPO = 128.0
@@ -192,18 +194,22 @@ def set_global_tempo(a_tempo):
 class pydaw_pixmap_knob(QDial):
     def __init__(
             self, a_size, a_min_val, a_max_val,
-            a_pixmap_cache=DEFAULT_KNOB_PIXMAP_CACHE):
+            a_pixmap_fg_cache=DEFAULT_KNOB_FG_PIXMAP_CACHE,
+            a_pixmap_bg_cache=DEFAULT_KNOB_BG_PIXMAP_CACHE):
         QDial.__init__(self)
-        self.pixmap_cache = a_pixmap_cache
+        self.pixmap_fg_cache = a_pixmap_fg_cache
+        self.pixmap_bg_cache = a_pixmap_bg_cache
         self.setRange(a_min_val, a_max_val)
         self.val_step = float(a_max_val - a_min_val) * 0.005  # / 200.0
         self.val_step_small = self.val_step * 0.1
         self.setGeometry(0, 0, a_size, a_size)
         self.pixmap_size = a_size - 10
-        self.pixmap = self.pixmap_cache.get_scaled_pixmap_knob(
+        self.pixmap_fg = self.pixmap_fg_cache.get_scaled_pixmap_knob(
             self.pixmap_size)
-        self.background_pixmap = self.pixmap_cache.get_scaled_pixmap_knob(
-            self.pixmap_size, True)
+        self.pixmap_bg = self.pixmap_bg_cache.get_scaled_pixmap_knob(
+            self.pixmap_size)
+#        self.background_pixmap = self.pixmap_cache.get_scaled_pixmap_knob(
+#            self.pixmap_size, True)
         self.setFixedSize(a_size, a_size)
 
     def keyPressEvent(self, a_event):
@@ -216,8 +222,8 @@ class pydaw_pixmap_knob(QDial):
         p.setRenderHints(
             QPainter.HighQualityAntialiasing |
             QPainter.SmoothPixmapTransform)
-        if self.background_pixmap:
-            p.drawPixmap(0, 0, self.background_pixmap)
+#        if self.background_pixmap:
+#            p.drawPixmap(0, 0, self.background_pixmap)
         f_frac_val = ((float(self.value() - self.minimum())) /
             (float(self.maximum() - self.minimum())))
         f_rotate_value = f_frac_val * 270.0
@@ -230,6 +236,7 @@ class pydaw_pixmap_knob(QDial):
         p.drawArc(f_rect, -136 * 16, 136 * 2 * -16)
         p.setPen(KNOB_ARC_PEN)
         p.drawArc(f_rect, -136 * 16, (f_rotate_value + 1.0) * -16)
+        p.drawPixmap(5, 5, self.pixmap_bg)
 
         # xc and yc are the center of the widget's rect.
         xc = self.width() * 0.5
@@ -241,7 +248,8 @@ class pydaw_pixmap_knob(QDial):
         # rx and ry so it's in the center.
         rx = -(self.pixmap_size * 0.5)
         ry = -(self.pixmap_size * 0.5)
-        p.drawPixmap(rx, ry, self.pixmap)
+        p.drawPixmap(rx, ry, self.pixmap_fg)
+
 
     def mousePressEvent(self, a_event):
         self.mouse_pos = QCursor.pos()
