@@ -676,8 +676,12 @@ class AbstractUiControl:
             f_menu.addMenu(undo_menu)
             undo_menu.triggered.connect(self.undo_action_callback)
             for x in reversed(self.undo_history):
-                action = undo_menu.addAction(self.value_conversion(x))
-                action.control_value = x
+                value = self.value_conversion(x)
+                if value:
+                    action = undo_menu.addAction(self.value_conversion(x))
+                    if action is not None: # Not sure why this happens
+                        action.control_value = x
+
         if self.midi_learn_callback:
             f_ml_action = f_menu.addAction(_("MIDI Learn"))
             f_ml_action.triggered.connect(self.midi_learn)
