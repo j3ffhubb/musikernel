@@ -199,7 +199,7 @@ class pydaw_pixmap_knob(QDial):
         self.val_step = float(a_max_val - a_min_val) * 0.005  # / 200.0
         self.val_step_small = self.val_step * 0.1
         self.setGeometry(0, 0, a_size, a_size)
-        self.pixmap_size = a_size - 10
+        self.pixmap_size = a_size - 12
         self.pixmap_fg = self.pixmap_fg_cache.get_scaled_pixmap_knob(
             self.pixmap_size)
         self.pixmap_bg = self.pixmap_bg_cache.get_scaled_pixmap_knob(
@@ -230,7 +230,7 @@ class pydaw_pixmap_knob(QDial):
         p.drawArc(f_rect, -136 * 16, (f_rotate_value + 1.0) * -16)
 
         if self.pixmap_bg:
-            p.drawPixmap(5, 5, self.pixmap_bg)
+            p.drawPixmap(6, 6, self.pixmap_bg)
 
         if self.pixmap_fg:
             # xc and yc are the center of the widget's rect.
