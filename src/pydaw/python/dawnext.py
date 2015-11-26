@@ -4934,8 +4934,6 @@ class AudioItemSeq(AbstractItemEditor):
         """ Check that there are not too many vertical
             lines on the screen
         """
-        return
-
         f_num_count = len(self.text_list)
         if f_num_count == 0:
             return
