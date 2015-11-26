@@ -37,7 +37,7 @@ SCENE_BACKGROUND_BRUSH = QBrush(QColor("#424242"))
 DEFAULT_KNOB_SIZE = 48
 KNOB_ARC_PEN = QPen(QtCore.Qt.white, 5.0)
 
-KNOB_BACKGROUND_PEN = QPen(QColor.fromRgb(120, 120, 120, 255), 5.0)
+KNOB_BACKGROUND_PEN = QPen(QColor.fromRgb(90, 90, 90, 255), 5.0)
 
 class QGraphicsRectItemNDL(QGraphicsRectItem):
     """ QGraphicsRectItem without that awful dotted line when selected """
