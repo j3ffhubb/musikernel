@@ -150,33 +150,29 @@ class cc_mapping:
 
 
 class PixmapKnobCache:
-    def __init__(self, a_path, a_background=None):
+    def __init__(self, a_path):
         self.cache = {}
-        self.background_cache = {}
         self.path = a_path
-        self.background_path = a_background
         self.knob_pixmap = None
-        self.background_pixmap = None
+        self.first_load = True
 
-    def get_scaled_pixmap_knob(self, a_size, a_background=False):
-        if a_background and not self.background_path:
-            return None
+    def get_scaled_pixmap_knob(self, a_size):
         # hack to get around creating a QApplication first
-        if not a_background and not self.knob_pixmap:
-            self.knob_pixmap = QPixmap(self.path)
-        elif a_background and not self.background_pixmap:
-            self.background_pixmap = QPixmap(self.background_path)
-        if a_background:
-            f_cache = self.background_cache
-            f_pixmap = self.background_pixmap
-        else:
-            f_cache = self.cache
-            f_pixmap = self.knob_pixmap
-        if not a_size in f_cache:
-            f_cache[a_size] = f_pixmap.scaled(
+        if self.first_load:
+            self.first_load = False
+            if os.path.exists(self.path):
+                self.knob_pixmap = QPixmap(self.path)
+            else:
+                print("ERROR:  '{}' does not exist, you may be using "
+                    "an old-style theme, try loading the default "
+                    "theme".format(self.path))
+        if not self.knob_pixmap:
+            return None
+        if a_size not in self.cache:
+            self.cache[a_size] = self.knob_pixmap.scaled(
                 a_size, a_size,
                 QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-        return f_cache[a_size]
+        return self.cache[a_size]
 
 DEFAULT_KNOB_FG_PIXMAP_CACHE = PixmapKnobCache(
     os.path.join(pydaw_util.STYLESHEET_DIR, "knob-fg.png"))
@@ -208,8 +204,6 @@ class pydaw_pixmap_knob(QDial):
             self.pixmap_size)
         self.pixmap_bg = self.pixmap_bg_cache.get_scaled_pixmap_knob(
             self.pixmap_size)
-#        self.background_pixmap = self.pixmap_cache.get_scaled_pixmap_knob(
-#            self.pixmap_size, True)
         self.setFixedSize(a_size, a_size)
 
     def keyPressEvent(self, a_event):
@@ -222,8 +216,6 @@ class pydaw_pixmap_knob(QDial):
         p.setRenderHints(
             QPainter.HighQualityAntialiasing |
             QPainter.SmoothPixmapTransform)
-#        if self.background_pixmap:
-#            p.drawPixmap(0, 0, self.background_pixmap)
         f_frac_val = ((float(self.value() - self.minimum())) /
             (float(self.maximum() - self.minimum())))
         f_rotate_value = f_frac_val * 270.0
@@ -236,19 +228,22 @@ class pydaw_pixmap_knob(QDial):
         p.drawArc(f_rect, -136 * 16, 136 * 2 * -16)
         p.setPen(KNOB_ARC_PEN)
         p.drawArc(f_rect, -136 * 16, (f_rotate_value + 1.0) * -16)
-        p.drawPixmap(5, 5, self.pixmap_bg)
 
-        # xc and yc are the center of the widget's rect.
-        xc = self.width() * 0.5
-        yc = self.height() * 0.5
-        # translates the coordinate system by xc and yc
-        p.translate(xc, yc)
-        p.rotate(f_rotate_value)
-        # we need to move the rectangle that we draw by
-        # rx and ry so it's in the center.
-        rx = -(self.pixmap_size * 0.5)
-        ry = -(self.pixmap_size * 0.5)
-        p.drawPixmap(rx, ry, self.pixmap_fg)
+        if self.pixmap_bg:
+            p.drawPixmap(5, 5, self.pixmap_bg)
+
+        if self.pixmap_fg:
+            # xc and yc are the center of the widget's rect.
+            xc = self.width() * 0.5
+            yc = self.height() * 0.5
+            # translates the coordinate system by xc and yc
+            p.translate(xc, yc)
+            p.rotate(f_rotate_value)
+            # we need to move the rectangle that we draw by
+            # rx and ry so it's in the center.
+            rx = -(self.pixmap_size * 0.5)
+            ry = -(self.pixmap_size * 0.5)
+            p.drawPixmap(rx, ry, self.pixmap_fg)
 
 
     def mousePressEvent(self, a_event):
