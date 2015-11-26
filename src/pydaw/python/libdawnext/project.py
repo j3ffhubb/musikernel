@@ -1493,7 +1493,7 @@ class pydaw_item:
         f_result = []
 
         f_note_brush = QColor.fromRgb(210, 210, 210, 220)
-        f_audio_brush = QColor.fromRgb(90, 90, 90, 120)
+        f_audio_brush = QColor.fromRgb(150, 150, 150, 210)
         f_note_pen = QPen(f_note_brush)
         f_pen = QPen(f_audio_brush)
         f_pen.setCosmetic(True)

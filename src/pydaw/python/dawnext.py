@@ -695,6 +695,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.setFlag(QGraphicsItem.ItemIsMovable)
             self.setFlag(QGraphicsItem.ItemIsSelectable)
             self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
+            self.setFlag(QGraphicsItem.ItemDoesntPropagateOpacityToChildren)
         else:
             self.setEnabled(False)
             self.setOpacity(0.2)
@@ -711,7 +712,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             f_pixmaps, f_transform, self.x_scale, self.y_scale = \
                 PROJECT.get_item_path(
                     a_audio_item.item_uid, SEQUENCER_PX_PER_BEAT,
-                    REGION_EDITOR_TRACK_HEIGHT,
+                    REGION_EDITOR_TRACK_HEIGHT - 20,
                     CURRENT_REGION.get_tempo_at_pos(a_audio_item.start_beat))
             for f_pixmap in f_pixmaps:
                 f_pixmap_item = QGraphicsPixmapItem(self)
@@ -735,8 +736,6 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         self.label.setPos(1.0, 1.0)
         self.label.setFlag(QGraphicsItem.ItemIgnoresTransformations)
         self.label.setZValue(2100.00)
-
-        self.label_bg.setRect(self.label.boundingRect())
 
         self.start_handle = QGraphicsRectItem(parent=self)
         self.start_handle.setZValue(2200.0)
@@ -863,6 +862,9 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             0.0, 0.0, f_length, REGION_EDITOR_TRACK_HEIGHT)
         self.setRect(self.rect_orig)
 
+        label_rect = QtCore.QRectF(0.0, 0.0, f_length, 20)
+        self.label_bg.setRect(label_rect)
+
         f_track_num = REGION_EDITOR_HEADER_HEIGHT + (
             REGION_EDITOR_TRACK_HEIGHT * self.audio_item.track_num)
 
@@ -882,7 +884,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             f_offset_inc = project.PIXMAP_TILE_WIDTH * self.x_scale
             for f_pixmap_item in self.pixmap_items:
                 f_pixmap_item.setPos(
-                    f_offset + self.sample_start_offset_px, 0.0)
+                    f_offset + self.sample_start_offset_px, 20.0)
                 f_offset += f_offset_inc
 
         self.start_handle_scene_min = f_start + self.sample_start_offset_px
@@ -942,6 +944,8 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
 
     def set_brush(self, a_index=None):
         if self.isSelected():
+            if REGION_EDITOR_MODE == 0:
+                self.setOpacity(1.0)
             self.setBrush(SELECTED_ITEM_COLOR)
             self.label_bg.setBrush(SELECTED_ITEM_COLOR)
             self.start_handle.setPen(AUDIO_ITEM_HANDLE_SELECTED_PEN)
@@ -958,6 +962,8 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.length_handle.setBrush(AUDIO_ITEM_HANDLE_SELECTED_BRUSH)
             self.stretch_handle.setBrush(AUDIO_ITEM_HANDLE_SELECTED_BRUSH)
         else:
+            if REGION_EDITOR_MODE == 0:
+                self.setOpacity(0.3)
             self.start_handle.setPen(AUDIO_ITEM_HANDLE_PEN)
             self.length_handle.setPen(AUDIO_ITEM_HANDLE_PEN)
             self.stretch_handle.setPen(AUDIO_ITEM_HANDLE_PEN)
