@@ -85,7 +85,7 @@ class project_history_widget(QTreeWidget):
                 datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
             f_item = f_items[0]
             f_tar_path = os.path.join(
-                self.backup_dir, "{}.tar.bz2".format(f_item.text(0)))
+                self.backup_dir, f_item.text(0))
             shutil.move(f_project_dir, f_tmp_dir)
             with tarfile.open(f_tar_path, "r:bz2") as f_tar:
                 f_tar.extractall(self.project_dir)
