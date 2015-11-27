@@ -5302,6 +5302,8 @@ class time_pitch_dialog_widget:
                 libmk.PROJECT.save_stretch_dicts()
                 for f_stretch_item, f_audio_item in f_stretched_items:
                     f_stretch_item[2].wait()
+                    libmk.PROJECT.get_wav_uid_by_name(
+                        f_stretch_item[0], a_uid=f_stretch_item[1])
 #                    f_new_uid = libmk.PROJECT.get_wav_uid_by_name(
 #                        f_stretch_item[0], a_uid=f_stretch_item[1])
 #                    f_graph = libmk.PROJECT.get_sample_graph_by_uid(f_new_uid)
