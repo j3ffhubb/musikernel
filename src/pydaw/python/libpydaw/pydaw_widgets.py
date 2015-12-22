@@ -1759,9 +1759,6 @@ class AbstractFileBrowserWidget():
         self.folder_buttons_hlayout.addWidget(self.back_button)
         self.back_button.contextMenuEvent = self.back_contextMenuEvent
         self.back_button.pressed.connect(self.on_back)
-        self.bookmark_button = QPushButton(_("Bookmark"))
-        self.bookmark_button.pressed.connect(self.bookmark_button_pressed)
-        self.folder_buttons_hlayout.addWidget(self.bookmark_button)
 
         self.menu_button = QPushButton(_("Menu"))
         self.menu_button_menu = QMenu()
@@ -1773,6 +1770,16 @@ class AbstractFileBrowserWidget():
 
         self.paste_action = self.menu_button_menu.addAction(_("Paste"))
         self.paste_action.triggered.connect(self.paste_button_pressed)
+
+        self.menu_button_menu.addSeparator()
+
+        self.bookmark_action = self.menu_button_menu.addAction(_("Bookmark"))
+        self.bookmark_action.triggered.connect(self.bookmark_button_pressed)
+
+        self.bookmark_subfolders_action = self.menu_button_menu.addAction(
+            _("Bookmark Subfolders..."))
+        self.bookmark_subfolders_action.triggered.connect(
+            self.bookmark_subfolders)
 
         self.bookmarks_tab = QWidget()
         self.bookmarks_tab_vlayout = QVBoxLayout()
@@ -1946,21 +1953,44 @@ class AbstractFileBrowserWidget():
                 f_parent.addChild(f_child)
             f_parent.setExpanded(True)
 
-    def bookmark_button_pressed(self):
+    def bookmark_subfolders(self):
+        self.bookmark_button_pressed(a_recursive=True)
+
+    def bookmark_button_pressed(self, a_recursive=False):
         def on_ok(a_val=None):
             f_text = str(f_category.currentText()).strip()
             if not f_text:
                 QMessageBox.warning(
                     f_window, _("Error"), _("Category cannot be empty"))
-            f_val = str(f_lineedit.text()).strip()
-            if not f_val:
-                QMessageBox.warning(
-                    f_window, _("Error"), _("Name cannot be empty"))
-                return
-            pydaw_util.global_add_file_bookmark(
-                f_val, self.last_open_dir, f_text)
+            if a_recursive:
+                added_bm = False
+                for f_i in range(dir_list_widget.count()):
+                    item = dir_list_widget.item(f_i)
+                    if not item.isHidden() and item.isSelected():
+                         pydaw_util.global_add_file_bookmark(
+                             item.dirname_abbrev[-30:], item.dir_name, f_text)
+                         added_bm = True
+                if not added_bm:
+                    QMessageBox.warning(
+                        f_window, _("Error"), _("No folders selected"))
+                    return
+            else:
+                f_val = str(f_lineedit.text()).strip()
+                if not f_val:
+                    QMessageBox.warning(
+                        f_window, _("Error"), _("Name cannot be empty"))
+                    return
+                pydaw_util.global_add_file_bookmark(
+                    f_val, self.last_open_dir, f_text)
             self.open_bookmarks()
             f_window.close()
+
+        def filter_changed(self, a_val=None):
+            filter_text = str(filter_lineedit.text()).lower()
+            for f_i in range(dir_list_widget.count()):
+                item = dir_list_widget.item(f_i)
+                item.setHidden(
+                    filter_text not in item.dirname_abbrev.lower())
 
         def on_cancel(a_val=None):
             f_window.close()
@@ -1980,10 +2010,16 @@ class AbstractFileBrowserWidget():
         f_category.setEditable(True)
         f_category.addItems(sorted(f_dict.keys(), key=lambda s: s.lower()))
         f_grid_layout.addWidget(f_category, 0, 1)
-        f_lineedit = QLineEdit()
-        f_lineedit.setText(os.path.basename(self.last_open_dir))
-        f_grid_layout.addWidget(QLabel(_("Name:")), 1, 0)
-        f_grid_layout.addWidget(f_lineedit, 1, 1)
+        if a_recursive:
+            f_grid_layout.addWidget(QLabel(_("Filter:")), 2, 0)
+            filter_lineedit = QLineEdit()
+            f_grid_layout.addWidget(filter_lineedit, 2, 1)
+            filter_lineedit.textChanged.connect(filter_changed)
+        else:
+            f_lineedit = QLineEdit()
+            f_lineedit.setText(os.path.basename(self.last_open_dir))
+            f_grid_layout.addWidget(QLabel(_("Name:")), 1, 0)
+            f_grid_layout.addWidget(f_lineedit, 1, 1)
         f_hlayout2 = QHBoxLayout()
         f_layout.addLayout(f_hlayout2)
         f_ok_button = QPushButton(_("OK"))
@@ -1992,6 +2028,24 @@ class AbstractFileBrowserWidget():
         f_cancel_button = QPushButton(_("Cancel"))
         f_cancel_button.pressed.connect(on_cancel)
         f_hlayout2.addWidget(f_cancel_button)
+        if a_recursive:
+            libmk.APP.setOverrideCursor(QtCore.Qt.WaitCursor)
+            dirs = [os.path.join(x, a)
+                for x, y, z in os.walk(self.last_open_dir) for a in y
+                if "__MACOSX" not in x]
+            dirs.sort()
+            libmk.APP.restoreOverrideCursor()
+            dir_list_widget = QListWidget()
+            dir_list_widget.setSelectionMode(
+                QAbstractItemView.ExtendedSelection)
+            f_layout.addWidget(dir_list_widget)
+            for dirname in dirs:
+                dirname_abbrev = dirname.replace(self.last_open_dir, "", 1)
+                item = QListWidgetItem(dirname_abbrev)
+                item.dir_name = dirname
+                item.dirname_abbrev = dirname_abbrev
+                dir_list_widget.addItem(item)
+            dir_list_widget.selectAll()
         f_window.exec_()
 
     def copy_button_pressed(self):
