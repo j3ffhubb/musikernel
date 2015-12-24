@@ -174,8 +174,10 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/themes/default/default.pytheme
 %{{_usr}}/lib/{0}/themes/default/palette.json
 %{{_usr}}/lib/{0}/themes/default/v-fader.png
-%{{_usr}}/lib/{0}/themes/default/hide.svg
-%{{_usr}}/lib/{0}/themes/default/power.svg
+%{{_usr}}/lib/{0}/themes/default/hide-on.png
+%{{_usr}}/lib/{0}/themes/default/hide-off.png
+%{{_usr}}/lib/{0}/themes/default/power-on.png
+%{{_usr}}/lib/{0}/themes/default/power-off.png
 %{{_usr}}/share/applications/{0}.desktop
 %{{_usr}}/share/doc/{0}/copyright
 %{{_usr}}/share/pixmaps/{0}.png

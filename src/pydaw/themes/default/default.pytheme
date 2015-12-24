@@ -83,15 +83,25 @@ QCheckBox#button_power
 QRadioButton#tool_select::indicator,
 QRadioButton#tool_draw::indicator,
 QRadioButton#tool_erase::indicator,
-QRadioButton#tool_split::indicator,
-QCheckBox#button_hide::indicator,
-QCheckBox#button_power::indicator
+QRadioButton#tool_split::indicator
 {
     width: 24px;
     height: 24px;
     outline: none;
     border: 1px solid #dddddd;
     border-radius: 1px;
+}
+
+QCheckBox#button_hide,
+QCheckBox#button_power,
+QCheckBox#button_hide::indicator,
+QCheckBox#button_power::indicator
+{
+    width: 36px;
+    height: 36px;
+    outline: none;
+    border: none;
+    background: none;
 }
 
 QRadioButton#play_button::indicator::checked,
@@ -104,9 +114,7 @@ QRadioButton#stop_button::indicator::checked
 QRadioButton#tool_select::indicator::checked,
 QRadioButton#tool_draw::indicator::checked,
 QRadioButton#tool_erase::indicator::checked,
-QRadioButton#tool_split::indicator::checked,
-QCheckBox#button_hide::indicator::checked,
-QCheckBox#button_power::indicator::checked
+QRadioButton#tool_split::indicator::checked
 {
     background-color: #dddddd;
 }
@@ -121,21 +129,29 @@ QRadioButton#stop_button::indicator::unchecked
 QRadioButton#tool_select::indicator::unchecked,
 QRadioButton#tool_draw::indicator::unchecked,
 QRadioButton#tool_erase::indicator::unchecked,
-QRadioButton#tool_split::indicator::unchecked,
-QCheckBox#button_hide::indicator::unchecked,
-QCheckBox#button_power::indicator::unchecked
+QRadioButton#tool_split::indicator::unchecked
 {
     background-color: #666666;
 }
 
-QCheckBox#button_power::indicator
+QCheckBox#button_power::indicator::checked
 {
-    image: url($STYLE_FOLDER/power.svg);
+    image: url($STYLE_FOLDER/power-on.png);
 }
 
-QCheckBox#button_hide::indicator
+QCheckBox#button_power::indicator::unchecked
 {
-    image: url($STYLE_FOLDER/hide.svg);
+    image: url($STYLE_FOLDER/power-off.png);
+}
+
+QCheckBox#button_hide::indicator::checked
+{
+    image: url($STYLE_FOLDER/hide-on.png);
+}
+
+QCheckBox#button_hide::indicator::unchecked
+{
+    image: url($STYLE_FOLDER/hide-off.png);
 }
 
 QRadioButton#tool_select::indicator
