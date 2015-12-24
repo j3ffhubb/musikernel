@@ -2216,9 +2216,8 @@ NO_OPTIMIZATION void v_pydaw_set_plugin_index(
                 a_plugin_index, g_pydaw_wavpool_item_get,
                 a_plugin_uid, v_queue_osc_message);
 
-
             char f_file_name[1024];
-            sprintf(f_file_name, "%s%i",
+            snprintf(f_file_name, 1024, "%s%i",
                 musikernel->plugins_folder, a_plugin_uid);
 
             if(i_pydaw_file_exists(f_file_name))
@@ -2229,11 +2228,6 @@ NO_OPTIMIZATION void v_pydaw_set_plugin_index(
         }
     }
 
-    if(f_plugin)
-    {
-        f_plugin->power = a_power;
-    }
-
     if(a_lock)
     {
         pthread_spin_lock(&musikernel->main_lock);
@@ -2241,6 +2235,8 @@ NO_OPTIMIZATION void v_pydaw_set_plugin_index(
 
     if(f_plugin)
     {
+        f_plugin->power = a_power;
+
         for(f_i = 0; f_i < f_track->channels; ++f_i)
         {
             f_plugin->descriptor->connect_buffer(

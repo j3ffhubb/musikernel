@@ -88,7 +88,7 @@ NO_OPTIMIZATION void g_pydaw_plugin_init(
         fp_get_wavpool_item_from_host a_host_wavpool_func,
         int a_plugin_uid, fp_queue_message a_queue_func)
 {
-    f_result->active = 0;
+    f_result->active = 1;
     f_result->uid = a_index;
     f_result->pool_uid = a_plugin_uid;
     f_result->atm_count = 0;
