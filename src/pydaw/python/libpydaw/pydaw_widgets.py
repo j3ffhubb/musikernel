@@ -1983,7 +1983,8 @@ class AbstractFileBrowserWidget():
                 pydaw_util.global_add_file_bookmark(
                     f_val, self.last_open_dir, f_text)
             self.open_bookmarks()
-            f_window.close()
+            if not a_recursive:
+                f_window.close()
 
         def filter_changed(self, a_val=None):
             filter_text = str(filter_lineedit.text()).lower()
@@ -2022,10 +2023,14 @@ class AbstractFileBrowserWidget():
             f_grid_layout.addWidget(f_lineedit, 1, 1)
         f_hlayout2 = QHBoxLayout()
         f_layout.addLayout(f_hlayout2)
-        f_ok_button = QPushButton(_("OK"))
+        if a_recursive:
+            f_ok_button = QPushButton(_("Add"))
+            f_cancel_button = QPushButton(_("Close"))
+        else:
+            f_ok_button = QPushButton(_("OK"))
+            f_cancel_button = QPushButton(_("Cancel"))
         f_ok_button.pressed.connect(on_ok)
         f_hlayout2.addWidget(f_ok_button)
-        f_cancel_button = QPushButton(_("Cancel"))
         f_cancel_button.pressed.connect(on_cancel)
         f_hlayout2.addWidget(f_cancel_button)
         if a_recursive:
