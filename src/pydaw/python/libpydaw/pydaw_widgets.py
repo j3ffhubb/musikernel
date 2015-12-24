@@ -2036,8 +2036,7 @@ class AbstractFileBrowserWidget():
             dirs.sort()
             libmk.APP.restoreOverrideCursor()
             dir_list_widget = QListWidget()
-            dir_list_widget.setSelectionMode(
-                QAbstractItemView.ExtendedSelection)
+            dir_list_widget.setSelectionMode(QAbstractItemView.MultiSelection)
             f_layout.addWidget(dir_list_widget)
             for dirname in dirs:
                 dirname_abbrev = dirname.replace(self.last_open_dir, "", 1)
