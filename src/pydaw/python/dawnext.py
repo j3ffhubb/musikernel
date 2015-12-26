@@ -9188,18 +9188,24 @@ class MainWindow(QScrollArea):
     def on_undo(self):
         if libmk.IS_PLAYING or not self.check_tab_for_undo():
             return
+        libmk.APP.setOverrideCursor(QtCore.Qt.WaitCursor)
         if PROJECT.undo():
             global_ui_refresh_callback()
+            libmk.APP.restoreOverrideCursor()
         else:
+            libmk.APP.restoreOverrideCursor()
             QMessageBox.warning(
                 MAIN_WINDOW, "Error", "No more undo history left")
 
     def on_redo(self):
         if libmk.IS_PLAYING or not self.check_tab_for_undo():
             return
+        libmk.APP.setOverrideCursor(QtCore.Qt.WaitCursor)
         if PROJECT.redo():
             global_ui_refresh_callback()
+            libmk.APP.restoreOverrideCursor()
         else:
+            libmk.APP.restoreOverrideCursor()
             QMessageBox.warning(
                 MAIN_WINDOW, "Error", "Already at the latest commit")
 
