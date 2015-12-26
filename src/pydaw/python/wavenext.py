@@ -527,6 +527,14 @@ class MainWindow(QScrollArea):
         self.main_tabwidget.addTab(self.notes_tab, _("Project Notes"))
         self.main_tabwidget.currentChanged.connect(self.tab_changed)
 
+    def on_undo(self):
+        QMessageBox.warning(
+            MAIN_WINDOW, "Error",
+            "Wave-Next does not support undo/redo")
+
+    def on_redo(self):
+        self.on_undo()
+
     def tab_changed(self):
         f_index = self.main_tabwidget.currentIndex()
         if f_index == TAB_PLUGIN_RACK:
