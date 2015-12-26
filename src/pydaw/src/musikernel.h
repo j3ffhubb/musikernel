@@ -106,6 +106,7 @@ int MASTER_OUT_R = 1;
 #define MK_AUTOMATION_RESOLUTION (1.0f / 32.0f)
 #define ATM_TICK_BUFFER_SIZE 16
 
+int MK_OFFLINE_RENDER = 0;
 volatile int exiting = 0;
 float MASTER_VOL __attribute__((aligned(16))) = 1.0f;
 

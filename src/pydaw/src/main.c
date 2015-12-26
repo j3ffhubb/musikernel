@@ -109,7 +109,10 @@ int main(int argc, char **argv);
 int v_configure(const char * path, const char * key, const char * value);
 #endif
 
-
+int dawnext_main(int argc, char** argv);
+void print_help();
+int main(int argc, char** argv);
+int main_loop(int argc, char **argv);
 inline void v_pydaw_run_main_loop(int sample_count,
         float **output, float *a_input_buffers);
 
@@ -307,14 +310,109 @@ NO_OPTIMIZATION void * ui_process_monitor_thread(
 }
 
 
-/* argv positional args:
- * [1] Install prefix (ie: /usr)
- * [2] Project path
- * [3] UI PID  //for monitoring that the UI hasn't crashed
- * Optional args:
- * --sleep
- */
-NO_OPTIMIZATION int main(int argc, char **argv)
+void print_help()
+{
+    printf("Usage:\n");
+    printf("%s dawnext [project_dir] [output_file] [start_beat] "
+        "[end_beat] [sample_rate] [buffer_size] [thread_count] "
+        "[huge_pages] [stem]\n\n", MUSIKERNEL_VERSION);
+}
+
+int main(int argc, char** argv)
+{
+    if(argc < 2)
+    {
+        print_help();
+        return 1;
+    }
+    else if(!strcmp(argv[1], "dawnext"))
+    {
+        return dawnext_main(argc, argv);
+    }
+
+    return main_loop(argc, argv);
+}
+
+int dawnext_main(int argc, char** argv)
+{
+    if(argc < 11)
+    {
+        print_help();
+        return 1;
+    }
+
+    MK_OFFLINE_RENDER = 1;
+
+    char * f_project_dir = argv[2];
+    char * f_output_file = argv[3];
+    double f_start_beat = atof(argv[4]);
+    double f_end_beat = atof(argv[5]);
+    int f_sample_rate = atoi(argv[6]);
+    int f_buffer_size = atoi(argv[7]);
+    int f_thread_count = atoi(argv[8]);
+
+    int f_huge_pages = atoi(argv[9]);
+    assert(f_huge_pages == 0 || f_huge_pages == 1);
+
+    if(f_huge_pages)
+    {
+        printf("Attempting to use hugepages\n");
+    }
+
+    int f_stem_render = atoi(argv[10]);
+
+    USE_HUGEPAGES = f_huge_pages;
+
+    int f_create_file = 1;
+
+    int f_i;
+    for(f_i = 10; f_i < argc; ++f_i)
+    {
+        if(!strcmp(argv[f_i], "--no-file"))
+        {
+            f_create_file = 0;
+        }
+    }
+
+    float** f_output;
+    hpalloc((void**)&f_output, sizeof(float*) * 2);
+
+    v_pydaw_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 0);
+
+    /*
+    PYDAW_AUDIO_INPUT_TRACK_COUNT = 2;
+    v_pydaw_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 1);
+    v_wn_test();
+    */
+
+    f_i = 0;
+    while(f_i < 2)
+    {
+        hpalloc((void**)&f_output[f_i], sizeof(float) * f_buffer_size);
+        f_i++;
+    }
+
+    f_i = 0;
+    while(f_i < f_buffer_size)
+    {
+        f_output[0][f_i] = 0.0f;
+        f_output[1][f_i] = 0.0f;
+        f_i++;
+    }
+
+    musikernel->sample_count = f_buffer_size;
+
+    v_dn_offline_render_prep(dawnext);
+
+    v_dn_offline_render(dawnext, f_start_beat,
+        f_end_beat, f_output_file, f_create_file, f_stem_render);
+
+    v_pydaw_destructor();
+
+    return 0;
+}
+
+NO_OPTIMIZATION int main_loop(int argc, char **argv)
 {
     if(argc < 5)
     {

@@ -120,8 +120,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(4755, root, root) %{{_usr}}/bin/{0}-engine
 
 %attr(755, root, root) %{{_usr}}/bin/{0}.py
-%attr(755, root, root) %{{_usr}}/bin/{0}_render
-%attr(755, root, root) %{{_usr}}/bin/{0}_render-dbg
 %attr(755, root, root) %{{_usr}}/bin/{0}-engine-dbg
 %attr(755, root, root) %{{_usr}}/bin/{0}-engine-no-root
 %attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_paulstretch.py

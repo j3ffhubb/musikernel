@@ -102,7 +102,6 @@ CRISPNESS_SETTINGS = [
     "4", "5 (normal)", "6 (sharp, drums)"]
 
 BIN_PATH = None
-RENDER_BIN_PATH = None
 global_pydaw_is_sandboxed = False
 
 global_pydaw_with_audio = True
@@ -227,13 +226,10 @@ def engine_lib_configure(a_path, a_key, a_val):
 
 
 def pydaw_set_bin_path():
-    global BIN_PATH, RENDER_BIN_PATH
+    global BIN_PATH
     BIN_PATH = os.path.join(
         INSTALL_PREFIX, "bin",
         "{}-engine".format(global_pydaw_version_string))
-    RENDER_BIN_PATH = os.path.join(
-        INSTALL_PREFIX, "bin",
-        "{}_render".format(global_pydaw_version_string))
 
 
 def pydaw_escape_stylesheet(a_stylesheet, a_path):

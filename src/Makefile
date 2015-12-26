@@ -14,25 +14,21 @@ all:
 
 mingw:
 	CFLAGS+=" -static-libgcc " make -C pydaw lib
-	CFLAGS+=" -static-libgcc " make -C pydaw_render
 
 clang:
 	OPTIMIZE_FLAGS= CC=clang make
 
 mac_osx:
 	OPTIMIZE_FLAGS= CC=clang PREFIX=/usr/local make deps
-	OPTIMIZE_FLAGS= CC=clang make -C pydaw_render
 	OPTIMIZE_FLAGS= CC=clang make -C pydaw mac_osx
 native:
 	make PLAT_FLAGS=" -march=native " CFLAGS+=" -O2 "
 
 pydaw_src:
 	make -C pydaw PREFIX=$(PREFIX) CFLAGS+=" -O2 "
-	make -C pydaw_render
 
 native_src:
 	make -C pydaw PREFIX=$(PREFIX) CFLAGS+=" -O2 " PLAT_FLAGS=" -march=native "
-	make -C pydaw_render PLAT_FLAGS=" -march=native "
 
 rpm:
 	../rpm.py
@@ -68,7 +64,6 @@ install:
 	install -d $(MK_DIR)/sbsms/bin
 	make -C pydaw PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) install
 	install sbsms/cli/sbsms $(MK_DIR)/sbsms/bin
-	make -C pydaw_render DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) install
 
 install_mac_osx:
 	PREFIX=/usr/local make install_non_linux
@@ -76,7 +71,6 @@ install_mac_osx:
 install_non_linux:
 	install -d $(MK_DIR)
 	make -C pydaw PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) install_non_linux
-	make -C pydaw_render DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) install
 
 # --------------------------------------------------------------
 
@@ -88,7 +82,6 @@ uninstall:
 
 clean:
 	make -C pydaw clean
-	make -C pydaw_render clean
 
 
 

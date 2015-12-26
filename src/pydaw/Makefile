@@ -45,6 +45,9 @@ dbg:
 	make CFLAGS+=" -O0 -g -gdwarf-3 " $(PYDAW_VERSION)-engine
 	mv $(PYDAW_VERSION)-engine $(PYDAW_VERSION)-engine-dbg
 
+gprof:
+	make CFLAGS+=" -O2 -pg " LDFLAGS+=" -pg "
+
 eng:
 	rm -f src/*.o $(PYDAW_VERSION)-engine ; echo
 	rm -f $(PYDAW_VERSION)-engine src/*.o

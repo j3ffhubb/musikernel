@@ -9048,7 +9048,7 @@ class MainWindow(QScrollArea):
 
             if pydaw_util.IS_LINUX and f_debug_checkbox.isChecked():
                 f_cmd = "{} -e bash -c 'gdb {}-dbg'".format(
-                    pydaw_util.TERMINAL, pydaw_util.RENDER_BIN_PATH)
+                    pydaw_util.TERMINAL, pydaw_util.BIN_PATH)
                 f_run_cmd = [str(x) for x in
                     ("run", "dawnext", "'{}'".format(f_dir),
                     "'{}'".format(f_out_file), f_start_beat, f_end_beat,
@@ -9058,7 +9058,7 @@ class MainWindow(QScrollArea):
                 subprocess.Popen(f_cmd, shell=True)
             else:
                 f_cmd = [str(x) for x in
-                    (pydaw_util.RENDER_BIN_PATH, "dawnext",
+                    (pydaw_util.BIN_PATH, "dawnext",
                      f_dir, f_out_file, f_start_beat, f_end_beat,
                      f_samp_rate, f_buff_size, f_thread_count,
                      pydaw_util.USE_HUGEPAGES, f_stem)]

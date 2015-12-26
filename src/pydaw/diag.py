@@ -19,7 +19,7 @@ import sys
 with open("../major-version.txt") as f_file:
     MK_VERSION = f_file.read().strip()
 
-BIN = "./{}_render".format(MK_VERSION)
+BIN = "./{}-engine".format(MK_VERSION)
 HOME = os.path.expanduser("~")
 LAST_PROJECT = os.path.join(HOME, MK_VERSION, "config", "last-project.txt")
 
@@ -35,7 +35,7 @@ TOOLS = {
         "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0"
         "--no-file",
     "valgrind": "make clean > /dev/null 2>&1 && "
-        "make debug > /dev/null 2>&1 && "
+        "make dbg > /dev/null 2>&1 && "
         "valgrind --alignment=16 --track-origins=yes "
         "{BIN}-dbg {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 0 0"
         "--no-file",
@@ -50,8 +50,8 @@ TOOLS = {
     "profile": "make clean && make gprof && "
         "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0"
         "&& gprof {BIN} > profile.txt && gedit profile.txt",
-    "pahole": "make clean && make debug && pahole {BIN}",
-    "gdb": "make debug > /dev/null 2>&1 && "
+    "pahole": "make clean && make dbg && pahole {BIN}",
+    "gdb": "make dbg > /dev/null 2>&1 && "
         "echo run {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0 "
         "--no-file && gdb {BIN}-dbg ",
 }

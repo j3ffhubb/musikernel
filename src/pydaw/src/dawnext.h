@@ -984,12 +984,10 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
     v_pkm_run(f_track->peak_meter, f_track->buffers[0],
         f_track->buffers[1], a_sample_count);
 
-#ifndef MK_OFFLINE_RENDER
-    if(a_global_track_num)
+    if(a_global_track_num && !MK_OFFLINE_RENDER)
     {
         v_pydaw_zero_buffer(f_track->buffers, a_sample_count);
     }
-#endif
 
     if(f_track->sc_buffers_dirty)
     {
