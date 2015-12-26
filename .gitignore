@@ -51,13 +51,13 @@ ubuntu/pydaw_os/extract-cd
 ubuntu/pydaw_os/mnt
 ubuntu/pydaw_os/md5sum.txt
 *.iso
-src/pydaw_render/*.pymap
-src/pydaw_render/profile.txt
+src/pydaw/*.pymap
+src/pydaw/profile.txt
 *.project
 *.cproject
 src/pydaw/python/libpydaw/history_test*
-src/pydaw_render/gmon.out
-src/pydaw_render/profiling.txt
+src/pydaw/gmon.out
+src/pydaw/profiling.txt
 ubuntu/debian/DEBIAN/control
 ubuntu/debian/DEBIAN/md5sums
 tools/wavetable_maker/wavs/*.wav
@@ -65,8 +65,7 @@ tools/wavetable_maker/wt.h
 tools/wavetable_maker/test.txt
 src/way_v/WAY_V_qt
 tools/wavetable_maker/wtgen
-src/pydaw_render/musikernel*_render*
-src/pydaw_render/*.wav
+src/pydaw/*.wav
 src/build-suffix.txt
 src/pydaw_jack_oscrolloscope/pydaw_jack_oscrolloscope
 *.pyc
@@ -78,7 +77,7 @@ src/maintainer.txt
 *.la
 *.lo
 *~
-src/pydaw_render/test.wav.finished
+src/pydaw/test.wav.finished
 *.log
 *.libs*
 *.deps*
