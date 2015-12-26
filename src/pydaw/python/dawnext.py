@@ -7671,9 +7671,13 @@ def global_open_items(a_items=None, a_reset_scrollbar=False, a_new_ref=None):
         ITEM_REF_POS = (0.0, 4.0)
 
     if a_items is not None:
-        # Don't allow undo/redo to items that are no longer open in the editor
         if a_items != CURRENT_ITEM_NAME:
+            # Don't allow undo/redo to items that are no
+            # longer open in the editor
             PROJECT.clear_undo_context(TAB_ITEM_EDITOR)
+            LAST_ITEM_NAME = CURRENT_ITEM_NAME
+            LAST_ITEM = CURRENT_ITEM
+            CURRENT_ITEM_NAME = a_items
         ITEM_EDITOR.enabled = True
         PIANO_ROLL_EDITOR.selected_note_strings = []
         pydaw_set_piano_roll_quantize()
@@ -7681,11 +7685,8 @@ def global_open_items(a_items=None, a_reset_scrollbar=False, a_new_ref=None):
             for f_editor in MIDI_EDITORS:
                 f_editor.horizontalScrollBar().setSliderPosition(0)
         f_items_dict = PROJECT.get_items_dict()
-        LAST_ITEM_NAME = CURRENT_ITEM_NAME
-        LAST_ITEM = CURRENT_ITEM
         f_uid = f_items_dict.get_uid_by_name(a_items)
         CURRENT_ITEM = PROJECT.get_item_by_uid(f_uid)
-        CURRENT_ITEM_NAME = a_items
         ITEM_EDITOR.item_name_lineedit.setText(a_items)
 
     if CURRENT_ITEM:
