@@ -305,6 +305,7 @@ class AbstractPluginSettings:
             self.controls_widget = QWidget()
             self.controls_widget.setObjectName("plugin_rack")
             self.layout = QHBoxLayout(self.controls_widget)
+            self.layout.setContentsMargins(3, 3, 3, 3)
             self.layout.addWidget(QLabel(_("Plugin")))
             self.vlayout.addWidget(self.controls_widget)
             self.layout.addWidget(self.plugin_combobox)
