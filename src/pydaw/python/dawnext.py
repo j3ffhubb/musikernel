@@ -9186,7 +9186,7 @@ class MainWindow(QScrollArea):
         f_window.exec_()
 
     def on_undo(self):
-        if libmk.IS_PLAYING:
+        if libmk.IS_PLAYING or not self.check_tab_for_undo():
             return
         if PROJECT.undo():
             global_ui_refresh_callback()
@@ -9195,13 +9195,25 @@ class MainWindow(QScrollArea):
                 MAIN_WINDOW, "Error", "No more undo history left")
 
     def on_redo(self):
-        if libmk.IS_PLAYING:
+        if libmk.IS_PLAYING or not self.check_tab_for_undo():
             return
         if PROJECT.redo():
             global_ui_refresh_callback()
         else:
             QMessageBox.warning(
                 MAIN_WINDOW, "Error", "Already at the latest commit")
+
+    def check_tab_for_undo(self):
+        index = self.main_tabwidget.currentIndex()
+        if index in (TAB_SEQUENCER, TAB_ROUTING, TAB_ITEM_EDITOR):
+            return True
+        else:
+            QMessageBox.warning(
+                MAIN_WINDOW, "Error",
+                "Undo/redo only supported for the sequencer, item editor "
+                "and routing tab.  Individual plugins have undo for each "
+                "control by right-clicking and selecting the undo menu")
+            return False
 
     def tab_changed(self):
         f_index = self.main_tabwidget.currentIndex()
