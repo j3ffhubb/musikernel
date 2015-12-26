@@ -7671,6 +7671,9 @@ def global_open_items(a_items=None, a_reset_scrollbar=False, a_new_ref=None):
         ITEM_REF_POS = (0.0, 4.0)
 
     if a_items is not None:
+        # Don't allow undo/redo to items that are no longer open in the editor
+        if a_items != CURRENT_ITEM_NAME:
+            PROJECT.clear_undo_context(TAB_ITEM_EDITOR)
         ITEM_EDITOR.enabled = True
         PIANO_ROLL_EDITOR.selected_note_strings = []
         pydaw_set_piano_roll_quantize()
@@ -9203,6 +9206,7 @@ class MainWindow(QScrollArea):
 
     def tab_changed(self):
         f_index = self.main_tabwidget.currentIndex()
+        PROJECT.set_undo_context(f_index)
         if f_index == TAB_SEQUENCER and not libmk.IS_PLAYING:
             SEQUENCER.open_region()
         elif f_index == TAB_ITEM_EDITOR:

@@ -65,6 +65,7 @@ pydaw_min_note_length = 4.0 / 129.0
 
 class DawNextProject(libmk.AbstractProject):
     def __init__(self, a_with_audio):
+        self.undo_context = 0
         self.TRACK_COUNT = TRACK_COUNT_ALL
         self.last_item_number = 1
         self.last_region_number = 1
@@ -85,37 +86,48 @@ class DawNextProject(libmk.AbstractProject):
             if not pydaw_util.IS_A_TTY:
                 print(str(f_history_file))
 
+    def set_undo_context(self, a_context):
+        self.undo_context = a_context
+
+    def clear_undo_context(self, a_context):
+        self.history_commits[a_context] = []
+
     def commit(self, a_message, a_discard=False):
         """ Commit the project history """
+        if self.undo_context not in self.history_commits:
+            self.history_commits[self.undo_context] = []
         if self.history_undo_cursor > 0:
-            self.history_commits = self.history_commits[
-                :self.history_undo_cursor]
+            self.history_commits[self.undo_context] = self.history_commits[
+                self.undo_context][:self.history_undo_cursor]
             self.history_undo_cursor = 0
         if self.history_files and not a_discard:
             f_commit = pydaw_history.pydaw_history_commit(
                 self.history_files, a_message)
-            self.history_commits.append(f_commit)
+            self.history_commits[self.undo_context].append(f_commit)
         self.history_files = []
 
     def clear_history(self):
         self.history_undo_cursor = 0
         self.history_files = []
-        self.history_commits = []
+        self.history_commits = {}
 
     def undo(self):
-        if self.history_undo_cursor >= len(self.history_commits):
+        if self.undo_context not in self.history_commits or \
+        self.history_undo_cursor >= len(
+        self.history_commits[self.undo_context]):
             return False
         self.history_undo_cursor += 1
-        self.history_commits[-1 * self.history_undo_cursor].undo(
-            self.project_folder)
+        self.history_commits[self.undo_context][
+            -1 * self.history_undo_cursor].undo(self.project_folder)
         self.clear_caches()
         return True
 
     def redo(self):
-        if self.history_undo_cursor == 0:
+        if self.undo_context not in self.history_commits or \
+        self.history_undo_cursor == 0:
             return False
-        self.history_commits[-1 * self.history_undo_cursor].redo(
-            self.project_folder)
+        self.history_commits[self.undo_context][
+            -1 * self.history_undo_cursor].redo(self.project_folder)
         self.history_undo_cursor -= 1
         self.clear_caches()
         return True
