@@ -8364,8 +8364,6 @@ class SeqTrack:
     def refresh(self):
         self.track_name_lineedit.setText(TRACK_NAMES[self.track_number])
         if self.menu_created:
-            for f_plugin in self.plugins:
-                f_plugin.remove_from_layout()
             self.create_menu()
 
     def plugin_changed(self, a_val=None):
