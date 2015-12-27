@@ -38,14 +38,6 @@ RPM packages can be downloaded directly from [here](https://github.com/j3ffhubb/
 
 ######Ubuntu
 
-Import the MusiKernel public GPG key (prevents apt-get from complaining about verification)
-
-`sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0D94797D691048C1`
-
-Follow the instructions in the "Adding this PPA to your system" section [here](https://launchpad.net/~musikernel/+archive/ubuntu/musikernel1), then:
-
-`sudo apt-get update && sudo apt-get install musikernel1`
-
 Ubuntu packages can be downloaded directly from [here](https://github.com/j3ffhubb/musikernel/releases)
 
 ###How to Build
