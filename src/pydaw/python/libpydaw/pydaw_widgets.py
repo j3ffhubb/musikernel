@@ -380,9 +380,12 @@ class AbstractUiControl:
                 f_val = str(round(f_val * 0.001, 1)) + "k"
             retval = (str(f_val))
         elif self.val_conversion == KC_127_PITCH:
-            retval = (
-                str(int(pydaw_util.pydaw_pitch_to_hz(
-                (f_value * 0.818897638) + 20.0))))
+            f_val = (
+                int(pydaw_util.pydaw_pitch_to_hz(
+                (f_value * 0.818897638) + 20.0)))
+            if f_val >= 1000:
+                f_val = str(round(f_val * 0.001, 1)) + "k"
+            retval = (str(f_val))
         elif self.val_conversion == KC_127_ZERO_TO_X:
             f_dec_value = (float(f_value) *
                 self.label_value_127_multiply_by) - \
