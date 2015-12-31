@@ -373,11 +373,18 @@ void v_ui_send(char * a_path, char * a_msg)
     UI_SEND_CALLBACK(a_path, a_msg);
 }
 
-#else
+#elif defined(WITH_LIBLO)
 
 void v_ui_send(char * a_path, char * a_msg)
 {
     lo_send(musikernel->uiTarget, a_path, "s", a_msg);
+}
+
+#else
+
+void v_ui_send(char * a_path, char * a_msg)
+{
+
 }
 
 #endif
