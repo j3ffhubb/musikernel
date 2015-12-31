@@ -586,7 +586,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     int f_audio_input_count = 0;
     int f_audio_output_count = 2;
 
-#ifndef MK_DLL
+#ifdef WITH_LIBLO
 
     /* Create OSC thread */
 
