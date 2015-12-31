@@ -36,7 +36,7 @@ GNU General Public License for more details.
 
 #endif
 
-#ifndef MK_DLL
+#if defined(__linux__) && !defined(MK_DLL)
     #include <lo/lo.h>
 #endif
 
