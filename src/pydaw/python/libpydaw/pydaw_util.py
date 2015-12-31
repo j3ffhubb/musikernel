@@ -878,11 +878,9 @@ def pydaw_read_device_config():
                         "binaries to prevent lockups.")
 
             if not IS_LINUX:
-                BIN_PATH = None
                 global_device_val_dict["audioEngine"] = 8
                 IS_ENGINE_LIB = True
-
-            if BIN_PATH is not None:
+            else:
                 if int(global_device_val_dict["audioEngine"]) == 0:
                     BIN_PATH += "-no-root"
                 elif int(global_device_val_dict["audioEngine"]) <= 2:

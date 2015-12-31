@@ -60,9 +60,14 @@ lib:
 	mv $(PYDAW_VERSION)-engine.exe $(PYDAW_VERSION).dll || \
 	mv $(PYDAW_VERSION)-engine $(PYDAW_VERSION).so
 
+mingw:
+	make lib
+	make eng
+
 mac_osx:
 	OPTIMIZE_FLAGS= CC=clang PREFIX=/usr/local make lib
 	mv $(PYDAW_VERSION).so $(PYDAW_VERSION).dylib
+	make eng
 
 # --------------------------------------------------------------
 
@@ -81,6 +86,7 @@ install_non_linux:
 	python/mkplugins/__pycache__
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -m 755 $(PYDAW_VERSION).py $(DESTDIR)$(PREFIX)/bin
+	install -s -m 755 $(PYDAW_VERSION)-engine $(DESTDIR)$(PREFIX)/bin
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw
 	cp -r python $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw
