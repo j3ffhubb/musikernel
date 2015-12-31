@@ -158,7 +158,7 @@ void v_pydaw_destructor()
 
     usleep(300000);
 
-#ifndef MK_DLL
+#ifdef WITH_LIBLO
     lo_address_free(musikernel->uiTarget);
 #endif
 

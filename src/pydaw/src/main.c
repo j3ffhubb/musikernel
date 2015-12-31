@@ -92,7 +92,7 @@ static sigset_t _signals;
 
 int PYDAW_NO_HARDWARE = 0;
 
-#ifndef MK_DLL
+#ifdef WITH_LIBLO
 lo_server_thread serverThread;
 
 void osc_error(int num, const char *m, const char *path);
@@ -1088,7 +1088,7 @@ int v_configure(const char * path, const char * key, const char * value)
     return 1;
 }
 
-#ifndef MK_DLL
+#ifdef WITH_LIBLO
 
 void osc_error(int num, const char *msg, const char *path)
 {

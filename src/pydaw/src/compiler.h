@@ -38,6 +38,7 @@ GNU General Public License for more details.
 
 #if defined(__linux__) && !defined(MK_DLL)
     #include <lo/lo.h>
+    #define WITH_LIBLO
 #endif
 
 #if !defined(CACHE_LINE_SIZE)

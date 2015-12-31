@@ -282,7 +282,7 @@ typedef struct
     int audio_recording_quit_notifier __attribute__((aligned(16)));
     int playback_mode;  //0 == Stop, 1 == Play, 2 == Rec
 
-#ifndef MK_DLL
+#ifdef WITH_LIBLO
     lo_server_thread serverThread;
     lo_address uiTarget;
 #endif
@@ -830,7 +830,7 @@ void g_musikernel_get(float a_sr, t_midi_device_list * a_midi_devices)
     musikernel->osc_queue_index = 0;
     musikernel->osc_cursor_message = (char*)malloc(sizeof(char) * 1024);
 
-#ifndef MK_DLL
+#ifdef WITH_LIBLO
     musikernel->serverThread = lo_server_thread_new(NULL, pydaw_osc_error);
     musikernel->uiTarget = lo_address_new_from_url(
         "osc.udp://localhost:30321/");
@@ -927,7 +927,7 @@ void v_pydaw_set_host(int a_mode)
     }
 }
 
-#ifndef MK_DLL
+#ifdef WITH_LIBLO
 void v_pydaw_activate_osc_thread(lo_method_handler osc_message_handler)
 {
     lo_server_thread_add_method(musikernel->serverThread, NULL, NULL,
