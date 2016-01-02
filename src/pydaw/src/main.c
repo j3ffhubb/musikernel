@@ -313,6 +313,8 @@ NO_OPTIMIZATION void * ui_process_monitor_thread(
 void print_help()
 {
     printf("Usage:\n");
+    printf("%s install_prefix project_path ui_pid "
+            "huge_pages[--sleep]\n\n", MUSIKERNEL_VERSION);
     printf("%s dawnext [project_dir] [output_file] [start_beat] "
         "[end_beat] [sample_rate] [buffer_size] [thread_count] "
         "[huge_pages] [stem]\n\n", MUSIKERNEL_VERSION);
@@ -416,8 +418,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
 {
     if(argc < 5)
     {
-        printf("\nUsage: %s install_prefix project_path ui_pid "
-            "huge_pages[--sleep]\n\n", argv[0]);
+        print_help();
         mk_exit(9996);
     }
 
