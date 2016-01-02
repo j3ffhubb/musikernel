@@ -205,7 +205,7 @@ void * v_pydaw_osc_send_thread(void* a_arg)
     return (void*)1;
 }
 
-#if defined(__amd64__) || defined(__i386__)
+#if defined(__amd64__)
 void cpuID(unsigned int i, unsigned int regs[4])
 {
     asm volatile
@@ -272,11 +272,20 @@ NO_OPTIMIZATION int i_cpu_has_hyperthreading()
         return 0;
     }
 }
+#elif defined(__i386__)
+
+int i_cpu_has_hyperthreading()
+{
+    return 1;
+}
+
 #else
+
 int i_cpu_has_hyperthreading()
 {
     return 0;
 }
+
 #endif
 
 void v_pre_fault_thread_stack(int stacksize)
