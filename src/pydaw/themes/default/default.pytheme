@@ -480,7 +480,7 @@ QGroupBox
 {
     color: white;
     border: 2px solid #666666;
-    padding-top: 3ex;
+    padding-top: 1.2em;
 }
 
 
