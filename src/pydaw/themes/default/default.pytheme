@@ -5,23 +5,23 @@ QWidget:focus
 
 QMenu::item
 {
-    background-color: #545c64;
+    background-color: #434343;
 }
 
 QWidget#plugin_rack
 {
-    background-color: #303841;
+    background-color: #323232;
 }
 
 QWidget#mainwindow, QWidget#ccmaptabwidget, QWidget#itemtabwidget,
 QMessageBox
 {
-    background-color: #303841;
+    background-color: #444444;
 }
 
 QLabel
 {
-    background-color: #545c64;
+    background-color: #434343;
     padding: 2px;
     border: none;
 }
@@ -37,7 +37,7 @@ QWidget
 QWidget#plugin_ui, QDialog, QScrollArea, QMainWindow, QMenu,
 QSpinBox, QDoubleSpinBox
 {
-    background-color: #252b2d;
+    background-color: #434343;
     border: 1px solid #7a7a7a;
 }
 
@@ -51,20 +51,20 @@ QScrollArea
 QCheckBox, QRadiobutton
 {
     padding: 0px;
-    background-color: #545c64;
+    background-color: #434343;
     margin: 3px;
 }
 
 QSplitter::handle:vertical
 {
     height: 6px;
-    background-color: #303841;
+    background-color: #444444;
 }
 
 QSplitter::handle:horizontal
 {
     width:  6px;
-    background-color: #303841;
+    background-color: #444444;
 }
 
 /* Transport tool selector */
@@ -74,10 +74,15 @@ QRadioButton#tool_draw,
 QRadioButton#tool_erase,
 QRadioButton#tool_split,
 QCheckBox#button_hide,
-QCheckBox#button_power
+QCheckBox#button_power,
+QCheckBox#solo_checkbox,
+QCheckBox#mute_checkbox,
+QRadioButton#rec_arm_radiobutton
+
 {
     spacing: 1px; /* Removes that junk on the right side where the
                      text would've been */
+    background-color: transparent;
 }
 
 QRadioButton#tool_select::indicator,
@@ -472,7 +477,7 @@ QToolTip
     color: white;
     font-size: 15px;
     border: 1px solid white;
-    background-color: #545c64;
+    background-color: #434343;
     padding: 6px;
 }
 
@@ -498,19 +503,19 @@ QWidget#plugin_widget
 
 QWidget#track_panel
 {
-    background-color : #545c64;
+    background-color : #686868;
     border: 1px solid #333333;
 }
 
 QWidget#transport_panel
 {
-    background-color: #303841;
+    background-color: #444444;
     border: 2px solid #666666;
 }
 
 QGroupBox::title
 {
-    background-color: #545c64;
+    background-color: #434343;
     border: 1px solid #000000;
     subcontrol-position: top left;
 }
@@ -543,7 +548,7 @@ QPushButton:disabled, QComboBox:disabled
 QLineEdit, QLineEdit:disabled
 {
     color:white;
-    background-color: #303841;
+    background-color: #444444;
     padding: 1px;
     border: 1px solid #1e1e1e;
 }
@@ -618,7 +623,7 @@ QComboBox:on
 
 QAbstractItemView
 {
-    background-color: #545c64;
+    background-color: #434343;
     border: 2px solid darkgray;
     selection-background-color: QLinearGradient(
         x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ffffff, stop: 1 #dddddd);
@@ -747,7 +752,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 
 QTextEdit, QPlainTextEdit, QHeaderView::section
 {
-    background-color: #303841;
+    background-color: #444444;
 }
 
 
@@ -786,7 +791,7 @@ QToolBar::handle
 QMenu::separator
 {
     height: 6px;
-    background-color: #afb4ba;
+    background-color: #686868;
 }
 
 QProgressBar
@@ -806,7 +811,7 @@ QTabBar::tab
     color: #b1b1b1;
     border: 1px solid #000000;
     border-bottom-style: none;
-    background-color: #303841;
+    background-color: #444444;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 3px;
@@ -839,21 +844,25 @@ QTabBar::tab:first:!selected
 
 QTabBar::tab:!selected
 {
-    color: #dddddd;
+    color: #ffffff;
     border-bottom-style: solid;
     margin-top: 3px;
-    background-color: #303841;
+    background-color: #444444;
 }
 
 QTabBar::tab:selected
 {
-    background-color: #afb4ba;
+    background-color: #344a67;
 }
 
 QTabBar::tab:selected,QTabBar::tab:!selected:hover
 {
-    color: #151515;
     margin-bottom: 0px;
+}
+
+QTabBar::tab:selected
+{
+    color: #ffffff;
 }
 
 QTableWidget
