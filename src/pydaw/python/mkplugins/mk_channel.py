@@ -31,7 +31,7 @@ class mkchnl_plugin_ui(pydaw_abstract_plugin_ui):
         pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "MKCHNL"
         self.is_instrument = False
-        f_knob_size = 32
+        f_knob_size = 42
         self.gain_gridlayout = QGridLayout()
         if self.is_mixer:
             self.layout.addLayout(self.gain_gridlayout)
@@ -44,6 +44,7 @@ class mkchnl_plugin_ui(pydaw_abstract_plugin_ui):
             self.plugin_rel_callback, self.plugin_val_callback,
             -2400, 2400, 0, KC_DECIMAL, self.port_dict, None)
         self.gain_knob.add_to_grid_layout(self.gain_gridlayout, 0)
+        self.gain_knob.value_label.setMinimumWidth(55)
 
         self.pan_knob = pydaw_knob_control(
             f_knob_size, _("Pan"), MKCHNL_PAN,
@@ -73,7 +74,7 @@ class mkchnl_plugin_ui(pydaw_abstract_plugin_ui):
             self.hlayout.addLayout(self.volume_slider_layout, 1)
             self.volume_slider.add_to_grid_layout(
                 self.volume_slider_layout, 0, a_alignment=None)
-        self.volume_slider.value_label.setMinimumWidth(91)
+        self.volume_slider.value_label.setMinimumWidth(180)
         self.open_plugin_file()
         self.set_midi_learn(MKCHNL_PORT_MAP)
 
