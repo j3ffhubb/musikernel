@@ -3,13 +3,16 @@
 - [**Youtube** - Watch MusiKernel tutorial videos](https://www.youtube.com/channel/UCf_PgsosvLpxkN6bff9NESA/videos)
 - [**How to install**](#how-to-install)
 			- [Windows](#windows)
-			- [Mac OS X](#macosx)
+			- [Mac OS X](#mac-os-x)
 			- [Fedora](#fedora)
 			- [Ubuntu](#ubuntu)
 - [**How to Build**](#how-to-build)
 			- [Debian and Ubuntu](#debian-and-ubuntu)
 			- [Fedora](#fedora-1)
-			- [All Other Linux Distros](#all-others)
+			- [All Other Linux Distros](#all-other-linux-distros)
+			- [Mac OS X](#mac-os-x-1)
+			- [Windows](#windows-1)
+			
 
 ###What is MusiKernel?
 
@@ -21,7 +24,7 @@ MusiKernel is an all-in-one DAW and suite of instrument & effect plugins, design
 
 Download and run the Windows installer [here](https://github.com/j3ffhubb/musikernel/releases/) (64 bit only)
 
-######MacOSX
+######Mac OS X
 
 [Follow the instructions here](https://github.com/j3ffhubb/homebrew-musikernel)
 
@@ -63,7 +66,7 @@ cd ~/rpmbuild/RPMS/[your arch]
 sudo yum localinstall musikernel[version number].rpm
 ```
 
-######All Others
+######All Other Linux Distros
 
 ```
 # figure out the dependencies based on the Fedora or Ubuntu dependencies
@@ -73,3 +76,11 @@ make
 # the result is fully relocatable
 make install
 ```
+
+######Mac OS X
+
+Same as the install instructions
+
+######Windows
+
+It's complicated...
