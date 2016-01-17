@@ -68,7 +68,7 @@ void g_glc_init(t_glc_glitch * f_result, float a_sr)
     f_result->last_repeat = 99.99f;
     f_result->last_wet = -1.111f;
     f_result->repeat_count = 42;
-    f_result->sample_count = 99.99f;
+    f_result->sample_count = 99;
     f_result->sample_tmp = 0.0f;
     f_result->sr = a_sr;
     g_axf_init(&f_result->xfade, -3.0f);

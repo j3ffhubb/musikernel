@@ -115,7 +115,7 @@ inline float f_lms_ceiling(float a_input, float a_ceiling)
 
 #define arr_sqrt_count 401
 
-static __thread float arr_sqrt [arr_sqrt_count]
+__thread float arr_sqrt [arr_sqrt_count]
 __attribute__((aligned(CACHE_LINE_SIZE))) = {
 0.000000,0.100000,0.141421,0.173205,0.200000,0.223607,
 0.244949,0.264575,0.282843,0.300000,0.316228,0.331662,
