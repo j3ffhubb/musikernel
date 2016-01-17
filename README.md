@@ -16,7 +16,7 @@
 
 ###What is MusiKernel?
 
-MusiKernel is an all-in-one DAW and suite of instrument & effect plugins, designed to be easy for beginners to install and use without the need for any 3rd party software.  Simply install the package for your operating system, select your audio and MIDI hardware, and start making music.
+MusiKernel is an all-in-one DAW and suite of instrument & effect plugins, designed to be easy to install and use without the need for any 3rd party software.  Simply install the package for your operating system, select your audio and MIDI hardware, and start making music.
 
 ###How to Install
 
