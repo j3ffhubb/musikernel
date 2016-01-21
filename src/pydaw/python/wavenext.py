@@ -706,6 +706,7 @@ class pydaw_wave_editor_widget:
         self.vol_layout = QVBoxLayout()
         self.edit_hlayout.addLayout(self.vol_layout)
         self.vol_slider = QSlider(QtCore.Qt.Vertical)
+        self.vol_slider.setEnabled(False)
         self.vol_slider.setRange(-240, 120)
         self.vol_slider.setValue(0)
         self.vol_slider.valueChanged.connect(self.vol_changed)
@@ -1126,6 +1127,7 @@ class pydaw_wave_editor_widget:
             libmk.PROJECT.get_wav_uid_by_name(a_file))
         self.marker_callback()
         libmk.APP.restoreOverrideCursor()
+        self.vol_slider.setEnabled(True)
 
     def get_audio_item(self, a_uid=0):
         f_start = self.sample_graph.start_marker.value
