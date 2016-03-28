@@ -967,7 +967,11 @@ class pydaw_wave_editor_widget:
         self.open_file(a_action.file_name)
 
     def on_export(self):
-        if not self.history or libmk.IS_PLAYING:
+        if not self.history:
+            QMessageBox.warning(self.widget, _("Error"), _("No file loaded"))
+            return
+
+        if libmk.IS_PLAYING:
             return
 
         def ok_handler():
