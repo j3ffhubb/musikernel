@@ -1209,7 +1209,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         f_lane_num = int((a_y_pos - REGION_EDITOR_HEADER_HEIGHT) /
             REGION_EDITOR_TRACK_HEIGHT)
         f_lane_num = pydaw_clip_value(
-            f_lane_num, 0, AUDIO_ITEM_MAX_LANE)
+            f_lane_num, 0, project.TRACK_COUNT_ALL)
         f_y_pos = (f_lane_num *
             REGION_EDITOR_TRACK_HEIGHT) + REGION_EDITOR_HEADER_HEIGHT
         return f_lane_num, f_y_pos
