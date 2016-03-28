@@ -9116,6 +9116,9 @@ class MainWindow(QScrollArea):
                 "right-clicking on the sequencer timeline"))
             return
 
+        # Force the plugin state to be saved to disk first if it changed
+        PLUGIN_RACK.tab_selected(False)
+
         f_start_beat, f_end_beat = f_marker_pos
 
         f_window = QDialog(MAIN_WINDOW)
