@@ -1020,6 +1020,9 @@ class pydaw_wave_editor_widget:
         def on_overwrite(a_val=None):
             f_name.setText(self.file_lineedit.text())
 
+        # Force the plugin state to be saved to disk first if it changed
+        PLUGIN_RACK.save_callback()
+
         f_window = QDialog(MAIN_WINDOW)
         f_window.setWindowTitle(_("Offline Render"))
         f_layout = QGridLayout()
