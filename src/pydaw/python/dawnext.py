@@ -5444,6 +5444,11 @@ class FileDragDropper(pydaw_widgets.AbstractFileBrowserWidget):
             else:
                 AUDIO_ITEMS_TO_DROP.append(f_path)
 
+def open_last():
+    if LAST_ITEM_NAME:
+        global_open_items(LAST_ITEM_NAME, a_new_ref=LAST_ITEM_REF)
+        MAIN_WINDOW.tab_changed()
+
 class AudioItemSeqWidget(FileDragDropper):
     """ The parent widget (including the file browser dialog) for the
         AudioItemSeq
@@ -5502,6 +5507,12 @@ class AudioItemSeqWidget(FileDragDropper):
         self.crossfade_action.triggered.connect(AUDIO_SEQ.crossfade_selected)
         self.crossfade_action.setShortcut(
             QKeySequence.fromString("CTRL+F"))
+
+        self.action_menu.addSeparator()
+        self.open_last_action = self.action_menu.addAction(
+            _("Open Last Item(s)"))
+        self.open_last_action.triggered.connect(open_last)
+        self.open_last_action.setShortcut(QKeySequence.fromString("ALT+F"))
 
         self.v_zoom_slider = QSlider(QtCore.Qt.Horizontal)
         self.v_zoom_slider.setObjectName("zoom_slider")
