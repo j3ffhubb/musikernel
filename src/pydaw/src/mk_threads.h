@@ -414,7 +414,7 @@ void v_pydaw_init_worker_threads(
         {
             musikernel->worker_thread_count = 3;
         }
-        else if(f_cpu_count == 3 || f_cpu_count == 2)
+        else if(f_cpu_count == 3)
         {
             musikernel->worker_thread_count = 2;
         }
