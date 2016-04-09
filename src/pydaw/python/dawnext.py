@@ -8290,6 +8290,8 @@ class SeqTrack:
         self.automation_combobox.clear()
         self.automation_combobox.addItems(names)
         self.automation_combobox.setCurrentIndex(index)
+        if names[index] == "None":
+            self.control_combobox.clear()
         self.suppress_ccs_in_use = False
 
         self.update_in_use_combobox()
