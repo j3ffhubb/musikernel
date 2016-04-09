@@ -7699,6 +7699,7 @@ def global_open_items(a_items=None, a_reset_scrollbar=False, a_new_ref=None):
         f_uid = f_items_dict.get_uid_by_name(a_items)
         CURRENT_ITEM = PROJECT.get_item_by_uid(f_uid)
         ITEM_EDITOR.item_name_lineedit.setText(a_items)
+        ITEM_EDITOR.item_name_lineedit.setReadOnly(False)
 
     if CURRENT_ITEM:
         CURRENT_ITEM_LEN = CURRENT_ITEM.get_length(
@@ -7860,6 +7861,7 @@ class ItemListViewer:
 
         self.item_name_lineedit = QLineEdit()
         self.item_name_lineedit.setReadOnly(True)
+        self.item_name_lineedit.editingFinished.connect(self.on_item_rename)
         self.item_name_lineedit.setMinimumWidth(150)
         self.zoom_hlayout.addWidget(self.item_name_lineedit)
 
@@ -7885,6 +7887,14 @@ class ItemListViewer:
         self.default_pb_start = 0
         self.default_pb_val = 0
         self.default_pb_quantize = 0
+
+    def on_item_rename(self, a_val=None):
+        name = str(self.item_name_lineedit.text()).strip()
+        PROJECT.rename_items([CURRENT_ITEM_NAME], name)
+        PROJECT.commit(_("Rename items"))
+        items_dict = PROJECT.get_items_dict()
+        name = items_dict.get_name_by_uid(CURRENT_ITEM.uid)
+        self.item_name_lineedit.setText(name)
 
     def set_snap(self, a_val=None):
         f_index = self.snap_combobox.currentIndex()

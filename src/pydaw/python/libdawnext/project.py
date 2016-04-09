@@ -352,6 +352,9 @@ class DawNextProject(libmk.AbstractProject):
         self.IPC.pydaw_save_atm_region()
 
     def rename_items(self, a_item_names, a_new_item_name):
+        """ @a_item_names:  A list of str
+        """
+        assert isinstance(a_item_names, list), "a_item_names must be a list"
         f_items_dict = self.get_items_dict()
         if len(a_item_names) > 1 or f_items_dict.name_exists(a_new_item_name):
             f_suffix = 1
