@@ -191,22 +191,33 @@ class RegionSettings:
         self.hlayout0.addWidget(self.hzoom_slider)
         self.hzoom_slider.setObjectName("zoom_slider")
         self.hzoom_slider.setRange(0, 30)
-        self.hzoom_slider.setValue(3)
+        self.last_hzoom = 3
+        self.hzoom_slider.setValue(self.last_hzoom)
         self.hzoom_slider.setFixedWidth(90)
         self.hzoom_slider.sliderPressed.connect(self.hzoom_pressed)
         self.hzoom_slider.sliderReleased.connect(self.hzoom_released)
         self.hzoom_slider.valueChanged.connect(self.set_hzoom)
+        self.is_hzooming = False
 
         self.hlayout0.addWidget(QLabel("V"))
         self.vzoom_slider = QSlider(QtCore.Qt.Horizontal)
         self.hlayout0.addWidget(self.vzoom_slider)
         self.vzoom_slider.setObjectName("zoom_slider")
         self.vzoom_slider.setRange(0, 60)
-        self.vzoom_slider.setValue(0)
+        self.last_vzoom = 0
+        self.vzoom_slider.setValue(self.last_vzoom)
         self.vzoom_slider.setFixedWidth(60)
         self.vzoom_slider.sliderPressed.connect(self.vzoom_pressed)
         self.vzoom_slider.sliderReleased.connect(self.vzoom_released)
         self.vzoom_slider.valueChanged.connect(self.set_vzoom)
+        self.is_vzooming = False
+
+        # Ignore key and mouse wheel events, they do not work well with
+        # how the zoom sliders visualize their changes
+        self.hzoom_slider.wheelEvent = \
+            self.hzoom_slider.keyPressEvent = \
+            self.vzoom_slider.wheelEvent = \
+            self.vzoom_slider.keyPressEvent = lambda x: None
 
         self.size_label = QLabel()
         self.size_label.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -238,6 +249,7 @@ class RegionSettings:
         self.scrollbar.setValue(int(f_val))
 
     def vzoom_pressed(self, a_val=None):
+        self.is_vzooming = True
         self.old_px_per_beat = SEQUENCER_PX_PER_BEAT
         #self.size_label.move(QCursor.pos())
         self.size_label.setText("Track Height")
@@ -252,6 +264,7 @@ class RegionSettings:
         self.old_height_px = REGION_EDITOR_TRACK_HEIGHT
 
     def vzoom_released(self, a_val=None):
+        self.is_vzooming = False
         TRACK_PANEL.set_track_height()
         self.open_region()
 
@@ -268,14 +281,18 @@ class RegionSettings:
             REGION_TRACK_WIDTH, REGION_EDITOR_TRACK_HEIGHT + 2)
 
     def set_vzoom(self, a_val=None):
+        if not self.is_vzooming:
+            self.vzoom_slider.setValue(self.last_vzoom)
+            return
         global REGION_EDITOR_TRACK_HEIGHT, REGION_EDITOR_TOTAL_HEIGHT
-        f_val = self.vzoom_slider.value()
-        REGION_EDITOR_TRACK_HEIGHT = (f_val * 8) + 64
+        self.last_vzoom = self.vzoom_slider.value()
+        REGION_EDITOR_TRACK_HEIGHT = (self.last_vzoom * 8) + 64
         REGION_EDITOR_TOTAL_HEIGHT = (REGION_EDITOR_TRACK_COUNT *
             REGION_EDITOR_TRACK_HEIGHT)
         self.set_vzoom_size()
 
     def hzoom_pressed(self, a_val=None):
+        self.is_hzooming = True
         self.old_px_per_beat = SEQUENCER_PX_PER_BEAT
         #self.size_label.move(QCursor.pos())
         self.size_label.setText("Beat")
@@ -289,6 +306,7 @@ class RegionSettings:
         self.size_label.show()
 
     def hzoom_released(self, a_val=None):
+        self.is_hzooming = False
         pydaw_set_seq_snap()
         self.open_region()
         self.scrollbar.setValue(
@@ -302,22 +320,25 @@ class RegionSettings:
             SEQUENCER_PX_PER_BEAT, REGION_EDITOR_HEADER_HEIGHT)
 
     def set_hzoom(self, a_val=None):
+        if not self.is_hzooming:
+            self.hzoom_slider.setValue(self.last_hzoom)
+            return
         global SEQUENCER_PX_PER_BEAT, DRAW_SEQUENCER_GRAPHS
-        f_val = self.hzoom_slider.value()
-        if f_val < 3:
+        self.last_hzoom = self.hzoom_slider.value()
+        if self.last_hzoom < 3:
             DRAW_SEQUENCER_GRAPHS = False
             f_length = pydaw_get_current_region_length()
             f_width = SEQUENCER.width()
-            f_factor = {0:1, 1:2, 2:4}[f_val]
+            f_factor = {0:1, 1:2, 2:4}[self.last_hzoom]
             SEQUENCER_PX_PER_BEAT = (f_width / f_length) * f_factor
             self.size_label.setText("Project * {}".format(f_factor))
             self.size_label.setFixedSize(
                 150, REGION_EDITOR_HEADER_HEIGHT)
         else:
-            if f_val < 6:
-                f_val = 6
+            if self.last_hzoom < 6:
+                self.last_hzoom = 6
             DRAW_SEQUENCER_GRAPHS = True
-            SEQUENCER_PX_PER_BEAT = ((f_val - 6) * 4) + 24
+            SEQUENCER_PX_PER_BEAT = ((self.last_hzoom - 6) * 4) + 24
             self.size_label.setText("Beat")
             self.set_hzoom_size()
 
