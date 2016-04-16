@@ -589,6 +589,12 @@ QPushButton#plugin_menu::menu-indicator
     left: -2px;
 }
 
+QComboBox
+{
+    combobox-popup: 0;
+}
+
+
 QComboBox, QPushButton#plugin_menu
 {
     color: black;

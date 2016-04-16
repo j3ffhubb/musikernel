@@ -8357,6 +8357,7 @@ class SeqTrack:
             self.automation_callback)
 
         self.control_combobox = QComboBox()
+        self.control_combobox.setMaxVisibleItems(30)
         self.control_combobox.setMinimumWidth(240)
         self.menu_gridlayout.addWidget(QLabel(_("Control:")), 9, 20)
         self.menu_gridlayout.addWidget(self.control_combobox, 9, 21)
