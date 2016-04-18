@@ -628,6 +628,8 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
                 _("Oscillator {}".format(f_i)),
                 self.port_dict, self.preset_manager,
                 1 if f_i == 1 else 0)
+            f_osc1.osc_type_combobox.control.setMaxVisibleItems(
+                len(f_osc_types))
             f_osc1.pitch_knob.control.setRange(-72, 72)
             f_osc1_uni_voices = pydaw_knob_control(
                 f_knob_size, _("Unison"),
