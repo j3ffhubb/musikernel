@@ -701,7 +701,7 @@ class AbstractItemEditor(QGraphicsView):
             f_beat = int((a_event.scenePos().x() - self.cursor_offset)
                 / self.px_per_beat) + CURRENT_ITEM_REF.start_beat - \
                 CURRENT_ITEM_REF.start_offset
-            global_set_playback_pos(f_beat)
+            global_set_playback_pos(f_beat if f_beat >= 0 else 0)
 
 
 class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
