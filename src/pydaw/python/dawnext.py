@@ -2364,13 +2364,11 @@ class ItemSequencer(QGraphicsView):
         """ Check that there are not too many vertical
             lines on the screen
         """
-        return
-
         f_num_count = len(self.text_list)
         if f_num_count == 0:
             return
-        f_num_visible_count = int(f_num_count /
-            pydaw_clip_min(self.h_zoom, 1))
+        view_pct = float(self.width()) / float(self.max_x)
+        f_num_visible_count = int(f_num_count * view_pct)
 
         if f_num_visible_count > 24:
             for f_line in self.beat_line_list:

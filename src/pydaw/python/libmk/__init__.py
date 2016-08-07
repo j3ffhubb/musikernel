@@ -57,16 +57,21 @@ def on_ready():
         mod.on_ready()
 
 def clean_wav_pool():
-    f_result = set()
-    for f_host in HOST_MODULES:
-        f_result.update(f_host.active_wav_pool_uids())
+    traceback.print_stack()
+    result = set()
+    for host in HOST_MODULES:
+        uids = host.active_wav_pool_uids()
+        print(host, uids)
+        result.update(uids)
 
     if pydaw_util.USE_HUGEPAGES:
-        for f_uid in (x for x in f_result if x in MEMORY_ENTROPY_UIDS):
+        for f_uid in (x for x in result if x in MEMORY_ENTROPY_UIDS):
             MEMORY_ENTROPY_UIDS.remove(f_uid)
     #invert
-    f_len = len(PROJECT.get_wavs_dict())
-    f_result = [x for x in range(f_len) if x not in f_result]
+    wd = PROJECT.get_wavs_dict()
+    print(wd)
+    f_len = len(wd)
+    f_result = [x for x in range(f_len) if x not in result]
     print("clean_wav_pool '{}', '{}'".format(f_len, f_result))
     if f_result:
         f_msg = "|".join(str(x) for x in sorted(f_result))
