@@ -65,6 +65,8 @@ END_PEN = QPen(QColor.fromRgb(255, 60, 60), 6.0)
 def pydaw_get_current_region_length():
     return CURRENT_REGION.get_length() if CURRENT_REGION else 32
 
+CACHED_SEQ_LEN = 32
+
 def global_get_audio_file_from_clipboard():
     f_clipboard = QApplication.clipboard()
     f_path = f_clipboard.text()
@@ -728,8 +730,10 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         self.track_num = a_audio_item.track_num
 
         self.pixmap_items = []
+        self.should_draw = DRAW_SEQUENCER_GRAPHS or \
+            a_audio_item.length_beats > CACHED_SEQ_LEN * 0.02
 
-        if DRAW_SEQUENCER_GRAPHS:
+        if self.should_draw:
             f_pixmaps, f_transform, self.x_scale, self.y_scale = \
                 PROJECT.get_item_path(
                     a_audio_item.item_uid, SEQUENCER_PX_PER_BEAT,
@@ -900,7 +904,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
 
         self.sample_start_offset_px = -self.length_px_start
 
-        if DRAW_SEQUENCER_GRAPHS:
+        if self.should_draw:
             f_offset = 0
             f_offset_inc = project.PIXMAP_TILE_WIDTH * self.x_scale
             for f_pixmap_item in self.pixmap_items:
@@ -2026,7 +2030,7 @@ class ItemSequencer(QGraphicsView):
         elif REGION_EDITOR_MODE == 1:
             SEQUENCER.setDragMode(QGraphicsView.RubberBandDrag)
         self.enabled = False
-        global ATM_REGION
+        global ATM_REGION, CACHED_SEQ_LEN
         ATM_REGION = PROJECT.get_atm_region()
         f_items_dict = PROJECT.get_items_dict()
         f_scrollbar = self.horizontalScrollBar()
@@ -2035,6 +2039,7 @@ class ItemSequencer(QGraphicsView):
         self.clear_drawn_items()
         self.ignore_selection_change = True
         #, key=lambda x: x.bar_num,
+        CACHED_SEQ_LEN = pydaw_get_current_region_length()
         for f_item in sorted(CURRENT_REGION.items, reverse=True):
             if f_item.start_beat < pydaw_get_current_region_length():
                 f_item_name = f_items_dict.get_name_by_uid(f_item.item_uid)
