@@ -70,7 +70,6 @@ typedef struct
     float sample_start;
     float sample_end;
     int sample_start_offset;
-    float sample_start_offset_float;
     int sample_end_offset;
     //The audio track whose Modulex instance to write the samples to
     int outputs[MK_AUDIO_ITEM_SEND_COUNT];
@@ -645,8 +644,6 @@ t_pydaw_audio_item * g_audio_item_load_single(float a_sr,
             (int)((f_result->sample_start *
             ((float)f_result->wav_pool_item->length))) +
             PYDAW_AUDIO_ITEM_PADDING_DIV2;
-    f_result->sample_start_offset_float =
-            (float)(f_result->sample_start_offset);
 
     v_iterate_2d_char_array(f_current_string);
     float f_sample_end = atof(f_current_string->current_str) * 0.001f;
@@ -781,8 +778,6 @@ t_pydaw_audio_item * g_audio_item_load_single(float a_sr,
         int f_old_end = f_result->sample_end_offset;
         f_result->sample_start_offset =
                 f_result->wav_pool_item->length - f_old_end;
-        f_result->sample_start_offset_float =
-                (float)(f_result->sample_start_offset);
         f_result->sample_end_offset =
                 f_result->wav_pool_item->length - f_old_start;
     }
