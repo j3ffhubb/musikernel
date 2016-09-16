@@ -2,6 +2,7 @@
 Name=MusiKernel 2
 GenericName=MusiKernel 2
 Comment=A suite of audio hosts and plugins
+Comment[fr]=Un ensemble d'hôte audio et de greffons
 Exec=musikernel2.py
 Icon=musikernel2
 Terminal=false
