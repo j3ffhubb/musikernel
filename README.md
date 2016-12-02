@@ -1,6 +1,3 @@
-- **Twitter** - Follow @musikernel for the latest news and release announcements
-- [**KVR** - See screenshots](http://www.kvraudio.com/product/musikernel-by-musikernel)
-- [**Youtube** - Watch MusiKernel tutorial videos](https://www.youtube.com/channel/UCf_PgsosvLpxkN6bff9NESA/videos)
 - [**How to install**](#how-to-install)
 			- [Windows](#windows)
 			- [Mac OS X](#mac-os-x)
