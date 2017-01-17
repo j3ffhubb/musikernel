@@ -3,7 +3,8 @@ sudo dnf install python3-qt5 gcc alsa-lib-devel liblo-devel \
 libsndfile-devel gcc-c++ git python3-numpy \
 fftw-devel portmidi-devel portaudio-devel rubberband python3-devel \
 @development-tools fedora-packager livecd-tools spin-kickstarts \
-system-config-kickstart vorbis-tools gettext
+vorbis-tools gettext
+#system-config-kickstart
 
 # Now run:
 #
