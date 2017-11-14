@@ -11,21 +11,21 @@
 			- [Windows](#windows-1)
 			
 
-###What is MusiKernel?
+### What is MusiKernel?
 
 MusiKernel is an all-in-one DAW and suite of instrument & effect plugins, designed to be easy to install and use without the need for any 3rd party software.  Simply install the package for your operating system, select your audio and MIDI hardware, and start making music.
 
-###How to Install
+### How to Install
 
-######Windows
+###### Windows
 
 Download and run the Windows installer [here](https://github.com/j3ffhubb/musikernel/releases/) (64 bit only)
 
-######Mac OS X
+###### Mac OS X
 
 [Follow the instructions here](https://github.com/j3ffhubb/homebrew-musikernel)
 
-######Fedora
+###### Fedora
 
 From [here](https://copr.fedoraproject.org/coprs/musikernel/musikernel/)
 
@@ -36,13 +36,13 @@ sudo dnf install -y musikernel1
 
 RPM packages can be downloaded directly from [here](https://github.com/j3ffhubb/musikernel/releases)
 
-######Ubuntu
+###### Ubuntu
 
 Ubuntu packages can be downloaded directly from [here](https://github.com/j3ffhubb/musikernel/releases)
 
-###How to Build
+### How to Build
 
-######Debian and Ubuntu
+###### Debian and Ubuntu
 
 ```
 cd [musikernel dir]/src
@@ -53,7 +53,7 @@ cd ../ubuntu
 dpkg -i musikernel[your_version].deb  # as root
 ```
 
-######Fedora
+###### Fedora
 
 ```
 cd [musikernel src dir]/src
@@ -63,7 +63,7 @@ cd ~/rpmbuild/RPMS/[your arch]
 sudo yum localinstall musikernel[version number].rpm
 ```
 
-######All Other Linux Distros
+###### All Other Linux Distros
 
 ```
 # figure out the dependencies based on the Fedora or Ubuntu dependencies
@@ -74,10 +74,10 @@ make
 make install
 ```
 
-######Mac OS X
+###### Mac OS X
 
 Same as the install instructions
 
-######Windows
+###### Windows
 
 It's complicated...
