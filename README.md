@@ -1,14 +1,15 @@
 - [**How to install**](#how-to-install)
-			- [Windows](#windows)
-			- [Mac OS X](#mac-os-x)
-			- [Fedora](#fedora)
-			- [Ubuntu](#ubuntu)
+    - [Windows](#windows)
+    - [Mac OS X](#mac-os-x)
+    - [Fedora](#fedora)
+    - [Ubuntu](#ubuntu)
+
 - [**How to Build**](#how-to-build)
-			- [Debian and Ubuntu](#debian-and-ubuntu)
-			- [Fedora](#fedora-1)
-			- [All Other Linux Distros](#all-other-linux-distros)
-			- [Mac OS X](#mac-os-x-1)
-			- [Windows](#windows-1)
+    - [Debian and Ubuntu](#debian-and-ubuntu)
+    - [Fedora](#fedora-1)
+    - [All Other Linux Distros](#all-other-linux-distros)
+    - [Mac OS X](#mac-os-x-1)
+    - [Windows](#windows-1)
 			
 
 ### What is MusiKernel?
