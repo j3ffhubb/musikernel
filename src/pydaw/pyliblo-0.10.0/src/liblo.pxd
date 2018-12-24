@@ -45,6 +45,8 @@ cdef extern from 'lo/lo.h':
 
     ctypedef void(*lo_err_handler)(int num, const_char *msg, const_char *where)
     ctypedef int(*lo_method_handler)(const_char *path, const_char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
+    ctypedef int(*lo_bundle_start_handler)(lo_timetag time, void *user_data)
+    ctypedef int(*lo_bundle_end_handler)(void *user_data)
 
     # send
     int lo_send_message_from(lo_address targ, lo_server serv, char *path, lo_message msg)
@@ -58,6 +60,7 @@ cdef extern from 'lo/lo.h':
     int lo_server_get_protocol(lo_server s)
     lo_method lo_server_add_method(lo_server s, char *path, char *typespec, lo_method_handler h, void *user_data)
     void lo_server_del_method(lo_server s, char *path, char *typespec)
+    int lo_server_add_bundle_handlers(lo_server s, lo_bundle_start_handler sh, lo_bundle_end_handler eh, void *user_data)
     int lo_server_recv(lo_server s) nogil
     int lo_server_recv_noblock(lo_server s, int timeout) nogil
     int lo_server_get_socket_fd(lo_server s)

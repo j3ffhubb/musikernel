@@ -1,0 +1,29 @@
+pyliblo - Python bindings for the liblo OSC library
+
+Copyright (C) 2007-2015  Dominic Sacré  <dominic.sacre@gmx.de>
+
+http://das.nasophon.de/pyliblo/
+
+
+Requirements:
+=============
+
+* Python >= 2.6 (also works with 3.x) [http://www.python.org/]
+* Cython [http://www.cython.org/]
+* liblo >= 0.27 [http://liblo.sourceforge.net/]
+
+
+Installation:
+=============
+
+./setup.py build
+./setup.py install
+
+This will install both the python module and the send_osc/dump_osc scripts.
+
+
+Documentation:
+==============
+
+See http://dsacre.github.io/pyliblo/doc/ for API documentation.
+The 'examples' directory in the source tree contains some example code.

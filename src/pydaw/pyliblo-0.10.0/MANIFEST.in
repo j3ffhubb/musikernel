@@ -4,11 +4,11 @@ include NEWS
 include setup.py
 include src/liblo.pyx
 include src/liblo.pxd
-include src/liblo.c
 include scripts/dump_osc.py
 include scripts/send_osc.py
 include scripts/dump_osc.1
 include scripts/send_osc.1
-include test/unit.py
-include doc/API.html
-include doc/examples.html
+include test/*.py
+include examples/*.py
+graft doc
+prune doc/build
