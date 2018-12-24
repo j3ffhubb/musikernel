@@ -42,7 +42,7 @@ deb:
 
 deps:
 	make mingw_deps
-	cd pydaw/pyliblo-0.9.2 && python3 setup.py build && cp build/lib*/liblo* ../python/libpydaw
+	cd pydaw/pyliblo-0.10.0 && python3 setup.py build && cp build/lib*/liblo* ../python/libpydaw
 
 mingw_deps:
 	cd sbsms && ( ./configure || ./configure --enable-sse=no ) && make
@@ -54,7 +54,7 @@ mingw_deps_clean:
 
 deps_clean:
 	make mingw_deps_clean
-	cd pydaw/pyliblo-0.9.2 && python3 setup.py clean
+	cd pydaw/pyliblo-0.10.0 && python3 setup.py clean
 
 # --------------------------------------------------------------
 

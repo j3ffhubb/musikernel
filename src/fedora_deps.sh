@@ -1,9 +1,28 @@
+#!/bin/sh -x
+
 #dependencies
-sudo dnf install python3-qt5 gcc alsa-lib-devel liblo-devel \
-libsndfile-devel gcc-c++ git python3-numpy \
-fftw-devel portmidi-devel portaudio-devel rubberband python3-devel \
-@development-tools fedora-packager livecd-tools spin-kickstarts \
-vorbis-tools gettext
+sudo dnf install
+  alsa-lib-devel \
+  @development-tools \
+  fedora-packager \
+  fftw-devel \
+  gcc \
+  gcc-c++ \
+  gettext \
+  git \
+  liblo-devel \
+  libsndfile-devel \
+  livecd-tools \
+  portaudio-devel \
+  portmidi-devel \
+  python3-Cython
+  python3-devel \
+  python3-numpy \
+  python3-qt5 \
+  rubberband \
+  spin-kickstarts \
+  vorbis-tools \
+
 #system-config-kickstart
 
 # Now run:

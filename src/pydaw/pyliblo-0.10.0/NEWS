@@ -1,3 +1,13 @@
+2015-04-14: pyliblo 0.10.0
+
+  * New and improved documentation, built from docstrings using Sphinx.
+  * Add Server.add_bundle_handlers(), thanks to David Honour and Paul Weaver.
+  * Fix sending 64-bit values with Python 3 and on some 64-bit systems,
+    thanks to Sebastian Ramacher.
+  * Cython is now a mandatory build dependency. The generated liblo.c has
+    been removed from the release tarball.
+  * The minimum version of liblo required by pyliblo is now 0.27.
+
 2014-09-16: pyliblo 0.9.2
 
   * Add function Server.del_method(), thanks to a patch from Артём Попов.
