@@ -204,7 +204,6 @@ fp_svf2_run_filter fp_svf2_get_run_filter_ptr(int a_cascades,
 inline void v_svf2_run(t_svf2_filter *__restrict a_svf,
         t_svf2_kernel *__restrict a_kernel, float a_input_value)
 {
-    prefetch(&a_kernel->hp, 1);
     float oversample_iterator = 0.0f;
     int f_i;
 
@@ -240,7 +239,6 @@ void v_svf2_run_2_pole_lp(t_svf2_filter*__restrict a_svf,
 void v_svf2_run_4_pole_lp(t_svf2_filter*__restrict a_svf,
         float a_in0, float a_in1)
 {
-    prefetch(&a_svf->output0, 1);
     v_svf2_run(a_svf, &a_svf->filter_kernels[0][0], a_in0);
     v_svf2_run(a_svf, &a_svf->filter_kernels[0][1], a_in1);
 
