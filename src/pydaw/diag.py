@@ -32,12 +32,12 @@ else:
 TOOLS = {
     "benchmark": "make clean > /dev/null 2>&1 && "
         "make release > /dev/null 2>&1 && "
-        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0"
+        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0 "
         "--no-file",
     "valgrind": "make clean > /dev/null 2>&1 && "
         "make dbg > /dev/null 2>&1 && "
         "valgrind --alignment=16 --track-origins=yes "
-        "{BIN}-dbg {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 0 0"
+        "{BIN}-dbg {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 0 0 "
         "--no-file",
     "perf": "make clean > /dev/null 2>&1 && "
         "make release > /dev/null 2>&1 && "
@@ -45,10 +45,10 @@ TOOLS = {
         "dTLB-load-misses,iTLB-loads,iTLB-load-misses,L1-dcache-loads,"
         "L1-dcache-load-misses,L1-icache-loads,L1-icache-load-misses,"
         "branch-misses,LLC-loads,LLC-load-misses "
-        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0"
+        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0 "
         "--no-file",
     "profile": "make clean && make gprof && "
-        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0"
+        "{BIN} {HOST} '{PROJECT}' test.wav {TIME} {SR} 512 {CORES} 1 0 "
         "&& gprof {BIN} > profile.txt && gedit profile.txt",
     "pahole": "make clean && make dbg && pahole {BIN}",
     "gdb": "make dbg > /dev/null 2>&1 && "
