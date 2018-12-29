@@ -281,7 +281,7 @@ else:
     os.system(cp_cmd)
 
     if IS_INSTALL:
-        os.system("sudo dnf remove -y '{0}-*'".format(MAJOR_VERSION))
+        os.system("sudo dnf remove -y {0} '{0}-*'".format(MAJOR_VERSION))
         #os.system("sudo rpm -e {0}".format(MAJOR_VERSION))
         #os.system("sudo rpm -e {0}-debuginfo".format(MAJOR_VERSION))
         os.system("sudo rpm -ivh {}/{}".format(orig_wd, pkg_name))
