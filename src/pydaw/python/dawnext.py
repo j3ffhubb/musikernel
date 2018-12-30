@@ -9188,7 +9188,16 @@ class MainWindow(QScrollArea):
         f_sample_rate_hlayout.addWidget(QLabel(_("Sample Rate")))
         f_sample_rate = QComboBox()
         f_sample_rate.setMinimumWidth(105)
-        f_sample_rate.addItems(["44100", "48000", "88200", "96000", "192000"])
+        f_sample_rate.addItems([
+            "44100",
+            "48000",
+            "88200",
+            "96000",
+            "192000",
+            "384000",
+            "768000",
+            "1536000",
+        ])
 
         try:
             f_sr_index = f_sample_rate.findText(
