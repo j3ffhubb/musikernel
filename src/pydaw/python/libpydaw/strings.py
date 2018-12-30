@@ -130,14 +130,22 @@ terminate from another session.  If so, click 'OK' to kill the
 other process(es)""")
 
 routing_graph = _(
-"""This shows the audio/sidechain and MIDI routing of each track.
-Click above the tracks to connect/disconnect a track's audio output to
-the destination track behind it, and click below to connect a track to
-the track in front of it.
+"""This shows the audio, sidechain and MIDI routing of each track.
 
-CTRL+click to connect/disconnect to the sidechain input of the track.
+Click above the track to connect/disconnect a track's output to
+the destination track behind it (higher track number).
 
-SHIFT+click to connect/disconnect to the MIDI input of the track.
+Click below to connect a track to the track in front of it
+(lower track number).
+
+Click to route audio to the input of a track, which will appear as
+a white line.
+
+CTRL+click to connect/disconnect to the sidechain input of the track,
+which will appear as a red line.
+
+SHIFT+click to connect/disconnect to the MIDI input of the track,
+which will appear as a blue line.
 
 Creating feedback loops is not supported, you will receive an error
 message if an attempted connection creates feedback.
