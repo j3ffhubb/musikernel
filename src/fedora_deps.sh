@@ -2,26 +2,28 @@
 
 #dependencies
 sudo dnf install
-  alsa-lib-devel \
-  @development-tools \
-  fedora-packager \
-  fftw-devel \
-  gcc \
-  gcc-c++ \
-  gettext \
-  git \
-  liblo-devel \
-  libsndfile-devel \
-  livecd-tools \
-  portaudio-devel \
-  portmidi-devel \
-  python3-Cython
-  python3-devel \
-  python3-numpy \
-  python3-qt5 \
-  rubberband \
-  spin-kickstarts \
-  vorbis-tools \
+    alsa-lib-devel \
+    @development-tools \
+    fedora-packager \
+    ffmpeg \
+    fftw-devel \
+    gcc \
+    gcc-c++ \
+    gettext \
+    git \
+    lame \
+    liblo-devel \
+    libsndfile-devel \
+    livecd-tools \
+    portaudio-devel \
+    portmidi-devel \
+    python3-Cython
+    python3-devel \
+    python3-numpy \
+    python3-qt5 \
+    rubberband \
+    spin-kickstarts \
+    vorbis-tools
 
 #system-config-kickstart
 

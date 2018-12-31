@@ -86,12 +86,31 @@ License:        GPLv3
 URL:            http://github.com/j3ffhubb/musikernel/
 Source0:        {2}
 
-BuildRequires:  alsa-lib-devel liblo-devel libsndfile-devel fftw-devel \
-portmidi-devel portaudio-devel python3-devel gcc gcc-c++
+BuildRequires: \
+    alsa-lib-devel \
+    fftw-devel \
+    gcc \
+    gcc-c++ \
+    liblo-devel \
+    libsndfile-devel \
+    portaudio-devel \
+    portmidi-devel \
+    python3-devel \
 
-Requires:       python3-qt5 alsa-lib-devel liblo-devel rubberband \
-libsndfile-devel python3-numpy fftw-devel portmidi-devel \
-portaudio-devel python3-devel vorbis-tools
+Requires: \
+    alsa-lib-devel \
+    ffmpeg \
+    fftw-devel \
+    lame \
+    liblo-devel \
+    libsndfile-devel \
+    portaudio-devel \
+    portmidi-devel \
+    python3-devel \
+    python3-numpy \
+    python3-qt5 \
+    rubberband \
+    vorbis-tools \
 
 %define __provides_exclude_from ^%{{_usr}}/lib/{0}/.*$
 %global __python %{{__python3}}
