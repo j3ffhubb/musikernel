@@ -198,9 +198,9 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/share/applications/{0}.desktop
 %{{_usr}}/share/doc/{0}/copyright
 %{{_usr}}/share/pixmaps/{0}.png
-#%{{_usr}}/share/locale/pt_PT/LC_MESSAGES/{0}.mo
-#%{{_usr}}/share/locale/de/LC_MESSAGES/{0}.mo
-#%{{_usr}}/share/locale/fr/LC_MESSAGES/{0}.mo
+#%%{{_usr}}/share/locale/pt_PT/LC_MESSAGES/{0}.mo
+#%%{{_usr}}/share/locale/de/LC_MESSAGES/{0}.mo
+#%%{{_usr}}/share/locale/fr/LC_MESSAGES/{0}.mo
 %{{_usr}}/lib/{0}/pydaw/python/splash.png
 %{{_usr}}/lib/{0}/pydaw/python/wavefile/__init__.py
 %{{_usr}}/lib/{0}/pydaw/python/wavefile/libsndfile.py
@@ -241,17 +241,8 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/project.py
 %{{_usr}}/lib/{0}/pydaw/python/libdawnext/strings.py
 
-%{{_usr}}/lib/{0}/pydaw/python/__pycache__/*
-%{{_usr}}/lib/{0}/pydaw/python/libdawnext/__pycache__/*
-%{{_usr}}/lib/{0}/pydaw/python/libmk/__pycache__/*
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/__pycache__/*
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/__pycache__/*
-%{{_usr}}/lib/{0}/pydaw/python/wavefile/__pycache__/*
-
 %{{_usr}}/lib/{0}/pydaw/python/mido/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/__pycache__/*
 %{{_usr}}/lib/{0}/pydaw/python/mido/backends/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/backends/__pycache__/*
 %{{_usr}}/lib/{0}/pydaw/python/mido/backends/backend.py
 %{{_usr}}/lib/{0}/pydaw/python/mido/backends/portmidi.py
 %{{_usr}}/lib/{0}/pydaw/python/mido/backends/portmidi_init.py
