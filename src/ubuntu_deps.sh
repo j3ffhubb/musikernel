@@ -7,10 +7,32 @@ fi
 
 apt-get update
 
-apt-get install -y libasound2-dev \
-libportmidi-dev portaudio19-dev liblo-dev g++ libsndfile1-dev \
-libtool gdb debhelper dh-make build-essential automake autoconf \
-python3-pyqt5 python3 squashfs-tools genisoimage \
-python3-numpy libfftw3-dev gcc python3-dev libsbsms-dev \
-libav-tools lame vorbis-tools gettext rubberband-cli
+apt-get install -y \
+    autoconf \
+    automake \
+    build-essential \
+    debhelper \
+    dh-make \
+    ffmpeg \
+    g++ \
+    gcc \
+    gdb \
+    genisoimage \
+    gettext \
+    lame \
+    libasound2-dev \
+    libfftw3-dev \
+    liblo-dev \
+    libportmidi-dev \
+    libsbsms-dev \
+    libsndfile1-dev \
+    libtool \
+    portaudio19-dev \
+    python3 \
+    python3-dev \
+    python3-numpy \
+    python3-pyqt5 \
+    rubberband-cli
+    squashfs-tools \
+    vorbis-tools \
 
