@@ -92,7 +92,7 @@ f_debian_control = \
 "Depends: libasound2-dev, liblo-dev, libsndfile1-dev, "
 "libportmidi-dev, portaudio19-dev, libfftw3-dev, "
 "python3-pyqt5, python3-dev, python3-numpy, rubberband-cli, "
-"libav-tools, lame, vorbis-tools, libqt5svg5\n"
+"ffmpeg, lame, vorbis-tools, libqt5svg5\n"
 "Provides: {}\n"
 "Conflicts:\n"
 "Replaces:\n"
