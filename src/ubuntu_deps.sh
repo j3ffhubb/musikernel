@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 if [ "$(id -u)" != "0" ]; then
    echo "This script must be run as root, use sudo or su" 1>&2
@@ -32,7 +32,7 @@ apt-get install -y \
     python3-dev \
     python3-numpy \
     python3-pyqt5 \
-    rubberband-cli
+    rubberband-cli \
     squashfs-tools \
-    vorbis-tools \
+    vorbis-tools
 
