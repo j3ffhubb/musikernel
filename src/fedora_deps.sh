@@ -1,7 +1,9 @@
 #!/bin/sh -x
 
+# This script installs all dependencies needed to build on Fedora
+
 #dependencies
-sudo dnf install
+sudo dnf install \
     alsa-lib-devel \
     @development-tools \
     fedora-packager \
@@ -17,7 +19,7 @@ sudo dnf install
     livecd-tools \
     portaudio-devel \
     portmidi-devel \
-    python3-Cython
+    python3-Cython \
     python3-devel \
     python3-numpy \
     python3-qt5 \
