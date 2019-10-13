@@ -99,7 +99,6 @@ BuildRequires: \
 
 Requires: \
     alsa-lib-devel \
-    ffmpeg \
     fftw-devel \
     lame \
     liblo-devel \
@@ -111,6 +110,9 @@ Requires: \
     python3-qt5 \
     rubberband \
     vorbis-tools \
+
+Recommends: \
+    ffmpeg \
 
 %define __provides_exclude_from ^%{{_usr}}/lib/{0}/.*$
 %global __python %{{__python3}}
