@@ -10,6 +10,6 @@ Homepage: https://github.com/j3ffhubb/musikernel
 
 Package: musikernel2
 Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, libasound2-dev, liblo-dev, libsndfile1-dev, libportmidi-dev, portaudio19-dev, python3-pyqt5, python3, python3-numpy, rubberband-cli, libfftw3-dev, libav-tools, lame, vorbis-tools
+Depends: ${shlibs:Depends}, ${misc:Depends}, libasound2-dev, liblo-dev, libsndfile1-dev, libportmidi-dev, portaudio19-dev, python3-pyqt5, python3, python3-numpy, rubberband-cli, libfftw3-dev, ffmpeg, lame, vorbis-tools
 Description: MusiKernel is hosts/DAWs, instrument and effect plugins.
  MusiKernel is a powerful all-in-one suite of music production tools, and a complete open source framework for developing any type of audio application.
