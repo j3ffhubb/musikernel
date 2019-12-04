@@ -2,7 +2,7 @@
 Dec 2019:  Recent versions of Qt5 are very broken on Gnome3 (especially on
 Wayland), causing a number of significant UI bugs.  Unfortunately there
 is nothing that can be done within Musikernel to fix this, but alternate
-dektop environments like KDE have been tested and appear to work as intended.
+desktop environments like KDE have been tested and appear to work as intended.
 
 - [**How to install**](#how-to-install)
     - [Windows](#windows)
