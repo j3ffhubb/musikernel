@@ -20,32 +20,24 @@ desktop environments like KDE have been tested and appear to work as intended.
 
 ### What is MusiKernel?
 
-MusiKernel is an all-in-one DAW and suite of instrument & effect plugins, designed to be easy to install and use without the need for any 3rd party software.  Simply install the package for your operating system, select your audio and MIDI hardware, and start making music.
+MusiKernel is an all-in-one DAW and suite of instrument & effect plugins,
+designed to be easy to install and use without the need for any 3rd party
+software.  Simply install the package for your operating system, select your
+audio and MIDI hardware, and start making music.
 
 ### How to Install
 
-###### Windows
+###### Linux, Windows
 
-Download and run the Windows installer [here](https://github.com/j3ffhubb/musikernel/releases/) (64 bit only)
+Download and install from [here](https://github.com/j3ffhubb/musikernel/releases/)
 
 ###### Mac OS X
 
 [Follow the instructions here](https://github.com/j3ffhubb/homebrew-musikernel)
 
-###### Fedora
+###### Others
 
-From [here](https://copr.fedoraproject.org/coprs/musikernel/musikernel/)
-
-```
-sudo dnf copr enable -y musikernel/musikernel
-sudo dnf install -y musikernel1
-```
-
-RPM packages can be downloaded directly from [here](https://github.com/j3ffhubb/musikernel/releases)
-
-###### Ubuntu
-
-Ubuntu packages can be downloaded directly from [here](https://github.com/j3ffhubb/musikernel/releases)
+See the build instructions below to compile from source
 
 ### How to Build
 
@@ -65,9 +57,9 @@ dpkg -i musikernel[your_version].deb  # as root
 ```
 cd [musikernel src dir]/src
 ./fedora_deps.sh
-make rpm
-cd ~/rpmbuild/RPMS/[your arch]
-sudo yum localinstall musikernel[version number].rpm
+cd ..
+./rpm.py  # add -i to install automatically after building, or:
+sudo dnf install ./musikernel[version number].rpm
 ```
 
 ###### All Other Linux Distros
