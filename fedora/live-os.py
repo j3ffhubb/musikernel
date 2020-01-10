@@ -27,23 +27,32 @@ parser.add_argument(
 args = parser.parse_args()
 
 if args.de == "gnome":
-    ks_file = "/usr/share/spin-kickstarts/fedora-livecd-desktop.ks"
+    ks_file = "/usr/share/spin-kickstarts/fedora-live-desktop.ks"
     de_label = "Gnome"
 elif args.de == "lxde":
-    ks_file = "/usr/share/spin-kickstarts/fedora-livecd-lxde.ks"
+    ks_file = "/usr/share/spin-kickstarts/fedora-live-lxde.ks"
     de_label = "LXDE"
 elif args.de == "xfce":
-    ks_file = "/usr/share/spin-kickstarts/fedora-livecd-xfce.ks"
+    ks_file = "/usr/share/spin-kickstarts/fedora-live-xfce.ks"
     de_label = "XFCE"
 elif args.de == "kde":
-    ks_file = "/usr/share/spin-kickstarts/fedora-livecd-kde.ks"
+    ks_file = "/usr/share/spin-kickstarts/fedora-live-kde.ks"
     de_label = "KDE"
 elif args.de == "mate":
-    ks_file = "/usr/share/spin-kickstarts/fedora-livecd-mate-compiz.ks"
+    ks_file = "/usr/share/spin-kickstarts/fedora-live-mate-compiz.ks"
     de_label = "Mate"
 else:
     print("Invalid --de={}".format(args.de))
     parser.print_help()
+    exit(1)
+
+if not os.path.exists(ks_file):
+    print(
+        "{} not found, please run "
+        "'sudo dnf install spin-kickstarts'".format(
+            ks_file,
+        )
+    )
     exit(1)
 
 os.system("setenforce 0")
