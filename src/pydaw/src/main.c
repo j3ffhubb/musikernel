@@ -502,7 +502,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     else
     {
         printf("\n\nProcess scheduler set to %i, attempting to set "
-                "real-time scheduler.", f_current_proc_sched);
+                "real-time scheduler.\n", f_current_proc_sched);
         //Attempt to set the process priority to real-time
         const struct sched_param f_proc_param =
                 {sched_get_priority_max(RT_SCHED)};

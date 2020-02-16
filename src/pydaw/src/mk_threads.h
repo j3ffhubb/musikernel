@@ -12,7 +12,7 @@ GNU General Public License for more details.
 */
 
 #ifndef MK_THREADS_H
-#define	MK_THREADS_H
+#define MK_THREADS_H
 
 #ifdef SCHED_DEADLINE
     //#define RT_SCHED SCHED_DEADLINE
@@ -24,7 +24,12 @@ GNU General Public License for more details.
 #include "dawnext.h"
 #include "wavenext.h"
 
-#ifdef	__cplusplus
+#ifdef MACOS
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#endif
+
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -34,7 +39,7 @@ void * v_pydaw_worker_thread(void*);
 void v_pydaw_init_worker_threads(int, int, int);
 void v_open_project(const char*, int);
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
@@ -83,9 +88,13 @@ void v_open_project(const char* a_project_folder, int a_first_load)
 }
 
 void v_pydaw_activate(
-        int a_thread_count, int a_set_thread_affinity, char * a_project_path,
-        float a_sr, t_midi_device_list * a_midi_devices, int a_aux_threads)
-{
+    int a_thread_count,
+    int a_set_thread_affinity,
+    char* a_project_path,
+    float a_sr,
+    t_midi_device_list* a_midi_devices,
+    int a_aux_threads
+){
     /* Instantiate hosts */
     g_musikernel_get(a_sr, a_midi_devices);
 
@@ -113,7 +122,10 @@ void v_pydaw_activate(
     v_pydaw_set_host(f_host);
 
     v_pydaw_init_worker_threads(
-        a_thread_count, a_set_thread_affinity, a_aux_threads);
+        a_thread_count,
+        a_set_thread_affinity,
+        a_aux_threads
+    );
 
 #ifdef __linux__
     mlockall(MCL_CURRENT | MCL_FUTURE);
@@ -205,89 +217,6 @@ void * v_pydaw_osc_send_thread(void* a_arg)
     return (void*)1;
 }
 
-#if defined(__amd64__)
-void cpuID(unsigned int i, unsigned int regs[4])
-{
-    asm volatile
-      ("cpuid" : "=a" (regs[0]), "=b" (regs[1]), "=c" (regs[2]), "=d" (regs[3])
-       : "a" (i), "c" (0));
-    // ECX is set to zero for CPUID function 4
-}
-
-NO_OPTIMIZATION char * uint_to_char(unsigned int a_input)
-{
-    char* bytes = (char*)malloc(sizeof(char) * 5);
-
-    bytes[0] = a_input & 0xFF;
-    bytes[1] = (a_input >> 8) & 0xFF;
-    bytes[2] = (a_input >> 16) & 0xFF;
-    bytes[3] = (a_input >> 24) & 0xFF;
-    bytes[4] = '\0';
-
-    return bytes;
-}
-
-NO_OPTIMIZATION int i_cpu_has_hyperthreading()
-{
-    unsigned int regs[4];
-
-    // Get vendor
-    cpuID(0, regs);
-
-    char cpuVendor[12];
-    sprintf(cpuVendor, "%s%s%s", uint_to_char(regs[1]), uint_to_char(regs[3]),
-            uint_to_char(regs[2]));
-
-    // Get CPU features
-    cpuID(1, regs);
-    unsigned cpuFeatures = regs[3]; // EDX
-
-    // Logical core count per CPU
-    cpuID(1, regs);
-    unsigned logical = (regs[1] >> 16) & 0xff; // EBX[23:16]
-    unsigned cores = logical;
-
-    if(!strcmp(cpuVendor, "GenuineIntel"))
-    {
-        printf("\nDetected Intel CPU, checking for hyperthreading.\n");
-        // Get DCP cache info
-        cpuID(4, regs);
-        cores = ((regs[0] >> 26) & 0x3f) + 1; // EAX[31:26] + 1
-        // Detect hyper-threads
-        int hyperThreads = cpuFeatures & (1 << 28) && cores < logical;
-        return hyperThreads;
-
-    }
-    /*else if(!strcmp(cpuVendor, "AuthenticAMD"))
-    {
-        return 0;
-      // Get NC: Number of CPU cores - 1
-      //cpuID(0x80000008, regs);
-      //cores = ((unsigned)(regs[2] & 0xff)) + 1; // ECX[7:0] + 1
-    }*/
-    else
-    {
-        printf("Detected CPU vendor %s , assuming no hyper-threading.\n",
-                cpuVendor);
-        return 0;
-    }
-}
-#elif defined(__i386__)
-
-int i_cpu_has_hyperthreading()
-{
-    return 1;
-}
-
-#else
-
-int i_cpu_has_hyperthreading()
-{
-    return 0;
-}
-
-#endif
-
 void v_pre_fault_thread_stack(int stacksize)
 {
 #ifdef __linux__
@@ -371,98 +300,77 @@ void * v_pydaw_worker_thread(void* a_arg)
     return (void*)1;
 }
 
+int getNumberOfCores() {
+#ifdef WIN32
+    return atoi(getenv("NUMBER_OF_PROCESSORS"));
+#elif MACOS
+    int nm[2];
+    size_t len = 4;
+    uint32_t count;
+
+    nm[0] = CTL_HW;
+    nm[1] = HW_AVAILCPU;
+    sysctl(nm, 2, &count, &len, NULL, 0);
+
+    if(count < 1) {
+        nm[1] = HW_NCPU;
+        sysctl(nm, 2, &count, &len, NULL, 0);
+        if(count < 1){
+            count = 1;
+        }
+    }
+    return count;
+#elif __linux__
+    return sysconf(_SC_NPROCESSORS_ONLN);
+#else
+    return 1;
+#endif
+}
+
 void v_pydaw_init_worker_threads(
-        int a_thread_count, int a_set_thread_affinity, int a_aux_threads)
-{
+    int a_thread_count,
+    int a_set_thread_affinity,
+    int a_aux_threads
+){
     int f_stack_size = (1024 * 1024);
     int f_cpu_core_inc = 1;
+    int f_cpu_count = getNumberOfCores();
+    printf("Detected %i cpu cores\n", f_cpu_count);
 
-#ifdef __linux__
-    int f_cpu_count = sysconf(_SC_NPROCESSORS_ONLN);
-#endif
-
-#ifdef _WIN32
-    int f_cpu_count = atoi(getenv("NUMBER_OF_PROCESSORS"));
     if(f_cpu_count < 1)
     {
         f_cpu_count = 1;
     }
-    else if(f_cpu_count > 4)
-    {
-        f_cpu_count = 4;
-    }
-#endif
 
-#if defined(_WIN32) || defined(__linux__)
-    int f_has_ht = i_cpu_has_hyperthreading();
-
-    if(f_has_ht)
-    {
-        printf("\n\n#####################################################\n");
-        printf("Detected Intel hyperthreading, dividing logical"
-                " core count by 2.\n");
-        printf("You should consider turning off hyperthreading in "
-                "your PC's BIOS for best performance.\n");
-        printf("#########################################################\n\n");
-        f_cpu_count /= 2;
-        f_cpu_core_inc = 2;
-    }
-
-    if(a_thread_count == 0)
-    {
-        if(f_cpu_count > 3)
-        {
+    if(a_thread_count == 0){  // auto, select for the user
+        // 2 thread SMT is assumed now
+        int core_count = f_cpu_count / 2;
+        if(core_count >= 6){
+            musikernel->worker_thread_count = 4;
+        } else if(core_count >= 4){
             musikernel->worker_thread_count = 3;
-        }
-        else if(f_cpu_count == 3)
-        {
+        } else if(core_count == 3){
             musikernel->worker_thread_count = 2;
-        }
-        else
-        {
+        } else {
             musikernel->worker_thread_count = 1;
         }
-    }
-    else
-    {
-        if(a_thread_count > f_cpu_count)
-        {
+    } else {
+        if(a_thread_count > f_cpu_count){
             musikernel->worker_thread_count = f_cpu_count;
-        }
-        else
-        {
+        } else {
             musikernel->worker_thread_count = a_thread_count;
         }
     }
 
-    if(!f_has_ht &&
-    ((musikernel->worker_thread_count * 2) <= f_cpu_count))
-    {
+    if((musikernel->worker_thread_count * 2) <= f_cpu_count){
         f_cpu_core_inc = f_cpu_count / musikernel->worker_thread_count;
 
-        if(f_cpu_core_inc < 2)
-        {
+        if(f_cpu_core_inc < 2){
             f_cpu_core_inc = 2;
-        }
-        else if(f_cpu_core_inc > 4)
-        {
+        } else if(f_cpu_core_inc > 4){
             f_cpu_core_inc = 4;
         }
     }
-
-#else
-    int f_cpu_count = a_thread_count;
-
-    if(a_thread_count == 0)
-    {
-        musikernel->worker_thread_count = 1;
-    }
-    else
-    {
-        musikernel->worker_thread_count = a_thread_count;
-    }
-
-#endif
 
     printf("Spawning %i worker threads\n", musikernel->worker_thread_count);
 
@@ -499,93 +407,88 @@ void v_pydaw_init_worker_threads(
     //pthread_setschedparam(f_self, RT_SCHED, &param);
 
     int f_cpu_core = 0;
+    int f_i;
 
-    if(a_set_thread_affinity)
-    {
-        f_cpu_core += f_cpu_core_inc;
-
-        if(f_cpu_core >= f_cpu_count)
-        {
-            f_cpu_core = 0;
-        }
-    }
-
-    int f_i = 0;
-
-    while(f_i < (musikernel->worker_thread_count))
+    for(f_i = 0; f_i < (musikernel->worker_thread_count); ++f_i)
     {
         musikernel->track_thread_quit_notifier[f_i] = 0;
-        t_pydaw_thread_args * f_args =
-                (t_pydaw_thread_args*)malloc(sizeof(t_pydaw_thread_args));
+        t_pydaw_thread_args * f_args = (t_pydaw_thread_args*)malloc(
+            sizeof(t_pydaw_thread_args)
+        );
         f_args->thread_num = f_i;
         f_args->stack_size = f_stack_size;
 
-        if(f_i > 0)
-        {
-            //pthread_mutex_init(&musikernel->track_cond_mutex[f_i], NULL);
-            pthread_cond_init(&musikernel->track_cond[f_i], NULL);
-            pthread_spin_init(&musikernel->thread_locks[f_i], 0);
-            pthread_mutex_init(&musikernel->track_block_mutexes[f_i], NULL);
-            pthread_create(&musikernel->worker_threads[f_i],
-                    &threadAttr, v_pydaw_worker_thread, (void*)f_args);
-
-#ifdef __linux__
-            if(a_set_thread_affinity)
-            {
-                cpu_set_t cpuset;
-                CPU_ZERO(&cpuset);
-                CPU_SET(f_cpu_core, &cpuset);
-                pthread_setaffinity_np(musikernel->worker_threads[f_i],
-                        sizeof(cpu_set_t), &cpuset);
-                //sched_setaffinity(0, sizeof(cpu_set_t), &cpuset);
-                f_cpu_core += f_cpu_core_inc;
-            }
-
-            struct sched_param param2;
-            int f_applied_policy = 0;
-            pthread_getschedparam(musikernel->worker_threads[f_i],
-                &f_applied_policy, &param2);
-
-            if(f_applied_policy == RT_SCHED)
-            {
-                printf("Scheduling successfully applied with priority %i\n ",
-                        param2.__sched_priority);
-            }
-            else
-            {
-                printf("Scheduling was not successfully applied\n");
-            }
-#endif
-
-        }
-        else
-        {
+        if(f_i == 0){
             musikernel->main_thread_args = (void*)f_args;
         }
-        ++f_i;
+        //pthread_mutex_init(&musikernel->track_cond_mutex[f_i], NULL);
+        pthread_cond_init(&musikernel->track_cond[f_i], NULL);
+        pthread_spin_init(&musikernel->thread_locks[f_i], 0);
+        pthread_mutex_init(&musikernel->track_block_mutexes[f_i], NULL);
+        pthread_create(
+            &musikernel->worker_threads[f_i],
+            &threadAttr,
+            v_pydaw_worker_thread,
+            (void*)f_args
+        );
+
+#ifdef __linux__
+        if(a_set_thread_affinity){
+            cpu_set_t cpuset;
+            CPU_ZERO(&cpuset);
+            CPU_SET(f_cpu_core, &cpuset);
+            pthread_setaffinity_np(
+                    musikernel->worker_threads[f_i],
+                    sizeof(cpu_set_t),
+                    &cpuset
+            );
+            printf(
+                    "Locked thread %i to core %i\n",
+                    f_i,
+                    f_cpu_core
+            );
+            //sched_setaffinity(0, sizeof(cpu_set_t), &cpuset);
+            f_cpu_core += f_cpu_core_inc;
+        }
+
+        struct sched_param param2;
+        int f_applied_policy = 0;
+        pthread_getschedparam(musikernel->worker_threads[f_i],
+            &f_applied_policy, &param2);
+
+        if(f_applied_policy == RT_SCHED){
+            printf("Scheduling successfully applied with priority %i\n ",
+                    param2.__sched_priority);
+        } else {
+            printf("Scheduling was not successfully applied\n");
+        }
+#endif
     }
 
     pthread_attr_destroy(&threadAttr);
     musikernel->audio_recording_quit_notifier = 0;
 
-    if(a_aux_threads)
-    {
+    if(a_aux_threads){
         pthread_attr_t auxThreadAttr;
         pthread_attr_init(&auxThreadAttr);
         pthread_attr_setdetachstate(&auxThreadAttr, PTHREAD_CREATE_DETACHED);
         pthread_attr_setstacksize(&auxThreadAttr, (1024 * 1024));
 
-        pthread_create(&musikernel->audio_recording_thread, &auxThreadAttr,
-            v_pydaw_audio_recording_thread, NULL);
+        pthread_create(
+            &musikernel->audio_recording_thread,
+            &auxThreadAttr,
+            v_pydaw_audio_recording_thread,
+            NULL
+        );
 
-        pthread_create(&musikernel->osc_queue_thread, &auxThreadAttr,
-                v_pydaw_osc_send_thread, (void*)musikernel);
+        pthread_create(
+            &musikernel->osc_queue_thread,
+            &auxThreadAttr,
+            v_pydaw_osc_send_thread,
+            (void*)musikernel
+        );
         pthread_attr_destroy(&auxThreadAttr);
     }
 }
 
-
-
-
-#endif	/* MK_THREADS_H */
-
+#endif  /* MK_THREADS_H */
