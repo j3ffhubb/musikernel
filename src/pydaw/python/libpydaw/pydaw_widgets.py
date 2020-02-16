@@ -1455,8 +1455,18 @@ class pydaw_lfo_widget:
         self.layout = QGridLayout(self.groupbox)
         self.layout.setContentsMargins(3, 3, 3, 3)
         self.freq_knob = pydaw_knob_control(
-            a_size, _("Freq"), a_freq_port, a_rel_callback, a_val_callback,
-            10, 1600, 200, KC_HZ_DECIMAL, a_port_dict, a_preset_mgr)
+            a_size,
+            _("Freq"),
+            a_freq_port,
+            a_rel_callback,
+            a_val_callback,
+            10,
+            2100,
+            200,
+            KC_HZ_DECIMAL,
+            a_port_dict,
+            a_preset_mgr,
+        )
         self.freq_knob.add_to_grid_layout(self.layout, 0)
         self.type_combobox = pydaw_combobox_control(
             120, _("Type"), a_type_port, a_rel_callback, a_val_callback,
