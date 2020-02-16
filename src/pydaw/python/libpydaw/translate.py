@@ -28,7 +28,7 @@ try:
     print("locale: {}".format(global_locale))
     print("encoding: {}".format(global_encoding))
     global_language = gettext.translation(
-        "musikernel2",
+        "musikernel3",
         os.path.join(INSTALL_PREFIX, "share", "locale"),
         [global_locale])
     print("global_language.info: {}".format(global_language.info()))

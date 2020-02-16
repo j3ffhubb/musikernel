@@ -18,16 +18,16 @@
 .\" .sp <n>    insert n+1 empty lines
 .\" for manpage-specific macros, see man(7)
 .SH NAME
-musikernel2 \- program to do something
+musikernel3 \- program to do something
 .SH SYNOPSIS
-.B musikernel2
+.B musikernel3
 .RI [ options ] " files" ...
 .br
 .B bar
 .RI [ options ] " files" ...
 .SH DESCRIPTION
 This manual page documents briefly the
-.B musikernel2
+.B musikernel3
 and
 .B bar
 commands.
@@ -35,7 +35,7 @@ commands.
 .\" TeX users may be more comfortable with the \fB<whatever>\fP and
 .\" \fI<whatever>\fP escape sequences to invode bold face and italics,
 .\" respectively.
-\fBmusikernel2\fP is a program that...
+\fBmusikernel3\fP is a program that...
 .SH OPTIONS
 These programs follow the usual GNU command line syntax, with long
 options starting with two dashes (`-').

@@ -120,7 +120,7 @@ input("Press 'enter' to continue")
 
 NSIS = r"C:\Program Files (x86)\NSIS\Bin\makensis.exe"
 
-bat_script = r"""start /wait /b /REALTIME /D C:\musikernel2\mingw{bits}\bin python3.exe musikernel2.py
+bat_script = r"""start /wait /b /REALTIME /D C:\musikernel3\mingw{bits}\bin python3.exe musikernel3.py
 """
 
 for bits in ("64", "32"):    

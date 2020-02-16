@@ -79,7 +79,7 @@ MKENGINE_DIR = os.path.abspath(os.path.join(PYTHON_DIR, "..", "mkengine"))
 
 pydaw_terminating_char = "\\"
 
-global_pydaw_version_string = "musikernel2"
+global_pydaw_version_string = "musikernel3"
 global_pydaw_file_type_string = 'MusiKernel Project (default.{})'.format(
     global_pydaw_version_string)
 global_euphoria_file_type_string = 'Euphoria Sample File (*.u4ia4)'

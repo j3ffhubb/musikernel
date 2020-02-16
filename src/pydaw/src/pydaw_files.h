@@ -39,7 +39,7 @@ void chown_file(const char *file_name)
 
 #endif
 
-#define MUSIKERNEL_VERSION "musikernel2"
+#define MUSIKERNEL_VERSION "musikernel3"
 
 /*Standard string sizes*/
 #define PYDAW_XLARGE_STRING 1048576

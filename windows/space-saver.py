@@ -135,7 +135,7 @@ def delete_it_all(a_path):
         print("Warning:  '{}' is not empty".format(pkg_dir))
 
 for bits in ("64", "32"):
-    base_dir = r'C:\musikernel2'
+    base_dir = r'C:\musikernel3'
     mingw_dir = r'{0}\mingw{1}'.format(base_dir, bits)
     bin_dir = r'{0}\bin'.format(mingw_dir)
     bat_script = "{0}.bat".format(MAJOR_VERSION)
