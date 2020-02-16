@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=MusiKernel 2
-GenericName=MusiKernel 2
+Name=MusiKernel 3
+GenericName=MusiKernel 3
 Comment=A suite of audio hosts and plugins
 Comment[fr]=Un ensemble d'hôtes audio et de greffons
 Exec=musikernel3.py

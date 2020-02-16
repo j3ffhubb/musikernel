@@ -119,7 +119,7 @@ def prepare_to_quit():
 def set_window_title():
     if not MAIN_WINDOW:
         return
-    MAIN_WINDOW.setWindowTitle('MusiKernel 2 - {}'.format(
+    MAIN_WINDOW.setWindowTitle('MusiKernel 3 - {}'.format(
         os.path.join(
             PROJECT.project_folder, '{}.{}'.format(
                 PROJECT.project_file,
