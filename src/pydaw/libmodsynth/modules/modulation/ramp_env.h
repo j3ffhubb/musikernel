@@ -46,7 +46,7 @@ t_ramp_env * g_rmp_get_ramp_env(float);
 
 
 
-inline void f_rmp_run_ramp(t_ramp_env*__restrict a_rmp_ptr)
+inline void f_rmp_run_ramp(t_ramp_env* a_rmp_ptr)
 {
     if((a_rmp_ptr->output_multiplier) == 0.0f )
     {
@@ -74,7 +74,7 @@ inline void f_rmp_run_ramp(t_ramp_env*__restrict a_rmp_ptr)
 }
 
 
-inline void f_rmp_run_ramp_curve(t_ramp_env*__restrict a_rmp_ptr)
+inline void f_rmp_run_ramp_curve(t_ramp_env* a_rmp_ptr)
 {
     f_rmp_run_ramp(a_rmp_ptr);
 
@@ -90,7 +90,7 @@ inline void f_rmp_run_ramp_curve(t_ramp_env*__restrict a_rmp_ptr)
  *
  * Set envelope time without retriggering the envelope
  */
-void v_rmp_set_time(t_ramp_env*__restrict a_rmp_ptr,float a_time)
+void v_rmp_set_time(t_ramp_env* a_rmp_ptr,float a_time)
 {
     a_rmp_ptr->ramp_time = a_time;
 
@@ -114,7 +114,7 @@ void v_rmp_set_time(t_ramp_env*__restrict a_rmp_ptr,float a_time)
  *
  * Retrigger when using with
  */
-void v_rmp_retrigger_curve(t_ramp_env*__restrict a_rmp_ptr, float a_time, float a_multiplier, float a_curve)
+void v_rmp_retrigger_curve(t_ramp_env* a_rmp_ptr, float a_time, float a_multiplier, float a_curve)
 {
     v_rmp_retrigger(a_rmp_ptr, a_time, a_multiplier);
 
@@ -132,7 +132,7 @@ void v_rmp_retrigger_curve(t_ramp_env*__restrict a_rmp_ptr, float a_time, float 
  * float a_time,
  * float a_multiplier)
  */
-void v_rmp_retrigger(t_ramp_env*__restrict a_rmp_ptr, float a_time, float a_multiplier)
+void v_rmp_retrigger(t_ramp_env* a_rmp_ptr, float a_time, float a_multiplier)
 {
     a_rmp_ptr->output = 0.0f;
     a_rmp_ptr->ramp_time = a_time;
@@ -153,7 +153,7 @@ void v_rmp_retrigger(t_ramp_env*__restrict a_rmp_ptr, float a_time, float a_mult
 }
 
 /*Glide with constant time in seconds*/
-void v_rmp_retrigger_glide_t(t_ramp_env*__restrict a_rmp_ptr, float a_time, float a_current_note, float a_next_note)
+void v_rmp_retrigger_glide_t(t_ramp_env* a_rmp_ptr, float a_time, float a_current_note, float a_next_note)
 {
     a_rmp_ptr->ramp_time = a_time;
 
@@ -175,7 +175,7 @@ void v_rmp_retrigger_glide_t(t_ramp_env*__restrict a_rmp_ptr, float a_time, floa
 }
 
 /*Glide with constant rate in seconds-per-octave*/
-void v_rmp_retrigger_glide_r(t_ramp_env*__restrict a_rmp_ptr, float a_time, float a_current_note, float a_next_note)
+void v_rmp_retrigger_glide_r(t_ramp_env* a_rmp_ptr, float a_time, float a_current_note, float a_next_note)
 {
     a_rmp_ptr->output = 0.0f;
     a_rmp_ptr->output_multiplier = a_next_note - a_current_note;

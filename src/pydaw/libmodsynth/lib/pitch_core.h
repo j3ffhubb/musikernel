@@ -260,7 +260,7 @@ float f_pit_midi_note_to_hz_fast(float a_midi_note_number)
  * t_pit_ratio * a_ratio)
  */
 float f_pit_midi_note_to_ratio_fast(float a_base_pitch,
-        float a_transposed_pitch, t_pit_ratio *__restrict a_ratio)
+        float a_transposed_pitch, t_pit_ratio * a_ratio)
 {
     if(a_base_pitch != (a_ratio->pitch))
     {

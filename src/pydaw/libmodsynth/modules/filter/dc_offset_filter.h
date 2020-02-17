@@ -29,7 +29,7 @@ t_dco_dc_offset_filter * g_dco_get(float);
 inline float f_dco_run(t_dco_dc_offset_filter*,float);
 inline void v_dco_reset(t_dco_dc_offset_filter*);
 
-inline float f_dco_run(t_dco_dc_offset_filter*__restrict a_dco,float a_in)
+inline float f_dco_run(t_dco_dc_offset_filter* a_dco,float a_in)
 {
     register float output =
         (a_in - (a_dco->in_n_m1)) + ((a_dco->out_n_m1) * (a_dco->coeff));
@@ -41,7 +41,7 @@ inline float f_dco_run(t_dco_dc_offset_filter*__restrict a_dco,float a_in)
     return output;
 }
 
-inline void v_dco_reset(t_dco_dc_offset_filter*__restrict a_dco)
+inline void v_dco_reset(t_dco_dc_offset_filter* a_dco)
 {
     a_dco->in_n_m1 = 0.0f;
     a_dco->out_n_m1 = 0.0f;

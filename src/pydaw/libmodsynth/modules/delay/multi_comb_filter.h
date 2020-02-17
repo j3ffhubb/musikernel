@@ -57,7 +57,7 @@ t_mcm_multicomb * g_mcm_get(int, float);
  * float input value (audio sample, -1 to 1, typically)
  * );
  * This runs the filter.  You can then use the output sample in your plugin*/
-inline void v_mcm_run(t_mcm_multicomb*__restrict a_cmb_ptr,float a_value)
+inline void v_mcm_run(t_mcm_multicomb* a_cmb_ptr,float a_value)
 {
     a_cmb_ptr->input_buffer[(a_cmb_ptr->input_pointer)] = a_value;
     a_cmb_ptr->output_sample = 0.0f;
@@ -108,7 +108,7 @@ inline void v_mcm_run(t_mcm_multicomb*__restrict a_cmb_ptr,float a_value)
  *
  * Sets all parameters of the comb filters.
  */
-inline void v_mcm_set(t_mcm_multicomb*__restrict a_cmb_ptr, float a_feedback_db,
+inline void v_mcm_set(t_mcm_multicomb* a_cmb_ptr, float a_feedback_db,
         float a_midi_note_number, float a_spread)
 {
     /*Set feedback_linear, but only if it's changed since last time*/

@@ -72,8 +72,8 @@ void v_ifh_retrigger(t_int_frac_read_head*, int);
  * This function assumes you added adequate 0.0f's to the beginning and
  * end of the array, it does not check array boundaries
  */
-float f_sinc_interpolate(t_sinc_interpolator  *__restrict a_sinc,
-        float *__restrict a_array, float a_pos)
+float f_sinc_interpolate(t_sinc_interpolator  * a_sinc,
+        float * a_array, float a_pos)
 {
     a_sinc->pos_int = (int)a_pos;
     a_sinc->pos_frac = a_pos - (float)(a_sinc->pos_int);
@@ -86,8 +86,8 @@ float f_sinc_interpolate(t_sinc_interpolator  *__restrict a_sinc,
 }
 
 float f_sinc_interpolate2(
-    t_sinc_interpolator *__restrict a_sinc,
-    float *__restrict a_array,
+    t_sinc_interpolator * a_sinc,
+    float * a_array,
     int a_int_pos,
     float a_float_pos
 ){
