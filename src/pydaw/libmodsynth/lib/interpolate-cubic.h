@@ -53,7 +53,7 @@ float f_cubic_interpolate_ptr_wrap(float * a_table, int a_table_size,
         float a_ptr)
 {
     int int_pos = (int)a_ptr;
-    float mu = a_ptr - ((float)int_pos);
+    float mu = (float)a_ptr - (float)int_pos;
     float mu2 = mu * mu;
     int int_pos_plus1 = int_pos + 1;
     int int_pos_minus1 = int_pos - 1;
@@ -95,14 +95,22 @@ float f_cubic_interpolate_ptr_wrap(float * a_table, int a_table_size,
         int_pos_minus2 = int_pos_minus2 + a_table_size;
     }
 
-    float a0 = a_table[int_pos_plus1] - a_table[int_pos] -
-            a_table[int_pos_minus2] + a_table[int_pos_minus1];
-    float a1 = a_table[int_pos_minus2] -
-            a_table[int_pos_minus1] - a0;
-    float a2 = a_table[int_pos] - a_table[int_pos_minus2];
-    float a3 = a_table[int_pos_minus1];
+    float a[4];
+    a[0] =
+        a_table[int_pos_plus1] -
+        a_table[int_pos] -
+        a_table[int_pos_minus2] +
+        a_table[int_pos_minus1];
+    a[1] =
+        a_table[int_pos_minus2] -
+        a_table[int_pos_minus1] -
+        a[0];
+    a[2] =
+        a_table[int_pos] -
+        a_table[int_pos_minus2];
+    a[3] = a_table[int_pos_minus1];
 
-    return(a0 * mu * mu2 + a1 * mu2 + a2 * mu + a3);
+    return a[0] * mu * mu2 + a[1] * mu2 + a[2] * mu + a[3];
 }
 
 /* inline float f_cubic_interpolate_ptr_wrap(
@@ -124,13 +132,14 @@ inline float f_cubic_interpolate_ptr(float * a_table, float a_ptr)
     int int_pos_minus2 = (int_pos) - 2;
 
 #ifdef PYDAW_NO_HARDWARE
-    //Check this when run with no hardware, but otherwise save the CPU.
-    //Anything sending a position to this should already know that the position is valid.
+    // Check this when run with no hardware, but otherwise save the CPU.
+    // Anything sending a position to this should already know that the
+    // position is valid.
     assert(int_pos_minus1 >= 0);
     assert(int_pos_minus2 >= 0);
 #endif
 
-    float mu = a_ptr - (int_pos);
+    float mu = a_ptr - (float)int_pos;
 
     float mu2 = (mu) * (mu);
     float a0 = a_table[int_pos_plus1] - a_table[int_pos] -

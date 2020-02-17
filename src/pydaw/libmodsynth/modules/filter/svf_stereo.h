@@ -43,16 +43,32 @@ extern "C" {
 
 typedef struct
 {
-    float filter_input, filter_last_input, bp_m1, lp_m1, hp, bp, lp;
+    float filter_input;
+    float filter_last_input;
+    float bp_m1;
+    float lp_m1;
+    float hp;
+    float bp;
+    float lp;
 }t_svf2_kernel __attribute__((aligned(16)));
 
 typedef struct
 {
-    float cutoff_note, cutoff_hz, cutoff_filter, pi2_div_sr, sr, filter_res,
-            filter_res_db, velocity_cutoff; //, velocity_cutoff_amt;
-    float cutoff_base, cutoff_mod, cutoff_last,  velocity_mod_amt;
-    t_svf2_kernel filter_kernels [SVF_MAX_CASCADE][2];
-    float output0, output1;
+    float cutoff_note;
+    float cutoff_hz;
+    float cutoff_filter;
+    float pi2_div_sr;
+    float sr;
+    float filter_res;
+    float filter_res_db;
+    float velocity_cutoff; //, velocity_cutoff_amt;
+    float cutoff_base;
+    float cutoff_mod;
+    float cutoff_last;
+    float velocity_mod_amt;
+    t_svf2_kernel filter_kernels[SVF_MAX_CASCADE][2];
+    float output0;
+    float output1;
 } t_svf2_filter __attribute__((aligned(16)));
 
 void v_svf2_set_cutoff(t_svf2_filter*);
@@ -61,7 +77,7 @@ void v_svf2_set_cutoff_base(t_svf2_filter*, float);
 void v_svf2_add_cutoff_mod(t_svf2_filter*, float);
 void v_svf2_velocity_mod(t_svf2_filter*,float);
 
-typedef void (*fp_svf2_run_filter)(t_svf2_filter*,float, float);
+typedef void (*fp_svf2_run_filter)(t_svf2_filter*, float, float);
 
 /*The int is the number of cascaded filter kernels*/
 fp_svf2_run_filter fp_svf2_get_run_filter_ptr(int,int);
@@ -92,26 +108,24 @@ void v_svf2_reset(t_svf2_filter*);
 
 void v_svf2_reset(t_svf2_filter * a_svf2)
 {
-    register int f_i = 0;
-    while(f_i < SVF_MAX_CASCADE)
+    register int i;
+    for(i = 0; i < SVF_MAX_CASCADE; ++i)
     {
-        a_svf2->filter_kernels[f_i][0].bp = 0.0f;
-        a_svf2->filter_kernels[f_i][0].bp_m1 = 0.0f;
-        a_svf2->filter_kernels[f_i][0].filter_input = 0.0f;
-        a_svf2->filter_kernels[f_i][0].filter_last_input = 0.0f;
-        a_svf2->filter_kernels[f_i][0].hp = 0.0f;
-        a_svf2->filter_kernels[f_i][0].lp = 0.0f;
-        a_svf2->filter_kernels[f_i][0].lp_m1 = 0.0f;
+        a_svf2->filter_kernels[i][0].bp = 0.0f;
+        a_svf2->filter_kernels[i][0].bp_m1 = 0.0f;
+        a_svf2->filter_kernels[i][0].filter_input = 0.0f;
+        a_svf2->filter_kernels[i][0].filter_last_input = 0.0f;
+        a_svf2->filter_kernels[i][0].hp = 0.0f;
+        a_svf2->filter_kernels[i][0].lp = 0.0f;
+        a_svf2->filter_kernels[i][0].lp_m1 = 0.0f;
 
-        a_svf2->filter_kernels[f_i][1].bp = 0.0f;
-        a_svf2->filter_kernels[f_i][1].bp_m1 = 0.0f;
-        a_svf2->filter_kernels[f_i][1].filter_input = 0.0f;
-        a_svf2->filter_kernels[f_i][1].filter_last_input = 0.0f;
-        a_svf2->filter_kernels[f_i][1].hp = 0.0f;
-        a_svf2->filter_kernels[f_i][1].lp = 0.0f;
-        a_svf2->filter_kernels[f_i][1].lp_m1 = 0.0f;
-
-        ++f_i;
+        a_svf2->filter_kernels[i][1].bp = 0.0f;
+        a_svf2->filter_kernels[i][1].bp_m1 = 0.0f;
+        a_svf2->filter_kernels[i][1].filter_input = 0.0f;
+        a_svf2->filter_kernels[i][1].filter_last_input = 0.0f;
+        a_svf2->filter_kernels[i][1].hp = 0.0f;
+        a_svf2->filter_kernels[i][1].lp = 0.0f;
+        a_svf2->filter_kernels[i][1].lp_m1 = 0.0f;
     }
 }
 
@@ -254,25 +268,47 @@ void v_svf2_run_4_pole_lp(t_svf2_filter*__restrict a_svf,
 void v_svf2_run_2_pole_hp(t_svf2_filter*__restrict a_svf,
         float a_in0, float a_in1)
 {
-    v_svf2_run(a_svf, &a_svf->filter_kernels[0][0], a_in0);
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[0][0],
+        a_in0
+    );
     a_svf->output0 = a_svf->filter_kernels[0][0].hp;
 
-    v_svf2_run(a_svf, &a_svf->filter_kernels[0][1], a_in1);
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[0][1],
+        a_in1
+    );
     a_svf->output1 = a_svf->filter_kernels[0][1].hp;
 }
 
 void v_svf2_run_4_pole_hp(t_svf2_filter*__restrict a_svf,
         float a_in0, float a_in1)
 {
-    v_svf2_run(a_svf, &a_svf->filter_kernels[0][0], a_in0);
-    v_svf2_run(a_svf, &a_svf->filter_kernels[0][1], a_in1);
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[0][0],
+        a_in0
+    );
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[0][1],
+        a_in1
+    );
 
-    v_svf2_run(a_svf, &a_svf->filter_kernels[1][0],
-            (a_svf->filter_kernels[0][0].hp));
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[1][0],
+        a_svf->filter_kernels[0][0].hp
+    );
     a_svf->output0 = a_svf->filter_kernels[1][0].hp;
 
-    v_svf2_run(a_svf, &a_svf->filter_kernels[1][1],
-            (a_svf->filter_kernels[0][1].hp));
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[1][1],
+        a_svf->filter_kernels[0][1].hp
+    );
     a_svf->output1 = a_svf->filter_kernels[1][1].hp;
 }
 
@@ -304,31 +340,56 @@ void v_svf2_run_4_pole_bp(t_svf2_filter*__restrict a_svf,
 void v_svf2_run_2_pole_notch(t_svf2_filter*__restrict a_svf,
         float a_in0, float a_in1)
 {
-    v_svf2_run(a_svf, &a_svf->filter_kernels[0][0], a_in0);
-    a_svf->output0 = (a_svf->filter_kernels[0][0].hp) +
-            (a_svf->filter_kernels[0][0].lp);
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[0][0],
+        a_in0
+    );
+    a_svf->output0 =
+        a_svf->filter_kernels[0][0].hp +
+        a_svf->filter_kernels[0][0].lp;
 
-    v_svf2_run(a_svf, &a_svf->filter_kernels[0][1], a_in1);
-    a_svf->output1 = (a_svf->filter_kernels[0][1].hp) +
-            (a_svf->filter_kernels[0][1].lp);
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[0][1],
+        a_in1
+    );
+    a_svf->output1 =
+        a_svf->filter_kernels[0][1].hp +
+        a_svf->filter_kernels[0][1].lp;
 }
 
 void v_svf2_run_4_pole_notch(t_svf2_filter*__restrict a_svf,
         float a_in0, float a_in1)
 {
-    v_svf2_run(a_svf, &a_svf->filter_kernels[0][0], a_in0);
-    v_svf2_run(a_svf, &a_svf->filter_kernels[0][1], a_in1);
-    v_svf2_run(a_svf, &a_svf->filter_kernels[1][0],
-            (a_svf->filter_kernels[0][0].hp) +
-            (a_svf->filter_kernels[0][0].lp));
-    a_svf->output0 = (a_svf->filter_kernels[1][0].hp) +
-            (a_svf->filter_kernels[1][0].lp);
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[0][0],
+        a_in0
+    );
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[0][1],
+        a_in1
+    );
 
-    v_svf2_run(a_svf, &a_svf->filter_kernels[1][1],
-            (a_svf->filter_kernels[0][0].hp) +
-            (a_svf->filter_kernels[0][1].lp));
-    a_svf->output1 = (a_svf->filter_kernels[1][1].hp) +
-            (a_svf->filter_kernels[1][1].lp);
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[1][0],
+        a_svf->filter_kernels[0][0].hp + a_svf->filter_kernels[0][0].lp
+    );
+    a_svf->output0 =
+        a_svf->filter_kernels[1][0].hp +
+        a_svf->filter_kernels[1][0].lp;
+
+    v_svf2_run(
+        a_svf,
+        &a_svf->filter_kernels[1][1],
+        a_svf->filter_kernels[0][0].hp + a_svf->filter_kernels[0][1].lp
+    );
+    a_svf->output1 =
+        a_svf->filter_kernels[1][1].hp +
+        a_svf->filter_kernels[1][1].lp;
 }
 
 void v_svf2_run_2_pole_allpass(t_svf2_filter*__restrict a_svf,
