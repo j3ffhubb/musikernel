@@ -211,7 +211,7 @@ typedef struct
     float last_pos;
     float last_type;
     float last_wet;
-}t_grw_growl_filter __attribute__((aligned(16)));
+}t_grw_growl_filter;
 
 t_grw_growl_filter * g_grw_growl_filter_get(float);
 void v_grw_growl_filter_set(t_grw_growl_filter*, float, float, float);

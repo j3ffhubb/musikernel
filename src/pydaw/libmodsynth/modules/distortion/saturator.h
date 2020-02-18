@@ -32,7 +32,7 @@ typedef struct st_sat_saturator
     float last_outgain;
     float ingain_lin;
     float outgain_lin;
-}t_sat_saturator __attribute__((aligned(16)));
+}t_sat_saturator;
 
 t_sat_saturator * g_sat_get();
 inline void v_sat_set(t_sat_saturator*,float,float,float);
