@@ -1182,15 +1182,35 @@ class AudioInputTrack:
 
 class MkAudioItem:
     def __init__(
-            self, a_uid, a_sample_start=0.0, a_sample_end=1000.0,
-            a_start_bar=0, a_start_beat=0.0, a_timestretch_mode=3,
-            a_pitch_shift=0.0, a_output_track=0, a_vol=0.0,
-            a_timestretch_amt=1.0, a_fade_in=0.0, a_fade_out=999.0,
-            a_lane_num=0, a_pitch_shift_end=0.0,
-            a_timestretch_amt_end=1.0, a_reversed=False, a_crispness=5,
-            a_fadein_vol=-18, a_fadeout_vol=-18, a_paif_automation_uid=0,
-            a_send1=-1, a_s1_vol=0.0, a_send2=-1, a_s2_vol=0.0,
-            a_s0_sc=False, a_s1_sc=False, a_s2_sc=False):
+        self,
+        a_uid,
+        a_sample_start=0.0,
+        a_sample_end=1000.0,
+        a_start_bar=0,
+        a_start_beat=0.0,
+        a_timestretch_mode=3,
+        a_pitch_shift=0.0,
+        a_output_track=0,
+        a_vol=0.0,
+        a_timestretch_amt=1.0,
+        a_fade_in=0.0,
+        a_fade_out=999.0,
+        a_lane_num=0,
+        a_pitch_shift_end=0.0,
+        a_timestretch_amt_end=1.0,
+        a_reversed=False,
+        a_crispness=5,
+        a_fadein_vol=-18,
+        a_fadeout_vol=-18,
+        a_paif_automation_uid=0,
+        a_send1=-1,
+        a_s1_vol=0.0,
+        a_send2=-1,
+        a_s2_vol=0.0,
+        a_s0_sc=False,
+        a_s1_sc=False,
+        a_s2_sc=False,
+    ):
         self.uid = int(a_uid)
         self.sample_start = float(a_sample_start)
         self.sample_end = float(a_sample_end)
