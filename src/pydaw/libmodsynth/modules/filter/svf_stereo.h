@@ -44,7 +44,7 @@ extern "C" {
 typedef struct
 {
     float filter_input, filter_last_input, bp_m1, lp_m1, hp, bp, lp;
-}t_svf2_kernel __attribute__((aligned(16)));
+}t_svf2_kernel;
 
 typedef struct
 {
@@ -53,7 +53,7 @@ typedef struct
     float cutoff_base, cutoff_mod, cutoff_last,  velocity_mod_amt;
     t_svf2_kernel filter_kernels [SVF_MAX_CASCADE][2];
     float output0, output1;
-} t_svf2_filter __attribute__((aligned(16)));
+} t_svf2_filter;
 
 void v_svf2_set_cutoff(t_svf2_filter*);
 void v_svf2_set_res(t_svf2_filter*,  float);
