@@ -1,3 +1,4 @@
+*.swp
 tools/*.wav
 *.nsi
 windows/*.zip
