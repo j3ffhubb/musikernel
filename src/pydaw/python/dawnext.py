@@ -4099,6 +4099,18 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
         f_list = AUDIO_SEQ.get_selected()
         for f_item in f_list:
             f_item.audio_item.reversed = not f_item.audio_item.reversed
+            # Invert the start/end and fades so that the same section stays in
+            # the sequencer exactly as it is, just reversed
+            start = f_item.audio_item.sample_start
+            end = f_item.audio_item.sample_end
+            f_item.audio_item.sample_start = 1000. - end
+            f_item.audio_item.sample_end = 1000. - start
+
+            fade_in = f_item.audio_item.fade_in
+            fade_out = f_item.audio_item.fade_out
+            f_item.audio_item.fade_in = 999. - fade_out
+            f_item.audio_item.fade_out = 1000. - fade_in - 1.
+
         PROJECT.save_item(CURRENT_ITEM_NAME, CURRENT_ITEM)
         PROJECT.commit(_("Toggle audio items reversed"))
         global_open_audio_items(True)
