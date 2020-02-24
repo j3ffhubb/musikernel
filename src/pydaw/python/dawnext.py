@@ -8715,7 +8715,8 @@ class TransportWidget(libmk.AbstractTransport):
         self.loop_mode_combobox.addItems([_("Off"), _("Region")])
         self.loop_mode_combobox.setMinimumWidth(90)
         self.loop_mode_combobox.currentIndexChanged.connect(
-            self.on_loop_mode_changed)
+            self.on_loop_mode_changed,
+        )
         self.hlayout2.addWidget(self.loop_mode_combobox)
 
         self.hlayout3 = QHBoxLayout()
@@ -9123,7 +9124,11 @@ class MainWindow(QScrollArea):
                      f_samp_rate, f_buff_size, f_thread_count,
                      pydaw_util.USE_HUGEPAGES, f_stem)]
                 libmk.MAIN_WINDOW.show_offline_rendering_wait_window_v2(
-                    f_cmd, f_out_file, f_file_name=f_fini)
+                    f_cmd,
+                    f_out_file,
+                    f_file_name=f_fini,
+                )
+
                 if f_stem:
                     f_tracks = PROJECT.get_tracks()
                     for f_file in os.listdir(f_out_file):
@@ -9505,7 +9510,12 @@ MIXER_WIDGET = mkplugins.MixerWidget(TRACK_COUNT_ALL)
 
 def on_ready():
     """ Called after re-opening the audio engine """
-    pass
+    # Ensure that loop mode is restored in the engine
+    # to the same setting as the UI, since this is not part
+    # of the saved data
+    TRANSPORT.on_loop_mode_changed(
+        TRANSPORT.loop_mode_combobox.currentIndex(),
+    )
 
 def get_mixer_peak_meters():
     for k, v in MIXER_WIDGET.tracks.items():

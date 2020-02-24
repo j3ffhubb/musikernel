@@ -573,7 +573,11 @@ class MkMainWindow(QMainWindow):
         f_window.exec_()
 
     def show_offline_rendering_wait_window_v2(
-    self, a_cmd_list, a_file_name, f_file_name=None):
+        self,
+        a_cmd_list,
+        a_file_name,
+        f_file_name=None
+    ):
         if not f_file_name:
             f_file_name = "{}.finished".format(a_file_name)
         def ok_handler():
@@ -614,11 +618,15 @@ class MkMainWindow(QMainWindow):
                 f_time_label.setText(str(round(f_elapsed_time, 1)))
 
         f_proc = subprocess.Popen(
-            a_cmd_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            a_cmd_list,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
         f_start_time = time.time()
         f_window = QDialog(
             MAIN_WINDOW,
-            QtCore.Qt.WindowTitleHint | QtCore.Qt.FramelessWindowHint)
+            QtCore.Qt.WindowTitleHint | QtCore.Qt.FramelessWindowHint
+        )
         f_window.setWindowTitle(_("Rendering to .wav, please wait"))
         f_window.setMinimumSize(420, 210)
         f_layout = QGridLayout()
