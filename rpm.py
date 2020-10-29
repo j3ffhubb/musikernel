@@ -278,6 +278,9 @@ f_spec_file.close()
 
 os.system('cp "{}" "{}"'.format(global_spec_file, SPEC_DIR))
 
+if IS_INSTALL:
+    os.system('rm -f {}-*'.format(MAJOR_VERSION))
+
 os.chdir(SPEC_DIR)
 f_rpm_result = os.system("rpmbuild -ba {}".format(global_spec_file))
 
