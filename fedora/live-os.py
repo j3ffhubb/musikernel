@@ -14,7 +14,6 @@ GNU General Public License for more details.
 
 import argparse
 import os
-import re
 
 choices = {
     "gnome": (
@@ -38,11 +37,13 @@ choices = {
         "Mate",
     ),
 }
-if os.path.exists('/etc/redhat-release'):
-    with open('/etc/redhat-release') as f:
-        s = f.read()
-        releasever = re.findall(r'\d+', s)[0]
-else:
+try:
+    import dnf
+    db = dnf.dnf.Base()
+    releasever = db.conf.substitutions['releasever']
+except Exception as ex:
+    print("Could not read dnf database, setting default releasever=33")
+    print(ex)
     releasever = "33"
 
 parser = argparse.ArgumentParser(
@@ -55,12 +56,12 @@ parser.add_argument(
     "--de",
     choices=sorted(choices.keys()),
     default="kde",
-    help="Select the desktop environment, (default: kde)",
+    help="The desktop environment, (default: kde)",
 )
 parser.add_argument(
     '--releasever',
     default=releasever,
-    help="The release of Fedora to base the OS image on.  Default: ".format(
+    help="The release of Fedora to base the OS image on.  Default: {}".format(
         releasever
     ),
 )
@@ -130,16 +131,17 @@ kickstart_template = \
 %packages
 
 #MusiKernel Dependencies
-python3-qt5
 alsa-lib-devel
+fftw-devel
+lame
 liblo-devel
 libsndfile-devel
-python3-numpy
-fftw-devel
 portaudio-devel
 portmidi-devel
-rubberband
 python3-devel
+python3-numpy
+python3-qt5
+rubberband
 vorbis-tools
 
 #Not actually dependencies, but giving people with Firewire devices
@@ -152,8 +154,6 @@ qjackctl
 
 %post
 
-# I know, I should configure SELinux to only look the other
-# way for MusiKernel instead of disabling it, grumble, grumble...
 sed -i s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config
 
 %end
@@ -195,7 +195,7 @@ livecd-creator \
 """.format(
     releasever=args.releasever,
 )
-
+print(kickstart_command)
 os.system(kickstart_command)
 
 fname = "MusiKernel-OS-{}-Fedora-{}-{}.iso".format(
