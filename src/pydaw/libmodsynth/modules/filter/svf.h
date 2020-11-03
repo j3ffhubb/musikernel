@@ -225,22 +225,24 @@ inline fp_svf_run_filter svf_get_run_filter_ptr(int a_cascades, int a_filter_typ
  * float a_input_value) //the audio input to filter
  *
  * The main action to run the filter kernel*/
-inline void v_svf_set_input_value(t_state_variable_filter * a_svf,
-        t_svf_kernel *  a_kernel, float a_input_value)
-{
+inline void v_svf_set_input_value(
+    t_state_variable_filter* a_svf,
+    t_svf_kernel*  a_kernel,
+    float a_input_value
+){
     a_kernel->filter_input = a_input_value;
 
     register float oversample_iterator = 0.0f;
 
     while((oversample_iterator) < 1.0f)
     {
-        a_kernel->hp = f_linear_interpolate((a_kernel->filter_last_input),
-                (a_kernel->filter_input), (oversample_iterator))
-        - (((a_kernel->bp_m1) * (a_svf->filter_res)) + (a_kernel->lp_m1));
-        a_kernel->bp = ((a_kernel->hp) * (a_svf->cutoff_filter)) +
-                (a_kernel->bp_m1);
-        a_kernel->lp = ((a_kernel->bp) * (a_svf->cutoff_filter)) +
-                (a_kernel->lp_m1);
+        a_kernel->hp = f_linear_interpolate(
+            a_kernel->filter_last_input,
+            a_input_value,
+            oversample_iterator
+        ) - ((a_kernel->bp_m1 * a_svf->filter_res) + a_kernel->lp_m1);
+        a_kernel->bp = (a_kernel->hp * a_svf->cutoff_filter) + a_kernel->bp_m1;
+        a_kernel->lp = (a_kernel->bp * a_svf->cutoff_filter) + a_kernel->lp_m1;
 
         oversample_iterator += SVF_OVERSAMPLE_STEP_SIZE;
     }
@@ -348,16 +350,24 @@ inline float v_svf_run_2_pole_eq(t_state_variable_filter* a_svf,
 }
 
 
-inline float v_svf_run_4_pole_eq(t_state_variable_filter* a_svf,
-        float a_input)
-{
+inline float v_svf_run_4_pole_eq(
+    t_state_variable_filter* a_svf,
+    float a_input
+){
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
-    v_svf_set_input_value(a_svf, &a_svf->filter_kernels[1],
-            (((a_svf->filter_kernels[0].lp) + (a_svf->filter_kernels[0].hp)) +
-            ((a_svf->filter_kernels[0].bp) * (a_svf->gain_linear))));
+    v_svf_set_input_value(
+        a_svf,
+        &a_svf->filter_kernels[1],
+        (
+            (a_svf->filter_kernels[0].lp + a_svf->filter_kernels[0].hp) +
+            (a_svf->filter_kernels[0].bp * a_svf->gain_linear)
+        )
+    );
 
-    return (((a_svf->filter_kernels[1].lp) + (a_svf->filter_kernels[1].hp)) +
-            ((a_svf->filter_kernels[1].bp) * (a_svf->gain_linear)));
+    return (
+        (a_svf->filter_kernels[1].lp + a_svf->filter_kernels[1].hp) +
+        (a_svf->filter_kernels[1].bp * a_svf->gain_linear)
+    );
 }
 
 inline void v_svf_set_cutoff(t_state_variable_filter*);
