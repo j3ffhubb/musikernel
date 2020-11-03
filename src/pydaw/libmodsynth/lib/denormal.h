@@ -31,7 +31,7 @@ inline float f_remove_denormal(float);
  */
 inline float f_remove_denormal(float a_input)
 {
-    if((a_input > .00001f) || (a_input < -.00001f))
+    if((a_input > 1.0e-15) || (a_input < -1.0e-15))
     {
         return a_input;
     }
