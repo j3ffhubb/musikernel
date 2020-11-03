@@ -47,7 +47,7 @@ typedef struct st_osc_wav_unison{
     //Restart the oscillators at the same phase on each note-on
     float phases[OSC_UNISON_MAX_VOICES];
     //for generating instantaneous phase without affecting real phase
-    float fm_phases [OSC_UNISON_MAX_VOICES];
+    float fm_phases[OSC_UNISON_MAX_VOICES];
     float uni_spread;
     //Set this with unison voices to prevent excessive volume
     float adjusted_amp;
@@ -159,7 +159,8 @@ void v_osc_wav_set_unison_pitch(
 
 inline void v_osc_wav_apply_fm(
     t_osc_wav_unison* a_osc_ptr,
-    float a_signal, float a_amt
+    float a_signal,
+    float a_amt
 ){
     int i;
     float f_amt = a_signal * a_amt;
@@ -205,11 +206,12 @@ float f_osc_wav_run_unison(
     a_osc_ptr->current_sample = 0.0f;
 
     for(i = 0; i < a_osc_ptr->voice_count; ++i){
-        v_run_osc(&a_osc_ptr->osc_cores[i],
-                (a_osc_ptr->voice_inc[i]));
+        v_run_osc(
+            &a_osc_ptr->osc_cores[i],
+            a_osc_ptr->voice_inc[i]
+        );
 
-        a_osc_ptr->fm_phases[i] +=
-            (a_osc_ptr->osc_cores[i].output);
+        a_osc_ptr->fm_phases[i] += a_osc_ptr->osc_cores[i].output;
 
         while(a_osc_ptr->fm_phases[i] < 0.0f)
         {
@@ -221,13 +223,12 @@ float f_osc_wav_run_unison(
             a_osc_ptr->fm_phases[i] -= 1.0f;
         }
 
-        a_osc_ptr->current_sample = (a_osc_ptr->current_sample) +
-            f_cubic_interpolate_ptr_wrap(
-                a_osc_ptr->selected_wavetable,
-                a_osc_ptr->selected_wavetable_sample_count,
-                a_osc_ptr->fm_phases[i] *
-                a_osc_ptr->selected_wavetable_sample_count_float
-            );
+        a_osc_ptr->current_sample += f_cubic_interpolate_ptr_wrap(
+            a_osc_ptr->selected_wavetable,
+            a_osc_ptr->selected_wavetable_sample_count,
+            a_osc_ptr->fm_phases[i] *
+            a_osc_ptr->selected_wavetable_sample_count_float
+        );
     }
 
     return (a_osc_ptr->current_sample) * (a_osc_ptr->adjusted_amp);
