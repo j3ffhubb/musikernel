@@ -40,7 +40,7 @@ static void v_mkeq_on_stop(PYFX_Handle instance)
 }
 
 static void v_mkeq_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     if(a_is_sidechain)
     {
@@ -128,7 +128,7 @@ static void v_mkeq_load(PYFX_Handle instance,
 }
 
 static void v_mkeq_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_mkeq *plugin_data = (t_mkeq*)Instance;
     plugin_data->port_table[a_port] = a_value;

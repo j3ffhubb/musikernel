@@ -25,22 +25,22 @@ extern "C" {
 
 typedef struct st_enf_env_follower
 {
-    float input;
-    float output_smoothed;
+    MKFLT input;
+    MKFLT output_smoothed;
     t_opl_one_pole * smoother;
 #ifdef ENF_DEBUG_MODE
     int debug_counter;
 #endif
 }t_enf_env_follower;
 
-t_enf_env_follower * g_enf_get_env_follower(float);
-inline void v_enf_run_env_follower(t_enf_env_follower*, float);
+t_enf_env_follower * g_enf_get_env_follower(MKFLT);
+inline void v_enf_run_env_follower(t_enf_env_follower*, MKFLT);
 
 /* inline void v_enf_run_env_follower(
  * t_enf_env_follower * a_enf,
- * float a_input)  //the signal to follow
+ * MKFLT a_input)  //the signal to follow
  */
-inline void v_enf_run_env_follower(t_enf_env_follower * a_enf, float a_input)
+inline void v_enf_run_env_follower(t_enf_env_follower * a_enf, MKFLT a_input)
 {
 
     //Get absolute value.  This is much faster than fabs
@@ -73,10 +73,10 @@ inline void v_enf_run_env_follower(t_enf_env_follower * a_enf, float a_input)
 }
 
 /* t_enf_env_follower * g_enf_get_env_follower(
- * float a_sr //sample rate
+ * MKFLT a_sr //sample rate
  * )
  */
-t_enf_env_follower * g_enf_get_env_follower(float a_sr)
+t_enf_env_follower * g_enf_get_env_follower(MKFLT a_sr)
 {
     t_enf_env_follower * f_result = (t_enf_env_follower*)malloc(sizeof(t_enf_env_follower));
 

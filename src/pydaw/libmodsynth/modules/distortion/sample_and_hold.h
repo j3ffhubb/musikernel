@@ -23,19 +23,19 @@ extern "C" {
 
 typedef struct
 {
-    float output0, output1, hold0, hold1;
+    MKFLT output0, output1, hold0, hold1;
     int hold_count, hold_counter;
-    float last_pitch, last_wet, sr;
+    MKFLT last_pitch, last_wet, sr;
     t_audio_xfade xfade;
 } t_sah_sample_and_hold;
 
-t_sah_sample_and_hold * g_sah_sample_and_hold_get(float);
-void v_sah_sample_and_hold_set(t_sah_sample_and_hold*, float, float);
-void v_sah_sample_and_hold_run(t_sah_sample_and_hold*, float, float);
+t_sah_sample_and_hold * g_sah_sample_and_hold_get(MKFLT);
+void v_sah_sample_and_hold_set(t_sah_sample_and_hold*, MKFLT, MKFLT);
+void v_sah_sample_and_hold_run(t_sah_sample_and_hold*, MKFLT, MKFLT);
 void v_sah_free(t_sah_sample_and_hold*);
 
 
-void g_sah_init(t_sah_sample_and_hold * f_result, float a_sr)
+void g_sah_init(t_sah_sample_and_hold * f_result, MKFLT a_sr)
 {
     f_result->hold_count = 1;
     f_result->hold_counter = 0;
@@ -49,7 +49,7 @@ void g_sah_init(t_sah_sample_and_hold * f_result, float a_sr)
     g_axf_init(&f_result->xfade, -3.0f);
 }
 
-t_sah_sample_and_hold * g_sah_sample_and_hold_get(float a_sr)
+t_sah_sample_and_hold * g_sah_sample_and_hold_get(MKFLT a_sr)
 {
     t_sah_sample_and_hold * f_result;
 
@@ -58,8 +58,8 @@ t_sah_sample_and_hold * g_sah_sample_and_hold_get(float a_sr)
     return f_result;
 }
 
-void v_sah_sample_and_hold_set(t_sah_sample_and_hold* a_sah, float a_pitch,
-        float a_wet)
+void v_sah_sample_and_hold_set(t_sah_sample_and_hold* a_sah, MKFLT a_pitch,
+        MKFLT a_wet)
 {
     if(a_sah->last_pitch != a_pitch)
     {
@@ -76,7 +76,7 @@ void v_sah_sample_and_hold_set(t_sah_sample_and_hold* a_sah, float a_pitch,
 }
 
 void v_sah_sample_and_hold_run(t_sah_sample_and_hold* a_sah,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     a_sah->output0 = f_axf_run_xfade(&a_sah->xfade, a_in0, a_sah->hold0);
     a_sah->output1 = f_axf_run_xfade(&a_sah->xfade, a_in1, a_sah->hold1);

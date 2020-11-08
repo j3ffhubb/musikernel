@@ -52,7 +52,7 @@ static void v_sreverb_on_stop(PYFX_Handle instance)
 }
 
 static void v_sreverb_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     if(a_is_sidechain)
     {
@@ -122,7 +122,7 @@ static void v_sreverb_load(PYFX_Handle instance,
 }
 
 static void v_sreverb_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_sreverb *plugin_data = (t_sreverb*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -177,7 +177,7 @@ static void v_sreverb_run(
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
     }
 
-    float f_dry_vol;
+    MKFLT f_dry_vol;
 
     for(f_i = 0; f_i < sample_count; ++f_i)
     {

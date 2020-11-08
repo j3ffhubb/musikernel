@@ -20,24 +20,24 @@ GNU General Public License for more details.
 extern "C" {
 #endif
 
-inline float f_lms_abs(float);
-inline float f_lms_max(float,float);
-inline float f_lms_min(float,float);
-inline float f_lms_floor(float,float);
-inline float f_lms_ceiling(float,float);
-inline float f_lms_sqrt(float);
+inline MKFLT f_lms_abs(MKFLT);
+inline MKFLT f_lms_max(MKFLT,MKFLT);
+inline MKFLT f_lms_min(MKFLT,MKFLT);
+inline MKFLT f_lms_floor(MKFLT,MKFLT);
+inline MKFLT f_lms_ceiling(MKFLT,MKFLT);
+inline MKFLT f_lms_sqrt(MKFLT);
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-/* inline float f_lms_abs(float a_input)
+/* inline MKFLT f_lms_abs(MKFLT a_input)
  *
- * Return the absolute value of a float.  Use this instead of fabs from
+ * Return the absolute value of a MKFLT.  Use this instead of fabs from
  * math.h, it's much faster
  */
-inline float f_lms_abs(float a_input)
+inline MKFLT f_lms_abs(MKFLT a_input)
 {
     if(a_input > 0.0f)
     {
@@ -49,11 +49,11 @@ inline float f_lms_abs(float a_input)
     }
 }
 
-/* inline float f_lms_max(float a_1,float a_2)
+/* inline MKFLT f_lms_max(MKFLT a_1,MKFLT a_2)
  *
- * Return the larger of 2 floats
+ * Return the larger of 2 MKFLTs
  */
-inline float f_lms_max(float a_1,float a_2)
+inline MKFLT f_lms_max(MKFLT a_1,MKFLT a_2)
 {
     if(a_1 > a_2)
     {
@@ -65,11 +65,11 @@ inline float f_lms_max(float a_1,float a_2)
     }
 }
 
-/* inline float f_lms_max(float a_1,float a_2)
+/* inline MKFLT f_lms_max(MKFLT a_1,MKFLT a_2)
  *
- * Return the lesser of 2 floats
+ * Return the lesser of 2 MKFLTs
  */
-inline float f_lms_min(float a_1, float a_2)
+inline MKFLT f_lms_min(MKFLT a_1, MKFLT a_2)
 {
     if(a_1 < a_2)
     {
@@ -81,11 +81,11 @@ inline float f_lms_min(float a_1, float a_2)
     }
 }
 
-/* inline float f_lms_floor(float a_input, float a_floor)
+/* inline MKFLT f_lms_floor(MKFLT a_input, MKFLT a_floor)
  *
  * Clips a value if less than a_floor
  */
-inline float f_lms_floor(float a_input, float a_floor)
+inline MKFLT f_lms_floor(MKFLT a_input, MKFLT a_floor)
 {
     if(a_input < a_floor)
     {
@@ -97,11 +97,11 @@ inline float f_lms_floor(float a_input, float a_floor)
     }
 }
 
-/* inline float f_lms_ceiling(float a_input, float a_ceiling)
+/* inline MKFLT f_lms_ceiling(MKFLT a_input, MKFLT a_ceiling)
  *
  * Clips a value if more than a_ceiling
  */
-inline float f_lms_ceiling(float a_input, float a_ceiling)
+inline MKFLT f_lms_ceiling(MKFLT a_input, MKFLT a_ceiling)
 {
     if(a_input > a_ceiling)
     {
@@ -115,7 +115,7 @@ inline float f_lms_ceiling(float a_input, float a_ceiling)
 
 #define arr_sqrt_count 401
 
-__thread float arr_sqrt [arr_sqrt_count]
+__thread MKFLT arr_sqrt [arr_sqrt_count]
 __attribute__((aligned(CACHE_LINE_SIZE))) = {
 0.000000,0.100000,0.141421,0.173205,0.200000,0.223607,
 0.244949,0.264575,0.282843,0.300000,0.316228,0.331662,
@@ -185,12 +185,12 @@ __attribute__((aligned(CACHE_LINE_SIZE))) = {
 1.974842,1.977372,1.979899,1.982423,1.984943,1.987461,
 1.989975,1.992486,1.994994,1.997498,2.000000};
 
-/* inline float f_lms_sqrt(float a_input)
+/* inline MKFLT f_lms_sqrt(MKFLT a_input)
  *
  * Calculate a square root using a fast table-based lookup.
  * The range is zero to 4
  */
-inline float f_lms_sqrt(float a_input)
+inline MKFLT f_lms_sqrt(MKFLT a_input)
 {
     return f_linear_interpolate_ptr(arr_sqrt, (a_input * 100.0f));
 }

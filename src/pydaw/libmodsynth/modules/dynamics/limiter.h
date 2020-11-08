@@ -32,20 +32,20 @@ extern "C" {
 typedef struct st_lim_limiter
 {
     int holdtime, r1Timer, r2Timer;
-    float output0, output1;
-    float sr, sr_recip;
-    float thresh, ceiling, volume, release, r;
-    float maxSpls, max1Block, max2Block, envT, env, gain;
-    float last_thresh, last_ceiling, last_release;
-    float autogain;
-    float *buffer0, *buffer1;
+    MKFLT output0, output1;
+    MKFLT sr, sr_recip;
+    MKFLT thresh, ceiling, volume, release, r;
+    MKFLT maxSpls, max1Block, max2Block, envT, env, gain;
+    MKFLT last_thresh, last_ceiling, last_release;
+    MKFLT autogain;
+    MKFLT *buffer0, *buffer1;
     int buffer_size, buffer_index, buffer_read_index;
     t_state_variable_filter filter;
     t_pkm_redux peak_tracker;
 }t_lim_limiter;
 
-void v_lim_set(t_lim_limiter*,float, float, float);
-void v_lim_run(t_lim_limiter*,float, float);
+void v_lim_set(t_lim_limiter*,MKFLT, MKFLT, MKFLT);
+void v_lim_run(t_lim_limiter*,MKFLT, MKFLT);
 void v_lim_free(t_lim_limiter*);
 
 void v_lim_free(t_lim_limiter * a_lim)
@@ -58,8 +58,8 @@ void v_lim_free(t_lim_limiter * a_lim)
     }
 }
 
-void v_lim_set(t_lim_limiter*a_lim, float a_thresh, float a_ceiling,
-        float a_release)
+void v_lim_set(t_lim_limiter*a_lim, MKFLT a_thresh, MKFLT a_ceiling,
+        MKFLT a_release)
 {
     if(a_thresh != a_lim->last_thresh)
     {
@@ -91,7 +91,7 @@ void v_lim_set(t_lim_limiter*a_lim, float a_thresh, float a_ceiling,
     }
 }
 
-void v_lim_run(t_lim_limiter *a_lim, float a_in0, float a_in1)
+void v_lim_run(t_lim_limiter *a_lim, MKFLT a_in0, MKFLT a_in1)
 {
     a_lim->maxSpls = f_lms_max(f_lms_abs(a_in0), f_lms_abs(a_in1));
 
@@ -152,7 +152,7 @@ void v_lim_run(t_lim_limiter *a_lim, float a_in0, float a_in1)
         a_lim->buffer_index = 0;
     }
 
-    float f_gain =
+    MKFLT f_gain =
         v_svf_run_4_pole_lp(&a_lim->filter, a_lim->gain * a_lim->autogain);
 
     a_lim->output0 = a_lim->buffer0[a_lim->buffer_index] * f_gain;
@@ -161,7 +161,7 @@ void v_lim_run(t_lim_limiter *a_lim, float a_in0, float a_in1)
     v_pkm_redux_run(&a_lim->peak_tracker, a_lim->gain);
 }
 
-void g_lim_init(t_lim_limiter * f_result, float a_sr, int a_huge_pages)
+void g_lim_init(t_lim_limiter * f_result, MKFLT a_sr, int a_huge_pages)
 {
     f_result->holdtime = ((int)(a_sr / LMS_HOLD_TIME_DIVISOR));
 
@@ -171,16 +171,16 @@ void g_lim_init(t_lim_limiter * f_result, float a_sr, int a_huge_pages)
     if(a_huge_pages)
     {
         hpalloc((void**)&f_result->buffer0,
-            sizeof(float) * f_result->buffer_size);
+            sizeof(MKFLT) * f_result->buffer_size);
         hpalloc((void**)&f_result->buffer1,
-            sizeof(float) * f_result->buffer_size);
+            sizeof(MKFLT) * f_result->buffer_size);
     }
     else
     {
         lmalloc((void**)&f_result->buffer0,
-            sizeof(float) * f_result->buffer_size);
+            sizeof(MKFLT) * f_result->buffer_size);
         lmalloc((void**)&f_result->buffer1,
-            sizeof(float) * f_result->buffer_size);
+            sizeof(MKFLT) * f_result->buffer_size);
     }
 
     int f_i;

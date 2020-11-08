@@ -25,20 +25,20 @@ extern "C" {
 
 typedef struct st_amp_and_panner
 {
-    float amp_db;
-    float amp_linear;
-    float pan; //0 to 1
-    float amp_linear0;
-    float amp_linear1;
-    float output0;
-    float output1;
+    MKFLT amp_db;
+    MKFLT amp_linear;
+    MKFLT pan; //0 to 1
+    MKFLT amp_linear0;
+    MKFLT amp_linear1;
+    MKFLT output0;
+    MKFLT output1;
 }t_amp_and_panner;
 
-void v_app_set(t_amp_and_panner*,float,float);
-void v_app_run(t_amp_and_panner*,float,float);
+void v_app_set(t_amp_and_panner*,MKFLT,MKFLT);
+void v_app_run(t_amp_and_panner*,MKFLT,MKFLT);
 t_amp_and_panner * g_app_get();
 
-void v_app_set(t_amp_and_panner* a_app,float a_db,float a_pan)
+void v_app_set(t_amp_and_panner* a_app,MKFLT a_db,MKFLT a_pan)
 {
     a_app->amp_db = a_db;
     a_app->pan = a_pan;
@@ -53,13 +53,13 @@ void v_app_set(t_amp_and_panner* a_app,float a_db,float a_pan)
             * (a_app->amp_linear);
 }
 
-void v_app_run(t_amp_and_panner* a_app, float a_in0, float a_in1)
+void v_app_run(t_amp_and_panner* a_app, MKFLT a_in0, MKFLT a_in1)
 {
     a_app->output0 = a_in0 * (a_app->amp_linear0);
     a_app->output1 = a_in1 * (a_app->amp_linear1);
 }
 
-void v_app_run_monofier(t_amp_and_panner* a_app, float a_in0, float a_in1)
+void v_app_run_monofier(t_amp_and_panner* a_app, MKFLT a_in0, MKFLT a_in1)
 {
     v_app_run(a_app, a_in0, a_in1);
     a_app->output0 = a_app->output0 + a_app->output1;

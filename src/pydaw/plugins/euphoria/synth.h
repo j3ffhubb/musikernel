@@ -56,18 +56,18 @@ typedef struct
     //For the per-sample interpolation modes
     int (*ratio_function_ptr)(struct st_euphoria * plugin_data, int n);
     void (*interpolation_mode)(struct st_euphoria * plugin_data, int n, int ch);
-    float       sample_last_interpolated_value;
+    MKFLT       sample_last_interpolated_value;
     t_wav_pool_item * wavpool_items;
-    float       sampleStartPos;
-    float       sampleEndPos;
+    MKFLT       sampleStartPos;
+    MKFLT       sampleEndPos;
     // There is no sampleLoopEndPos because the regular
     // sample end is re-used for this purpose
-    float       sampleLoopStartPos;
-    float       sample_amp;     //linear, for multiplying
-    float adjusted_base_pitch;
+    MKFLT       sampleLoopStartPos;
+    MKFLT       sample_amp;     //linear, for multiplying
+    MKFLT adjusted_base_pitch;
     fp_noise_func_ptr noise_func_ptr;
     int noise_index;
-    float noise_linamp;
+    MKFLT noise_linamp;
 }t_euphoria_sample;
 
 typedef struct st_euphoria
@@ -138,29 +138,29 @@ typedef struct st_euphoria
     /*The index of the current sample being played*/
     int current_sample;
 
-    float ratio;
+    MKFLT ratio;
     t_voc_voices * voices;
     long         sampleNo;
 
-    float sample[2];
+    MKFLT sample[2];
 
     t_euphoria_mono_modules * mono_modules;
     t_pit_ratio * smp_pit_ratio;
     t_euphoria_poly_voice * data[EUPHORIA_POLYPHONY];
 
     //These are used for storing the mono FX buffers from the polyphonic voices.
-    float mono_fx_buffers[EUPHORIA_MONO_FX_GROUPS_COUNT][2];
+    MKFLT mono_fx_buffers[EUPHORIA_MONO_FX_GROUPS_COUNT][2];
     //For indexing operations that don't need to track realtime events closely
     int i_slow_index;
 
-    float amp;  //linear amplitude, from the master volume knob
+    MKFLT amp;  //linear amplitude, from the master volume knob
 
-    float sv_pitch_bend_value;
-    float sv_last_note;  //For glide
+    MKFLT sv_pitch_bend_value;
+    MKFLT sv_last_note;  //For glide
 
     t_plugin_event_queue midi_queue;
     t_plugin_event_queue atm_queue;
-    float * port_table;
+    MKFLT * port_table;
     int plugin_uid;
     t_plugin_cc_map cc_map;
     PYFX_Descriptor * descriptor;

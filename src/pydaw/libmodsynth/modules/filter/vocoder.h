@@ -33,7 +33,7 @@ typedef struct
 
 typedef struct
 {
-    float output0, output1;
+    MKFLT output0, output1;
     t_vdr_band bands[VOCODER_BAND_COUNT];
     t_vdr_band low_band;
     t_vdr_band high_band;
@@ -43,9 +43,9 @@ typedef struct
 }
 #endif
 
-void g_vdr_band_init(t_vdr_band * self, float a_sr, float a_pitch, float a_res)
+void g_vdr_band_init(t_vdr_band * self, MKFLT a_sr, MKFLT a_pitch, MKFLT a_res)
 {
-    float f_release = (1.0f / f_pit_midi_note_to_hz(a_pitch)) * 100.0f;
+    MKFLT f_release = (1.0f / f_pit_midi_note_to_hz(a_pitch)) * 100.0f;
     g_svf_init(&self->m_filter, a_sr);
     v_svf_set_res(&self->m_filter, a_res);
     v_svf_set_cutoff_base(&self->m_filter, a_pitch);
@@ -58,15 +58,15 @@ void g_vdr_band_init(t_vdr_band * self, float a_sr, float a_pitch, float a_res)
     v_svf2_set_cutoff(&self->c_filter);
 }
 
-void g_vdr_init(t_vdr_vocoder * self, float a_sr)
+void g_vdr_init(t_vdr_vocoder * self, MKFLT a_sr)
 {
     self->output0 = 0.0f;
     self->output1 = 0.0f;
 
     int f_i;
-    float f_freq = f_pit_hz_to_midi_note(240.0f);
-    float f_inc = (f_pit_hz_to_midi_note(7200.0f) - f_freq) /
-        (float)VOCODER_BAND_COUNT;
+    MKFLT f_freq = f_pit_hz_to_midi_note(240.0f);
+    MKFLT f_inc = (f_pit_hz_to_midi_note(7200.0f) - f_freq) /
+        (MKFLT)VOCODER_BAND_COUNT;
 
     for(f_i = 0; f_i < VOCODER_BAND_COUNT; ++f_i)
     {
@@ -81,15 +81,15 @@ void g_vdr_init(t_vdr_vocoder * self, float a_sr)
 
 }
 
-void v_vdr_run(t_vdr_vocoder * self, float a_mod_in0, float a_mod_in1,
-        float a_input0, float a_input1)
+void v_vdr_run(t_vdr_vocoder * self, MKFLT a_mod_in0, MKFLT a_mod_in1,
+        MKFLT a_input0, MKFLT a_input1)
 {
     int f_i;
-    float f_env_val;
+    MKFLT f_env_val;
     t_state_variable_filter * f_m_filter;
     t_svf2_filter * f_c_filter;
     t_enf2_env_follower * f_envf;
-    float f_mono_input = (a_mod_in0 + a_mod_in1) * 0.5f;
+    MKFLT f_mono_input = (a_mod_in0 + a_mod_in1) * 0.5f;
 
     self->output0 = 0.0f;
     self->output1 = 0.0f;

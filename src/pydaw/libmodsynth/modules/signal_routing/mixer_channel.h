@@ -26,32 +26,32 @@ extern "C" {
 typedef struct st_mxc_mixer_channel
 {
     t_amp * amp_ptr;
-    float amp_linear;
+    MKFLT amp_linear;
     t_smoother_linear * amp_smoother;
-    float gain_db;
-    float gain_linear;
-    float master_gain0;
-    float master_gain1;
+    MKFLT gain_db;
+    MKFLT gain_linear;
+    MKFLT master_gain0;
+    MKFLT master_gain1;
     t_smoother_linear * pan_smoother;
-    float pan0;
-    float pan1;
+    MKFLT pan0;
+    MKFLT pan1;
     t_lin_interpolater * sine_interpolator;
-    float pan_law_gain_linear;
+    MKFLT pan_law_gain_linear;
     fp_mix_function mix_function;
-    float in0, in1;
-    float out0, out1;
+    MKFLT in0, in1;
+    MKFLT out0, out1;
 }t_mxc_mixer_channel;
 
-void (*fp_mix_function)(t_mxc_mixer_channel*,float,float,float,float,float);
+void (*fp_mix_function)(t_mxc_mixer_channel*,MKFLT,MKFLT,MKFLT,MKFLT,MKFLT);
 t_mxc_mixer_channel * g_mxc_get();
-void v_mxc_mix_stereo_to_stereo(t_mxc_mixer_channel*,float,float,float,float,
-        float,float);
-void v_mxc_mix_stereo_to_mono(t_mxc_mixer_channel*,float,float,float,float,
-        float,float);
-static void v_mxc_run_smoothers(t_mxc_mixer_channel*, float, float);
+void v_mxc_mix_stereo_to_stereo(t_mxc_mixer_channel*,MKFLT,MKFLT,MKFLT,MKFLT,
+        MKFLT,MKFLT);
+void v_mxc_mix_stereo_to_mono(t_mxc_mixer_channel*,MKFLT,MKFLT,MKFLT,MKFLT,
+        MKFLT,MKFLT);
+static void v_mxc_run_smoothers(t_mxc_mixer_channel*, MKFLT, MKFLT);
 
-static void v_mxc_run_smoothers(t_mxc_mixer_channel* a_mxc, float a_amp,
-        float a_pan, float a_pan_law)
+static void v_mxc_run_smoothers(t_mxc_mixer_channel* a_mxc, MKFLT a_amp,
+        MKFLT a_pan, MKFLT a_pan_law)
 {
     v_sml_run(a_mxc->amp_smoother, a_amp);
     v_sml_run(a_mxc->pan_smoother, a_pan);
@@ -81,8 +81,8 @@ static void v_mxc_run_smoothers(t_mxc_mixer_channel* a_mxc, float a_amp,
     a_mxc->master_gain1 = (a_mxc->amp_linear) * (a_mxc->pan1);
 }
 
-void v_mxc_mix_stereo_to_stereo(t_mxc_mixer_channel* a_mxc, float a_in0,
-        float a_in1, float a_amp, float a_gain, float a_pan, float a_pan_law)
+void v_mxc_mix_stereo_to_stereo(t_mxc_mixer_channel* a_mxc, MKFLT a_in0,
+        MKFLT a_in1, MKFLT a_amp, MKFLT a_gain, MKFLT a_pan, MKFLT a_pan_law)
 {
     v_mxc_run_smoothers(a_mxc, a_amp, a_pan);
 
@@ -90,8 +90,8 @@ void v_mxc_mix_stereo_to_stereo(t_mxc_mixer_channel* a_mxc, float a_in0,
     a_mxc->out1 = (a_mxc->master_gain1) * a_in1;
 }
 
-void v_mxc_mix_stereo_to_mono(t_mxc_mixer_channel* a_mxc, float a_in0,
-        float a_in1, float a_amp, float a_gain, float a_pan, float a_pan_law)
+void v_mxc_mix_stereo_to_mono(t_mxc_mixer_channel* a_mxc, MKFLT a_in0,
+        MKFLT a_in1, MKFLT a_amp, MKFLT a_gain, MKFLT a_pan, MKFLT a_pan_law)
 {
     v_mxc_run_smoothers(a_mxc, a_amp, a_pan);
 
@@ -102,7 +102,7 @@ void v_mxc_mix_stereo_to_mono(t_mxc_mixer_channel* a_mxc, float a_in0,
     a_mxc->out1 = (a_mxc->master_gain1) * a_mxc->in1;
 }
 
-t_mxc_mixer_channel * g_mxc_get(float a_sr)
+t_mxc_mixer_channel * g_mxc_get(MKFLT a_sr)
 {
     t_mxc_mixer_channel f_result =
             (t_mxc_mixer_channel*)malloc(sizeof(t_mxc_mixer_channel));

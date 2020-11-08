@@ -25,11 +25,11 @@ extern "C" {
 
 typedef struct
 {
-    float thresh, ratio, ratio_recip, knee, knee_thresh,
+    MKFLT thresh, ratio, ratio_recip, knee, knee_thresh,
         gain, gain_lin;
     t_state_variable_filter filter;
-    float output0, output1;
-    float rms_time, rms_last, rms_sum, rms_count_recip, sr;
+    MKFLT output0, output1;
+    MKFLT rms_time, rms_last, rms_sum, rms_count_recip, sr;
     int rms_counter, rms_count;
     t_enf2_env_follower env_follower;
     t_pkm_redux peak_tracker;
@@ -40,7 +40,7 @@ typedef struct
 }
 #endif
 
-void g_cmp_init(t_cmp_compressor * self, float a_sr)
+void g_cmp_init(t_cmp_compressor * self, MKFLT a_sr)
 {
     self->thresh = 0.0f;
     self->knee_thresh = 0.0f;
@@ -64,8 +64,8 @@ void g_cmp_init(t_cmp_compressor * self, float a_sr)
     g_pkm_redux_init(&self->peak_tracker, a_sr);
 }
 
-void v_cmp_set(t_cmp_compressor * self, float thresh, float ratio,
-        float knee, float attack, float release, float gain)
+void v_cmp_set(t_cmp_compressor * self, MKFLT thresh, MKFLT ratio,
+        MKFLT knee, MKFLT attack, MKFLT release, MKFLT gain)
 {
     v_enf_set(&self->env_follower, attack, release);
 
@@ -87,13 +87,13 @@ void v_cmp_set(t_cmp_compressor * self, float thresh, float ratio,
 }
 
 
-void v_cmp_run(t_cmp_compressor * self, float a_in0, float a_in1)
+void v_cmp_run(t_cmp_compressor * self, MKFLT a_in0, MKFLT a_in1)
 {
-    float f_max = f_lms_max(f_lms_abs(a_in0), f_lms_abs(a_in1));
+    MKFLT f_max = f_lms_max(f_lms_abs(a_in0), f_lms_abs(a_in1));
     v_enf_run(&self->env_follower, f_max);
-    float f_db = f_linear_to_db_fast(self->env_follower.envelope);
-    float f_vol = 1.0f;
-    float f_gain = 0.0f;
+    MKFLT f_db = f_linear_to_db_fast(self->env_follower.envelope);
+    MKFLT f_vol = 1.0f;
+    MKFLT f_gain = 0.0f;
 
     if(f_db > self->thresh)
     {
@@ -105,9 +105,9 @@ void v_cmp_run(t_cmp_compressor * self, float a_in0, float a_in1)
     }
     else if(f_db > self->knee_thresh)
     {
-        float f_diff = (f_db - self->knee_thresh);
-        float f_percent = f_diff / self->knee;
-        float f_ratio = ((self->ratio - 1.0f) * f_percent) + 1.0f;
+        MKFLT f_diff = (f_db - self->knee_thresh);
+        MKFLT f_percent = f_diff / self->knee;
+        MKFLT f_ratio = ((self->ratio - 1.0f) * f_percent) + 1.0f;
         f_vol = f_db_to_linear_fast(f_diff / f_ratio);
         f_vol = v_svf_run_4_pole_lp(&self->filter, f_vol);
         self->output0 = a_in0 * f_vol;
@@ -122,20 +122,20 @@ void v_cmp_run(t_cmp_compressor * self, float a_in0, float a_in1)
     v_pkm_redux_run(&self->peak_tracker, f_vol);
 }
 
-void v_cmp_set_rms(t_cmp_compressor * self, float rms_time)
+void v_cmp_set_rms(t_cmp_compressor * self, MKFLT rms_time)
 {
     if(self->rms_time != rms_time)
     {
         self->rms_time = rms_time;
         self->rms_count = rms_time * self->sr;
-        self->rms_count_recip = 1.0f / (float)self->rms_count;
+        self->rms_count_recip = 1.0f / (MKFLT)self->rms_count;
     }
 }
 
-void v_cmp_run_rms(t_cmp_compressor * self, float a_in0, float a_in1)
+void v_cmp_run_rms(t_cmp_compressor * self, MKFLT a_in0, MKFLT a_in1)
 {
-    float f_vol = 1.0f;
-    float f_gain = 0.0f;
+    MKFLT f_vol = 1.0f;
+    MKFLT f_gain = 0.0f;
     self->rms_sum += f_lms_max(a_in0 * a_in0, a_in1 * a_in1);
     ++self->rms_counter;
 
@@ -147,7 +147,7 @@ void v_cmp_run_rms(t_cmp_compressor * self, float a_in0, float a_in1)
     }
 
     v_enf_run(&self->env_follower, self->rms_last);
-    float f_db = f_linear_to_db_fast(self->env_follower.envelope);
+    MKFLT f_db = f_linear_to_db_fast(self->env_follower.envelope);
 
     if(f_db > self->thresh)
     {
@@ -159,9 +159,9 @@ void v_cmp_run_rms(t_cmp_compressor * self, float a_in0, float a_in1)
     }
     else if(f_db > self->knee_thresh)
     {
-        float f_diff = (f_db - self->knee_thresh);
-        float f_percent = f_diff / self->knee;
-        float f_ratio = ((self->ratio - 1.0f) * f_percent) + 1.0f;
+        MKFLT f_diff = (f_db - self->knee_thresh);
+        MKFLT f_percent = f_diff / self->knee;
+        MKFLT f_ratio = ((self->ratio - 1.0f) * f_percent) + 1.0f;
         f_gain = f_diff / f_ratio;
         f_vol = f_db_to_linear_fast(f_gain);
         f_vol = v_svf_run_4_pole_lp(&self->filter, f_vol);

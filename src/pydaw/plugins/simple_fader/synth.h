@@ -31,9 +31,9 @@ extern "C" {
 
 typedef struct
 {
-    float * buffers[2];
+    MKFLT * buffers[2];
     PYFX_Data *vol_slider;
-    float fs;
+    MKFLT fs;
     t_sfader_mono_modules * mono_modules;
 
     int i_mono_out;
@@ -44,7 +44,7 @@ typedef struct
     int plugin_uid;
     fp_queue_message queue_func;
 
-    float * port_table;
+    MKFLT * port_table;
     t_plugin_cc_map cc_map;
     PYFX_Descriptor * descriptor;
 } t_sfader;

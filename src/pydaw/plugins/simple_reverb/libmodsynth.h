@@ -34,9 +34,9 @@ typedef struct
     t_rvb_reverb reverb;
 }t_sreverb_mono_modules;
 
-t_sreverb_mono_modules * v_sreverb_mono_init(float, int);
+t_sreverb_mono_modules * v_sreverb_mono_init(MKFLT, int);
 
-t_sreverb_mono_modules * v_sreverb_mono_init(float a_sr, int a_plugin_uid)
+t_sreverb_mono_modules * v_sreverb_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_sreverb_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_sreverb_mono_modules));

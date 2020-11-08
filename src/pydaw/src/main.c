@@ -113,8 +113,11 @@ int dawnext_main(int argc, char** argv);
 void print_help();
 int main(int argc, char** argv);
 int main_loop(int argc, char **argv);
-inline void v_pydaw_run_main_loop(int sample_count,
-        float **output, float *a_input_buffers);
+inline void v_pydaw_run_main_loop(
+    int sample_count,
+    MKFLT **output,
+    MKFLT *a_input_buffers
+);
 
 void signalHandler(int sig)
 {
@@ -125,24 +128,19 @@ void signalHandler(int sig)
 }
 
 
-inline void v_pydaw_run(float ** buffers, float * a_input, int sample_count)
+inline void v_pydaw_run(MKFLT ** buffers, MKFLT * a_input, int sample_count)
 {
     pthread_spin_lock(&musikernel->main_lock);
 
-    if(likely(!musikernel->is_offline_rendering))
-    {
+    if(likely(!musikernel->is_offline_rendering)){
         v_pydaw_run_main_loop(sample_count, buffers, a_input);
-    }
-    else
-    {
+    } else {
         /*Clear the output buffer*/
-        register int f_i = 0;
+        int f_i;
 
-        while(f_i < sample_count)
-        {
+        for(f_i = 0; f_i < sample_count; ++f_i){
             buffers[0][f_i] = 0.0f;
             buffers[1][f_i] = 0.0f;
-            ++f_i;
         }
     }
 
@@ -150,7 +148,7 @@ inline void v_pydaw_run(float ** buffers, float * a_input, int sample_count)
 }
 
 inline void v_pydaw_run_main_loop(int sample_count,
-        float ** a_buffers, PYFX_Data *a_input_buffers)
+        MKFLT ** a_buffers, PYFX_Data *a_input_buffers)
 {
     musikernel->current_host->run(sample_count, a_buffers, a_input_buffers);
 
@@ -172,7 +170,7 @@ inline void v_pydaw_run_main_loop(int sample_count,
                 v_adsr_run(&f_audio_item->adsrs[0]);
                 if(f_wav_item->channels == 1)
                 {
-                    float f_tmp_sample = f_cubic_interpolate_ptr_ifh(
+                    MKFLT f_tmp_sample = f_cubic_interpolate_ptr_ifh(
                         (f_wav_item->samples[0]),
                         (f_audio_item->sample_read_heads[0].whole_number),
                         (f_audio_item->sample_read_heads[0].fraction)) *
@@ -188,17 +186,17 @@ inline void v_pydaw_run_main_loop(int sample_count,
                     a_buffers[0][f_i] = f_cubic_interpolate_ptr_ifh(
                         (f_wav_item->samples[0]),
                         (f_audio_item->sample_read_heads[0].whole_number),
-                        (f_audio_item->sample_read_heads[0].fraction)) *
-                        (f_audio_item->adsrs[0].output) *
-                        (musikernel->preview_amp_lin); // *
-                    //(f_audio_item->fade_vol);
+                        (f_audio_item->sample_read_heads[0].fraction)
+                    ) * f_audio_item->adsrs[0].output *
+                        musikernel->preview_amp_lin; // *
+                        //(f_audio_item->fade_vol);
 
                     a_buffers[1][f_i] = f_cubic_interpolate_ptr_ifh(
                         (f_wav_item->samples[1]),
                         (f_audio_item->sample_read_heads[0].whole_number),
-                        (f_audio_item->sample_read_heads[0].fraction)) *
-                        (f_audio_item->adsrs[0].output) *
-                        (musikernel->preview_amp_lin); // *
+                        (f_audio_item->sample_read_heads[0].fraction)
+                    ) * f_audio_item->adsrs[0].output *
+                        musikernel->preview_amp_lin; // *
                         //(f_audio_item->fade_vol);
                 }
 
@@ -237,13 +235,15 @@ int THREAD_AFFINITY = 0;
 int THREAD_AFFINITY_SET = 0;
 
 static int portaudioCallback(
-        const void *inputBuffer, void *outputBuffer,
-        unsigned long framesPerBuffer,
-        const PaStreamCallbackTimeInfo* timeInfo,
-        PaStreamCallbackFlags statusFlags, void *userData)
-{
+    const void *inputBuffer,
+    void *outputBuffer,
+    unsigned long framesPerBuffer,
+    const PaStreamCallbackTimeInfo* timeInfo,
+    PaStreamCallbackFlags statusFlags,
+    void *userData
+){
     musikernel->out = (float*)outputBuffer;
-    float *in = (float*)inputBuffer;
+    MKFLT *in = (MKFLT*)inputBuffer;
 
     if(unlikely(framesPerBuffer > FRAMES_PER_BUFFER))
     {
@@ -252,8 +252,6 @@ static int portaudioCallback(
             (int)framesPerBuffer, FRAMES_PER_BUFFER);
         framesPerBuffer = FRAMES_PER_BUFFER;
     }
-
-
 
     // Try one time to set thread affinity
     if(unlikely(THREAD_AFFINITY && !THREAD_AFFINITY_SET))
@@ -376,8 +374,8 @@ int dawnext_main(int argc, char** argv)
         }
     }
 
-    float** f_output;
-    hpalloc((void**)&f_output, sizeof(float*) * 2);
+    MKFLT** f_output;
+    hpalloc((void**)&f_output, sizeof(MKFLT*) * 2);
 
     v_pydaw_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 0);
 
@@ -390,7 +388,7 @@ int dawnext_main(int argc, char** argv)
     f_i = 0;
     while(f_i < 2)
     {
-        hpalloc((void**)&f_output[f_i], sizeof(float) * f_buffer_size);
+        hpalloc((void**)&f_output[f_i], sizeof(MKFLT) * f_buffer_size);
         f_i++;
     }
 
@@ -422,7 +420,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
         mk_exit(9996);
     }
 
-    float sample_rate = 44100.0f;
+    MKFLT sample_rate = 44100.0f;
     int f_thread_count = 0;
     int f_thread_affinity = 0;
     int f_performance = 0;
@@ -529,18 +527,19 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     pthread_sigmask(SIG_UNBLOCK, &_signals, 0);
 #endif
 
-
     j = 0;
 
-    hpalloc((void**)&pluginOutputBuffers, 2 * sizeof(float*));
+    hpalloc(
+        (void**)&pluginOutputBuffers,
+        2 * sizeof(MKFLT*)
+    );
 
-    int f_i = 0;
-    while(f_i < 2)
-    {
+    int f_i;
+    for(f_i = 0; f_i < 2; ++f_i){
         hpalloc(
             (void**)&pluginOutputBuffers[f_i],
-            sizeof(float) * FRAMES_PER_BUFFER);
-        ++f_i;
+            sizeof(MKFLT) * FRAMES_PER_BUFFER
+        );
     }
 
     /*Initialize Portaudio*/
@@ -606,15 +605,12 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
 
     char f_host_apis[f_api_count][256];
 
-    for(f_i = 0; f_i < f_api_count; ++f_i)
-    {
+    for(f_i = 0; f_i < f_api_count; ++f_i){
         snprintf(f_host_apis[f_i], 256, "%s", Pa_GetHostApiInfo(f_i)->name);
     }
 
-    while(1)
-    {
-        if(i_pydaw_file_exists(f_device_file_path))
-        {
+    while(1){
+        if(i_pydaw_file_exists(f_device_file_path)){
             printf("device.txt exists\n");
             t_2d_char_array * f_current_string = g_get_2d_array_from_file(
                     f_device_file_path, PYDAW_LARGE_STRING);
@@ -626,13 +622,13 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
             while(1)
             {
                 v_iterate_2d_char_array(f_current_string);
-                if(f_current_string->eof)
-                {
+                if(f_current_string->eof){
                     break;
                 }
-                if(!strcmp(f_current_string->current_str, "") ||
-                    f_current_string->eol)
-                {
+                if(
+                    !strcmp(f_current_string->current_str, "") ||
+                    f_current_string->eol
+                ){
                     continue;
                 }
 
@@ -640,8 +636,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
                 v_iterate_2d_char_array_to_next_line(f_current_string);
                 strcpy(f_value_char, f_current_string->current_str);
 
-                if(!strcmp(f_key_char, "hostApi"))
-                {
+                if(!strcmp(f_key_char, "hostApi")){
                     for(f_i = 0; f_i < f_api_count; ++f_i)
                     {
                         if(!strcmp(f_value_char, f_host_apis[f_i]))
@@ -652,69 +647,47 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
                     }
                     printf("host api: %s\n", f_value_char);
                     printf("host api index %i\n", f_host_api_index);
-                }
-                else if(!strcmp(f_key_char, "name"))
-                {
+                } else if(!strcmp(f_key_char, "name")){
                     snprintf(f_device_name, 256, "%s", f_value_char);
                     printf("device name: \"%s\"\n", f_device_name);
                 }
 #if defined(_WIN32) || defined(__APPLE__)
-                else if(!strcmp(f_key_char, "inputName"))
-                {
+                else if(!strcmp(f_key_char, "inputName")){
                     snprintf(f_input_name, 256, "%s", f_value_char);
                     printf("input name: %s\n", f_device_name);
                 }
 #endif
-                else if(!strcmp(f_key_char, "bufferSize"))
-                {
+                else if(!strcmp(f_key_char, "bufferSize")){
                     f_frame_count = atoi(f_value_char);
                     printf("bufferSize: %i\n", f_frame_count);
-                }
-                else if(!strcmp(f_key_char, "audioEngine"))
-                {
+                } else if(!strcmp(f_key_char, "audioEngine")){
                     int f_engine = atoi(f_value_char);
                     printf("audioEngine: %i\n", f_engine);
-                    if(f_engine == 4 || f_engine == 5 || f_engine == 7)
-                    {
+                    if(f_engine == 4 || f_engine == 5 || f_engine == 7){
                         PYDAW_NO_HARDWARE = 1;
-                    }
-                    else
-                    {
+                    } else {
                         PYDAW_NO_HARDWARE = 0;
                     }
-                }
-                else if(!strcmp(f_key_char, "sampleRate"))
-                {
+                } else if(!strcmp(f_key_char, "sampleRate")){
                     sample_rate = atof(f_value_char);
                     printf("sampleRate: %i\n", (int)sample_rate);
-                }
-                else if(!strcmp(f_key_char, "threads"))
-                {
+                } else if(!strcmp(f_key_char, "threads")){
                     f_thread_count = atoi(f_value_char);
-                    if(f_thread_count > 8)
-                    {
+                    if(f_thread_count > 8){
                         f_thread_count = 8;
-                    }
-                    else if(f_thread_count < 0)
-                    {
+                    } else if(f_thread_count < 0){
                         f_thread_count = 0;
                     }
                     printf("threads: %i\n", f_thread_count);
-                }
-                else if(!strcmp(f_key_char, "threadAffinity"))
-                {
+                } else if(!strcmp(f_key_char, "threadAffinity")){
                     f_thread_affinity = atoi(f_value_char);
                     THREAD_AFFINITY = f_thread_affinity;
                     printf("threadAffinity: %i\n", f_thread_affinity);
-                }
-                else if(!strcmp(f_key_char, "performance"))
-                {
+                } else if(!strcmp(f_key_char, "performance")){
                     f_performance = atoi(f_value_char);
 
                     printf("performance: %i\n", f_performance);
-                }
-                else if(!strcmp(f_key_char, "midiInDevice"))
-                {
+                } else if(!strcmp(f_key_char, "midiInDevice")){
 #ifndef NO_MIDI
                     sprintf(f_midi_device_name, "%s", f_value_char);
                     printf("midiInDevice: %s\n", f_value_char);
@@ -793,9 +766,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
 
             g_free_2d_char_array(f_current_string);
 
-        }
-        else
-        {
+        } else {
             printf("Device config not found\n");
             mk_exit(RET_CODE_CONFIG_NOT_FOUND);
 
@@ -810,16 +781,15 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
         outputParameters.hostApiSpecificStreamInfo = NULL;
 
         int f_found_index = 0;
-        for(f_i = 0; f_i < Pa_GetDeviceCount(); ++f_i)
-        {
+        for(f_i = 0; f_i < Pa_GetDeviceCount(); ++f_i){
             const PaDeviceInfo * f_padevice = Pa_GetDeviceInfo(f_i);
             printf("\"%s\" %i %i\n", f_padevice->name, f_padevice->hostApi,
                 f_padevice->maxOutputChannels);
-            if(!strcmp(f_padevice->name, f_device_name) &&
-               f_host_api_index == f_padevice->hostApi)
-            {
-                if(!f_padevice->maxOutputChannels)
-                {
+            if(
+                !strcmp(f_padevice->name, f_device_name) &&
+                f_host_api_index == f_padevice->hostApi
+            ){
+                if(!f_padevice->maxOutputChannels){
                     printf("Error:  PaDevice->maxOutputChannels == 0, "
                         "device may already be open by another application\n");
                     mk_exit(RET_CODE_AUDIO_DEVICE_BUSY);
@@ -832,8 +802,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
             }
         }
 
-        if(!f_found_index)
-        {
+        if(!f_found_index){
             printf("Device not found\n");
             mk_exit(RET_CODE_DEVICE_NOT_FOUND);
         }
@@ -855,10 +824,11 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
             for(f_i = 0; f_i < Pa_GetDeviceCount(); ++f_i)
             {
                 const PaDeviceInfo * f_padevice = Pa_GetDeviceInfo(f_i);
-                if(!strcmp(f_padevice->name, f_input_name) &&
-                   f_host_api_index == f_padevice->hostApi &&
-                    f_padevice->maxInputChannels)
-                {
+                if(
+                    !strcmp(f_padevice->name, f_input_name) &&
+                    f_host_api_index == f_padevice->hostApi &&
+                    f_padevice->maxInputChannels
+                ){
                     inputParameters.device = f_i;
                     f_found_index = 1;
                     break;
@@ -871,8 +841,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
                 mk_exit(RET_CODE_DEVICE_NOT_FOUND);
             }
 
-            f_device_info =
-                Pa_GetDeviceInfo(inputParameters.device);
+            f_device_info = Pa_GetDeviceInfo(inputParameters.device);
 
             inputParameters.suggestedLatency =
                 f_device_info->defaultLowInputLatency;
@@ -891,13 +860,15 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
             }
 
             err = Pa_OpenStream(
-                &stream, f_input_params,
-                &outputParameters, sample_rate, //SAMPLE_RATE,
-                f_frame_count, //FRAMES_PER_BUFFER,
-                /* we won't output out of range samples so don't bother
-                 * clipping them */
-                0, /* paClipOff, */
-                portaudioCallback, NULL);
+                &stream,
+                f_input_params,
+                &outputParameters,
+                sample_rate,
+                f_frame_count,
+                0, // paClipOff
+                portaudioCallback,
+                NULL
+            );
 
             if(err != paNoError)
             {
@@ -911,7 +882,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
 
     char * f_master_vol_str = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
     get_file_setting(f_master_vol_str, "master_vol", "0.0");
-    float f_master_vol = atof(f_master_vol_str);
+    MKFLT f_master_vol = atof(f_master_vol_str);
     free(f_master_vol_str);
 
     MASTER_VOL = f_db_to_linear(f_master_vol * 0.1);
@@ -931,8 +902,8 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     v_queue_osc_message("ready", "");
 
     // only for no-hardware mode
-    float * f_portaudio_input_buffer = NULL;
-    float * f_portaudio_output_buffer = NULL;
+    MKFLT * f_portaudio_input_buffer = NULL;
+    MKFLT * f_portaudio_output_buffer = NULL;
 
     if(!PYDAW_NO_HARDWARE)
     {
@@ -945,7 +916,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
         }
         const PaStreamInfo * f_stream_info = Pa_GetStreamInfo(stream);
         printf("Actual output latency:\n\tmilliseconds:  %f\n\tsamples:  %i\n",
-            (float)f_stream_info->outputLatency * 1000.0f,
+            (MKFLT)f_stream_info->outputLatency * 1000.0f,
             (int)(f_stream_info->outputLatency * f_stream_info->sampleRate));
         if((int)f_stream_info->sampleRate != (int)sample_rate)
         {
@@ -956,9 +927,9 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     else
     {
         lmalloc((void**)&f_portaudio_input_buffer,
-            sizeof(float) * FRAMES_PER_BUFFER);
+            sizeof(MKFLT) * FRAMES_PER_BUFFER);
         lmalloc((void**)&f_portaudio_output_buffer,
-            sizeof(float) * FRAMES_PER_BUFFER);
+            sizeof(MKFLT) * FRAMES_PER_BUFFER);
 
         for(f_i = 0; f_i < FRAMES_PER_BUFFER; ++f_i)
         {

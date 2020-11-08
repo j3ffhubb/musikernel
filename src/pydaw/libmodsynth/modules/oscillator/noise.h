@@ -25,16 +25,16 @@ extern "C" {
 typedef struct st_white_noise
 {
     int array_count, read_head;
-    float * sample_array;
-    float b0,b1,b2,b3,b4,b5,b6;  //pink noise coefficients
+    MKFLT * sample_array;
+    MKFLT b0,b1,b2,b3,b4,b5,b6;  //pink noise coefficients
 }t_white_noise;
 
-typedef float (*fp_noise_func_ptr)(t_white_noise*);
+typedef MKFLT (*fp_noise_func_ptr)(t_white_noise*);
 
-t_white_noise * g_get_white_noise(float);
-inline float f_run_white_noise(t_white_noise *);
-inline float f_run_pink_noise(t_white_noise *);
-inline float f_run_noise_off(t_white_noise *);
+t_white_noise * g_get_white_noise(MKFLT);
+inline MKFLT f_run_white_noise(t_white_noise *);
+inline MKFLT f_run_pink_noise(t_white_noise *);
+inline MKFLT f_run_noise_off(t_white_noise *);
 inline fp_noise_func_ptr fp_get_noise_func_ptr(int);
 
 fp_noise_func_ptr f_noise_func_ptr_arr[] =
@@ -52,7 +52,7 @@ inline fp_noise_func_ptr fp_get_noise_func_ptr(int a_index)
 
 static unsigned int seed_helper = 18;
 
-void g_white_noise_init(t_white_noise * f_result, float a_sample_rate)
+void g_white_noise_init(t_white_noise * f_result, MKFLT a_sample_rate)
 {
     time_t f_clock = time(NULL);
     srand(((unsigned)f_clock) + (seed_helper));
@@ -63,7 +63,7 @@ void g_white_noise_init(t_white_noise * f_result, float a_sample_rate)
     f_result->read_head = 0;
 
     hpalloc((void**)&f_result->sample_array,
-        sizeof(float) * f_result->array_count);
+        sizeof(MKFLT) * f_result->array_count);
 
     f_result->b0 = f_result->b1 = f_result->b2 = f_result->b3 =
             f_result->b4 = f_result->b5 = f_result->b6 = 0.0f;
@@ -77,18 +77,18 @@ void g_white_noise_init(t_white_noise * f_result, float a_sample_rate)
         /*Mixing 3 random numbers together gives a more natural
          * sounding white noise, instead of a "brick" of noise,
          * as seen on an oscilloscope*/
-        float f_sample1 = ((double)rand() * f_rand_recip) - 0.5f;
-        float f_sample2 = ((double)rand() * f_rand_recip) - 0.5f;
-        float f_sample3 = ((double)rand() * f_rand_recip) - 0.5f;
+        MKFLT f_sample1 = ((double)rand() * f_rand_recip) - 0.5f;
+        MKFLT f_sample2 = ((double)rand() * f_rand_recip) - 0.5f;
+        MKFLT f_sample3 = ((double)rand() * f_rand_recip) - 0.5f;
 
         f_result->sample_array[f_i] = (f_sample1 + f_sample2 + f_sample3) * .5f;
         f_i++;
     }
 }
 
-/* t_white_noise * g_get_white_noise(float a_sample_rate)
+/* t_white_noise * g_get_white_noise(MKFLT a_sample_rate)
  */
-t_white_noise * g_get_white_noise(float a_sample_rate)
+t_white_noise * g_get_white_noise(MKFLT a_sample_rate)
 {
     t_white_noise * f_result;
     hpalloc((void**)&f_result, sizeof(t_white_noise));
@@ -96,11 +96,11 @@ t_white_noise * g_get_white_noise(float a_sample_rate)
     return f_result;
 }
 
-/* inline float f_run_white_noise(t_white_noise * a_w_noise)
+/* inline MKFLT f_run_white_noise(t_white_noise * a_w_noise)
  *
  * returns a single sample of white noise
  */
-inline float f_run_white_noise(t_white_noise * a_w_noise)
+inline MKFLT f_run_white_noise(t_white_noise * a_w_noise)
 {
     ++a_w_noise->read_head;
 
@@ -112,11 +112,11 @@ inline float f_run_white_noise(t_white_noise * a_w_noise)
     return a_w_noise->sample_array[(a_w_noise->read_head)];
 }
 
-/* inline float f_run_pink_noise(t_white_noise * a_w_noise)
+/* inline MKFLT f_run_pink_noise(t_white_noise * a_w_noise)
  *
  * returns a single sample of pink noise
  */
-inline float f_run_pink_noise(t_white_noise * a_w_noise)
+inline MKFLT f_run_pink_noise(t_white_noise * a_w_noise)
 {
     ++a_w_noise->read_head;
 
@@ -125,7 +125,7 @@ inline float f_run_pink_noise(t_white_noise * a_w_noise)
         a_w_noise->read_head = 0;
     }
 
-    float f_white = a_w_noise->sample_array[(a_w_noise->read_head)];
+    MKFLT f_white = a_w_noise->sample_array[(a_w_noise->read_head)];
 
     (a_w_noise->b0) = 0.99886f * (a_w_noise->b0) + f_white * 0.0555179f;
     (a_w_noise->b1) = 0.99332f * (a_w_noise->b1) + f_white * 0.0750759f;
@@ -139,7 +139,7 @@ inline float f_run_pink_noise(t_white_noise * a_w_noise)
             0.5362f;
 }
 
-inline float f_run_noise_off(t_white_noise * a_w_noise)
+inline MKFLT f_run_noise_off(t_white_noise * a_w_noise)
 {
     return 0.0f;
 }

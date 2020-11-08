@@ -43,62 +43,62 @@ extern "C" {
 
 typedef struct
 {
-    float filter_input;
-    float filter_last_input;
-    float bp_m1;
-    float lp_m1;
-    float hp;
-    float bp;
-    float lp;
+    MKFLT filter_input;
+    MKFLT filter_last_input;
+    MKFLT bp_m1;
+    MKFLT lp_m1;
+    MKFLT hp;
+    MKFLT bp;
+    MKFLT lp;
 }t_svf2_kernel;
 
 typedef struct
 {
-    float cutoff_note;
-    float cutoff_hz;
-    float cutoff_filter;
-    float pi2_div_sr;
-    float sr;
-    float filter_res;
-    float filter_res_db;
-    float velocity_cutoff; //, velocity_cutoff_amt;
-    float cutoff_base;
-    float cutoff_mod;
-    float cutoff_last;
-    float velocity_mod_amt;
+    MKFLT cutoff_note;
+    MKFLT cutoff_hz;
+    MKFLT cutoff_filter;
+    MKFLT pi2_div_sr;
+    MKFLT sr;
+    MKFLT filter_res;
+    MKFLT filter_res_db;
+    MKFLT velocity_cutoff; //, velocity_cutoff_amt;
+    MKFLT cutoff_base;
+    MKFLT cutoff_mod;
+    MKFLT cutoff_last;
+    MKFLT velocity_mod_amt;
     t_svf2_kernel filter_kernels[SVF_MAX_CASCADE][2];
-    float output0;
-    float output1;
+    MKFLT output0;
+    MKFLT output1;
 } t_svf2_filter;
 
 void v_svf2_set_cutoff(t_svf2_filter*);
-void v_svf2_set_res(t_svf2_filter*, float);
-void v_svf2_set_cutoff_base(t_svf2_filter*, float);
-void v_svf2_add_cutoff_mod(t_svf2_filter*, float);
-void v_svf2_velocity_mod(t_svf2_filter*,float);
+void v_svf2_set_res(t_svf2_filter*, MKFLT);
+void v_svf2_set_cutoff_base(t_svf2_filter*, MKFLT);
+void v_svf2_add_cutoff_mod(t_svf2_filter*, MKFLT);
+void v_svf2_velocity_mod(t_svf2_filter*,MKFLT);
 
-typedef void (*fp_svf2_run_filter)(t_svf2_filter*, float, float);
+typedef void (*fp_svf2_run_filter)(t_svf2_filter*, MKFLT, MKFLT);
 
 /*The int is the number of cascaded filter kernels*/
 fp_svf2_run_filter fp_svf2_get_run_filter_ptr(int,int);
 
-void v_svf2_run(t_svf2_filter*, t_svf2_kernel *, float);
+void v_svf2_run(t_svf2_filter*, t_svf2_kernel *, MKFLT);
 
-void v_svf2_run_2_pole_lp(t_svf2_filter*, float, float);
-void v_svf2_run_4_pole_lp(t_svf2_filter*, float, float);
+void v_svf2_run_2_pole_lp(t_svf2_filter*, MKFLT, MKFLT);
+void v_svf2_run_4_pole_lp(t_svf2_filter*, MKFLT, MKFLT);
 
-void v_svf2_run_2_pole_hp(t_svf2_filter*, float, float);
-void v_svf2_run_4_pole_hp(t_svf2_filter*, float, float);
+void v_svf2_run_2_pole_hp(t_svf2_filter*, MKFLT, MKFLT);
+void v_svf2_run_4_pole_hp(t_svf2_filter*, MKFLT, MKFLT);
 
-void v_svf2_run_2_pole_bp(t_svf2_filter*, float, float);
-void v_svf2_run_4_pole_bp(t_svf2_filter*, float, float);
+void v_svf2_run_2_pole_bp(t_svf2_filter*, MKFLT, MKFLT);
+void v_svf2_run_4_pole_bp(t_svf2_filter*, MKFLT, MKFLT);
 
-void v_svf2_run_2_pole_notch(t_svf2_filter*, float, float);
-void v_svf2_run_4_pole_notch(t_svf2_filter*, float, float);
+void v_svf2_run_2_pole_notch(t_svf2_filter*, MKFLT, MKFLT);
+void v_svf2_run_4_pole_notch(t_svf2_filter*, MKFLT, MKFLT);
 
-void v_svf2_run_no_filter(t_svf2_filter*, float, float);
+void v_svf2_run_no_filter(t_svf2_filter*, MKFLT, MKFLT);
 
-void v_svf2_run_2_pole_allpass(t_svf2_filter*, float, float);
+void v_svf2_run_2_pole_allpass(t_svf2_filter*, MKFLT, MKFLT);
 
 void v_svf2_reset(t_svf2_filter*);
 
@@ -132,15 +132,15 @@ void v_svf2_reset(t_svf2_filter * a_svf2)
 
 /* void v_svf2_run_no_filter(
  * t_svf2_filter* a_svf,
- * float a_in) //audio input
+ * MKFLT a_in) //audio input
  *
  * This is for allowing a filter to be turned off by running a
  * function pointer.  a_in is returned unmodified.
  */
 void v_svf2_run_no_filter(
     t_svf2_filter* a_svf,
-    float a_in0,
-    float a_in1
+    MKFLT a_in0,
+    MKFLT a_in1
 ){
     a_svf->output0 = a_in0;
     a_svf->output1 = a_in1;
@@ -211,15 +211,15 @@ fp_svf2_run_filter fp_svf2_get_run_filter_ptr(
 /* void v_svf2_run(
  * t_svf2_filter * a_svf,
  * t_svf2_kernel * a_kernel,
- * float a_input_value) //the audio input to filter
+ * MKFLT a_input_value) //the audio input to filter
  *
  * The main action to run the filter kernel*/
 inline void v_svf2_run(
     t_svf2_filter * a_svf,
     t_svf2_kernel * a_kernel,
-    float a_input_value
+    MKFLT a_input_value
 ){
-    float oversample_iterator = 0.0f;
+    MKFLT oversample_iterator = 0.0f;
     int f_i;
 
     a_kernel->filter_input = a_input_value;
@@ -243,8 +243,8 @@ inline void v_svf2_run(
 
 void v_svf2_run_2_pole_lp(
     t_svf2_filter* a_svf,
-    float a_in0,
-    float a_in1
+    MKFLT a_in0,
+    MKFLT a_in1
 ){
     v_svf2_run(
         a_svf,
@@ -263,8 +263,8 @@ void v_svf2_run_2_pole_lp(
 
 void v_svf2_run_4_pole_lp(
     t_svf2_filter* a_svf,
-    float a_in0,
-    float a_in1
+    MKFLT a_in0,
+    MKFLT a_in1
 ){
     v_svf2_run(
         a_svf,
@@ -294,8 +294,8 @@ void v_svf2_run_4_pole_lp(
 
 void v_svf2_run_2_pole_hp(
     t_svf2_filter* a_svf,
-    float a_in0,
-    float a_in1
+    MKFLT a_in0,
+    MKFLT a_in1
 ){
     v_svf2_run(
         a_svf,
@@ -313,7 +313,7 @@ void v_svf2_run_2_pole_hp(
 }
 
 void v_svf2_run_4_pole_hp(t_svf2_filter* a_svf,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     v_svf2_run(
         a_svf,
@@ -342,7 +342,7 @@ void v_svf2_run_4_pole_hp(t_svf2_filter* a_svf,
 }
 
 void v_svf2_run_2_pole_bp(t_svf2_filter* a_svf,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     v_svf2_run(
         a_svf,
@@ -360,7 +360,7 @@ void v_svf2_run_2_pole_bp(t_svf2_filter* a_svf,
 }
 
 void v_svf2_run_4_pole_bp(t_svf2_filter* a_svf,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     v_svf2_run(
         a_svf,
@@ -389,7 +389,7 @@ void v_svf2_run_4_pole_bp(t_svf2_filter* a_svf,
 }
 
 void v_svf2_run_2_pole_notch(t_svf2_filter* a_svf,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     v_svf2_run(
         a_svf,
@@ -411,7 +411,7 @@ void v_svf2_run_2_pole_notch(t_svf2_filter* a_svf,
 }
 
 void v_svf2_run_4_pole_notch(t_svf2_filter* a_svf,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     v_svf2_run(
         a_svf,
@@ -444,7 +444,7 @@ void v_svf2_run_4_pole_notch(t_svf2_filter* a_svf,
 }
 
 void v_svf2_run_2_pole_allpass(t_svf2_filter* a_svf,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     v_svf2_run(a_svf, &a_svf->filter_kernels[0][0], a_in0);
     a_svf->output0 = (a_svf->filter_kernels[0][0].hp) +
@@ -457,30 +457,30 @@ void v_svf2_run_2_pole_allpass(t_svf2_filter* a_svf,
             (a_svf->filter_kernels[0][1].bp);
 }
 
-/* void v_svf2_velocity_mod(t_svf2_filter* a_svf, float a_velocity)
+/* void v_svf2_velocity_mod(t_svf2_filter* a_svf, MKFLT a_velocity)
  */
 void v_svf2_velocity_mod(t_svf2_filter* a_svf,
-        float a_velocity)
+        MKFLT a_velocity)
 {
     a_svf->velocity_cutoff = ((a_velocity) * .2f) - 24.0f;
     a_svf->velocity_mod_amt = a_velocity * 0.007874016f;
 }
 
 /* void v_svf2_set_cutoff_base(t_svf2_filter* a_svf,
- * float a_midi_note_number)
+ * MKFLT a_midi_note_number)
  * Set the base pitch of the filter, this will usually correspond to a
  * single GUI knob*/
 void v_svf2_set_cutoff_base(t_svf2_filter* a_svf,
-        float a_midi_note_number)
+        MKFLT a_midi_note_number)
 {
     a_svf->cutoff_base = a_midi_note_number;
 }
 
 /* void v_svf2_add_cutoff_mod(t_svf2_filter* a_svf,
- * float a_midi_note_number)
+ * MKFLT a_midi_note_number)
  * Modulate the filters cutoff with an envelope, LFO, etc...*/
 void v_svf2_add_cutoff_mod(t_svf2_filter* a_svf,
-        float a_midi_note_number)
+        MKFLT a_midi_note_number)
 {
     a_svf->cutoff_mod = (a_svf->cutoff_mod) + a_midi_note_number;
 }
@@ -514,10 +514,10 @@ void v_svf2_set_cutoff(t_svf2_filter * a_svf)
 
 /* void v_svf2_set_res(
  * t_svf2_filter * a_svf,
- * float a_db)   //-100 to 0 is the expected range
+ * MKFLT a_db)   //-100 to 0 is the expected range
  *
  */
-void v_svf2_set_res(t_svf2_filter * a_svf, float a_db)
+void v_svf2_set_res(t_svf2_filter * a_svf, MKFLT a_db)
 {
     /*Don't calculate it again if it hasn't changed*/
     if((a_svf->filter_res_db) == a_db)
@@ -539,9 +539,9 @@ void v_svf2_set_res(t_svf2_filter * a_svf, float a_db)
     a_svf->filter_res = (1.0f - (f_db_to_linear_fast(a_db))) * 2.0f;
 }
 
-void g_svf2_init(t_svf2_filter * f_svf, float a_sample_rate)
+void g_svf2_init(t_svf2_filter * f_svf, MKFLT a_sample_rate)
 {
-    f_svf->sr = a_sample_rate * ((float)(SVF_OVERSAMPLE_MULTIPLIER));
+    f_svf->sr = a_sample_rate * ((MKFLT)(SVF_OVERSAMPLE_MULTIPLIER));
     f_svf->pi2_div_sr = (PI2 / (f_svf->sr));
 
     int f_i = 0;

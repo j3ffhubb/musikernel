@@ -42,42 +42,42 @@ typedef struct
 
 typedef struct
 {
-    float   amp;
-    float note_f;
+    MKFLT   amp;
+    MKFLT note_f;
     int note;
-    float osc1_linamp;
-    float osc2_linamp;
-    float noise_linamp;
+    MKFLT osc1_linamp;
+    MKFLT osc2_linamp;
+    MKFLT noise_linamp;
     int hard_sync;
     int noise_prefx;
     fp_noise_func_ptr noise_func_ptr;
     int adsr_prefx;
-    float unison_spread1;
-    float unison_spread2;
-    float dist_out_gain;
-    float osc1pb;
-    float osc2pb;
+    MKFLT unison_spread1;
+    MKFLT unison_spread2;
+    MKFLT dist_out_gain;
+    MKFLT osc1pb;
+    MKFLT osc2pb;
 
-    float lfo_amp_output, lfo_pitch_output, lfo_filter_output;
+    MKFLT lfo_amp_output, lfo_pitch_output, lfo_filter_output;
 
     t_smoother_linear glide_smoother;
     t_ramp_env glide_env;
     t_lfs_lfo lfo1;
     t_ramp_env pitch_env;
     //For glide
-    float last_pitch;
+    MKFLT last_pitch;
       //base pitch for all oscillators, to avoid redundant calculations
-    float base_pitch;
-    float target_pitch;
+    MKFLT base_pitch;
+    MKFLT target_pitch;
 
-    float osc1_pitch_adjust, osc2_pitch_adjust;
+    MKFLT osc1_pitch_adjust, osc2_pitch_adjust;
 
     t_osc_simple_unison osc_unison1;
     t_osc_simple_unison osc_unison2;
     t_white_noise white_noise1;
 
-    float noise_amp;
-    float filter_keytrk;
+    MKFLT noise_amp;
+    MKFLT filter_keytrk;
 
     t_adsr adsr_filter;
     fp_adsr_run adsr_run_func;
@@ -89,11 +89,11 @@ typedef struct
     fp_multi_dist mdist_fp;
 }t_rayv2_poly_voice  __attribute__((aligned(16)));
 
-t_rayv2_poly_voice * g_rayv2_poly_init(float);
+t_rayv2_poly_voice * g_rayv2_poly_init(MKFLT);
 
 
 
-t_rayv2_poly_voice * g_rayv2_poly_init(float a_sr)
+t_rayv2_poly_voice * g_rayv2_poly_init(MKFLT a_sr)
 {
     t_rayv2_poly_voice * f_voice;
     hpalloc((void**)&f_voice, sizeof(t_rayv2_poly_voice));
@@ -163,11 +163,11 @@ void v_rayv2_poly_note_off(t_rayv2_poly_voice * a_voice, int a_fast)
     v_adsr_release(&a_voice->adsr_filter);
 }
 
-t_rayv2_mono_modules * v_rayv2_mono_init(float);
+t_rayv2_mono_modules * v_rayv2_mono_init(MKFLT);
 
 
 /*Initialize any modules that will be run monophonically*/
-t_rayv2_mono_modules * v_rayv2_mono_init(float a_sr)
+t_rayv2_mono_modules * v_rayv2_mono_init(MKFLT a_sr)
 {
     t_rayv2_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_rayv2_mono_modules));

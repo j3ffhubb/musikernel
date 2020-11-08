@@ -41,18 +41,18 @@ typedef struct
 
 typedef struct
 {
-    float   amp;
-    float note_f;
+    MKFLT   amp;
+    MKFLT note_f;
     int note;
-    float osc1_linamp;
-    float osc2_linamp;
-    float noise_linamp;
+    MKFLT osc1_linamp;
+    MKFLT osc2_linamp;
+    MKFLT noise_linamp;
     int hard_sync;
     int adsr_prefx;
-    float unison_spread;
+    MKFLT unison_spread;
 
-    float current_sample;
-    float lfo_amp_output, lfo_pitch_output, lfo_filter_output;
+    MKFLT current_sample;
+    MKFLT lfo_amp_output, lfo_pitch_output, lfo_filter_output;
 
 
     t_smoother_linear glide_smoother;
@@ -60,19 +60,19 @@ typedef struct
     t_lfs_lfo lfo1;
     t_ramp_env pitch_env;
     //For glide
-    float last_pitch;
+    MKFLT last_pitch;
       //base pitch for all oscillators, to avoid redundant calculations
-    float base_pitch;
-    float target_pitch;
+    MKFLT base_pitch;
+    MKFLT target_pitch;
 
-    float osc1_pitch_adjust, osc2_pitch_adjust;
+    MKFLT osc1_pitch_adjust, osc2_pitch_adjust;
 
     t_osc_simple_unison osc_unison1;
     t_osc_simple_unison osc_unison2;
     t_white_noise white_noise1;
 
-    float noise_amp;
-    float filter_keytrk;
+    MKFLT noise_amp;
+    MKFLT filter_keytrk;
 
     t_adsr adsr_filter;
     fp_adsr_run adsr_run_func;
@@ -80,7 +80,7 @@ typedef struct
     t_state_variable_filter svf_filter;
     fp_svf_run_filter svf_function;
 
-    float filter_output;  //For assigning the filter output to
+    MKFLT filter_output;  //For assigning the filter output to
     // This corresponds to the current sample being processed on this voice.
     // += this to the output buffer when finished.
 
@@ -88,11 +88,11 @@ typedef struct
     t_audio_xfade dist_dry_wet;
 }t_rayv_poly_voice  __attribute__((aligned(16)));
 
-t_rayv_poly_voice * g_rayv_poly_init(float);
+t_rayv_poly_voice * g_rayv_poly_init(MKFLT);
 
 
 
-t_rayv_poly_voice * g_rayv_poly_init(float a_sr)
+t_rayv_poly_voice * g_rayv_poly_init(MKFLT a_sr)
 {
     t_rayv_poly_voice * f_voice;
     hpalloc((void**)&f_voice, sizeof(t_rayv_poly_voice));
@@ -166,11 +166,11 @@ void v_rayv_poly_note_off(t_rayv_poly_voice * a_voice, int a_fast)
     v_adsr_release(&a_voice->adsr_filter);
 }
 
-t_rayv_mono_modules * v_rayv_mono_init(float);
+t_rayv_mono_modules * v_rayv_mono_init(MKFLT);
 
 
 /*Initialize any modules that will be run monophonically*/
-t_rayv_mono_modules * v_rayv_mono_init(float a_sr)
+t_rayv_mono_modules * v_rayv_mono_init(MKFLT a_sr)
 {
     t_rayv_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_rayv_mono_modules));

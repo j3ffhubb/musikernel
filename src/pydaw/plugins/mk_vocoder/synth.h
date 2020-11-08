@@ -37,9 +37,9 @@ typedef struct
     PYFX_Data * wet;
     PYFX_Data * modulator;
     PYFX_Data * carrier;
-    float * buffers[2];
-    float * sc_buffers[2];
-    float fs;
+    MKFLT * buffers[2];
+    MKFLT * sc_buffers[2];
+    MKFLT fs;
     t_mk_vocoder_mono_modules * mono_modules;
 
     int i_mono_out;
@@ -50,7 +50,7 @@ typedef struct
     int plugin_uid;
     fp_queue_message queue_func;
 
-    float * port_table;
+    MKFLT * port_table;
     t_plugin_cc_map cc_map;
     PYFX_Descriptor * descriptor;
 } t_mk_vocoder;

@@ -20,39 +20,39 @@ GNU General Public License for more details.
 extern "C" {
 #endif
 
-inline float f_linear_interpolate(float, float, float);
-float f_linear_interpolate_ptr_wrap(float*, int, float);
-inline float f_linear_interpolate_ptr(float*, float);
-inline float f_linear_interpolate_ptr_ifh(float * a_table, int a_whole_number,
-        float a_frac);
+inline MKFLT f_linear_interpolate(MKFLT, MKFLT, MKFLT);
+MKFLT f_linear_interpolate_ptr_wrap(MKFLT*, int, MKFLT);
+inline MKFLT f_linear_interpolate_ptr(MKFLT*, MKFLT);
+inline MKFLT f_linear_interpolate_ptr_ifh(MKFLT * a_table, int a_whole_number,
+        MKFLT a_frac);
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-/* inline float f_linear_interpolate(
- * float a_a, //item 0
- * float a_b, //item 1
- * float a_position)  //position between the 2, range:  0 to 1
+/* inline MKFLT f_linear_interpolate(
+ * MKFLT a_a, //item 0
+ * MKFLT a_b, //item 1
+ * MKFLT a_position)  //position between the 2, range:  0 to 1
  */
-inline float f_linear_interpolate(float a_a, float a_b, float a_pos)
+inline MKFLT f_linear_interpolate(MKFLT a_a, MKFLT a_b, MKFLT a_pos)
 {
     return ((1.0f - a_pos) * a_a) + (a_pos * a_b);
 }
 
 
-/* float f_linear_interpolate_ptr_wrap(
- * float * a_table,
+/* MKFLT f_linear_interpolate_ptr_wrap(
+ * MKFLT * a_table,
  * int a_table_size,
- * float a_ptr,
+ * MKFLT a_ptr,
  * )
  *
- * This method uses a pointer instead of an array the float* must be malloc'd
- * to (sizeof(float) * a_table_size)
+ * This method uses a pointer instead of an array the MKFLT* must be malloc'd
+ * to (sizeof(MKFLT) * a_table_size)
  */
-float f_linear_interpolate_ptr_wrap(float * a_table, int a_table_size,
-        float a_ptr)
+MKFLT f_linear_interpolate_ptr_wrap(MKFLT * a_table, int a_table_size,
+        MKFLT a_ptr)
 {
     int int_pos = (int)a_ptr;
     int int_pos_plus_1 = int_pos + 1;
@@ -77,47 +77,47 @@ float f_linear_interpolate_ptr_wrap(float * a_table, int a_table_size,
         int_pos_plus_1 += a_table_size;
     }
 
-    float pos = a_ptr - int_pos;
+    MKFLT pos = a_ptr - int_pos;
 
     return f_linear_interpolate(a_table[int_pos], a_table[int_pos_plus_1], pos);
 }
 
-/* inline float f_linear_interpolate_ptr_wrap(
- * float * a_table,
- * float a_ptr,
+/* inline MKFLT f_linear_interpolate_ptr_wrap(
+ * MKFLT * a_table,
+ * MKFLT a_ptr,
  * )
  *
- * This method uses a pointer instead of an array the float* must be malloc'd
- * to (sizeof(float) * a_table_size)
+ * This method uses a pointer instead of an array the MKFLT* must be malloc'd
+ * to (sizeof(MKFLT) * a_table_size)
  *
  * THIS DOES NOT CHECK THAT YOU PROVIDED A VALID POSITION
  */
-inline float f_linear_interpolate_ptr(float * a_table, float a_ptr)
+inline MKFLT f_linear_interpolate_ptr(MKFLT * a_table, MKFLT a_ptr)
 {
     int int_pos = (int)a_ptr;
     int int_pos_plus_1 = int_pos + 1;
 
-    float pos = a_ptr - int_pos;
+    MKFLT pos = a_ptr - int_pos;
 
     return f_linear_interpolate(a_table[int_pos], a_table[int_pos_plus_1], pos);
 }
 
-/* inline float f_linear_interpolate_ptr_ifh(
- * float * a_table,
+/* inline MKFLT f_linear_interpolate_ptr_ifh(
+ * MKFLT * a_table,
  * int a_table_size,
  * int a_whole_number,
- * float a_frac,
+ * MKFLT a_frac,
  * )
  *
  * For use with the read_head type in Euphoria Sampler
  */
-inline float f_linear_interpolate_ptr_ifh(float * a_table, int a_whole_number,
-        float a_frac)
+inline MKFLT f_linear_interpolate_ptr_ifh(MKFLT * a_table, int a_whole_number,
+        MKFLT a_frac)
 {
     int int_pos = a_whole_number;
     int int_pos_plus_1 = int_pos + 1;
 
-    float pos = a_frac;
+    MKFLT pos = a_frac;
 
     return f_linear_interpolate(a_table[int_pos], a_table[int_pos_plus_1], pos);
 }

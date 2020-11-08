@@ -25,17 +25,17 @@ extern "C" {
 
 typedef struct st_pit_ratio
 {
-    float pitch, hz, hz_recip;
+    MKFLT pitch, hz, hz_recip;
 }t_pit_ratio;
 
 t_pit_ratio * g_pit_ratio();
 
 
-inline float f_pit_midi_note_to_hz(float);
-inline float f_pit_hz_to_midi_note(float);
-inline float f_pit_midi_note_to_samples(float, float);
-float f_pit_midi_note_to_hz_fast(float);
-float f_pit_midi_note_to_ratio_fast(float, float, t_pit_ratio*);
+inline MKFLT f_pit_midi_note_to_hz(MKFLT);
+inline MKFLT f_pit_hz_to_midi_note(MKFLT);
+inline MKFLT f_pit_midi_note_to_samples(MKFLT, MKFLT);
+MKFLT f_pit_midi_note_to_hz_fast(MKFLT);
+MKFLT f_pit_midi_note_to_ratio_fast(MKFLT, MKFLT, t_pit_ratio*);
 
 #ifdef	__cplusplus
 }
@@ -58,32 +58,32 @@ t_pit_ratio * g_pit_ratio()
 
 /*Functions*/
 
-/* inline float f_pit_midi_note_to_hz(
- * float a_midi_note_number)  //typical range:  20 to 124
+/* inline MKFLT f_pit_midi_note_to_hz(
+ * MKFLT a_midi_note_number)  //typical range:  20 to 124
  *
  * Convert midi note number to hz*/
-inline float f_pit_midi_note_to_hz(float a_midi_note_number)
+inline MKFLT f_pit_midi_note_to_hz(MKFLT a_midi_note_number)
 {
     return (base_a4 * pow(2.0f, (a_midi_note_number - 57.0f) * 0.0833333f));
 }
 
-/* inline float f_pit_hz_to_midi_note(
- * float _hz) //typical range:  20 to 20000
+/* inline MKFLT f_pit_hz_to_midi_note(
+ * MKFLT _hz) //typical range:  20 to 20000
  *
  * Convert hz to midi note number*/
-inline float f_pit_hz_to_midi_note(float a_hz)
+inline MKFLT f_pit_hz_to_midi_note(MKFLT a_hz)
 {
      return ((12.0f * log2(a_hz * base_a4_recip)) + 57.0f);
 }
 
-/* inline float f_pit_midi_note_to_samples(
- * float a_midi_note_number, //typical range 20 to 124
- * float a_sample_rate)
+/* inline MKFLT f_pit_midi_note_to_samples(
+ * MKFLT a_midi_note_number, //typical range 20 to 124
+ * MKFLT a_sample_rate)
  *
  * Convert a midi note number pitch to the number of samples in a single
  * wave-length at that pitch*/
-inline float f_pit_midi_note_to_samples(float a_midi_note_number,
-        float a_sample_rate)
+inline MKFLT f_pit_midi_note_to_samples(MKFLT a_midi_note_number,
+        MKFLT a_sample_rate)
 {
     /*This will be used by the _fast method, as it cannot be plotted
      * without knowing the sample rate first*/
@@ -99,7 +99,7 @@ inline float f_pit_midi_note_to_samples(float a_midi_note_number,
 #define arr_pit_p2f_count 2521
 #define arr_pit_p2f_count_m1 2520
 
-static __thread float arr_pit_p2f[arr_pit_p2f_count]
+static __thread MKFLT arr_pit_p2f[arr_pit_p2f_count]
 __attribute__((aligned(CACHE_LINE_SIZE))) = {
 16.351620, 16.398912, 16.446342, 16.493912, 16.541616, 16.589458, 16.637440, 16.685560, 16.733822, 16.782221, 16.830759, 16.879436, 16.928257, 16.977221, 17.026323, 17.075567, 17.124954, 17.174484, 17.224159, 17.273975,
 17.323936, 17.374043, 17.424292, 17.474691, 17.525232, 17.575920, 17.626753, 17.677734, 17.728867, 17.780142, 17.831566, 17.883141, 17.934862, 17.986738, 18.038761, 18.090933, 18.143255, 18.195730, 18.248362, 18.301140,
@@ -229,16 +229,16 @@ __attribute__((aligned(CACHE_LINE_SIZE))) = {
 22350.572266, 22415.220703, 22480.044922, 22545.068359, 22610.269531, 22675.667969, 22741.255859, 22807.025391, 22872.994141, 22939.142578, 23005.494141, 23072.035156, 23138.759766, 23205.689453, 23272.800781, 23340.115234, 23407.626953, 23475.322266, 23543.222656, 23611.310547,
 23679.605469};
 
-/* float f_pit_midi_note_to_hz_fast(
- * float a_midi_note_number) //range: 20 to 124
+/* MKFLT f_pit_midi_note_to_hz_fast(
+ * MKFLT a_midi_note_number) //range: 20 to 124
  *
  * Convert midi note number to hz, using a fast table lookup.
  * You should prefer this function whenever possible, it is much faster than the
  * regular version.
  */
-float f_pit_midi_note_to_hz_fast(float a_midi_note_number)
+MKFLT f_pit_midi_note_to_hz_fast(MKFLT a_midi_note_number)
 {
-    float arr_index = (a_midi_note_number * 20.0f) - 1.0f;
+    MKFLT arr_index = (a_midi_note_number * 20.0f) - 1.0f;
 
     if((arr_index) > arr_pit_p2f_count_limit)
     {
@@ -253,14 +253,14 @@ float f_pit_midi_note_to_hz_fast(float a_midi_note_number)
 }
 
 
-/* inline float f_pit_midi_note_to_ratio_fast(
- * float a_base_pitch, //The base pitch of the sample in MIDI note number
- * float a_transposed_pitch, //The pitch the sample will be transposed to
+/* inline MKFLT f_pit_midi_note_to_ratio_fast(
+ * MKFLT a_base_pitch, //The base pitch of the sample in MIDI note number
+ * MKFLT a_transposed_pitch, //The pitch the sample will be transposed to
  * t_pit_pitch_core* a_pit,
  * t_pit_ratio * a_ratio)
  */
-float f_pit_midi_note_to_ratio_fast(float a_base_pitch,
-        float a_transposed_pitch, t_pit_ratio * a_ratio)
+MKFLT f_pit_midi_note_to_ratio_fast(MKFLT a_base_pitch,
+        MKFLT a_transposed_pitch, t_pit_ratio * a_ratio)
 {
     if(a_base_pitch != (a_ratio->pitch))
     {

@@ -42,7 +42,7 @@ static void v_xfade_on_stop(PYFX_Handle instance)
 }
 
 static void v_xfade_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     t_xfade *plugin = (t_xfade*)instance;
 
@@ -102,7 +102,7 @@ static void v_xfade_load(PYFX_Handle instance,
 }
 
 static void v_xfade_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_xfade *plugin_data = (t_xfade*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -169,7 +169,7 @@ static void v_xfade_run(
     int midi_event_pos = 0;
     int f_i = 0;
 
-    float f_pan_law = (*plugin_data->pan_law) * 0.01f;
+    MKFLT f_pan_law = (*plugin_data->pan_law) * 0.01f;
 
     while(f_i < sample_count)
     {

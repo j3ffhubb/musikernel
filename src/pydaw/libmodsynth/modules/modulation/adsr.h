@@ -40,44 +40,44 @@ extern "C" {
 
 typedef struct st_adsr
 {
-    float output;
-    float output_db;
+    MKFLT output;
+    MKFLT output_db;
     int stage;  //0=a,1=d,2=s,3=r,4=inactive,6=delay,9=hold
-    float a_inc;
-    float d_inc;
-    float s_value;
-    float r_inc;
+    MKFLT a_inc;
+    MKFLT d_inc;
+    MKFLT s_value;
+    MKFLT r_inc;
 
-    float a_inc_db;
-    float d_inc_db;
-    float r_inc_db;
+    MKFLT a_inc_db;
+    MKFLT d_inc_db;
+    MKFLT r_inc_db;
 
-    float a_time;
-    float d_time;
-    float r_time;
+    MKFLT a_time;
+    MKFLT d_time;
+    MKFLT r_time;
 
     int time_counter;
     int delay_count;
     int hold_count;
     int wait_count;
 
-    float sr;
-    float sr_recip;
+    MKFLT sr;
+    MKFLT sr_recip;
 }t_adsr;
 
-void v_adsr_set_a_time(t_adsr*, float);
-void v_adsr_set_d_time(t_adsr*, float);
-void v_adsr_set_s_value(t_adsr*, float);
-void v_adsr_set_s_value_db(t_adsr*, float);
-void v_adsr_set_r_time(t_adsr*, float);
+void v_adsr_set_a_time(t_adsr*, MKFLT);
+void v_adsr_set_d_time(t_adsr*, MKFLT);
+void v_adsr_set_s_value(t_adsr*, MKFLT);
+void v_adsr_set_s_value_db(t_adsr*, MKFLT);
+void v_adsr_set_r_time(t_adsr*, MKFLT);
 void v_adsr_set_fast_release(t_adsr*);
 
-void v_adsr_set_delay_time(t_adsr*, float);
-void v_adsr_set_hold_time(t_adsr*, float);
+void v_adsr_set_delay_time(t_adsr*, MKFLT);
+void v_adsr_set_hold_time(t_adsr*, MKFLT);
 
-void v_adsr_set_adsr_db(t_adsr*, float, float, float, float);
-void v_adsr_set_adsr(t_adsr*, float, float, float, float);
-void v_adsr_set_adsr_lin_from_db(t_adsr*, float, float, float, float);
+void v_adsr_set_adsr_db(t_adsr*, MKFLT, MKFLT, MKFLT, MKFLT);
+void v_adsr_set_adsr(t_adsr*, MKFLT, MKFLT, MKFLT, MKFLT);
+void v_adsr_set_adsr_lin_from_db(t_adsr*, MKFLT, MKFLT, MKFLT, MKFLT);
 
 void v_adsr_retrigger(t_adsr *);
 void v_adsr_release(t_adsr *);
@@ -85,10 +85,10 @@ void v_adsr_run(t_adsr *);
 void v_adsr_run_db(t_adsr *);
 void v_adsr_kill(t_adsr *);
 
-t_adsr * g_adsr_get_adsr(float);
+t_adsr * g_adsr_get_adsr(MKFLT);
 
 typedef void (*fp_adsr_run)(t_adsr*);
-typedef void (*fp_adsr_set)(t_adsr*, float, float, float, float);
+typedef void (*fp_adsr_set)(t_adsr*, MKFLT, MKFLT, MKFLT, MKFLT);
 
 fp_adsr_set FP_ADSR_SET[] = {
     v_adsr_set_adsr_db,
@@ -100,11 +100,11 @@ fp_adsr_run FP_ADSR_RUN[] = {
     v_adsr_run
 };
 
-/* void v_adsr_set_delay_time(t_adsr* a_adsr, float a_time)
+/* void v_adsr_set_delay_time(t_adsr* a_adsr, MKFLT a_time)
  *
  * MUST BE CALLED AFTER RETRIGGER!!!!
  */
-void v_adsr_set_delay_time(t_adsr* a_adsr, float a_time)
+void v_adsr_set_delay_time(t_adsr* a_adsr, MKFLT a_time)
 {
     if(a_time == 0.0f)
     {
@@ -117,7 +117,7 @@ void v_adsr_set_delay_time(t_adsr* a_adsr, float a_time)
     }
 }
 
-void v_adsr_set_hold_time(t_adsr* a_adsr, float a_time)
+void v_adsr_set_hold_time(t_adsr* a_adsr, MKFLT a_time)
 {
     if(a_time == 0.0f)
     {
@@ -132,11 +132,11 @@ void v_adsr_set_hold_time(t_adsr* a_adsr, float a_time)
 
 /* void v_adsr_set_a_time(
  * t_adsr* a_adsr_ptr,
- * float a_time)  //time in seconds
+ * MKFLT a_time)  //time in seconds
  *
  * Sets the envelope attack time
  */
-void v_adsr_set_a_time(t_adsr* a_adsr_ptr, float a_time)
+void v_adsr_set_a_time(t_adsr* a_adsr_ptr, MKFLT a_time)
 {
     if((a_adsr_ptr->a_time) == a_time)
         return;
@@ -156,11 +156,11 @@ void v_adsr_set_a_time(t_adsr* a_adsr_ptr, float a_time)
 
 /* void v_adsr_set_d_time(
  * t_adsr* a_adsr_ptr,
- * float a_time) //time in seconds
+ * MKFLT a_time) //time in seconds
  *
  * Sets the envelope decay time
  */
-void v_adsr_set_d_time(t_adsr* a_adsr_ptr, float a_time)
+void v_adsr_set_d_time(t_adsr* a_adsr_ptr, MKFLT a_time)
 {
     if((a_adsr_ptr->d_time) == a_time)
         return;
@@ -179,11 +179,11 @@ void v_adsr_set_d_time(t_adsr* a_adsr_ptr, float a_time)
 
 /* void v_adsr_set_r_time(
  * t_adsr* a_adsr_ptr,
- * float a_time) //time in seconds
+ * MKFLT a_time) //time in seconds
  *
  * Sets the envelope release time
  */
-void v_adsr_set_r_time(t_adsr* a_adsr_ptr, float a_time)
+void v_adsr_set_r_time(t_adsr* a_adsr_ptr, MKFLT a_time)
 {
     if((a_adsr_ptr->r_time) == a_time)
         return;
@@ -218,9 +218,9 @@ void v_adsr_set_fast_release(t_adsr* a_adsr_ptr)
 
 /* void v_adsr_set_s_value(
  * t_adsr* a_adsr_ptr,
- * float a_value) //The sustain value, range: 0 to 1
+ * MKFLT a_value) //The sustain value, range: 0 to 1
  */
-void v_adsr_set_s_value(t_adsr* a_adsr_ptr, float a_value)
+void v_adsr_set_s_value(t_adsr* a_adsr_ptr, MKFLT a_value)
 {
     a_adsr_ptr->s_value = a_value;
 
@@ -232,24 +232,24 @@ void v_adsr_set_s_value(t_adsr* a_adsr_ptr, float a_value)
 
 /* void v_adsr_set_s_value_db(
  * t_adsr* a_adsr_ptr,
- * float a_value)  //The decibel value of sustain, typically -30 to 0
+ * MKFLT a_value)  //The decibel value of sustain, typically -30 to 0
  */
-void v_adsr_set_s_value_db(t_adsr* a_adsr_ptr, float a_value)
+void v_adsr_set_s_value_db(t_adsr* a_adsr_ptr, MKFLT a_value)
 {
     v_adsr_set_s_value(a_adsr_ptr, f_db_to_linear_fast(a_value));
 }
 
 /* void v_adsr_set_adsr(
  * t_adsr* a_adsr_ptr,
- * float a_a, //attack
- * float a_d, //decay
- * float a_s, //sustain
- * float a_r) //release
+ * MKFLT a_a, //attack
+ * MKFLT a_d, //decay
+ * MKFLT a_s, //sustain
+ * MKFLT a_r) //release
  *
  * Set allADSR values, with a range of 0 to 1 for sustain
  */
-void v_adsr_set_adsr(t_adsr* a_adsr_ptr, float a_a,
-        float a_d, float a_s, float a_r)
+void v_adsr_set_adsr(t_adsr* a_adsr_ptr, MKFLT a_a,
+        MKFLT a_d, MKFLT a_s, MKFLT a_r)
 {
     v_adsr_set_a_time(a_adsr_ptr, a_a);
     v_adsr_set_d_time(a_adsr_ptr, a_d);
@@ -257,8 +257,8 @@ void v_adsr_set_adsr(t_adsr* a_adsr_ptr, float a_a,
     v_adsr_set_r_time(a_adsr_ptr, a_r);
 }
 
-void v_adsr_set_adsr_lin_from_db(t_adsr* a_adsr_ptr, float a_a,
-        float a_d, float a_s, float a_r)
+void v_adsr_set_adsr_lin_from_db(t_adsr* a_adsr_ptr, MKFLT a_a,
+        MKFLT a_d, MKFLT a_s, MKFLT a_r)
 {
     a_s = f_db_to_linear_fast(a_s);
     v_adsr_set_adsr(a_adsr_ptr, a_a, a_d, a_s, a_r);
@@ -266,15 +266,15 @@ void v_adsr_set_adsr_lin_from_db(t_adsr* a_adsr_ptr, float a_a,
 
 /* void v_adsr_set_adsr(
  * t_adsr* a_adsr_ptr,
- * float a_a, //attack
- * float a_d, //decay
- * float a_s, //sustain
- * float a_r) //release
+ * MKFLT a_a, //attack
+ * MKFLT a_d, //decay
+ * MKFLT a_s, //sustain
+ * MKFLT a_r) //release
  *
  * Set all ADSR values, with a range of -30 to 0 for sustain
  */
-void v_adsr_set_adsr_db(t_adsr* a_adsr_ptr, float a_a,
-        float a_d, float a_s, float a_r)
+void v_adsr_set_adsr_db(t_adsr* a_adsr_ptr, MKFLT a_a,
+        MKFLT a_d, MKFLT a_s, MKFLT a_r)
 {
     v_adsr_set_a_time(a_adsr_ptr, a_a);
     v_adsr_set_d_time(a_adsr_ptr, a_d);
@@ -318,7 +318,7 @@ void v_adsr_release(t_adsr * a_adsr_ptr)
     }
 }
 
-void g_adsr_init(t_adsr * f_result, float a_sr)
+void g_adsr_init(t_adsr * f_result, MKFLT a_sr)
 {
     f_result->sr = a_sr;
     f_result->sr_recip = 1.0f / a_sr;
@@ -353,10 +353,10 @@ void g_adsr_init(t_adsr * f_result, float a_sr)
 }
 
 /* t_adsr * g_adsr_get_adsr(
- * float a_sr_recip) // 1.0f/sample_rate (TODO: use sample_rate instead)
+ * MKFLT a_sr_recip) // 1.0f/sample_rate (TODO: use sample_rate instead)
  *
  */
-t_adsr * g_adsr_get_adsr(float a_sr)
+t_adsr * g_adsr_get_adsr(MKFLT a_sr)
 {
     t_adsr * f_result;
     hpalloc((void**)&f_result, sizeof(t_adsr));

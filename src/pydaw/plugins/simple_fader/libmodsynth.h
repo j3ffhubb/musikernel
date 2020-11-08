@@ -26,17 +26,17 @@ extern "C" {
 
 typedef struct
 {
-    float current_sample0;
-    float current_sample1;
+    MKFLT current_sample0;
+    MKFLT current_sample1;
 
-    float vol_linear;
+    MKFLT vol_linear;
 
     t_smoother_linear * volume_smoother;
 }t_sfader_mono_modules;
 
-t_sfader_mono_modules * v_sfader_mono_init(float, int);
+t_sfader_mono_modules * v_sfader_mono_init(MKFLT, int);
 
-t_sfader_mono_modules * v_sfader_mono_init(float a_sr, int a_plugin_uid)
+t_sfader_mono_modules * v_sfader_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_sfader_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_sfader_mono_modules));

@@ -69,12 +69,12 @@ typedef struct
 typedef struct
 {
     int sample_fade_in_end_sample;
-    float sample_fade_in_inc;
+    MKFLT sample_fade_in_inc;
     int sample_fade_out_start_sample;
-    float sample_fade_out_dec;
-    float sample_fade_amp;
+    MKFLT sample_fade_out_dec;
+    MKFLT sample_fade_amp;
     t_int_frac_read_head sample_read_heads;
-    float vel_sens_output;
+    MKFLT vel_sens_output;
 }t_euphoria_pfx_sample;
 
 typedef struct
@@ -86,34 +86,34 @@ typedef struct
     t_ramp_env ramp_env;
 
     // For glide
-    float last_pitch;
-    float base_pitch;
+    MKFLT last_pitch;
+    MKFLT base_pitch;
 
-    float target_pitch;
+    MKFLT target_pitch;
 
-    float filter_output;  //For assigning the filter output to
+    MKFLT filter_output;  //For assigning the filter output to
 
     // This corresponds to the current sample being processed on this voice.
     // += this to the output buffer when finished.
-    float current_sample;
+    MKFLT current_sample;
 
     t_lfs_lfo lfo1;
 
-    float note_f;
-    float noise_sample;
+    MKFLT note_f;
+    MKFLT noise_sample;
 
     t_euphoria_pfx_sample samples[EUPHORIA_MAX_SAMPLE_COUNT];
 
     t_euphoria_pfx_group effects [EUPHORIA_MODULAR_POLYFX_COUNT];
 
-    float modulex_current_sample[2];
+    MKFLT modulex_current_sample[2];
 
-    float * modulator_outputs[EUPHORIA_MODULATOR_COUNT];
+    MKFLT * modulator_outputs[EUPHORIA_MODULATOR_COUNT];
 
     int noise_index;
 
-    float velocity_track;
-    float keyboard_track;
+    MKFLT velocity_track;
+    MKFLT keyboard_track;
     int velocities;
 
     //Sample indexes for each note to play
@@ -129,7 +129,7 @@ typedef struct
     int polyfx_mod_src_index[EUPHORIA_MODULAR_POLYFX_COUNT][
         (EUPHORIA_CONTROLS_PER_MOD_EFFECT * EUPHORIA_MODULATOR_COUNT)];
     //The value of the mod_matrix knob, multiplied by .01
-    float polyfx_mod_matrix_values[EUPHORIA_MODULAR_POLYFX_COUNT][
+    MKFLT polyfx_mod_matrix_values[EUPHORIA_MODULAR_POLYFX_COUNT][
         (EUPHORIA_CONTROLS_PER_MOD_EFFECT * EUPHORIA_MODULATOR_COUNT)];
 
     //Active PolyFX to process
@@ -138,11 +138,11 @@ typedef struct
 
 }t_euphoria_poly_voice __attribute__((aligned(16)));
 
-t_euphoria_poly_voice * g_euphoria_poly_init(float);
+t_euphoria_poly_voice * g_euphoria_poly_init(MKFLT);
 
 /*initialize all of the modules in an instance of poly_voice*/
 
-t_euphoria_poly_voice * g_euphoria_poly_init(float a_sr)
+t_euphoria_poly_voice * g_euphoria_poly_init(MKFLT a_sr)
 {
     t_euphoria_poly_voice * f_voice;
     hpalloc((void**)&f_voice, sizeof(t_euphoria_poly_voice));
@@ -218,9 +218,9 @@ void v_euphoria_poly_note_off(t_euphoria_poly_voice * a_voice,
     v_adsr_release(&a_voice->adsr_filter);
 }
 
-t_euphoria_mono_modules * g_euphoria_mono_init(float a_sr);
+t_euphoria_mono_modules * g_euphoria_mono_init(MKFLT a_sr);
 
-t_euphoria_mono_modules * g_euphoria_mono_init(float a_sr)
+t_euphoria_mono_modules * g_euphoria_mono_init(MKFLT a_sr)
 {
     t_euphoria_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_euphoria_mono_modules));

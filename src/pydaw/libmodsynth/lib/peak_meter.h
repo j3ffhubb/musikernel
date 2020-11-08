@@ -25,7 +25,7 @@ extern "C" {
 // a peak meter
 typedef struct
 {
-    volatile float value[2];
+    volatile MKFLT value[2];
     int buffer_pos;
     volatile int dirty;
 }t_pkm_peak_meter;
@@ -33,7 +33,7 @@ typedef struct
 // a gain reduction meter
 typedef struct
 {
-    float gain_redux;
+    MKFLT gain_redux;
     int counter;
     int count;
     int dirty;
@@ -43,7 +43,7 @@ typedef struct
 }
 #endif
 
-void g_pkm_redux_init(t_pkm_redux * self, float a_sr)
+void g_pkm_redux_init(t_pkm_redux * self, MKFLT a_sr)
 {
     self->gain_redux = 0.0f;
     self->counter = 0;
@@ -56,7 +56,7 @@ void v_pkm_redux_lin_reset(t_pkm_redux * self)
     self->gain_redux = 1.0f;
 }
 
-void v_pkm_redux_run(t_pkm_redux * self, float a_gain)
+void v_pkm_redux_run(t_pkm_redux * self, MKFLT a_gain)
 {
     ++self->counter;
     if(unlikely(self->counter >= self->count))
@@ -89,9 +89,9 @@ t_pkm_peak_meter * g_pkm_get()
     return f_result;
 }
 
-static inline float f_pkm_compare(float a_audio, float a_peak)
+static inline MKFLT f_pkm_compare(MKFLT a_audio, MKFLT a_peak)
 {
-    float f_value = a_audio;
+    MKFLT f_value = a_audio;
 
     if(a_audio < 0.0f)
     {
@@ -116,7 +116,7 @@ void v_pkm_reset(t_pkm_peak_meter * self)
 }
 
 void v_pkm_run(t_pkm_peak_meter * self,
-        float * a_in0, float * a_in1, int a_count)
+        MKFLT * a_in0, MKFLT * a_in1, int a_count)
 {
     if(self->dirty)
     {

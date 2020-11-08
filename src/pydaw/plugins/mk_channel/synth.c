@@ -39,7 +39,7 @@ static void v_mkchnl_on_stop(PYFX_Handle instance)
 }
 
 static void v_mkchnl_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     if(a_is_sidechain)
     {
@@ -72,7 +72,7 @@ static PYFX_Handle g_mkchnl_instantiate(PYFX_Descriptor * descriptor,
 {
     t_mkchnl *plugin_data;
     hpalloc((void**)&plugin_data, sizeof(t_mkchnl));
-    hpalloc((void**)&plugin_data->buffers, sizeof(float*) * 2);
+    hpalloc((void**)&plugin_data->buffers, sizeof(MKFLT*) * 2);
 
     plugin_data->descriptor = descriptor;
     plugin_data->fs = s_rate;
@@ -99,7 +99,7 @@ static void v_mkchnl_load(PYFX_Handle instance,
 }
 
 static void v_mkchnl_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_mkchnl *plugin_data = (t_mkchnl*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -156,16 +156,16 @@ static void v_mkchnl_process_midi(
 
 static void v_mkchnl_run_mixing(
         PYFX_Handle instance, int sample_count,
-        float ** output_buffers, int output_count,
+        MKFLT ** output_buffers, int output_count,
         struct ShdsList * midi_events, struct ShdsList * atm_events)
 {
     t_mkchnl *plugin_data = (t_mkchnl*)instance;
 
     v_mkchnl_process_midi(instance, midi_events, atm_events);
 
-    float f_vol_linear;
-    float f_gain = f_db_to_linear_fast((*plugin_data->gain) * 0.01f);
-    float f_pan_law = (*plugin_data->pan_law) * 0.01f;
+    MKFLT f_vol_linear;
+    MKFLT f_gain = f_db_to_linear_fast((*plugin_data->gain) * 0.01f);
+    MKFLT f_pan_law = (*plugin_data->pan_law) * 0.01f;
 
     int midi_event_pos = 0;
     register int f_i = 0;
@@ -223,10 +223,10 @@ static void v_mkchnl_run(
     int midi_event_pos = 0;
     int f_i = 0;
 
-    float f_vol_linear;
+    MKFLT f_vol_linear;
 
-    float f_gain = f_db_to_linear_fast((*plugin_data->gain) * 0.01f);
-    float f_pan_law = (*plugin_data->pan_law) * 0.01f;
+    MKFLT f_gain = f_db_to_linear_fast((*plugin_data->gain) * 0.01f);
+    MKFLT f_pan_law = (*plugin_data->pan_law) * 0.01f;
 
     while(f_i < sample_count)
     {

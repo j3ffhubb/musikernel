@@ -26,34 +26,34 @@ extern "C" {
 
 typedef struct
 {
-    float * buffer;
-    float read_head;
+    MKFLT * buffer;
+    MKFLT read_head;
     int buffer_size, read_head_int, write_head, first_run;
-    float last_time, last_pitch;
+    MKFLT last_time, last_pitch;
     int sample_count;
-    float sr, sample_count_f;
-    float rate;
-    float output0, output1;
+    MKFLT sr, sample_count_f;
+    MKFLT rate;
+    MKFLT output0, output1;
     t_pit_ratio pitch_ratio;
     t_audio_xfade xfade;
     t_adsr adsr;
 }t_glc_glitch_v2;
 
-void g_glc_glitch_v2_init(t_glc_glitch_v2*, float);
-void v_glc_glitch_v2_set(t_glc_glitch_v2*, float, float);
-void v_glc_glitch_v2_run(t_glc_glitch_v2*, float, float);
+void g_glc_glitch_v2_init(t_glc_glitch_v2*, MKFLT);
+void v_glc_glitch_v2_set(t_glc_glitch_v2*, MKFLT, MKFLT);
+void v_glc_glitch_v2_run(t_glc_glitch_v2*, MKFLT, MKFLT);
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-void g_glc_glitch_v2_init(t_glc_glitch_v2 * f_result, float a_sr)
+void g_glc_glitch_v2_init(t_glc_glitch_v2 * f_result, MKFLT a_sr)
 {
     f_result->buffer_size = (int)(a_sr * 0.25f);
 
     hpalloc((void**)&f_result->buffer,
-        sizeof(float) * (f_result->buffer_size + 100));
+        sizeof(MKFLT) * (f_result->buffer_size + 100));
 
     g_pit_ratio_init(&f_result->pitch_ratio);
     g_adsr_init(&f_result->adsr, a_sr);
@@ -80,7 +80,7 @@ void g_glc_glitch_v2_init(t_glc_glitch_v2 * f_result, float a_sr)
     f_result->sr = a_sr;
 }
 
-void v_glc_glitch_v2_set(t_glc_glitch_v2* a_glc, float a_time, float a_pitch)
+void v_glc_glitch_v2_set(t_glc_glitch_v2* a_glc, MKFLT a_time, MKFLT a_pitch)
 {
     if(a_glc->last_time != a_time)
     {
@@ -129,7 +129,7 @@ inline void v_glc_glitch_v2_release(t_glc_glitch_v2* a_glc)
     v_adsr_release(&a_glc->adsr);
 }
 
-void v_glc_glitch_v2_run(t_glc_glitch_v2* a_glc, float a_input0, float a_input1)
+void v_glc_glitch_v2_run(t_glc_glitch_v2* a_glc, MKFLT a_input0, MKFLT a_input1)
 {
     if(a_glc->write_head < a_glc->buffer_size)
     {
@@ -152,14 +152,14 @@ void v_glc_glitch_v2_run(t_glc_glitch_v2* a_glc, float a_input0, float a_input1)
     }
     else
     {
-        float f_pos = a_glc->read_head;
+        MKFLT f_pos = a_glc->read_head;
 
-        if(f_pos > (float)a_glc->write_head)
+        if(f_pos > (MKFLT)a_glc->write_head)
         {
-            f_pos = (float)a_glc->write_head;
+            f_pos = (MKFLT)a_glc->write_head;
         }
 
-        float f_output =
+        MKFLT f_output =
             f_cubic_interpolate_ptr_wrap(
                 a_glc->buffer, a_glc->sample_count, a_glc->read_head);
 

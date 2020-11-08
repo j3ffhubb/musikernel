@@ -23,14 +23,14 @@ extern "C" {
 
 typedef struct
 {
-    float bits, multiplier, recip;
+    MKFLT bits, multiplier, recip;
     int val0, val1;
-    float output0, output1;
+    MKFLT output0, output1;
 } t_lfi_lofi;
 
 t_lfi_lofi * g_lfi_lofi_get();
-void v_lfi_lofi_set(t_lfi_lofi*, float);
-void v_lfi_lofi_run(t_lfi_lofi*, float, float);
+void v_lfi_lofi_set(t_lfi_lofi*, MKFLT);
+void v_lfi_lofi_run(t_lfi_lofi*, MKFLT, MKFLT);
 
 void g_lfi_init(t_lfi_lofi * f_result)
 {
@@ -52,7 +52,7 @@ t_lfi_lofi * g_lfi_lofi_get()
     return f_result;
 }
 
-void v_lfi_lofi_set(t_lfi_lofi* a_lfi, float a_bits)
+void v_lfi_lofi_set(t_lfi_lofi* a_lfi, MKFLT a_bits)
 {
     if(a_lfi->bits != a_bits)
     {
@@ -62,13 +62,13 @@ void v_lfi_lofi_set(t_lfi_lofi* a_lfi, float a_bits)
     }
 }
 
-void v_lfi_lofi_run(t_lfi_lofi* a_lfi, float a_in0, float a_in1)
+void v_lfi_lofi_run(t_lfi_lofi* a_lfi, MKFLT a_in0, MKFLT a_in1)
 {
     a_lfi->val0 = (int)((a_lfi->multiplier) * a_in0);
     a_lfi->val1 = (int)((a_lfi->multiplier) * a_in1);
 
-    a_lfi->output0 = ((float)(a_lfi->val0)) * (a_lfi->recip);
-    a_lfi->output1 = ((float)(a_lfi->val1)) * (a_lfi->recip);
+    a_lfi->output0 = ((MKFLT)(a_lfi->val0)) * (a_lfi->recip);
+    a_lfi->output1 = ((MKFLT)(a_lfi->val1)) * (a_lfi->recip);
 }
 
 

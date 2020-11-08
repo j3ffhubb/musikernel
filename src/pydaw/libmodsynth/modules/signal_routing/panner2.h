@@ -20,7 +20,7 @@ extern "C" {
 
 typedef struct
 {
-    float gainL, gainR;
+    MKFLT gainL, gainR;
 }t_pn2_panner2;
 
 
@@ -34,7 +34,7 @@ void g_pn2_init(t_pn2_panner2 * self)
     self->gainR = 1.0f;
 }
 
-void v_pn2_set(t_pn2_panner2 * self, float a_pan, float a_law)
+void v_pn2_set(t_pn2_panner2 * self, MKFLT a_pan, MKFLT a_law)
 {
     if(a_pan == 0.0f)
     {

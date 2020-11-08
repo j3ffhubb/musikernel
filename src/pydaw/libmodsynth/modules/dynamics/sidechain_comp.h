@@ -27,9 +27,9 @@ extern "C" {
 
 typedef struct
 {
-    float pitch, ratio, thresh, wet, attack, release;
+    MKFLT pitch, ratio, thresh, wet, attack, release;
     t_state_variable_filter filter;
-    float output0, output1;
+    MKFLT output0, output1;
     t_enf2_env_follower env_follower;
     t_audio_xfade xfade;
     t_pkm_redux peak_tracker;
@@ -40,7 +40,7 @@ typedef struct
 #endif
 
 
-void g_scc_init(t_scc_sidechain_comp * self, float a_sr)
+void g_scc_init(t_scc_sidechain_comp * self, MKFLT a_sr)
 {
     g_enf_init(&self->env_follower, a_sr);
     g_axf_init(&self->xfade, -3.0f);
@@ -59,8 +59,8 @@ void g_scc_init(t_scc_sidechain_comp * self, float a_sr)
     g_pkm_redux_init(&self->peak_tracker, a_sr);
 }
 
-void v_scc_set(t_scc_sidechain_comp *self, float a_thresh, float a_ratio,
-    float a_attack, float a_release, float a_wet)
+void v_scc_set(t_scc_sidechain_comp *self, MKFLT a_thresh, MKFLT a_ratio,
+    MKFLT a_attack, MKFLT a_release, MKFLT a_wet)
 {
     self->thresh = a_thresh;
     self->ratio = a_ratio;
@@ -80,9 +80,9 @@ void v_scc_set(t_scc_sidechain_comp *self, float a_thresh, float a_ratio,
 }
 
 void v_scc_run_comp(t_scc_sidechain_comp *self,
-    float a_input0, float a_input1, float a_output0, float a_output1)
+    MKFLT a_input0, MKFLT a_input1, MKFLT a_output0, MKFLT a_output1)
 {
-    float f_gain;
+    MKFLT f_gain;
 
     v_enf_run(&self->env_follower,
         f_lms_max(f_lms_abs(a_input0), f_lms_abs(a_input1)));

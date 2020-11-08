@@ -24,11 +24,11 @@ extern "C" {
 
 typedef struct
 {
-    float output;
+    MKFLT output;
 }t_smoother_iir;
 
-inline void v_smr_iir_run(t_smoother_iir*, float);
-inline void v_smr_iir_run_fast(t_smoother_iir*, float);
+inline void v_smr_iir_run(t_smoother_iir*, MKFLT);
+inline void v_smr_iir_run_fast(t_smoother_iir*, MKFLT);
 
 #ifdef	__cplusplus
 }
@@ -38,11 +38,11 @@ inline void v_smr_iir_run_fast(t_smoother_iir*, float);
 
 /* inline void v_smr_iir_run(
  * t_smoother_iir *
- * a_smoother, float a_in)  //The input to be smoothed
+ * a_smoother, MKFLT a_in)  //The input to be smoothed
  *
  * Use t_smoother_iir->output as your new control value after running this
  */
-inline void v_smr_iir_run(t_smoother_iir * a_smoother, float a_in)
+inline void v_smr_iir_run(t_smoother_iir * a_smoother, MKFLT a_in)
 {
     a_smoother->output =
             f_remove_denormal((a_in * 0.01f) + ((a_smoother->output) * 0.99f));
@@ -50,11 +50,11 @@ inline void v_smr_iir_run(t_smoother_iir * a_smoother, float a_in)
 
 /* inline void v_smr_iir_run_fast(
  * t_smoother_iir *
- * a_smoother, float a_in)  //The input to be smoothed
+ * a_smoother, MKFLT a_in)  //The input to be smoothed
  *
  * Use t_smoother_iir->output as your new control value after running this
  */
-inline void v_smr_iir_run_fast(t_smoother_iir * a_smoother, float a_in)
+inline void v_smr_iir_run_fast(t_smoother_iir * a_smoother, MKFLT a_in)
 {
     a_smoother->output =
             f_remove_denormal((a_in * .2f) + ((a_smoother->output) * .8f));

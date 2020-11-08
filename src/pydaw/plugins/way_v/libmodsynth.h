@@ -56,15 +56,15 @@ typedef struct
 
 typedef struct
 {
-    float fm_osc_values[WAYV_OSC_COUNT];
-    float fm_last;
+    MKFLT fm_osc_values[WAYV_OSC_COUNT];
+    MKFLT fm_last;
 
-    float osc_linamp;
+    MKFLT osc_linamp;
     int osc_audible;
     int osc_on;
-    float osc_uni_spread;
-    float osc_fm[WAYV_OSC_COUNT];
-    float osc_macro_amp[2];
+    MKFLT osc_uni_spread;
+    MKFLT osc_fm[WAYV_OSC_COUNT];
+    MKFLT osc_macro_amp[2];
 
     t_osc_wav_unison osc_wavtable;
 
@@ -84,7 +84,7 @@ typedef struct
     t_adsr adsr_main;
     /*This corresponds to the current sample being processed on this voice.
      * += this to the output buffer when finished.*/
-    float current_sample;
+    MKFLT current_sample;
     t_ramp_env glide_env;
     t_adsr adsr_amp;
     t_adsr adsr_filter;
@@ -92,46 +92,46 @@ typedef struct
 
     int adsr_lfo_on;
     t_lfs_lfo lfo1;
-    float lfo_amount_output, lfo_amp_output, lfo_pitch_output;
+    MKFLT lfo_amount_output, lfo_amp_output, lfo_pitch_output;
     t_adsr adsr_lfo;
     fp_noise_func_ptr noise_func_ptr;
 
-    float note_f;
+    MKFLT note_f;
     int note;
 
     t_smoother_linear glide_smoother;
 
     //base pitch for all oscillators, to avoid redundant calculations
-    float base_pitch;
-    float target_pitch;
+    MKFLT base_pitch;
+    MKFLT target_pitch;
     //For simplicity, this is used whether glide is turned on or not
-    float last_pitch;
+    MKFLT last_pitch;
 
     int perc_env_on;
     t_pnv_perc_env perc_env;
 
     t_wayv_osc osc[WAYV_OSC_COUNT];
 
-    float noise_amp;
-    float noise_linamp;
+    MKFLT noise_amp;
+    MKFLT noise_linamp;
     t_white_noise white_noise1;
-    float noise_sample;
+    MKFLT noise_sample;
     t_adsr adsr_noise;
     int adsr_noise_on;
     int noise_prefx;
 
     int adsr_prefx;
 
-    float velocity_track;
-    float keyboard_track;
+    MKFLT velocity_track;
+    MKFLT keyboard_track;
 
     t_wayv_pfx_group effects[WAYV_MODULAR_POLYFX_COUNT];
 
-    float modulex_current_sample[2];
-    float * modulator_outputs[WAYV_MODULATOR_COUNT];
+    MKFLT modulex_current_sample[2];
+    MKFLT * modulator_outputs[WAYV_MODULATOR_COUNT];
 
-    float amp;
-    float master_vol_lin;
+    MKFLT amp;
+    MKFLT master_vol_lin;
 
     int active_polyfx[WAYV_MODULAR_POLYFX_COUNT];
     int active_polyfx_count;
@@ -148,16 +148,16 @@ typedef struct
     [(WAYV_CONTROLS_PER_MOD_EFFECT * WAYV_MODULATOR_COUNT)];
 
     //The value of the mod_matrix knob, multiplied by .01
-    float polyfx_mod_matrix_values[WAYV_MODULAR_POLYFX_COUNT]
+    MKFLT polyfx_mod_matrix_values[WAYV_MODULAR_POLYFX_COUNT]
     [(WAYV_CONTROLS_PER_MOD_EFFECT * WAYV_MODULATOR_COUNT)];
 
 }t_wayv_poly_voice  __attribute__((aligned(16)));
 
-t_wayv_poly_voice * g_wayv_poly_init(float a_sr, t_wayv_mono_modules* a_mono);
+t_wayv_poly_voice * g_wayv_poly_init(MKFLT a_sr, t_wayv_mono_modules* a_mono);
 
 /*initialize all of the modules in an instance of poly_voice*/
 
-t_wayv_poly_voice * g_wayv_poly_init(float a_sr, t_wayv_mono_modules* a_mono)
+t_wayv_poly_voice * g_wayv_poly_init(MKFLT a_sr, t_wayv_mono_modules* a_mono)
 {
     t_wayv_poly_voice * f_voice;
     hpalloc((void**)&f_voice, sizeof(t_wayv_poly_voice));
@@ -288,11 +288,11 @@ void v_wayv_poly_note_off(t_wayv_poly_voice * a_voice, int a_fast)
 
 }
 
-t_wayv_mono_modules * v_wayv_mono_init(float);
+t_wayv_mono_modules * v_wayv_mono_init(MKFLT);
 
 
 /*Initialize any modules that will be run monophonically*/
-t_wayv_mono_modules * v_wayv_mono_init(float a_sr)
+t_wayv_mono_modules * v_wayv_mono_init(MKFLT a_sr)
 {
     t_wayv_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_wayv_mono_modules));

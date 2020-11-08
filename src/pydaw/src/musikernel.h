@@ -29,7 +29,7 @@ GNU General Public License for more details.
     #define t_midi_device_list void
 
     void midiPoll(void * arg){}
-    void midiDeviceRead(void * arg1, float arg2, int arg3){}
+    void midiDeviceRead(void * arg1, MKFLT arg2, int arg3){}
 #endif
 
 #define MAX_WORKER_THREADS 8
@@ -108,9 +108,9 @@ int MASTER_OUT_R = 1;
 
 int MK_OFFLINE_RENDER = 0;
 volatile int exiting = 0;
-float MASTER_VOL __attribute__((aligned(16))) = 1.0f;
+MKFLT MASTER_VOL __attribute__((aligned(16))) = 1.0f;
 
-float **pluginOutputBuffers;
+MKFLT **pluginOutputBuffers;
 
 #ifdef	__cplusplus
 extern "C" {
@@ -132,10 +132,10 @@ typedef struct
     long current_sample;
     double start_beat;
     double end_beat;
-    float period_inc_beats;
-    float * buffers[2];
-    float * sc_buffers[2];
-    float * input_buffer;
+    MKFLT period_inc_beats;
+    MKFLT * buffers[2];
+    MKFLT * sc_buffers[2];
+    MKFLT * input_buffer;
     int atm_tick_count;
     t_atm_tick atm_ticks[ATM_TICK_BUFFER_SIZE];
 }t_sample_period;
@@ -151,15 +151,15 @@ typedef struct
     int type;  //0:Loop,1:TempoChange
     double beat;
     double start_beat;  //currently only for the loop event
-    float tempo;
+    MKFLT tempo;
 }t_mk_seq_event;
 
 typedef struct
 {
     int is_looping;
-    float tempo;
-    float playback_inc;
-    float samples_per_beat;
+    MKFLT tempo;
+    MKFLT playback_inc;
+    MKFLT samples_per_beat;
     t_sample_period period;
 }t_mk_seq_event_period;
 
@@ -178,9 +178,9 @@ typedef struct
     // Each tick of the automation clock happens in this many cycles
     double atm_clock_samples;
     double atm_pos;
-    float tempo;
-    float playback_inc;
-    float samples_per_beat;
+    MKFLT tempo;
+    MKFLT playback_inc;
+    MKFLT samples_per_beat;
     t_sample_period period;
 }t_mk_seq_event_list;
 
@@ -214,8 +214,8 @@ typedef struct
     t_pydaw_plugin * plugins[MAX_PLUGIN_TOTAL_COUNT];
     int track_num;
     t_pkm_peak_meter * peak_meter;
-    float ** buffers;
-    float ** sc_buffers;
+    MKFLT ** buffers;
+    MKFLT ** sc_buffers;
     int sc_buffers_dirty;
     int channels;
     pthread_spinlock_t lock;
@@ -235,7 +235,7 @@ typedef struct
 
 typedef struct
 {
-    void (*run)(int sample_count, float **output, float *a_input_buffers);
+    void (*run)(int sample_count, MKFLT **output, MKFLT *a_input_buffers);
     void (*osc_send)(t_osc_send_data*);
     void (*audio_inputs)();
     void (*mix)();
@@ -243,9 +243,9 @@ typedef struct
 
 typedef struct
 {
-    float sample_rate;
+    MKFLT sample_rate;
     int current_host;
-    char padding[CACHE_LINE_SIZE - sizeof(float) - sizeof(int)];
+    char padding[CACHE_LINE_SIZE - sizeof(MKFLT) - sizeof(int)];
 }t_mk_thread_storage __attribute__((aligned(CACHE_LINE_SIZE)));
 
 typedef struct
@@ -254,7 +254,7 @@ typedef struct
     t_mk_host * current_host;
     t_mk_host hosts[MK_HOST_COUNT];
     t_wav_pool * wav_pool;
-    float *out;  // From Portaudio's callback
+    float* out;  // From Portaudio's callback
     int sample_count;
     pthread_spinlock_t main_lock;
 
@@ -272,9 +272,9 @@ typedef struct
     //set from the audio device buffer size every time the main loop is called.
     t_wav_pool_item * preview_wav_item;
     t_pydaw_audio_item * preview_audio_item;
-    float preview_start; //0.0f to 1.0f
+    MKFLT preview_start; //0.0f to 1.0f
     int is_previewing;  //Set this to self->ab_mode on playback
-    float preview_amp_lin;
+    MKFLT preview_amp_lin;
     int preview_max_sample_count;
     t_pyaudio_input * audio_inputs;
     pthread_mutex_t audio_inputs_mutex;
@@ -325,9 +325,9 @@ typedef struct
     char padding[4];
 }t_pytrack_routing;
 
-void g_musikernel_get(float, t_midi_device_list*);
-t_pytrack * g_pytrack_get(int, float);
-inline void v_pydaw_zero_buffer(float**, int);
+void g_musikernel_get(MKFLT, t_midi_device_list*);
+t_pytrack * g_pytrack_get(int, MKFLT);
+inline void v_pydaw_zero_buffer(MKFLT**, int);
 double v_pydaw_print_benchmark(char * a_message,
         struct timespec a_start, struct timespec a_finish);
 void * v_pydaw_audio_recording_thread(void* a_arg);
@@ -339,7 +339,7 @@ void v_pytrack_routing_set(t_pytrack_routing *, int, int);
 void v_pytrack_routing_free(t_pytrack_routing *);
 void v_pydaw_set_host(int);
 
-void v_mk_set_tempo(t_mk_seq_event_list*, float);
+void v_mk_set_tempo(t_mk_seq_event_list*, MKFLT);
 
 #ifdef	__cplusplus
 }
@@ -440,7 +440,7 @@ void v_create_sample_graph(t_wav_pool_item * self)
         (int)self->sample_rate);
     fwrite(str_buff, 1, len, f_sg);
 
-    float f_length = (float)self->length / (float)self->sample_rate;
+    MKFLT f_length = (MKFLT)self->length / (MKFLT)self->sample_rate;
 
     len = snprintf(str_buff, 2048, "meta|length|%f\n", f_length);
     fwrite(str_buff, 1, len, f_sg);
@@ -453,7 +453,7 @@ void v_create_sample_graph(t_wav_pool_item * self)
     }
     else if(f_length < 20.0)
     {
-        f_peak_size = (int)((float)self->sample_rate * 0.005);
+        f_peak_size = (int)((MKFLT)self->sample_rate * 0.005);
     }
     else
     {
@@ -462,14 +462,14 @@ void v_create_sample_graph(t_wav_pool_item * self)
 
     int f_count = 0;
     int f_i, f_i2, f_i3;
-    float f_sample;
+    MKFLT f_sample;
 
     for(f_i2 = 0; f_i2 < self->length; f_i2 += f_peak_size)
     {
         for(f_i = 0; f_i < self->channels; ++f_i)
         {
-            float f_high = 0.01;
-            float f_low = -0.01;
+            MKFLT f_high = 0.01;
+            MKFLT f_low = -0.01;
 
             int f_stop = f_i2 + f_peak_size;
             if(f_stop > self->length)
@@ -513,18 +513,21 @@ void v_default_mix()
 {
     register int f_i;
     int framesPerBuffer = musikernel->sample_count;
-    float * out = musikernel->out;
+    float* out = musikernel->out;
 
     if(OUTPUT_CH_COUNT > 2)
     {
         int f_i2 = 0;
-        memset(out, 0,
-            sizeof(float) * framesPerBuffer * OUTPUT_CH_COUNT);
+        memset(
+            out,
+            0,
+            sizeof(float) * framesPerBuffer * OUTPUT_CH_COUNT
+        );
 
         for(f_i = 0; f_i < framesPerBuffer; ++f_i)
         {
-            out[f_i2 + MASTER_OUT_L] = pluginOutputBuffers[0][f_i];
-            out[f_i2 + MASTER_OUT_R] = pluginOutputBuffers[1][f_i];
+            out[f_i2 + MASTER_OUT_L] = (float)pluginOutputBuffers[0][f_i];
+            out[f_i2 + MASTER_OUT_R] = (float)pluginOutputBuffers[1][f_i];
             f_i2 += OUTPUT_CH_COUNT;
         }
     }
@@ -532,9 +535,9 @@ void v_default_mix()
     {
         for(f_i = 0; f_i < framesPerBuffer; ++f_i)
         {
-            *out = pluginOutputBuffers[0][f_i];  // left
+            *out = (float)pluginOutputBuffers[0][f_i];  // left
             ++out;
-            *out = pluginOutputBuffers[1][f_i];  // right
+            *out = (float)pluginOutputBuffers[1][f_i];  // right
             ++out;
         }
     }
@@ -586,11 +589,11 @@ void g_seq_event_result_init(t_mk_seq_event_result * self)
 }
 
 void v_sample_period_split(
-        t_sample_period_split* self, float ** a_buffers,
-        float ** a_sc_buffers, int a_sample_count,
+        t_sample_period_split* self, MKFLT ** a_buffers,
+        MKFLT ** a_sc_buffers, int a_sample_count,
         double a_period_start_beat, double a_period_end_beat,
         double a_event1_beat, double a_event2_beat, long a_current_sample,
-        float * a_input_buffer, int a_input_count)
+        MKFLT * a_input_buffer, int a_input_count)
 {
     self->periods[0].current_sample = a_current_sample;
 
@@ -784,7 +787,7 @@ void pydaw_osc_error(int num, const char *msg, const char *path)
 	    num, path, msg);
 }
 
-void g_musikernel_get(float a_sr, t_midi_device_list * a_midi_devices)
+void g_musikernel_get(MKFLT a_sr, t_midi_device_list * a_midi_devices)
 {
     clalloc((void**)&musikernel, sizeof(t_musikernel));
     musikernel->wav_pool = g_wav_pool_get(a_sr);
@@ -957,7 +960,7 @@ inline double v_pydaw_print_benchmark(char * a_message,
 }
 #endif
 
-inline void v_pydaw_zero_buffer(float ** a_buffers, int a_count)
+inline void v_pydaw_zero_buffer(MKFLT ** a_buffers, int a_count)
 {
     register int f_i2 = 0;
 
@@ -1027,7 +1030,7 @@ void v_pydaw_open_track(t_pytrack * a_track, char * a_tracks_folder,
     }
 }
 
-t_pytrack * g_pytrack_get(int a_track_num, float a_sr)
+t_pytrack * g_pytrack_get(int a_track_num, MKFLT a_sr)
 {
     int f_i = 0;
 
@@ -1044,16 +1047,16 @@ t_pytrack * g_pytrack_get(int a_track_num, float a_sr)
 
     pthread_spin_init(&f_result->lock, 0);
 
-    hpalloc((void**)&f_result->buffers, (sizeof(float*) * f_result->channels));
+    hpalloc((void**)&f_result->buffers, (sizeof(MKFLT*) * f_result->channels));
     hpalloc((void**)&f_result->sc_buffers,
-        (sizeof(float*) * f_result->channels));
+        (sizeof(MKFLT*) * f_result->channels));
 
     while(f_i < f_result->channels)
     {
         clalloc((void**)&f_result->buffers[f_i],
-            (sizeof(float) * FRAMES_PER_BUFFER));
+            (sizeof(MKFLT) * FRAMES_PER_BUFFER));
         clalloc((void**)&f_result->sc_buffers[f_i],
-            (sizeof(float) * FRAMES_PER_BUFFER));
+            (sizeof(MKFLT) * FRAMES_PER_BUFFER));
         ++f_i;
     }
 
@@ -1190,12 +1193,12 @@ void v_stop_record_audio()
 
             if(f_frames)
             {
-                f_count =sf_writef_float(f_ai->sndfile,
+                f_count =mk_write_audio(f_ai->sndfile,
                     f_ai->rec_buffers[(f_ai->current_buffer)],
                     ((f_ai->buffer_iterator[(f_ai->current_buffer)])
                     / f_ai->channels));
 
-                printf("sf_writef_float returned %i\n", f_count);
+                printf("mk_write_audio returned %i\n", f_count);
             }
 
             sf_close(f_ai->sndfile);
@@ -1258,10 +1261,10 @@ void * v_pydaw_audio_recording_thread(void* a_arg)
                         "%i frames, %i channels for input %i\n",
                         f_frames, f_ai->channels, f_i);
 
-                    f_count = sf_writef_float(f_ai->sndfile,
+                    f_count = mk_write_audio(f_ai->sndfile,
                         f_ai->rec_buffers[f_ai->buffer_to_flush], f_frames);
 
-                    printf("sf_writef_float returned %i\n", f_count);
+                    printf("mk_write_audio returned %i\n", f_count);
 
                     f_ai->flush_last_buffer_pending = 0;
                     f_ai->buffer_iterator[f_ai->buffer_to_flush] = 0;
@@ -1280,11 +1283,11 @@ void * v_pydaw_audio_recording_thread(void* a_arg)
     return (void*)1;
 }
 
-void v_audio_input_run(int f_index, float ** output, float ** sc_output,
-        float * a_input, int sample_count, int * a_sc_dirty)
+void v_audio_input_run(int f_index, MKFLT ** output, MKFLT ** sc_output,
+        MKFLT * a_input, int sample_count, int * a_sc_dirty)
 {
     int f_i2;
-    float f_tmp_sample;
+    MKFLT f_tmp_sample;
     t_pyaudio_input * f_ai = &musikernel->audio_inputs[f_index];
 
     int f_output_mode = f_ai->output_mode;
@@ -1516,15 +1519,15 @@ inline double f_bpm_to_seconds_per_beat(double a_tempo)
 }
 
 inline double f_pydaw_samples_to_beat_count(int a_sample_count, double a_tempo,
-        float a_sr)
+        MKFLT a_sr)
 {
     double f_seconds_per_beat = f_bpm_to_seconds_per_beat(a_tempo);
     double f_seconds = (double)(a_sample_count) / a_sr;
     return f_seconds / f_seconds_per_beat;
 }
 
-inline int i_beat_count_to_samples(double a_beat_count, float a_tempo,
-        float a_sr)
+inline int i_beat_count_to_samples(double a_beat_count, MKFLT a_tempo,
+        MKFLT a_sr)
 {
     double f_seconds = f_bpm_to_seconds_per_beat(a_tempo) * a_beat_count;
     return (int)(f_seconds * a_sr);
@@ -1532,7 +1535,7 @@ inline int i_beat_count_to_samples(double a_beat_count, float a_tempo,
 
 
 inline void v_buffer_mix(int a_count,
-    float ** __restrict__ a_buffer_src, float ** __restrict__ a_buffer_dest)
+    MKFLT ** __restrict__ a_buffer_src, MKFLT ** __restrict__ a_buffer_dest)
 {
     register int f_i2 = 0;
 
@@ -1556,7 +1559,7 @@ void v_wait_for_threads()
 }
 
 void g_pynote_init(t_pydaw_seq_event * f_result, int a_note, int a_vel,
-        float a_start, float a_length)
+        MKFLT a_start, MKFLT a_length)
 {
     f_result->type = PYDAW_EVENT_NOTEON;
     f_result->length = a_length;
@@ -1566,7 +1569,7 @@ void g_pynote_init(t_pydaw_seq_event * f_result, int a_note, int a_vel,
 }
 
 t_pydaw_seq_event * g_pynote_get(int a_note, int a_vel,
-        float a_start, float a_length)
+        MKFLT a_start, MKFLT a_length)
 {
     t_pydaw_seq_event * f_result =
         (t_pydaw_seq_event*)malloc(sizeof(t_pydaw_seq_event));
@@ -1575,7 +1578,7 @@ t_pydaw_seq_event * g_pynote_get(int a_note, int a_vel,
 }
 
 void g_pycc_init(t_pydaw_seq_event * f_result, int a_cc_num,
-    float a_cc_val, float a_start)
+    MKFLT a_cc_val, MKFLT a_start)
 {
     f_result->type = PYDAW_EVENT_CONTROLLER;
     f_result->param = a_cc_num;
@@ -1583,7 +1586,7 @@ void g_pycc_init(t_pydaw_seq_event * f_result, int a_cc_num,
     f_result->start = a_start;
 }
 
-t_pydaw_seq_event * g_pycc_get(int a_cc_num, float a_cc_val, float a_start)
+t_pydaw_seq_event * g_pycc_get(int a_cc_num, MKFLT a_cc_val, MKFLT a_start)
 {
     t_pydaw_seq_event * f_result =
         (t_pydaw_seq_event*)malloc(sizeof(t_pydaw_seq_event));
@@ -1591,15 +1594,15 @@ t_pydaw_seq_event * g_pycc_get(int a_cc_num, float a_cc_val, float a_start)
     return f_result;
 }
 
-void g_pypitchbend_init(t_pydaw_seq_event * f_result, float a_start,
-    float a_value)
+void g_pypitchbend_init(t_pydaw_seq_event * f_result, MKFLT a_start,
+    MKFLT a_value)
 {
     f_result->type = PYDAW_EVENT_PITCHBEND;
     f_result->start = a_start;
     f_result->value = a_value;
 }
 
-t_pydaw_seq_event * g_pypitchbend_get(float a_start, float a_value)
+t_pydaw_seq_event * g_pypitchbend_get(MKFLT a_start, MKFLT a_value)
 {
     t_pydaw_seq_event * f_result =
         (t_pydaw_seq_event*)malloc(sizeof(t_pydaw_seq_event));
@@ -1648,13 +1651,13 @@ void v_mk_set_time_params(t_sample_period * self)
 
 void v_mk_seq_event_result_set_default(t_mk_seq_event_result * self,
         t_mk_seq_event_list * a_list,
-        float ** a_buffers, float * a_input_buffers, int a_input_count,
+        MKFLT ** a_buffers, MKFLT * a_input_buffers, int a_input_count,
         int a_sample_count, long a_current_sample)
 {
     self->count = 1;
     t_sample_period * f_period = &self->sample_periods[0].period;
     f_period->period_inc_beats =
-        ((a_list->playback_inc) * ((float)(a_sample_count)));
+        ((a_list->playback_inc) * ((MKFLT)(a_sample_count)));
     v_mk_set_time_params(f_period);
     f_period->current_sample = a_current_sample;
     f_period->sample_count = a_sample_count;
@@ -1663,11 +1666,11 @@ void v_mk_seq_event_result_set_default(t_mk_seq_event_result * self,
     f_period->input_buffer = a_input_buffers;
 }
 
-void v_set_sample_period(t_sample_period * self, float a_playback_inc,
-        float ** a_buffers, float ** a_sc_buffers, float * a_input_buffers,
+void v_set_sample_period(t_sample_period * self, MKFLT a_playback_inc,
+        MKFLT ** a_buffers, MKFLT ** a_sc_buffers, MKFLT * a_input_buffers,
         int a_sample_count, long a_current_sample)
 {
-    self->period_inc_beats = a_playback_inc * ((float)(a_sample_count));
+    self->period_inc_beats = a_playback_inc * ((MKFLT)(a_sample_count));
 
     self->current_sample = a_current_sample;
     self->sample_count = a_sample_count;
@@ -1688,9 +1691,9 @@ void v_set_sample_period(t_sample_period * self, float a_playback_inc,
     self->input_buffer = a_input_buffers;
 }
 
-void v_mk_set_tempo(t_mk_seq_event_list * self, float a_tempo)
+void v_mk_set_tempo(t_mk_seq_event_list * self, MKFLT a_tempo)
 {
-    float f_sample_rate = musikernel->thread_storage[0].sample_rate;
+    MKFLT f_sample_rate = musikernel->thread_storage[0].sample_rate;
     self->tempo = a_tempo;
     self->playback_inc = (1.0f / f_sample_rate) / (60.0f / a_tempo);
     self->samples_per_beat = (f_sample_rate) / (a_tempo / 60.0f);
@@ -1730,7 +1733,7 @@ void v_mk_set_playback_pos(
 
 void v_mk_seq_event_list_set(t_mk_seq_event_list * self,
         t_mk_seq_event_result * a_result,
-        float ** a_buffers, float * a_input_buffers, int a_input_count,
+        MKFLT ** a_buffers, MKFLT * a_input_buffers, int a_input_count,
         int a_sample_count, long a_current_sample, int a_loop_mode)
 {
     int f_i;
@@ -1858,7 +1861,7 @@ void v_mk_seq_event_list_set(t_mk_seq_event_list * self,
                 f_tmp_period->current_sample);
 
             f_period->period.period_inc_beats = ((f_period->playback_inc) *
-                ((float)(f_tmp_period->sample_count)));
+                ((MKFLT)(f_tmp_period->sample_count)));
 
             if(f_loop_start >= 0.0)
             {
@@ -1896,7 +1899,7 @@ void v_mk_seq_event_list_set(t_mk_seq_event_list * self,
                 f_tmp_period->current_sample);
 
             f_period->period.period_inc_beats = ((f_period->playback_inc) *
-                ((float)(f_tmp_period->sample_count)));
+                ((MKFLT)(f_tmp_period->sample_count)));
 
             f_period->period.start_beat = f_tmp_period->start_beat;
 
@@ -1925,7 +1928,7 @@ void v_mk_seq_event_list_set(t_mk_seq_event_list * self,
                 }
 
                 f_period->period.period_inc_beats = ((f_period->playback_inc) *
-                    ((float)(f_tmp_period->sample_count)));
+                    ((MKFLT)(f_tmp_period->sample_count)));
                 f_period->period.end_beat = f_period->period.start_beat +
                     f_period->period.period_inc_beats;
             }
@@ -1960,7 +1963,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
         int f_plugin_uid = atoi(f_val_arr->array[0]);
 
         int f_port = atoi(f_val_arr->array[1]);
-        float f_value = atof(f_val_arr->array[2]);
+        MKFLT f_value = atof(f_val_arr->array[2]);
 
         t_pydaw_plugin * f_instance;
         pthread_spin_lock(&musikernel->main_lock);
@@ -2011,8 +2014,8 @@ void v_mk_configure(const char* a_key, const char* a_value)
         t_1d_char_array * f_val_arr = c_split_str(a_value, '|', 2,
                 PYDAW_SMALL_STRING);
         int f_index = atoi(f_val_arr->array[0]);
-        float f_vol = atof(f_val_arr->array[1]);
-        float f_vol_linear = f_db_to_linear_fast(f_vol);
+        MKFLT f_vol = atof(f_val_arr->array[1]);
+        MKFLT f_vol_linear = f_db_to_linear_fast(f_vol);
 
         g_free_1d_char_array(f_val_arr);
 
@@ -2084,9 +2087,9 @@ void v_mk_configure(const char* a_key, const char* a_value)
         v_iterate_2d_char_array(f_arr);
         strcpy(f_out_file, f_arr->current_str);
         v_iterate_2d_char_array(f_arr);
-        float f_start = atof(f_arr->current_str);
+        MKFLT f_start = atof(f_arr->current_str);
         v_iterate_2d_char_array(f_arr);
-        float f_end = atof(f_arr->current_str);
+        MKFLT f_end = atof(f_arr->current_str);
 
         v_pydaw_rate_envelope(f_in_file, f_out_file, f_start, f_end);
 
@@ -2122,9 +2125,9 @@ void v_mk_configure(const char* a_key, const char* a_value)
         v_iterate_2d_char_array(f_arr);
         strcpy(f_out_file, f_arr->current_str);
         v_iterate_2d_char_array(f_arr);
-        float f_start = atof(f_arr->current_str);
+        MKFLT f_start = atof(f_arr->current_str);
         v_iterate_2d_char_array(f_arr);
-        float f_end = atof(f_arr->current_str);
+        MKFLT f_end = atof(f_arr->current_str);
 
         v_pydaw_pitch_envelope(f_in_file, f_out_file, f_start, f_end);
 
@@ -2159,7 +2162,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
                 g_wav_pool_item_get(f_uid, f_old->path,
                 musikernel->wav_pool->sample_rate);
 
-        float * f_old_samples[2];
+        MKFLT * f_old_samples[2];
         f_old_samples[0] = f_old->samples[0];
         f_old_samples[1] = f_old->samples[1];
 

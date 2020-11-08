@@ -23,11 +23,11 @@ extern "C" {
 
 typedef struct
 {
-    float output;   //range:  0 to 1
+    MKFLT output;   //range:  0 to 1
 }t_osc_core;
 
 
-void v_run_osc(t_osc_core *, float);
+void v_run_osc(t_osc_core *, MKFLT);
 t_osc_core * g_get_osc_core();
 void v_osc_core_free(t_osc_core *);
 
@@ -54,11 +54,11 @@ void v_osc_core_free(t_osc_core * a_osc)
 
 /* void v_run_osc(
  * t_osc_core *a_core,
- * float a_inc) //The increment to run the oscillator by.
+ * MKFLT a_inc) //The increment to run the oscillator by.
  * The oscillator will increment until it reaches 1,
  * then resets to (value - 1), for each oscillation
  */
-void v_run_osc(t_osc_core *a_core, float a_inc)
+void v_run_osc(t_osc_core *a_core, MKFLT a_inc)
 {
     a_core->output = (a_core->output) + a_inc;
 
@@ -68,7 +68,7 @@ void v_run_osc(t_osc_core *a_core, float a_inc)
     }
 }
 
-int v_run_osc_sync(t_osc_core *a_core, float a_inc)
+int v_run_osc_sync(t_osc_core *a_core, MKFLT a_inc)
 {
     a_core->output += a_inc;
 

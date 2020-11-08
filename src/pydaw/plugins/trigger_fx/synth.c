@@ -56,7 +56,7 @@ static void v_triggerfx_on_stop(PYFX_Handle instance)
 }
 
 static void v_triggerfx_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     if(a_is_sidechain)
     {
@@ -135,14 +135,14 @@ static void v_triggerfx_load(PYFX_Handle instance,
 }
 
 static void v_triggerfx_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_triggerfx *plugin_data = (t_triggerfx*)Instance;
     plugin_data->port_table[a_port] = a_value;
 }
 
 static inline void v_triggerfx_run_gate(t_triggerfx *plugin_data,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     v_sml_run(&plugin_data->mono_modules->gate_wet_smoother,
             *plugin_data->gate_wet * 0.01f);
@@ -153,7 +153,7 @@ static inline void v_triggerfx_run_gate(t_triggerfx *plugin_data,
 }
 
 static inline void v_triggerfx_run_glitch(t_triggerfx *plugin_data,
-        float a_in0, float a_in1)
+        MKFLT a_in0, MKFLT a_in1)
 {
     v_sml_run(&plugin_data->mono_modules->glitch_time_smoother,
             *plugin_data->glitch_time * 0.01f);
@@ -193,8 +193,8 @@ static void v_triggerfx_process_midi_event(
                     TRIGGERFX_EVENT_GATE_ON;
             plugin_data->midi_event_ticks[plugin_data->midi_event_count] =
                     a_event->tick;
-            float f_db = (0.283464567f *  // 1.0f / 127.0f
-                ((float)a_event->velocity)) - 28.3464567f;
+            MKFLT f_db = (0.283464567f *  // 1.0f / 127.0f
+                ((MKFLT)a_event->velocity)) - 28.3464567f;
             plugin_data->midi_event_values[plugin_data->midi_event_count] =
                 f_db_to_linear_fast(f_db);
 
@@ -206,8 +206,8 @@ static void v_triggerfx_process_midi_event(
                     TRIGGERFX_EVENT_GLITCH_ON;
             plugin_data->midi_event_ticks[plugin_data->midi_event_count] =
                     a_event->tick;
-            float f_db = (0.283464567f *  // 1.0f / 127.0f
-                ((float)a_event->velocity)) - 28.3464567f;
+            MKFLT f_db = (0.283464567f *  // 1.0f / 127.0f
+                ((MKFLT)a_event->velocity)) - 28.3464567f;
             plugin_data->midi_event_values[plugin_data->midi_event_count] =
                 f_db_to_linear_fast(f_db);
 

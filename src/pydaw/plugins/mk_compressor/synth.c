@@ -39,7 +39,7 @@ static void v_mk_comp_on_stop(PYFX_Handle instance)
 }
 
 static void v_mk_comp_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     t_mk_comp *plugin = (t_mk_comp*)instance;
 
@@ -112,7 +112,7 @@ static void v_mk_comp_load(PYFX_Handle instance,
 }
 
 static void v_mk_comp_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_mk_comp *plugin_data = (t_mk_comp*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -151,7 +151,7 @@ static void v_mk_comp_run(
     int midi_event_pos = 0;
     int f_is_rms = (int)(*plugin_data->mode);
     t_cmp_compressor * f_cmp = &plugin_data->mono_modules->compressor;
-    float f_gain = f_db_to_linear_fast((*plugin_data->gain) * 0.1f);
+    MKFLT f_gain = f_db_to_linear_fast((*plugin_data->gain) * 0.1f);
     plugin_data->midi_event_count = 0;
 
     for(f_i = 0; f_i < event_count; ++f_i)

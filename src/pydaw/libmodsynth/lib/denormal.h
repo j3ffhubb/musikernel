@@ -18,18 +18,18 @@ GNU General Public License for more details.
 extern "C" {
 #endif
 
-inline float f_remove_denormal(float);
+inline MKFLT f_remove_denormal(MKFLT);
 
 #ifdef	__cplusplus
 }
 #endif
 
-/* inline float f_remove_denormal(float a_input)
+/* inline MKFLT f_remove_denormal(MKFLT a_input)
  *
  * Prevent recursive modules like filters and feedback delays from
  * consuming too much CPU
  */
-inline float f_remove_denormal(float a_input)
+inline MKFLT f_remove_denormal(MKFLT a_input)
 {
     if((a_input > 1.0e-15) || (a_input < -1.0e-15))
     {

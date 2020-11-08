@@ -22,20 +22,20 @@ extern "C" {
 
 typedef struct st_scl_soft_clipper
 {
-    float threshold_db;
-    float threshold_linear, threshold_linear_neg;
-    float amount;
-    float output0;
-    float output1;
-    float temp;
+    MKFLT threshold_db;
+    MKFLT threshold_linear, threshold_linear_neg;
+    MKFLT amount;
+    MKFLT output0;
+    MKFLT output1;
+    MKFLT temp;
     t_amp * amp_ptr;
 }t_soft_clipper;
 
-void v_scl_set(t_soft_clipper*,float,float);
-void v_scl_run(t_soft_clipper*,float,float);
+void v_scl_set(t_soft_clipper*,MKFLT,MKFLT);
+void v_scl_run(t_soft_clipper*,MKFLT,MKFLT);
 t_soft_clipper * g_scl_get();
 
-void v_scl_set(t_soft_clipper* a_scl, float a_threshold_db, float a_amount)
+void v_scl_set(t_soft_clipper* a_scl, MKFLT a_threshold_db, MKFLT a_amount)
 {
     if(a_threshold_db != (a_scl->threshold_db))
     {
@@ -48,7 +48,7 @@ void v_scl_set(t_soft_clipper* a_scl, float a_threshold_db, float a_amount)
     a_scl->amount = a_amount;
 }
 
-void v_scl_run(t_soft_clipper* a_scl,float a_in0, float a_in1)
+void v_scl_run(t_soft_clipper* a_scl,MKFLT a_in0, MKFLT a_in1)
 {
     if(a_in0 > (a_scl->threshold_linear))
     {

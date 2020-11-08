@@ -27,41 +27,41 @@ extern "C" {
 #define OSC_UNISON_MAX_VOICES 7
 
 //Used to switch between values, uses much less CPU than a switch statement
-typedef float (*fp_get_osc_func_ptr)(t_osc_core*);
+typedef MKFLT (*fp_get_osc_func_ptr)(t_osc_core*);
 
 typedef struct
 {
-    float sr_recip;
+    MKFLT sr_recip;
     //Set this to the max number of voices, not to exceed OSC_UNISON_MAX_VOICES
     int voice_count;
     fp_get_osc_func_ptr osc_type;
-    float bottom_pitch;
-    float pitch_inc;
-    float voice_inc [OSC_UNISON_MAX_VOICES];
+    MKFLT bottom_pitch;
+    MKFLT pitch_inc;
+    MKFLT voice_inc [OSC_UNISON_MAX_VOICES];
     t_osc_core osc_cores [OSC_UNISON_MAX_VOICES];
     //Restart the oscillators at the same phase on each note-on
-    float phases [OSC_UNISON_MAX_VOICES];
-    float uni_spread;
+    MKFLT phases [OSC_UNISON_MAX_VOICES];
+    MKFLT uni_spread;
     //Set this with unison voices to prevent excessive volume
-    float last_pitch;
-    float adjusted_amp;
-    float current_sample;  //current output sample for the entire oscillator
+    MKFLT last_pitch;
+    MKFLT adjusted_amp;
+    MKFLT current_sample;  //current output sample for the entire oscillator
     int is_resetting;  //For oscillator sync
 }t_osc_simple_unison;
 
 
 inline void v_osc_set_uni_voice_count(t_osc_simple_unison*, int);
 inline void v_osc_set_unison_pitch(t_osc_simple_unison * a_osc_ptr,
-        float a_spread, float a_pitch);
-inline float f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr);
-inline float f_get_saw(t_osc_core *);
-inline float f_get_sine(t_osc_core *);
-inline float f_get_square(t_osc_core *);
-inline float f_get_triangle(t_osc_core *);
-inline float f_get_osc_off(t_osc_core *);
+        MKFLT a_spread, MKFLT a_pitch);
+inline MKFLT f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr);
+inline MKFLT f_get_saw(t_osc_core *);
+inline MKFLT f_get_sine(t_osc_core *);
+inline MKFLT f_get_square(t_osc_core *);
+inline MKFLT f_get_triangle(t_osc_core *);
+inline MKFLT f_get_osc_off(t_osc_core *);
 inline void v_osc_set_simple_osc_unison_type(t_osc_simple_unison *, int);
 inline void v_osc_note_on_sync_phases(t_osc_simple_unison *);
-t_osc_simple_unison * g_osc_get_osc_simple_unison(float);
+t_osc_simple_unison * g_osc_get_osc_simple_unison(MKFLT);
 
 
 /* void v_osc_set_uni_voice_count(
@@ -78,21 +78,21 @@ inline void v_osc_set_uni_voice_count(t_osc_simple_unison* a_osc_ptr,
         // Force a recalculation of v_osc_set_unison_pitch
         a_osc_ptr->last_pitch = -12345.0f;
         a_osc_ptr->voice_count = a_value;
-        a_osc_ptr->adjusted_amp = (1.0f / (float)(a_osc_ptr->voice_count)) +
-            (((float)(a_osc_ptr->voice_count - 1)) * .06f);
+        a_osc_ptr->adjusted_amp = (1.0f / (MKFLT)(a_osc_ptr->voice_count)) +
+            (((MKFLT)(a_osc_ptr->voice_count - 1)) * .06f);
     }
 }
 
 
 /* void v_osc_set_unison_pitch(
  * t_osc_simple_unison * a_osc_ptr,
- * float a_spread, //the total spread of the unison pitches, the distance in
+ * MKFLT a_spread, //the total spread of the unison pitches, the distance in
  *                 //semitones from bottom pitch to top.  Typically .1 to .5
- * float a_pitch)  //the pitch of the oscillator in MIDI note number,
+ * MKFLT a_pitch)  //the pitch of the oscillator in MIDI note number,
  *                 //typically 32 to 70
  */
 inline void v_osc_set_unison_pitch(t_osc_simple_unison * a_osc_ptr,
-        float a_spread, float a_pitch)
+        MKFLT a_spread, MKFLT a_pitch)
 {
     if((a_osc_ptr->voice_count) == 1)
     {
@@ -106,7 +106,7 @@ inline void v_osc_set_unison_pitch(t_osc_simple_unison * a_osc_ptr,
         {
             a_osc_ptr->uni_spread = a_spread;
             a_osc_ptr->bottom_pitch = -0.5f * a_spread;
-            a_osc_ptr->pitch_inc = a_spread / ((float)(a_osc_ptr->voice_count));
+            a_osc_ptr->pitch_inc = a_spread / ((MKFLT)(a_osc_ptr->voice_count));
             f_changed = 1;
         }
 
@@ -120,7 +120,7 @@ inline void v_osc_set_unison_pitch(t_osc_simple_unison * a_osc_ptr,
             {
                 a_osc_ptr->voice_inc[f_i] = f_pit_midi_note_to_hz_fast(
                     (a_pitch + (a_osc_ptr->bottom_pitch) +
-                    (a_osc_ptr->pitch_inc * ((float)f_i)))) *
+                    (a_osc_ptr->pitch_inc * ((MKFLT)f_i)))) *
                     (a_osc_ptr->sr_recip);
             }
         }
@@ -128,11 +128,11 @@ inline void v_osc_set_unison_pitch(t_osc_simple_unison * a_osc_ptr,
 
 }
 
-/* float f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr)
+/* MKFLT f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr)
  *
  * Returns one sample of an oscillator's output
  */
-inline float f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr)
+inline MKFLT f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr)
 {
     register int f_i = 0;
     a_osc_ptr->current_sample = 0.0f;
@@ -149,7 +149,7 @@ inline float f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr)
     return (a_osc_ptr->current_sample) * (a_osc_ptr->adjusted_amp);
 }
 
-/* float f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr)
+/* MKFLT f_osc_run_unison_osc(t_osc_simple_unison * a_osc_ptr)
  *
  * For warming up oscillators
  */
@@ -164,7 +164,7 @@ inline void f_osc_run_unison_osc_core_only(t_osc_simple_unison * a_osc_ptr)
     }
 }
 
-inline float f_osc_run_unison_osc_sync(t_osc_simple_unison * a_osc_ptr)
+inline MKFLT f_osc_run_unison_osc_sync(t_osc_simple_unison * a_osc_ptr)
 {
     register int f_i = 0;
     a_osc_ptr->current_sample = 0.0f;
@@ -179,18 +179,18 @@ inline float f_osc_run_unison_osc_sync(t_osc_simple_unison * a_osc_ptr)
     return (a_osc_ptr->current_sample) * (a_osc_ptr->adjusted_amp);
 }
 
-inline float f_get_saw(t_osc_core * a_core)
+inline MKFLT f_get_saw(t_osc_core * a_core)
 {
     return (((a_core->output) * 2.0f) - 1.0f);
 }
 
-inline float f_get_sine(t_osc_core * a_core)
+inline MKFLT f_get_sine(t_osc_core * a_core)
 {
     //return sin((a_core->output) * PI2);
     return f_sine_fast_run((a_core->output));
 }
 
-inline float f_get_square(t_osc_core * a_core)
+inline MKFLT f_get_square(t_osc_core * a_core)
 {
     if((a_core->output) >= 0.5f)
     {
@@ -202,7 +202,7 @@ inline float f_get_square(t_osc_core * a_core)
     }
 }
 
-inline float f_get_hsquare(t_osc_core * a_core)
+inline MKFLT f_get_hsquare(t_osc_core * a_core)
 {
     if((a_core->output) <= 0.25f)
     {
@@ -214,7 +214,7 @@ inline float f_get_hsquare(t_osc_core * a_core)
     }
 }
 
-inline float f_get_qsquare(t_osc_core * a_core)
+inline MKFLT f_get_qsquare(t_osc_core * a_core)
 {
     if((a_core->output) <= 0.125f)
     {
@@ -226,9 +226,9 @@ inline float f_get_qsquare(t_osc_core * a_core)
     }
 }
 
-inline float f_get_triangle(t_osc_core * a_core)
+inline MKFLT f_get_triangle(t_osc_core * a_core)
 {
-    float f_ramp = ((a_core->output) * 4.0f) - 2.0f;
+    MKFLT f_ramp = ((a_core->output) * 4.0f) - 2.0f;
     if(f_ramp > 1.0f)
     {
         return 2.0f - f_ramp;
@@ -245,7 +245,7 @@ inline float f_get_triangle(t_osc_core * a_core)
 
 
 //Return zero if the oscillator is turned off.
-inline float f_get_osc_off(t_osc_core * a_core)
+inline MKFLT f_get_osc_off(t_osc_core * a_core)
 {
     return 0.0f;
 }
@@ -299,7 +299,7 @@ inline void v_osc_note_on_sync_phases_hard(t_osc_simple_unison * a_osc_ptr)
 }
 
 void g_osc_simple_unison_init(
-        t_osc_simple_unison * f_result, float a_sample_rate)
+        t_osc_simple_unison * f_result, MKFLT a_sample_rate)
 {
     f_result->osc_type = f_get_saw;
     f_result->sr_recip = 1.0 / a_sample_rate;
@@ -345,9 +345,9 @@ void g_osc_simple_unison_init(
 
 }
 
-/* t_osc_simple_unison * g_osc_get_osc_simple_unison(float a_sample_rate)
+/* t_osc_simple_unison * g_osc_get_osc_simple_unison(MKFLT a_sample_rate)
  */
-t_osc_simple_unison * g_osc_get_osc_simple_unison(float a_sample_rate)
+t_osc_simple_unison * g_osc_get_osc_simple_unison(MKFLT a_sample_rate)
 {
     t_osc_simple_unison * f_result;
     lmalloc((void**)&f_result, sizeof(t_osc_simple_unison));
@@ -356,7 +356,7 @@ t_osc_simple_unison * g_osc_get_osc_simple_unison(float a_sample_rate)
 }
 
 void g_osc_init_osc_simple_single(
-        t_osc_simple_unison * f_result, float a_sample_rate)
+        t_osc_simple_unison * f_result, MKFLT a_sample_rate)
 {
     f_result->osc_type = f_get_saw;
     f_result->sr_recip = 1.0 / a_sample_rate;
@@ -391,7 +391,7 @@ void g_osc_init_osc_simple_single(
     v_osc_set_unison_pitch(f_result, .2, 60.0f);
 }
 
-t_osc_simple_unison * g_osc_get_osc_simple_single(float a_sample_rate)
+t_osc_simple_unison * g_osc_get_osc_simple_single(MKFLT a_sample_rate)
 {
     t_osc_simple_unison * f_result;
 

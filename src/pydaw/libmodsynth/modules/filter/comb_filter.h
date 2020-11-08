@@ -30,26 +30,26 @@ extern "C" {
 
 typedef struct st_comb_filter
 {
-    float delay_pointer;
+    MKFLT delay_pointer;
     int input_pointer;  //The index where the current sample is written to
     int buffer_size;  //The size of input_buffer
-    float wet_sample;
-    float feedback_linear;
-    float wet_db;
-    float output_sample;
-    float wet_linear;
-    float feedback_db;
-    float midi_note_number;
+    MKFLT wet_sample;
+    MKFLT feedback_linear;
+    MKFLT wet_db;
+    MKFLT output_sample;
+    MKFLT wet_linear;
+    MKFLT feedback_db;
+    MKFLT midi_note_number;
     //How many samples, including the fractional part, to delay the signal
-    float delay_samples;
-    float sr;
-    float * input_buffer;
+    MKFLT delay_samples;
+    MKFLT sr;
+    MKFLT * input_buffer;
     int mc_delay_samples[MC_CMB_COUNT];
-    float mc_detune;
+    MKFLT mc_detune;
 }t_comb_filter;
 
-inline void v_cmb_run(t_comb_filter*, float);
-inline void v_cmb_set_all(t_comb_filter*, float, float, float);
+inline void v_cmb_run(t_comb_filter*, MKFLT);
+inline void v_cmb_set_all(t_comb_filter*, MKFLT, MKFLT, MKFLT);
 void v_cmb_free(t_comb_filter*);
 
 #ifdef	__cplusplus
@@ -58,10 +58,10 @@ void v_cmb_free(t_comb_filter*);
 
 /* v_cmb_run(
  * t_comb_filter*,
- * float input value (audio sample, -1 to 1, typically)
+ * MKFLT input value (audio sample, -1 to 1, typically)
  * );
  * This runs the filter.  You can then use the output sample in your plugin*/
-inline void v_cmb_run(t_comb_filter* a_cmb_ptr, float a_value)
+inline void v_cmb_run(t_comb_filter* a_cmb_ptr, MKFLT a_value)
 {
     a_cmb_ptr->delay_pointer =
         (a_cmb_ptr->input_pointer) - (a_cmb_ptr->delay_samples);
@@ -98,7 +98,7 @@ inline void v_cmb_run(t_comb_filter* a_cmb_ptr, float a_value)
     }
 }
 
-inline void v_cmb_mc_run(t_comb_filter* a_cmb_ptr, float a_value)
+inline void v_cmb_mc_run(t_comb_filter* a_cmb_ptr, MKFLT a_value)
 {
     a_cmb_ptr->input_buffer[(a_cmb_ptr->input_pointer)] = a_value;
     a_cmb_ptr->output_sample = a_value;
@@ -144,15 +144,15 @@ inline void v_cmb_mc_run(t_comb_filter* a_cmb_ptr, float a_value)
 
 /*v_cmb_set_all(
  * t_comb_filter*,
- * float wet (decibels -20 to 0)
- * float feedback (decibels -20 to 0)
- * float pitch (midi note number, 20 to 120)
+ * MKFLT wet (decibels -20 to 0)
+ * MKFLT feedback (decibels -20 to 0)
+ * MKFLT pitch (midi note number, 20 to 120)
  * );
  *
  * Sets all parameters of the comb filter.
  */
 inline void v_cmb_set_all(t_comb_filter* a_cmb_ptr,
-    float a_wet_db, float a_feedback_db, float a_midi_note_number)
+    MKFLT a_wet_db, MKFLT a_feedback_db, MKFLT a_midi_note_number)
 {
     if((a_cmb_ptr->wet_db) != a_wet_db)
     {
@@ -182,7 +182,7 @@ inline void v_cmb_set_all(t_comb_filter* a_cmb_ptr,
 }
 
 inline void v_cmb_mc_set_all(t_comb_filter* a_cmb,
-    float a_wet_db, float a_midi_note_number, float a_detune)
+    MKFLT a_wet_db, MKFLT a_midi_note_number, MKFLT a_detune)
 {
     if(a_cmb->mc_detune != a_detune ||
         a_cmb->midi_note_number != a_midi_note_number)
@@ -193,7 +193,7 @@ inline void v_cmb_mc_set_all(t_comb_filter* a_cmb,
         while(f_i < MC_CMB_COUNT)
         {
             a_cmb->mc_delay_samples[f_i] = f_pit_midi_note_to_samples(
-                    a_midi_note_number + (a_detune * (float)f_i), (a_cmb->sr));
+                    a_midi_note_number + (a_detune * (MKFLT)f_i), (a_cmb->sr));
             ++f_i;
         }
     }
@@ -201,7 +201,7 @@ inline void v_cmb_mc_set_all(t_comb_filter* a_cmb,
     v_cmb_set_all(a_cmb, a_wet_db, a_wet_db - 13.0f, a_midi_note_number);
 }
 
-void g_cmb_init(t_comb_filter * f_result, float a_sr, int a_huge_pages)
+void g_cmb_init(t_comb_filter * f_result, MKFLT a_sr, int a_huge_pages)
 {
     register int f_i = 0;
 
@@ -211,12 +211,12 @@ void g_cmb_init(t_comb_filter * f_result, float a_sr, int a_huge_pages)
     if(a_huge_pages)
     {
         hpalloc((void**)(&(f_result->input_buffer)),
-            sizeof(float) * (f_result->buffer_size));
+            sizeof(MKFLT) * (f_result->buffer_size));
     }
     else
     {
         lmalloc((void**)(&(f_result->input_buffer)),
-            sizeof(float) * (f_result->buffer_size));
+            sizeof(MKFLT) * (f_result->buffer_size));
     }
 
     while(f_i < (f_result->buffer_size))

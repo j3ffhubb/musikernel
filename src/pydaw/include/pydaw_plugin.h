@@ -31,7 +31,7 @@ extern "C" {
 
 typedef void (*fp_queue_message)(char*, char*);
 
-typedef float PYFX_Data;
+typedef MKFLT PYFX_Data;
 
 typedef int PYFX_PortDescriptor;
 
@@ -57,22 +57,22 @@ typedef struct
 	int duration;		/**< duration until note-off;
                                  * only for #PYDAW_EVENT_NOTEON */
 	int param;		/**< control parameter */
-        float value;
-        float start;
-        float length;
+        MKFLT value;
+        MKFLT start;
+        MKFLT length;
         int port;
 } t_pydaw_seq_event;
 
 typedef struct
 {
     int uid;
-    float * samples[2];
-    float ratio_orig;
+    MKFLT * samples[2];
+    MKFLT ratio_orig;
     int channels;
     int length;
-    float sample_rate;
+    MKFLT sample_rate;
     int is_loaded;  //wav's are now loaded dynamically when they are first seen
-    float host_sr;  //host sample-rate, cached here for easy access
+    MKFLT host_sr;  //host sample-rate, cached here for easy access
     char path[2048];
 }t_wav_pool_item;
 
@@ -112,7 +112,7 @@ typedef struct _PYFX_Descriptor {
     /* Assign the audio buffer at DataLocation to index a_index
      */
     void (*connect_buffer)(PYFX_Handle Instance, int a_index,
-            float * DataLocation, int a_is_sidechain);
+            MKFLT * DataLocation, int a_is_sidechain);
 
     void (*cleanup)(PYFX_Handle Instance);
 
@@ -121,7 +121,7 @@ typedef struct _PYFX_Descriptor {
     void (*load)(PYFX_Handle Instance, struct _PYFX_Descriptor * Descriptor,
             char * a_file_path);
 
-    void (*set_port_value)(PYFX_Handle Instance, int a_port, float a_value);
+    void (*set_port_value)(PYFX_Handle Instance, int a_port, MKFLT a_value);
 
     void (*set_cc_map)(PYFX_Handle Instance, char * a_msg);
 
@@ -147,7 +147,7 @@ typedef struct _PYFX_Descriptor {
     // to implement or set this
     void (*run_mixing)(
         PYFX_Handle Instance, int SampleCount,
-        float ** output_buffers, int output_count,
+        MKFLT ** output_buffers, int output_count,
         struct ShdsList * midi_events,
         struct ShdsList * atm_events);
 
@@ -170,7 +170,7 @@ typedef struct
 {
     int type;
     int tick;
-    float value;
+    MKFLT value;
     int port;
 }t_plugin_event_queue_item;
 
@@ -185,8 +185,8 @@ typedef struct
 {
     int count;
     int ports[5];
-    float lows[5];
-    float highs[5];
+    MKFLT lows[5];
+    MKFLT highs[5];
 }t_cc_mapping;
 
 typedef struct
@@ -194,15 +194,15 @@ typedef struct
     t_cc_mapping map[128];
 }t_plugin_cc_map;
 
-void v_plugin_event_queue_add(t_plugin_event_queue*, int, int, float, int);
+void v_plugin_event_queue_add(t_plugin_event_queue*, int, int, MKFLT, int);
 void v_plugin_event_queue_reset(t_plugin_event_queue*);
 t_plugin_event_queue_item * v_plugin_event_queue_iter(
     t_plugin_event_queue*, int);
-void v_plugin_event_queue_atm_set(t_plugin_event_queue*, int, float*);
-inline float f_cc_to_ctrl_val(PYFX_Descriptor*, int, float);
+void v_plugin_event_queue_atm_set(t_plugin_event_queue*, int, MKFLT*);
+inline MKFLT f_cc_to_ctrl_val(PYFX_Descriptor*, int, MKFLT);
 void v_cc_mapping_init(t_cc_mapping*);
 void v_cc_map_init(t_plugin_cc_map*);
-void v_cc_map_translate(t_plugin_cc_map*, PYFX_Descriptor*, float*, int, float);
+void v_cc_map_translate(t_plugin_cc_map*, PYFX_Descriptor*, MKFLT*, int, MKFLT);
 void v_generic_cc_map_set(t_plugin_cc_map*, char*);
 
 #ifdef __cplusplus
@@ -222,7 +222,7 @@ void v_cc_mapping_init(t_cc_mapping* self)
     }
 }
 
-void v_cc_mapping_set(t_cc_mapping* self, int a_port, float a_low, float a_high)
+void v_cc_mapping_set(t_cc_mapping* self, int a_port, MKFLT a_low, MKFLT a_high)
 {
     self->ports[self->count] = a_port;
     self->lows[self->count] = a_low;
@@ -241,7 +241,7 @@ void v_cc_map_init(t_plugin_cc_map * self)
 }
 
 void v_cc_map_translate(t_plugin_cc_map *self, PYFX_Descriptor *desc,
-    float *a_port_table, int a_cc, float a_value)
+    MKFLT *a_port_table, int a_cc, MKFLT a_value)
 {
     int f_i;
     a_value *= 0.007874f;  // a_val / 127.0f
@@ -250,15 +250,15 @@ void v_cc_map_translate(t_plugin_cc_map *self, PYFX_Descriptor *desc,
     {
         int f_port = self->map[a_cc].ports[f_i];
         PYFX_PortRangeHint * f_range = &desc->PortRangeHints[f_port];
-        float f_diff = f_range->UpperBound - f_range->LowerBound;
-        float f_min = f_diff * self->map[a_cc].lows[f_i];
-        float f_max = f_diff * self->map[a_cc].highs[f_i];
+        MKFLT f_diff = f_range->UpperBound - f_range->LowerBound;
+        MKFLT f_min = f_diff * self->map[a_cc].lows[f_i];
+        MKFLT f_max = f_diff * self->map[a_cc].highs[f_i];
         a_port_table[f_port] = (a_value * (f_max - f_min)) +
             f_min + f_range->LowerBound;
     }
 }
 
-float f_atm_to_ctrl_val(PYFX_Descriptor *self, int a_port, float a_val)
+MKFLT f_atm_to_ctrl_val(PYFX_Descriptor *self, int a_port, MKFLT a_val)
 {
     PYFX_PortRangeHint * f_range = &self->PortRangeHints[a_port];
     a_val *= 0.007874f;  // a_val / 127.0f
@@ -268,7 +268,7 @@ float f_atm_to_ctrl_val(PYFX_Descriptor *self, int a_port, float a_val)
 
 void v_plugin_event_queue_add(
     t_plugin_event_queue *self, int a_type, int a_tick,
-    float a_val, int a_port)
+    MKFLT a_val, int a_port)
 {
     t_plugin_event_queue_item * f_item = &self->items[self->count];
     f_item->type = a_type;
@@ -302,7 +302,7 @@ t_plugin_event_queue_item * v_plugin_event_queue_iter(
 }
 
 void v_plugin_event_queue_atm_set(
-    t_plugin_event_queue *self, int a_sample_num, float * a_table)
+    t_plugin_event_queue *self, int a_sample_num, MKFLT * a_table)
 {
     while(1)
     {
@@ -386,7 +386,7 @@ PYFX_Descriptor * pydaw_get_pyfx_descriptor(int a_port_count)
 }
 
 void pydaw_set_pyfx_port(PYFX_Descriptor * a_desc, int a_port,
-        float a_default, float a_min, float a_max)
+        MKFLT a_default, MKFLT a_min, MKFLT a_max)
 {
     assert(a_port >= 0 && a_port < a_desc->PortCount);
     assert(!a_desc->PortDescriptors[a_port]);
@@ -409,15 +409,15 @@ PYFX_Data g_pydaw_get_port_default(PYFX_Descriptor *plugin, int port)
     return hint.DefaultValue;
 }
 
-float * g_pydaw_get_port_table(PYFX_Handle * handle,
+MKFLT * g_pydaw_get_port_table(PYFX_Handle * handle,
         PYFX_Descriptor * descriptor)
 {
-    float * pluginControlIns;
+    MKFLT * pluginControlIns;
     int j;
 
     int f_i = 0;
 
-    hpalloc((void**)(&pluginControlIns), sizeof(float) * descriptor->PortCount);
+    hpalloc((void**)(&pluginControlIns), sizeof(MKFLT) * descriptor->PortCount);
 
     f_i = 0;
     while(f_i < descriptor->PortCount)
@@ -458,9 +458,9 @@ void v_generic_cc_map_set(t_plugin_cc_map * a_cc_map, char * a_str)
         v_iterate_2d_char_array(f_2d_array);
         int f_port = atoi(f_2d_array->current_str);
         v_iterate_2d_char_array(f_2d_array);
-        float f_low = atof(f_2d_array->current_str);
+        MKFLT f_low = atof(f_2d_array->current_str);
         v_iterate_2d_char_array(f_2d_array);
-        float f_high = atof(f_2d_array->current_str);
+        MKFLT f_high = atof(f_2d_array->current_str);
 
         v_cc_mapping_set(&a_cc_map->map[f_cc], f_port, f_low, f_high);
 
@@ -469,7 +469,7 @@ void v_generic_cc_map_set(t_plugin_cc_map * a_cc_map, char * a_str)
 }
 
 void pydaw_generic_file_loader(PYFX_Handle Instance,
-        PYFX_Descriptor * Descriptor, char * a_path, float * a_table,
+        PYFX_Descriptor * Descriptor, char * a_path, MKFLT * a_table,
         t_plugin_cc_map * a_cc_map)
 {
     t_2d_char_array * f_2d_array = g_get_2d_array_from_file(a_path,
@@ -516,9 +516,9 @@ void pydaw_generic_file_loader(PYFX_Handle Instance,
                 v_iterate_2d_char_array(f_2d_array);
                 int f_port = atoi(f_2d_array->current_str);
                 v_iterate_2d_char_array(f_2d_array);
-                float f_low = atof(f_2d_array->current_str);
+                MKFLT f_low = atof(f_2d_array->current_str);
                 v_iterate_2d_char_array(f_2d_array);
-                float f_high = atof(f_2d_array->current_str);
+                MKFLT f_high = atof(f_2d_array->current_str);
 
                 v_cc_mapping_set(&a_cc_map->map[f_cc], f_port, f_low, f_high);
                 ++f_i;
@@ -528,7 +528,7 @@ void pydaw_generic_file_loader(PYFX_Handle Instance,
         {
             int f_port_key = atoi(f_2d_array->current_str);
             v_iterate_2d_char_array_to_next_line(f_2d_array);
-            float f_port_value = atof(f_2d_array->current_str);
+            MKFLT f_port_value = atof(f_2d_array->current_str);
 
             assert(f_port_key >= 0);
             assert(f_port_key <= Descriptor->PortCount);

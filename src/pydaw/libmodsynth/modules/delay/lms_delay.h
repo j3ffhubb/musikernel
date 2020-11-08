@@ -36,12 +36,12 @@ typedef struct
 {
     t_delay_tap tap0;
     t_delay_tap tap1;
-    float output0;  //mixed signal out
-    float output1;  //mixed signal out
-    float feedback0;  //feedback out/in
-    float feedback1;  //feedback out/in
-    float feedback_db;
-    float feedback_linear;
+    MKFLT output0;  //mixed signal out
+    MKFLT output1;  //mixed signal out
+    MKFLT feedback0;  //feedback out/in
+    MKFLT feedback1;  //feedback out/in
+    MKFLT feedback_db;
+    MKFLT feedback_linear;
     t_dw_dry_wet * dw0;
     t_dw_dry_wet * dw1;
     t_audio_xfade stereo_xfade0;
@@ -49,11 +49,11 @@ typedef struct
 
     t_enf_env_follower * feeback_env_follower;  //Checks for overflow
     t_enf_env_follower * input_env_follower;  //Checks for overflow
-    float wet_dry_diff;  //difference between wet and dry output volume
-    float combined_inputs;  //Add output 0 and 1
+    MKFLT wet_dry_diff;  //difference between wet and dry output volume
+    MKFLT combined_inputs;  //Add output 0 and 1
     t_lim_limiter limiter;
-    float last_duck;
-    float limiter_gain;
+    MKFLT last_duck;
+    MKFLT limiter_gain;
 
     t_state_variable_filter svf0;
     t_state_variable_filter svf1;
@@ -62,17 +62,17 @@ typedef struct
 
 }t_lms_delay;
 
-t_lms_delay * g_ldl_get_delay(float,float);
-inline void v_ldl_set_delay(t_lms_delay*,float,float,float,float,float,
-        float,float);
-inline void v_ldl_run_delay(t_lms_delay*,float,float);
+t_lms_delay * g_ldl_get_delay(MKFLT,MKFLT);
+inline void v_ldl_set_delay(t_lms_delay*,MKFLT,MKFLT,MKFLT,MKFLT,MKFLT,
+        MKFLT,MKFLT);
+inline void v_ldl_run_delay(t_lms_delay*,MKFLT,MKFLT);
 
 /*t_lms_delay * g_ldl_get_delay(
- * float a_seconds, //The maximum amount of time for the delay to buffer
- * float a_sr  //sample rate
+ * MKFLT a_seconds, //The maximum amount of time for the delay to buffer
+ * MKFLT a_sr  //sample rate
  * )
  */
-t_lms_delay * g_ldl_get_delay(float a_seconds, float a_sr)
+t_lms_delay * g_ldl_get_delay(MKFLT a_seconds, MKFLT a_sr)
 {
     t_lms_delay* f_result;
     hpalloc((void**)&f_result, sizeof(t_lms_delay));
@@ -109,7 +109,7 @@ t_lms_delay * g_ldl_get_delay(float a_seconds, float a_sr)
     return f_result;
 }
 
-inline void v_ldl_run_delay(t_lms_delay* a_dly, float a_in0, float a_in1)
+inline void v_ldl_run_delay(t_lms_delay* a_dly, MKFLT a_in0, MKFLT a_in1)
 {
     v_lim_run(&a_dly->limiter, a_in0, a_in1);
 
@@ -151,16 +151,16 @@ inline void v_ldl_run_delay(t_lms_delay* a_dly, float a_in0, float a_in1)
 
 /*inline void v_ldl_set_delay(
  * t_lms_delay* a_dly,
- * float a_seconds,
- * float a_feeback_db, //This should not exceed -2 or it could explode
+ * MKFLT a_seconds,
+ * MKFLT a_feeback_db, //This should not exceed -2 or it could explode
  * int a_is_ducking,
- * float a_wet,
- * float a_dry,
- * float a_stereo)  //Crossfading between dual-mono and stereo.  0 to 1
+ * MKFLT a_wet,
+ * MKFLT a_dry,
+ * MKFLT a_stereo)  //Crossfading between dual-mono and stereo.  0 to 1
  */
-inline void v_ldl_set_delay(t_lms_delay* a_dly,float a_seconds,
-        float a_feeback_db, float a_wet, float a_dry,
-        float a_stereo, float a_duck, float a_damp)
+inline void v_ldl_set_delay(t_lms_delay* a_dly,MKFLT a_seconds,
+        MKFLT a_feeback_db, MKFLT a_wet, MKFLT a_dry,
+        MKFLT a_stereo, MKFLT a_duck, MKFLT a_damp)
 {
     v_dly_set_delay_seconds(&a_dly->delay0, &a_dly->tap0, a_seconds);
     v_dly_set_delay_seconds(&a_dly->delay1, &a_dly->tap1, a_seconds);

@@ -24,7 +24,7 @@ GNU General Public License for more details.
 extern "C" {
 #endif
 
-static __thread float f_formant_pitches[3][10]
+static __thread MKFLT f_formant_pitches[3][10]
 __attribute__((aligned(CACHE_LINE_SIZE))) =
 {
     {65.7647152829, 64.0195500087, 60.2218660311, 48.5454706023, 54.9116472027,
@@ -52,7 +52,7 @@ f_list.append([440, 1020, 2240]) #"u"
 def pydaw_hz_to_pitch(a_hz):
     return ((12.0 * log(a_hz * (1.0/440.0), 2.0)) + 57.0)
 
-print("static float f_formant_pitches[3][" + str(len(f_list)) + "] =\n{")
+print("static MKFLT f_formant_pitches[3][" + str(len(f_list)) + "] =\n{")
 for i in range(3):
     f_print = "    {"
     for f_item in f_list:
@@ -66,20 +66,20 @@ print "};"
 typedef struct
 {
     t_state_variable_filter * filters[3][2];
-    float output0;
-    float output1;
-    float pitch_tmp;
-    float last_pos;
-    float last_wet;
+    MKFLT output0;
+    MKFLT output1;
+    MKFLT pitch_tmp;
+    MKFLT last_pos;
+    MKFLT last_wet;
     t_audio_xfade xfade;
 }t_for_formant_filter;
 
-t_for_formant_filter * g_for_formant_filter_get(float);
-void v_for_formant_filter_set(t_for_formant_filter*, float, float);
-void v_for_formant_filter_run(t_for_formant_filter*, float, float);
+t_for_formant_filter * g_for_formant_filter_get(MKFLT);
+void v_for_formant_filter_set(t_for_formant_filter*, MKFLT, MKFLT);
+void v_for_formant_filter_run(t_for_formant_filter*, MKFLT, MKFLT);
 
 
-void g_for_init(t_for_formant_filter * f_result, float a_sr)
+void g_for_init(t_for_formant_filter * f_result, MKFLT a_sr)
 {
     register int f_i = 0;
     register int f_i2;
@@ -104,7 +104,7 @@ void g_for_init(t_for_formant_filter * f_result, float a_sr)
     g_axf_init(&f_result->xfade, -3.0f);
 }
 
-t_for_formant_filter * g_for_formant_filter_get(float a_sr)
+t_for_formant_filter * g_for_formant_filter_get(MKFLT a_sr)
 {
     t_for_formant_filter * f_result;
 
@@ -113,7 +113,7 @@ t_for_formant_filter * g_for_formant_filter_get(float a_sr)
     return f_result;
 }
 
-void v_for_formant_filter_set(t_for_formant_filter* a_for, float a_pos, float a_wet)
+void v_for_formant_filter_set(t_for_formant_filter* a_for, MKFLT a_pos, MKFLT a_wet)
 {
     if(a_pos != a_for->last_pos)
     {
@@ -143,7 +143,7 @@ void v_for_formant_filter_set(t_for_formant_filter* a_for, float a_pos, float a_
     }
 }
 
-void v_for_formant_filter_run(t_for_formant_filter* a_for, float a_input0, float a_input1)
+void v_for_formant_filter_run(t_for_formant_filter* a_for, MKFLT a_input0, MKFLT a_input1)
 {
     register int iter = 0;
     a_for->output0 = 0.0f;
@@ -166,7 +166,7 @@ void v_for_formant_filter_run(t_for_formant_filter* a_for, float a_input0, float
 }
 
 
-static __thread float pydaw_growl_table[25][3][5]
+static __thread MKFLT pydaw_growl_table[25][3][5]
 __attribute__((aligned(CACHE_LINE_SIZE))) =
 {
     {{67.35f, 73.633f, 89.038f, 92.901f, 98.902f}, {1.0f, 0.631f, 0.1f, 0.016f, 0.001f}, {-0.75, -0.556, -0.167, -0.077, 0.0}}, //alto a
@@ -199,26 +199,26 @@ __attribute__((aligned(CACHE_LINE_SIZE))) =
 typedef struct
 {
     t_svf2_filter filter;
-    float amp;
+    MKFLT amp;
 }t_grw_band;
 
 typedef struct
 {
-    float output0;
-    float output1;
+    MKFLT output0;
+    MKFLT output1;
     t_grw_band bands[5];
     t_audio_xfade xfade;
-    float last_pos;
-    float last_type;
-    float last_wet;
+    MKFLT last_pos;
+    MKFLT last_type;
+    MKFLT last_wet;
 }t_grw_growl_filter;
 
-t_grw_growl_filter * g_grw_growl_filter_get(float);
-void v_grw_growl_filter_set(t_grw_growl_filter*, float, float, float);
-void v_grw_growl_filter_run(t_grw_growl_filter*, float, float);
+t_grw_growl_filter * g_grw_growl_filter_get(MKFLT);
+void v_grw_growl_filter_set(t_grw_growl_filter*, MKFLT, MKFLT, MKFLT);
+void v_grw_growl_filter_run(t_grw_growl_filter*, MKFLT, MKFLT);
 void v_grw_growl_filter_free(t_grw_growl_filter*);
 
-void g_grw_init(t_grw_growl_filter * f_result, float a_sr)
+void g_grw_init(t_grw_growl_filter * f_result, MKFLT a_sr)
 {
     int f_i;
 
@@ -240,7 +240,7 @@ void g_grw_init(t_grw_growl_filter * f_result, float a_sr)
 
 }
 
-t_grw_growl_filter * g_grw_growl_filter_get(float a_sr)
+t_grw_growl_filter * g_grw_growl_filter_get(MKFLT a_sr)
 {
     t_grw_growl_filter * f_result;
     lmalloc((void**)&f_result, sizeof(t_grw_growl_filter));
@@ -248,8 +248,8 @@ t_grw_growl_filter * g_grw_growl_filter_get(float a_sr)
     return f_result;
 }
 
-void v_grw_growl_filter_set(t_grw_growl_filter* a_grw, float a_pos,
-    float a_wet, float a_type)
+void v_grw_growl_filter_set(t_grw_growl_filter* a_grw, MKFLT a_pos,
+    MKFLT a_wet, MKFLT a_type)
 {
     if(a_pos != a_grw->last_pos || a_type != a_grw->last_type)
     {
@@ -257,7 +257,7 @@ void v_grw_growl_filter_set(t_grw_growl_filter* a_grw, float a_pos,
         a_grw->last_pos = a_pos;
         a_grw->last_type = a_type;
         int iter;
-        float f_pos_f = a_pos + a_type;
+        MKFLT f_pos_f = a_pos + a_type;
         int f_pos = (int)f_pos_f;
         int f_pos_plus_one = f_pos + 1;
         if(f_pos_plus_one > 24)
@@ -265,7 +265,7 @@ void v_grw_growl_filter_set(t_grw_growl_filter* a_grw, float a_pos,
             f_pos_plus_one = 24;
         }
 
-        float f_pos_frac = f_pos_f - (float)f_pos;
+        MKFLT f_pos_frac = f_pos_f - (MKFLT)f_pos;
 
         for(iter = 0; iter < 5; ++iter)
         {
@@ -292,11 +292,11 @@ void v_grw_growl_filter_set(t_grw_growl_filter* a_grw, float a_pos,
 }
 
 void v_grw_growl_filter_run(t_grw_growl_filter* a_grw,
-        float a_input0, float a_input1)
+        MKFLT a_input0, MKFLT a_input1)
 {
     int f_i;
     t_svf2_filter * f_filter;
-    float f_amp;
+    MKFLT f_amp;
     a_grw->output0 = 0.0f;
     a_grw->output1 = 0.0f;
 

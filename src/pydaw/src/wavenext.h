@@ -40,7 +40,7 @@ void v_pydaw_set_ab_mode(int a_mode);
 void v_pydaw_set_we_file(t_wavenext * self, const char * a_file);
 void v_pydaw_set_wave_editor_item(t_wavenext * self, const char * a_string);
 inline void v_pydaw_run_wave_editor(int sample_count,
-    float **output, float * a_input);
+    MKFLT **output, MKFLT * a_input);
 
 #ifdef	__cplusplus
 }
@@ -50,7 +50,7 @@ t_wavenext * wavenext;
 
 void g_wavenext_get()
 {
-    float f_sample_rate = musikernel->thread_storage[0].sample_rate;
+    MKFLT f_sample_rate = musikernel->thread_storage[0].sample_rate;
     clalloc((void**)&wavenext, sizeof(t_wavenext));
     wavenext->ab_wav_item = 0;
     wavenext->ab_audio_item = g_pydaw_audio_item_get(f_sample_rate);
@@ -147,21 +147,21 @@ void v_pydaw_we_export(t_wavenext * self, const char * a_file_out)
     musikernel->is_offline_rendering = 1;
     pthread_spin_unlock(&musikernel->main_lock);
 
-    float f_sample_rate = musikernel->thread_storage[0].sample_rate;
+    MKFLT f_sample_rate = musikernel->thread_storage[0].sample_rate;
 
     long f_size = 0;
     long f_block_size = (musikernel->sample_count);
 
-    float * f_output = NULL;
-    lmalloc((void**)&f_output, sizeof(float) * (f_block_size * 2));
+    MKFLT * f_output = NULL;
+    lmalloc((void**)&f_output, sizeof(MKFLT) * (f_block_size * 2));
 
-    float ** f_buffer = NULL;
-    lmalloc((void**)&f_buffer, sizeof(float*) * 2);
+    MKFLT ** f_buffer = NULL;
+    lmalloc((void**)&f_buffer, sizeof(MKFLT*) * 2);
 
     int f_i = 0;
     while(f_i < 2)
     {
-        lmalloc((void**)&f_buffer[f_i], sizeof(float) * f_block_size);
+        lmalloc((void**)&f_buffer[f_i], sizeof(MKFLT) * f_block_size);
         ++f_i;
     }
 
@@ -209,7 +209,7 @@ void v_pydaw_we_export(t_wavenext * self, const char * a_file_out)
             ++f_i;
         }
 
-        sf_writef_float(f_sndfile, f_output, f_block_size);
+        mk_write_audio(f_sndfile, f_output, f_block_size);
     }
 
 #ifdef __linux__
@@ -307,7 +307,7 @@ void v_pydaw_set_wave_editor_item(t_wavenext * self,
 
 
 inline void v_pydaw_run_wave_editor(int sample_count,
-        float **output, float * a_input)
+        MKFLT **output, MKFLT * a_input)
 {
     t_wavenext * self = wavenext;
     t_pydaw_plugin * f_plugin;
@@ -342,7 +342,7 @@ inline void v_pydaw_run_wave_editor(int sample_count,
 
                 if(self->ab_wav_item->channels == 1)
                 {
-                    float f_tmp_sample = f_cubic_interpolate_ptr_ifh(
+                    MKFLT f_tmp_sample = f_cubic_interpolate_ptr_ifh(
                     (self->ab_wav_item->samples[0]),
                     (self->ab_audio_item->sample_read_heads[0].whole_number),
                     (self->ab_audio_item->sample_read_heads[0].fraction)) *
@@ -384,7 +384,7 @@ inline void v_pydaw_run_wave_editor(int sample_count,
         }
     }
 
-    float ** f_buff = f_track->buffers;
+    MKFLT ** f_buff = f_track->buffers;
 
     for(f_i = 0; f_i < sample_count; ++f_i)
     {
@@ -427,10 +427,10 @@ void v_wn_osc_send(t_osc_send_data * a_buffers)
 
     if(musikernel->playback_mode == 1)
     {
-        float f_frac =
-        (float)(wavenext->ab_audio_item->sample_read_heads[
+        MKFLT f_frac =
+        (MKFLT)(wavenext->ab_audio_item->sample_read_heads[
             0].whole_number)
-        / (float)(wavenext->ab_audio_item->wav_pool_item->length);
+        / (MKFLT)(wavenext->ab_audio_item->wav_pool_item->length);
 
         sprintf(a_buffers->f_msg, "%f", f_frac);
         v_queue_osc_message("wec", a_buffers->f_msg);
@@ -549,13 +549,13 @@ void v_wn_test()
 
     v_pydaw_set_host(MK_HOST_WAVENEXT);
     v_wn_set_playback_mode(wavenext, PYDAW_PLAYBACK_MODE_REC, 0);
-    float * f_output_arr[2];
+    MKFLT * f_output_arr[2];
 
     int f_i, f_i2;
 
     for(f_i = 0; f_i < 2; ++f_i)
     {
-        hpalloc((void**)&f_output_arr[f_i], sizeof(float) * 1024);
+        hpalloc((void**)&f_output_arr[f_i], sizeof(MKFLT) * 1024);
 
         for(f_i2 = 0; f_i2 < 1024; ++f_i2)
         {
@@ -563,8 +563,8 @@ void v_wn_test()
         }
     }
 
-    float * f_input_arr;
-    hpalloc((void**)&f_input_arr, sizeof(float) * (1024 * 1024));
+    MKFLT * f_input_arr;
+    hpalloc((void**)&f_input_arr, sizeof(MKFLT) * (1024 * 1024));
 
     for(f_i = 0; f_i < (1024 * 1024); ++f_i)
     {

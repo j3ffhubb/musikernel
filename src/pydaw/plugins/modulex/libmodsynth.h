@@ -41,16 +41,16 @@ typedef struct
 
     t_smoother_linear time_smoother;
 
-    float current_sample0;
-    float current_sample1;
+    MKFLT current_sample0;
+    MKFLT current_sample1;
 
-    float vol_linear;
+    MKFLT vol_linear;
     t_smoother_linear smoothers[8][3];
 }t_modulex_mono_modules;
 
-t_modulex_mono_modules * v_modulex_mono_init(float, int);
+t_modulex_mono_modules * v_modulex_mono_init(MKFLT, int);
 
-t_modulex_mono_modules * v_modulex_mono_init(float a_sr, int a_plugin_uid)
+t_modulex_mono_modules * v_modulex_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_modulex_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_modulex_mono_modules));

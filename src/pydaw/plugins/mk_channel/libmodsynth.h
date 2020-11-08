@@ -27,8 +27,8 @@ extern "C" {
 
 typedef struct
 {
-    float current_sample0;
-    float current_sample1;
+    MKFLT current_sample0;
+    MKFLT current_sample1;
 
     t_smoother_linear volume_smoother;
     t_smoother_linear pan_smoother;
@@ -36,9 +36,9 @@ typedef struct
     t_pn2_panner2 panner;
 }t_mkchnl_mono_modules;
 
-t_mkchnl_mono_modules * v_mkchnl_mono_init(float, int);
+t_mkchnl_mono_modules * v_mkchnl_mono_init(MKFLT, int);
 
-t_mkchnl_mono_modules * v_mkchnl_mono_init(float a_sr, int a_plugin_uid)
+t_mkchnl_mono_modules * v_mkchnl_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_mkchnl_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_mkchnl_mono_modules));

@@ -26,26 +26,26 @@ extern "C" {
 
 typedef struct
 {
-    float rate;
-    float last_value;
-    float sample_rate;
-    float sr_recip;
+    MKFLT rate;
+    MKFLT last_value;
+    MKFLT sample_rate;
+    MKFLT sr_recip;
 
 #ifdef SML_DEBUG_MODE
     int debug_counter;
 #endif
 }t_smoother_linear;
 
-t_smoother_linear * g_sml_get_smoother_linear(float, float, float, float);
-inline void v_sml_run(t_smoother_linear * a_smoother, float);
+t_smoother_linear * g_sml_get_smoother_linear(MKFLT, MKFLT, MKFLT, MKFLT);
+inline void v_sml_run(t_smoother_linear * a_smoother, MKFLT);
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-void g_sml_init(t_smoother_linear * f_result, float a_sample_rate,
-        float a_high, float a_low, float a_time_in_seconds)
+void g_sml_init(t_smoother_linear * f_result, MKFLT a_sample_rate,
+        MKFLT a_high, MKFLT a_low, MKFLT a_time_in_seconds)
 {
     assert(a_high > a_low);
     f_result->last_value = (((a_high - a_low) * .5f) + a_low);
@@ -60,18 +60,18 @@ void g_sml_init(t_smoother_linear * f_result, float a_sample_rate,
 }
 
 /* t_smoother_linear * g_sml_get_smoother_linear(
- * float a_sample_rate,
- * float a_high, //The high value of the control
- * float a_low,  //The low value of the control
- * float a_time_in_seconds)
+ * MKFLT a_sample_rate,
+ * MKFLT a_high, //The high value of the control
+ * MKFLT a_low,  //The low value of the control
+ * MKFLT a_time_in_seconds)
  *
  * There's not much good reason to change this while the synth is running
  * for controls, so you should only set it here.
  * If using this for glide or other things that must be smoothed
  * dynamically, you can use the set method below
  */
-t_smoother_linear * g_sml_get_smoother_linear(float a_sample_rate,
-        float a_high, float a_low, float a_time_in_seconds)
+t_smoother_linear * g_sml_get_smoother_linear(MKFLT a_sample_rate,
+        MKFLT a_high, MKFLT a_low, MKFLT a_time_in_seconds)
 {
     t_smoother_linear * f_result;
 
@@ -89,11 +89,11 @@ t_smoother_linear * g_sml_get_smoother_linear(float a_sample_rate,
 
 /* inline void v_sml_run(
  * t_smoother_linear * a_smoother,
- * float a_current_value) //the current control value you wish to smooth
+ * MKFLT a_current_value) //the current control value you wish to smooth
  *
  * smoother->last_value will be the smoothed value
  */
-inline void v_sml_run(t_smoother_linear * a_smoother, float a_current_value)
+inline void v_sml_run(t_smoother_linear * a_smoother, MKFLT a_current_value)
 {
     /*Evaluated first because most controls won't be moving most of the time,
      * should consume the fewest cycles*/

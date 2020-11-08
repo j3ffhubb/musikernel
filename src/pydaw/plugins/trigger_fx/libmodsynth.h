@@ -33,24 +33,24 @@ typedef struct
 {
     t_smoother_linear pitchbend_smoother;
 
-    float current_sample0;
-    float current_sample1;
+    MKFLT current_sample0;
+    MKFLT current_sample1;
 
-    float vol_linear;
+    MKFLT vol_linear;
 
     t_smoother_linear gate_wet_smoother;
     t_smoother_linear glitch_time_smoother;
 
     t_gat_gate gate;
-    float gate_on;
+    MKFLT gate_on;
 
     t_glc_glitch_v2 glitch;
-    float glitch_on;
+    MKFLT glitch_on;
 }t_triggerfx_mono_modules;
 
-t_triggerfx_mono_modules * v_triggerfx_mono_init(float, int);
+t_triggerfx_mono_modules * v_triggerfx_mono_init(MKFLT, int);
 
-t_triggerfx_mono_modules * v_triggerfx_mono_init(float a_sr, int a_plugin_uid)
+t_triggerfx_mono_modules * v_triggerfx_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_triggerfx_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_triggerfx_mono_modules));

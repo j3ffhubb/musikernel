@@ -105,7 +105,7 @@ static void v_wayv_on_stop(PYFX_Handle instance)
 }
 
 static void v_wayv_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     if(a_is_sidechain)
     {
@@ -680,7 +680,7 @@ static void v_wayv_load(PYFX_Handle instance,
 }
 
 static void v_wayv_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_wayv *plugin_data = (t_wayv*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -713,9 +713,9 @@ static void v_wayv_process_midi_event(
             int f_adsr_main_lin = (int)(*plugin_data->adsr_lin_main);
             f_wayv_voice->adsr_run_func = FP_ADSR_RUN[f_adsr_main_lin];
 
-            float f_master_pitch = (*plugin_data->master_pitch);
+            MKFLT f_master_pitch = (*plugin_data->master_pitch);
 
-            f_wayv_voice->note_f = (float)a_event->note + f_master_pitch;
+            f_wayv_voice->note_f = (MKFLT)a_event->note + f_master_pitch;
             f_wayv_voice->note = a_event->note + (int)(f_master_pitch);
 
             f_wayv_voice->amp =
@@ -729,7 +729,7 @@ static void v_wayv_process_midi_event(
             f_wayv_voice->keyboard_track = f_wayv_voice->note_f * 0.007874016f;
 
             f_wayv_voice->velocity_track =
-                ((float)(a_event->velocity)) * 0.007874016f;
+                ((MKFLT)(a_event->velocity)) * 0.007874016f;
 
             f_wayv_voice->target_pitch = f_wayv_voice->note_f;
 
@@ -749,7 +749,7 @@ static void v_wayv_process_midi_event(
 
             int f_i;
 
-            float f_db;
+            MKFLT f_db;
 
             for(f_i = 0; f_i < WAYV_OSC_COUNT; ++f_i)
             {
@@ -810,11 +810,11 @@ static void v_wayv_process_midi_event(
 
                 if(f_pfx_osc->adsr_amp_on)
                 {
-                    float f_attack1 = *(plugin_data->attack[f_i]) * .01f;
+                    MKFLT f_attack1 = *(plugin_data->attack[f_i]) * .01f;
                     f_attack1 = (f_attack1) * (f_attack1);
-                    float f_decay1 = *(plugin_data->decay[f_i]) * .01f;
+                    MKFLT f_decay1 = *(plugin_data->decay[f_i]) * .01f;
                     f_decay1 = (f_decay1) * (f_decay1);
-                    float f_release1 = *(plugin_data->release[f_i]) * .01f;
+                    MKFLT f_release1 = *(plugin_data->release[f_i]) * .01f;
                     f_release1 = (f_release1) * (f_release1);
 
                     v_adsr_set_adsr_db(
@@ -847,12 +847,12 @@ static void v_wayv_process_midi_event(
             if(f_wayv_voice->adsr_noise_on)
             {
                 v_adsr_retrigger(&f_wayv_voice->adsr_noise);
-                float f_attack = *(plugin_data->noise_attack) * .01f;
+                MKFLT f_attack = *(plugin_data->noise_attack) * .01f;
                 f_attack = (f_attack) * (f_attack);
-                float f_decay = *(plugin_data->noise_decay) * .01f;
+                MKFLT f_decay = *(plugin_data->noise_decay) * .01f;
                 f_decay = (f_decay) * (f_decay);
-                float f_sustain = (*plugin_data->noise_sustain);
-                float f_release = *(plugin_data->noise_release) * .01f;
+                MKFLT f_sustain = (*plugin_data->noise_sustain);
+                MKFLT f_release = *(plugin_data->noise_release) * .01f;
                 f_release = (f_release) * (f_release);
                 v_adsr_set_adsr_db(&f_wayv_voice->adsr_noise,
                         f_attack, f_decay, f_sustain, f_release);
@@ -869,12 +869,12 @@ static void v_wayv_process_midi_event(
             if(f_wayv_voice->adsr_lfo_on)
             {
                 v_adsr_retrigger(&f_wayv_voice->adsr_lfo);
-                float f_attack = *(plugin_data->lfo_attack) * .01f;
+                MKFLT f_attack = *(plugin_data->lfo_attack) * .01f;
                 f_attack = (f_attack) * (f_attack);
-                float f_decay = *(plugin_data->lfo_decay) * .01f;
+                MKFLT f_decay = *(plugin_data->lfo_decay) * .01f;
                 f_decay = (f_decay) * (f_decay);
-                float f_sustain = (*plugin_data->lfo_sustain) * 0.01f;
-                float f_release = *(plugin_data->lfo_release) * .01f;
+                MKFLT f_sustain = (*plugin_data->lfo_sustain) * 0.01f;
+                MKFLT f_release = *(plugin_data->lfo_release) * .01f;
                 f_release = (f_release) * (f_release);
                 v_adsr_set_adsr(&f_wayv_voice->adsr_lfo,
                         f_attack, f_decay, f_sustain, f_release);
@@ -888,11 +888,11 @@ static void v_wayv_process_midi_event(
 
             v_adsr_retrigger(&f_wayv_voice->adsr_main);
 
-            float f_attack = *(plugin_data->attack_main) * .01f;
+            MKFLT f_attack = *(plugin_data->attack_main) * .01f;
             f_attack = (f_attack) * (f_attack);
-            float f_decay = *(plugin_data->decay_main) * .01f;
+            MKFLT f_decay = *(plugin_data->decay_main) * .01f;
             f_decay = (f_decay) * (f_decay);
-            float f_release = *(plugin_data->release_main) * .01f;
+            MKFLT f_release = *(plugin_data->release_main) * .01f;
             f_release = (f_release) * (f_release);
 
             FP_ADSR_SET[f_adsr_main_lin](&f_wayv_voice->adsr_main,
@@ -969,11 +969,11 @@ static void v_wayv_process_midi_event(
                        *plugin_data->lfo_phase * 0.01f,
                        *plugin_data->lfo_type);
 
-            float f_attack_a = (*(plugin_data->pfx_attack) * .01);
+            MKFLT f_attack_a = (*(plugin_data->pfx_attack) * .01);
             f_attack_a *= f_attack_a;
-            float f_decay_a = (*(plugin_data->pfx_decay) * .01);
+            MKFLT f_decay_a = (*(plugin_data->pfx_decay) * .01);
             f_decay_a *= f_decay_a;
-            float f_release_a = (*(plugin_data->pfx_release) * .01);
+            MKFLT f_release_a = (*(plugin_data->pfx_release) * .01);
             f_release_a *= f_release_a;
 
             v_adsr_set_adsr_db(&f_wayv_voice->adsr_amp,
@@ -987,11 +987,11 @@ static void v_wayv_process_midi_event(
                 &f_wayv_voice->adsr_amp,
                 (*(plugin_data->pfx_hold) * .01));
 
-            float f_attack_f = (*(plugin_data->pfx_attack_f) * .01);
+            MKFLT f_attack_f = (*(plugin_data->pfx_attack_f) * .01);
             f_attack_f *= f_attack_f;
-            float f_decay_f = (*(plugin_data->pfx_decay_f) * .01);
+            MKFLT f_decay_f = (*(plugin_data->pfx_decay_f) * .01);
             f_decay_f *= f_decay_f;
-            float f_release_f = (*(plugin_data->pfx_release_f) * .01);
+            MKFLT f_release_f = (*(plugin_data->pfx_release_f) * .01);
             f_release_f *= f_release_f;
 
             v_adsr_set_adsr(&f_wayv_voice->adsr_filter,
@@ -1282,8 +1282,8 @@ static void v_run_wayv_voice(t_wayv *plugin_data,
     }
 
     register int f_osc_num = 0;
-    float f_macro_amp;
-    float f_osc_amp;
+    MKFLT f_macro_amp;
+    MKFLT f_osc_amp;
     t_wayv_osc * f_osc;
 
     while(f_osc_num < WAYV_OSC_COUNT)
@@ -1464,7 +1464,7 @@ static void v_run_wayv_voice(t_wayv *plugin_data,
         if(a_voice->adsr_noise_on)
         {
             v_adsr_run(&a_voice->adsr_noise);
-            float f_noise =
+            MKFLT f_noise =
                 a_voice->noise_func_ptr(&a_voice->white_noise1) *
                 (a_voice->noise_linamp) * a_voice->adsr_noise.output *
                 a_voice->adsr_main.output;
@@ -1473,7 +1473,7 @@ static void v_run_wayv_voice(t_wayv *plugin_data,
         }
         else
         {
-            float f_noise =
+            MKFLT f_noise =
                 (a_voice->noise_func_ptr(&a_voice->white_noise1) *
                 (a_voice->noise_linamp)) *
                 a_voice->adsr_main.output;
@@ -1499,11 +1499,11 @@ static void v_run_wayv_voice(t_wayv *plugin_data,
 }
 
 
-float * f_char_to_wavetable(char * a_char)
+MKFLT * f_char_to_wavetable(char * a_char)
 {
-    float * f_result;
+    MKFLT * f_result;
 
-    lmalloc((void**)&f_result, sizeof(float) * 1024);
+    lmalloc((void**)&f_result, sizeof(MKFLT) * 1024);
 
     t_1d_char_array * f_arr = c_split_str(a_char, '|', 1025, 32);
 
@@ -1529,19 +1529,19 @@ void v_wayv_configure(PYFX_Handle instance, char *key,
 
     if (!strcmp(key, "wayv_add_eng0"))
     {
-        float * f_table = f_char_to_wavetable(value);
+        MKFLT * f_table = f_char_to_wavetable(value);
         v_wt_set_wavetable(plugin_data->mono_modules->wavetables, 17, f_table,
                 1024, a_spinlock, &plugin_data->mono_modules->reset_wavetables);
     }
     else if (!strcmp(key, "wayv_add_eng1"))
     {
-        float * f_table = f_char_to_wavetable(value);
+        MKFLT * f_table = f_char_to_wavetable(value);
         v_wt_set_wavetable(plugin_data->mono_modules->wavetables, 18, f_table,
                 1024, a_spinlock, &plugin_data->mono_modules->reset_wavetables);
     }
     else if (!strcmp(key, "wayv_add_eng2"))
     {
-        float * f_table = f_char_to_wavetable(value);
+        MKFLT * f_table = f_char_to_wavetable(value);
         v_wt_set_wavetable(plugin_data->mono_modules->wavetables, 19, f_table,
                 1024, a_spinlock, &plugin_data->mono_modules->reset_wavetables);
     }
@@ -1569,11 +1569,11 @@ PYFX_Descriptor *wayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, WAYV_SUSTAIN2, 0.0f, -30.0f, 0.0f);
     pydaw_set_pyfx_port(f_result, WAYV_RELEASE2, 50.0f, 10.0f, 400.0f);
     pydaw_set_pyfx_port(f_result, WAYV_NOISE_AMP, -30.0f, -60.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, WAYV_OSC1_TYPE, 1.0f, 0.0f, (float)WT_TOTAL_WAVETABLE_COUNT);
+    pydaw_set_pyfx_port(f_result, WAYV_OSC1_TYPE, 1.0f, 0.0f, (MKFLT)WT_TOTAL_WAVETABLE_COUNT);
     pydaw_set_pyfx_port(f_result, WAYV_OSC1_PITCH, 0.0f, -72.0f, 72.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC1_TUNE, 0.0f, -100.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC1_VOLUME, -6.0f, -30.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, WAYV_OSC2_TYPE, 0.0f, 0.0f, (float)WT_TOTAL_WAVETABLE_COUNT);
+    pydaw_set_pyfx_port(f_result, WAYV_OSC2_TYPE, 0.0f, 0.0f, (MKFLT)WT_TOTAL_WAVETABLE_COUNT);
     pydaw_set_pyfx_port(f_result, WAYV_OSC2_PITCH, 0.0f, -72.0f, 72.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC2_TUNE, 0.0f, -100.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC2_VOLUME, -6.0f, -30.0f, 0.0f);
@@ -1627,7 +1627,7 @@ PYFX_Descriptor *wayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, WAYV_OSC2_UNISON_VOICES, 1.0f, 1.0f, 7.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC2_UNISON_SPREAD, 50.0f, 0.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_LFO_AMOUNT, 100.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, WAYV_OSC3_TYPE, 0.0f, 0.0f, (float)WT_TOTAL_WAVETABLE_COUNT);
+    pydaw_set_pyfx_port(f_result, WAYV_OSC3_TYPE, 0.0f, 0.0f, (MKFLT)WT_TOTAL_WAVETABLE_COUNT);
     pydaw_set_pyfx_port(f_result, WAYV_OSC3_PITCH, 0.0f, -72.0f, 72.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC3_TUNE, 0.0f, -100.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC3_VOLUME, -6.0f, -30.0f, 0.0f);
@@ -1666,7 +1666,7 @@ PYFX_Descriptor *wayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, WAYV_OSC1_FM4, 0.0f, 0.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC2_FM4, 0.0f, 0.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC3_FM4, 0.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, WAYV_OSC4_TYPE, 0.0f, 0.0f, (float)WT_TOTAL_WAVETABLE_COUNT);
+    pydaw_set_pyfx_port(f_result, WAYV_OSC4_TYPE, 0.0f, 0.0f, (MKFLT)WT_TOTAL_WAVETABLE_COUNT);
     pydaw_set_pyfx_port(f_result, WAYV_OSC4_PITCH, 0.0f, -72.0f, 72.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC4_TUNE, 0.0f, -100.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC4_VOLUME, -6.0f, -30.0f, 0.0f);
@@ -1754,7 +1754,7 @@ PYFX_Descriptor *wayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, WAYV_SUSTAIN_LFO, 100.0f, 0.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_RELEASE_LFO, 50.0f, 10.0f, 400.0f);
     pydaw_set_pyfx_port(f_result, WAYV_ADSR_LFO_ON, 0.0f, 0.0f, 1.0f);
-    pydaw_set_pyfx_port(f_result, WAYV_OSC5_TYPE, 0.0f, 0.0f, (float)WT_TOTAL_WAVETABLE_COUNT);
+    pydaw_set_pyfx_port(f_result, WAYV_OSC5_TYPE, 0.0f, 0.0f, (MKFLT)WT_TOTAL_WAVETABLE_COUNT);
     pydaw_set_pyfx_port(f_result, WAYV_OSC5_PITCH, 0.0f, -72.0f, 72.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC5_TUNE, 0.0f, -100.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC5_VOLUME, -6.0f, -30.0f, 0.0f);
@@ -1767,7 +1767,7 @@ PYFX_Descriptor *wayv_PYFX_descriptor()
     pydaw_set_pyfx_port(f_result, WAYV_SUSTAIN5, 0.0f, -30.0f, 0.0f);
     pydaw_set_pyfx_port(f_result, WAYV_RELEASE5, 50.0f, 10.0f, 400.0f);
     pydaw_set_pyfx_port(f_result, WAYV_ADSR5_CHECKBOX, 0.0f, 0, 1);
-    pydaw_set_pyfx_port(f_result, WAYV_OSC6_TYPE, 0.0f, 0.0f, (float)WT_TOTAL_WAVETABLE_COUNT);
+    pydaw_set_pyfx_port(f_result, WAYV_OSC6_TYPE, 0.0f, 0.0f, (MKFLT)WT_TOTAL_WAVETABLE_COUNT);
     pydaw_set_pyfx_port(f_result, WAYV_OSC6_PITCH, 0.0f, -72.0f, 72.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC6_TUNE, 0.0f, -100.0f, 100.0f);
     pydaw_set_pyfx_port(f_result, WAYV_OSC6_VOLUME, -6.0f, -30.0f, 0.0f);

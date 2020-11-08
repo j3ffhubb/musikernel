@@ -26,36 +26,36 @@ extern "C" {
 
 typedef struct
 {
-    float * buffer;
-    float wet_lin, wet_db, freq_last, mod_amt;
-    float output0, output1;
-    float delay_offset_amt, delay_offset;
-    float pos_left, pos_right;
+    MKFLT * buffer;
+    MKFLT wet_lin, wet_db, freq_last, mod_amt;
+    MKFLT output0, output1;
+    MKFLT delay_offset_amt, delay_offset;
+    MKFLT pos_left, pos_right;
     int buffer_size, buffer_ptr;
-    float buffer_size_float;
+    MKFLT buffer_size_MKFLT;
     t_lfs_lfo lfo;
     t_svf2_filter hp;
     t_svf2_filter lp;
 }t_crs_chorus;
 
 void v_crs_free(t_crs_chorus *);
-void v_crs_chorus_set(t_crs_chorus*, float, float);
-void v_crs_chorus_run(t_crs_chorus*, float, float);
+void v_crs_chorus_set(t_crs_chorus*, MKFLT, MKFLT);
+void v_crs_chorus_run(t_crs_chorus*, MKFLT, MKFLT);
 
-void g_crs_init(t_crs_chorus * f_result, float a_sr, int a_huge_pages)
+void g_crs_init(t_crs_chorus * f_result, MKFLT a_sr, int a_huge_pages)
 {
     f_result->buffer_size = (int)(a_sr * 0.050f);
-    f_result->buffer_size_float = ((float)(f_result->buffer_size));
+    f_result->buffer_size_MKFLT = ((MKFLT)(f_result->buffer_size));
 
     if(a_huge_pages)
     {
         hpalloc((void**)&f_result->buffer,
-            sizeof(float) * f_result->buffer_size);
+            sizeof(MKFLT) * f_result->buffer_size);
     }
     else
     {
         lmalloc((void**)&f_result->buffer,
-            sizeof(float) * f_result->buffer_size);
+            sizeof(MKFLT) * f_result->buffer_size);
     }
 
     int f_i = 0;
@@ -88,7 +88,7 @@ void g_crs_init(t_crs_chorus * f_result, float a_sr, int a_huge_pages)
     v_lfs_sync(&f_result->lfo, 0.0f, 1);
 }
 
-void v_crs_chorus_set(t_crs_chorus* a_crs, float a_freq, float a_wet)
+void v_crs_chorus_set(t_crs_chorus* a_crs, MKFLT a_freq, MKFLT a_wet)
 {
     if(a_wet != (a_crs->wet_db))
     {
@@ -103,11 +103,11 @@ void v_crs_chorus_set(t_crs_chorus* a_crs, float a_freq, float a_wet)
     }
 }
 
-void v_crs_chorus_run(t_crs_chorus* a_crs, float a_input0, float a_input1)
+void v_crs_chorus_run(t_crs_chorus* a_crs, MKFLT a_input0, MKFLT a_input1)
 {
     a_crs->buffer[(a_crs->buffer_ptr)] = (a_input0 + a_input1) * 0.5f;
 
-    a_crs->delay_offset = ((float)(a_crs->buffer_ptr)) -
+    a_crs->delay_offset = ((MKFLT)(a_crs->buffer_ptr)) -
             (a_crs->delay_offset_amt);
 
     v_lfs_run(&a_crs->lfo);
@@ -115,25 +115,25 @@ void v_crs_chorus_run(t_crs_chorus* a_crs, float a_input0, float a_input1)
     a_crs->pos_left = ((a_crs->delay_offset) + ((a_crs->lfo.output) *
             (a_crs->mod_amt)));
 
-    if((a_crs->pos_left) >= (a_crs->buffer_size_float))
+    if((a_crs->pos_left) >= (a_crs->buffer_size_MKFLT))
     {
-        a_crs->pos_left -= (a_crs->buffer_size_float);
+        a_crs->pos_left -= (a_crs->buffer_size_MKFLT);
     }
     else if((a_crs->pos_left) < 0.0f)
     {
-        a_crs->pos_left += (a_crs->buffer_size_float);
+        a_crs->pos_left += (a_crs->buffer_size_MKFLT);
     }
 
     a_crs->pos_right = ((a_crs->delay_offset) + ((a_crs->lfo.output) *
             (a_crs->mod_amt) * -1.0f));
 
-    if((a_crs->pos_right) >= (a_crs->buffer_size_float))
+    if((a_crs->pos_right) >= (a_crs->buffer_size_MKFLT))
     {
-        a_crs->pos_right -= (a_crs->buffer_size_float);
+        a_crs->pos_right -= (a_crs->buffer_size_MKFLT);
     }
     else if((a_crs->pos_right) < 0.0f)
     {
-        a_crs->pos_right += (a_crs->buffer_size_float);
+        a_crs->pos_right += (a_crs->buffer_size_MKFLT);
     }
 
     a_crs->output0 = a_input0 + (f_cubic_interpolate_ptr_wrap(a_crs->buffer,

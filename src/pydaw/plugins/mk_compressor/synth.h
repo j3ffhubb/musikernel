@@ -55,19 +55,19 @@ typedef struct
     PYFX_Data *peak_meter;
 
 
-    float fs;
+    MKFLT fs;
     t_mk_comp_mono_modules * mono_modules;
 
     int midi_event_types[200];
     int midi_event_ticks[200];
-    float midi_event_values[200];
+    MKFLT midi_event_values[200];
     int midi_event_ports[200];
     int midi_event_count;
     t_plugin_event_queue atm_queue;
     int plugin_uid;
     fp_queue_message queue_func;
 
-    float * port_table;
+    MKFLT * port_table;
     t_plugin_cc_map cc_map;
     PYFX_Descriptor * descriptor;
     char ui_msg_buff[64];

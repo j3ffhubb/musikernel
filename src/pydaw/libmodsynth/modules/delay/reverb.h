@@ -32,57 +32,57 @@ extern "C" {
 typedef struct
 {
     t_comb_filter tap;
-    float pitch;
+    MKFLT pitch;
 }t_rvb_tap;
 
 typedef struct
 {
     t_state_variable_filter diffuser;
-    float pitch;
+    MKFLT pitch;
 }t_rvb_diffuser;
 
 typedef struct
 {
-    float output;
-    float feedback;
+    MKFLT output;
+    MKFLT feedback;
     t_lfs_lfo lfo;
     t_state_variable_filter lp;
     t_state_variable_filter hp;
-    float wet_linear;
+    MKFLT wet_linear;
     t_rvb_tap taps[PYDAW_REVERB_TAP_COUNT];
     t_rvb_diffuser diffusers[PYDAW_REVERB_DIFFUSER_COUNT];
-    float * predelay_buffer;
+    MKFLT * predelay_buffer;
     int predelay_counter;
     int predelay_size;
-    float color;
-    float wet;
-    float time;
-    float volume_factor;
-    float last_predelay;
-    float sr;
-    float hp_cutoff;
+    MKFLT color;
+    MKFLT wet;
+    MKFLT time;
+    MKFLT volume_factor;
+    MKFLT last_predelay;
+    MKFLT sr;
+    MKFLT hp_cutoff;
 } t_rvb_reverb;
 
-t_rvb_reverb * g_rvb_reverb_get(float);
-void v_rvb_reverb_set(t_rvb_reverb *, float, float, float, float, float);
-inline void v_rvb_reverb_run(t_rvb_reverb *, float, float);
+t_rvb_reverb * g_rvb_reverb_get(MKFLT);
+void v_rvb_reverb_set(t_rvb_reverb *, MKFLT, MKFLT, MKFLT, MKFLT, MKFLT);
+inline void v_rvb_reverb_run(t_rvb_reverb *, MKFLT, MKFLT);
 
 
-void v_rvb_reverb_set(t_rvb_reverb * self, float a_time, float a_wet,
-        float a_color, float a_predelay, float a_hp_cutoff)
+void v_rvb_reverb_set(t_rvb_reverb * self, MKFLT a_time, MKFLT a_wet,
+        MKFLT a_color, MKFLT a_predelay, MKFLT a_hp_cutoff)
 {
     if(unlikely(a_time != self->time))
     {
         int f_i;
-        float f_base = 30.0f - (a_time * 25.0f);
-        float f_factor = 1.4f + (a_time * 0.8f);
+        MKFLT f_base = 30.0f - (a_time * 25.0f);
+        MKFLT f_factor = 1.4f + (a_time * 0.8f);
 
         self->feedback = a_time - 1.03f;
         v_lfs_set(&self->lfo, 1.0f - (a_time * 0.9f));
 
         for(f_i = 0; f_i < PYDAW_REVERB_TAP_COUNT; ++f_i)
         {
-            self->taps[f_i].pitch = f_base + (((float)f_i) * f_factor);
+            self->taps[f_i].pitch = f_base + (((MKFLT)f_i) * f_factor);
             v_cmb_set_all(&self->taps[f_i].tap, 0.0f, self->feedback,
                 self->taps[f_i].pitch);
         }
@@ -121,8 +121,8 @@ void v_rvb_reverb_set(t_rvb_reverb * self, float a_time, float a_wet,
     }
 }
 
-inline void v_rvb_reverb_run(t_rvb_reverb * self, float a_input0,
-        float a_input1)
+inline void v_rvb_reverb_run(t_rvb_reverb * self, MKFLT a_input0,
+        MKFLT a_input1)
 {
     int f_i;
     t_state_variable_filter * f_filter;
@@ -130,9 +130,9 @@ inline void v_rvb_reverb_run(t_rvb_reverb * self, float a_input0,
 
     self->output *= 0.02f;
     v_lfs_run(&self->lfo);
-    float f_lfo_diff = self->lfo.output * 2.0f;
+    MKFLT f_lfo_diff = self->lfo.output * 2.0f;
 
-    float f_tmp_sample = v_svf_run_2_pole_lp(&self->lp,
+    MKFLT f_tmp_sample = v_svf_run_2_pole_lp(&self->lp,
             (a_input0 + a_input1));
     f_tmp_sample = v_svf_run_2_pole_hp(&self->hp, f_tmp_sample);
     f_tmp_sample *= (self->wet_linear);
@@ -166,7 +166,7 @@ inline void v_rvb_reverb_run(t_rvb_reverb * self, float a_input0,
 void v_rvb_panic(t_rvb_reverb * self)
 {
     register int f_i, f_i2;
-    float * f_tmp;
+    MKFLT * f_tmp;
     int f_count;
     int f_pre_count = self->sr + 5000;
     for(f_i = 0; f_i < f_pre_count; ++f_i)
@@ -185,7 +185,7 @@ void v_rvb_panic(t_rvb_reverb * self)
     }
 }
 
-void g_rvb_reverb_init(t_rvb_reverb * f_result, float a_sr)
+void g_rvb_reverb_init(t_rvb_reverb * f_result, MKFLT a_sr)
 {
     int f_i;
 
@@ -199,7 +199,7 @@ void g_rvb_reverb_init(t_rvb_reverb * f_result, float a_sr)
 
     for(f_i = 0; f_i < PYDAW_REVERB_DIFFUSER_COUNT; ++f_i)
     {
-        f_result->diffusers[f_i].pitch = 33.0f + (((float)f_i) * 7.0f);
+        f_result->diffusers[f_i].pitch = 33.0f + (((MKFLT)f_i) * 7.0f);
     }
 
     f_result->output = 0.0f;
@@ -215,7 +215,7 @@ void g_rvb_reverb_init(t_rvb_reverb * f_result, float a_sr)
     g_svf_init(&f_result->lp, a_sr);
     v_svf_set_res(&f_result->lp, -36.0f);
 
-    f_result->volume_factor = (1.0f / (float)PYDAW_REVERB_DIFFUSER_COUNT) * 0.5;
+    f_result->volume_factor = (1.0f / (MKFLT)PYDAW_REVERB_DIFFUSER_COUNT) * 0.5;
 
     f_i = 0;
 
@@ -242,7 +242,7 @@ void g_rvb_reverb_init(t_rvb_reverb * f_result, float a_sr)
     f_result->predelay_size = (int)(a_sr * 0.01f);
 
     hpalloc((void**)&f_result->predelay_buffer,
-        sizeof(float) * (a_sr + 5000));
+        sizeof(MKFLT) * (a_sr + 5000));
 
     f_i = 0;
     while(f_i < (a_sr + 5000))

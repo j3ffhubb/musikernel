@@ -22,16 +22,16 @@ extern "C" {
 
 typedef struct
 {
-    float in_n_m1, out_n_m1, coeff;
+    MKFLT in_n_m1, out_n_m1, coeff;
 }t_dco_dc_offset_filter;
 
-t_dco_dc_offset_filter * g_dco_get(float);
-inline float f_dco_run(t_dco_dc_offset_filter*,float);
+t_dco_dc_offset_filter * g_dco_get(MKFLT);
+inline MKFLT f_dco_run(t_dco_dc_offset_filter*,MKFLT);
 inline void v_dco_reset(t_dco_dc_offset_filter*);
 
-inline float f_dco_run(t_dco_dc_offset_filter* a_dco,float a_in)
+inline MKFLT f_dco_run(t_dco_dc_offset_filter* a_dco,MKFLT a_in)
 {
-    register float output =
+    register MKFLT output =
         (a_in - (a_dco->in_n_m1)) + ((a_dco->out_n_m1) * (a_dco->coeff));
     output = f_remove_denormal(output);
 
@@ -47,14 +47,14 @@ inline void v_dco_reset(t_dco_dc_offset_filter* a_dco)
     a_dco->out_n_m1 = 0.0f;
 }
 
-void g_dco_init(t_dco_dc_offset_filter * f_result, float a_sr)
+void g_dco_init(t_dco_dc_offset_filter * f_result, MKFLT a_sr)
 {
     f_result->coeff = (1.0f - (6.6f/a_sr));
     v_dco_reset(f_result);
 }
 
 
-t_dco_dc_offset_filter * g_dco_get(float a_sr)
+t_dco_dc_offset_filter * g_dco_get(MKFLT a_sr)
 {
     t_dco_dc_offset_filter * f_result;
     lmalloc((void**)&f_result, sizeof(t_dco_dc_offset_filter));

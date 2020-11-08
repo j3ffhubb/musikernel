@@ -22,10 +22,10 @@ GNU General Public License for more details.
 extern "C" {
 #endif
 
-inline float f_sine_fast_run(float);
-inline float f_sine_fast_run_radians(float);
-inline float f_cosine_fast_run(float);
-inline float f_cosine_fast_run_radians(float);
+inline MKFLT f_sine_fast_run(MKFLT);
+inline MKFLT f_sine_fast_run_radians(MKFLT);
+inline MKFLT f_cosine_fast_run(MKFLT);
+inline MKFLT f_cosine_fast_run_radians(MKFLT);
 
 #ifdef	__cplusplus
 }
@@ -36,7 +36,7 @@ inline float f_cosine_fast_run_radians(float);
 #define ARR_SINE_COUNT_RADIANS (ARR_SINE_COUNT / PI2)
 #define ARR_COSINE_PHASE_RADIANS (PI* 0.25f)
 
-__thread float ARR_SINE[ARR_SINE_COUNT]
+__thread MKFLT ARR_SINE[ARR_SINE_COUNT]
 __attribute__((aligned(CACHE_LINE_SIZE))) = {
 0.000000, 0.007836, 0.015672, 0.023506, 0.031340, 0.039171, 0.047000, 0.054826, 0.062648, 0.070467, 0.078282, 0.086091, 0.093896, 0.101694, 0.109486, 0.117272, 0.125051, 0.132821, 0.140584, 0.148338,
 0.156083, 0.163818, 0.171543, 0.179258, 0.186961, 0.194654, 0.202334, 0.210002, 0.217657, 0.225298, 0.232926, 0.240539, 0.248138, 0.255721, 0.263289, 0.270840, 0.278375, 0.285893, 0.293393, 0.300876,
@@ -81,47 +81,47 @@ __attribute__((aligned(CACHE_LINE_SIZE))) = {
 -0.014247, -0.006411};
 
 
-/* inline float f_sine_fast_run(float a_osc_core)
+/* inline MKFLT f_sine_fast_run(MKFLT a_osc_core)
  *
  * Accepts zero to one input.
  */
-inline float f_sine_fast_run(float a_osc_core)
+inline MKFLT f_sine_fast_run(MKFLT a_osc_core)
 {
     return f_linear_interpolate_ptr_wrap(ARR_SINE, ARR_SINE_COUNT,
             (a_osc_core * ARR_SINE_COUNT));
 }
 
-/* inline float f_sine_fast_run(float a_osc_core)
+/* inline MKFLT f_sine_fast_run(MKFLT a_osc_core)
  *
  * Accepts input in radians (zero to (PI * 2))
  */
-inline float f_sine_fast_run_radians(float a_osc_core)
+inline MKFLT f_sine_fast_run_radians(MKFLT a_osc_core)
 {
     return f_linear_interpolate_ptr_wrap(ARR_SINE, ARR_SINE_COUNT,
             (a_osc_core * ARR_SINE_COUNT_RADIANS));
 }
 
-/* inline float f_cosine_fast_run(
- * float a_osc_core,
+/* inline MKFLT f_cosine_fast_run(
+ * MKFLT a_osc_core,
  * t_lin_interpolater * a_lin)
  *
  * Perform a fast, table-lookup based cosine.  Accepts zero to one input
  */
-inline float f_cosine_fast_run(float a_osc_core)
+inline MKFLT f_cosine_fast_run(MKFLT a_osc_core)
 {
     return f_linear_interpolate_ptr_wrap(ARR_SINE, ARR_SINE_COUNT,
             ((a_osc_core * ARR_SINE_COUNT) + 0.25f));
 }
 
 
-/* inline float f_cosine_fast_run(
- * float a_osc_core,
+/* inline MKFLT f_cosine_fast_run(
+ * MKFLT a_osc_core,
  * t_lin_interpolater * a_lin)
  *
  * Perform a fast, table-lookup based cosine.
  * Accepts input in Radians (zero to (PI * 2))
  */
-inline float f_cosine_fast_run_radians(float a_osc_core)
+inline MKFLT f_cosine_fast_run_radians(MKFLT a_osc_core)
 {
     return f_linear_interpolate_ptr_wrap(ARR_SINE, ARR_SINE_COUNT,
         ((a_osc_core * ARR_SINE_COUNT_RADIANS) + ARR_COSINE_PHASE_RADIANS));

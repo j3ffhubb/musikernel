@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 typedef struct{
-    float gain, in_db;
+    MKFLT gain, in_db;
     t_clipper clipper1;
     t_audio_xfade dist_dry_wet;
 }t_mds_multidist;
@@ -33,20 +33,20 @@ typedef struct{
 }
 #endif
 
-typedef float (*fp_multi_dist)(t_mds_multidist*, float, float);
+typedef MKFLT (*fp_multi_dist)(t_mds_multidist*, MKFLT, MKFLT);
 
-float f_multi_dist_off(t_mds_multidist* self, float a_sample, float a_out)
+MKFLT f_multi_dist_off(t_mds_multidist* self, MKFLT a_sample, MKFLT a_out)
 {
     return a_sample;
 }
 
-float f_multi_dist_clip(t_mds_multidist* self, float a_sample, float a_out)
+MKFLT f_multi_dist_clip(t_mds_multidist* self, MKFLT a_sample, MKFLT a_out)
 {
     return f_axf_run_xfade(&self->dist_dry_wet, a_sample,
         f_clp_clip(&self->clipper1, a_sample * self->gain) * a_out);
 }
 
-float f_multi_dist_foldback(t_mds_multidist* self, float a_sample, float a_out)
+MKFLT f_multi_dist_foldback(t_mds_multidist* self, MKFLT a_sample, MKFLT a_out)
 {
     return f_axf_run_xfade(&self->dist_dry_wet, a_sample,
         f_fbk_mono(a_sample * self->gain) * a_out);
@@ -63,7 +63,7 @@ fp_multi_dist g_mds_get_fp(int index)
     return MULTI_DIST_FP[index];
 }
 
-void v_mds_set_gain(t_mds_multidist * self, float a_db)
+void v_mds_set_gain(t_mds_multidist * self, MKFLT a_db)
 {
     if((self->in_db) != a_db)
     {

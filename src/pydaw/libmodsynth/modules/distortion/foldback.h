@@ -23,7 +23,7 @@ extern "C" {
 
 typedef struct
 {
-    float thresh, thresh_db, gain, gain_db, output[2];
+    MKFLT thresh, thresh_db, gain, gain_db, output[2];
 } t_fbk_foldback;
 
 
@@ -41,7 +41,7 @@ void g_fbk_init(t_fbk_foldback * self)
     self->gain_db = 0.0f;
 }
 
-void v_fbk_set(t_fbk_foldback * self, float a_thresh_db, float a_gain_db)
+void v_fbk_set(t_fbk_foldback * self, MKFLT a_thresh_db, MKFLT a_gain_db)
 {
     if(self->gain_db != a_gain_db)
     {
@@ -56,17 +56,17 @@ void v_fbk_set(t_fbk_foldback * self, float a_thresh_db, float a_gain_db)
     }
 }
 
-void v_fbk_run(t_fbk_foldback * self, float a_input0, float a_input1)
+void v_fbk_run(t_fbk_foldback * self, MKFLT a_input0, MKFLT a_input1)
 {
     a_input0 *= self->gain;
     a_input1 *= self->gain;
 
-    float f_arr[2] = {a_input0, a_input1};
+    MKFLT f_arr[2] = {a_input0, a_input1};
     int f_i;
 
     for(f_i = 0; f_i < 2; ++f_i)
     {
-        float f_input = f_arr[f_i];
+        MKFLT f_input = f_arr[f_i];
         if(f_input > 0.0f)
         {
             if(f_input > self->thresh)
@@ -95,7 +95,7 @@ void v_fbk_run(t_fbk_foldback * self, float a_input0, float a_input1)
     }
 }
 
-float f_fbk_mono(float a_val)
+MKFLT f_fbk_mono(MKFLT a_val)
 {
     if(a_val > 1.0f)
     {

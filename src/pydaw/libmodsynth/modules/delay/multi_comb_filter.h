@@ -30,34 +30,34 @@ typedef struct
 {
     int buffer_size;  //The size of input_buffer
     int input_pointer;  //The index where the current sample is written to
-    float delay_pointer; //
-    float wet_sample;
-    float output_sample;
-    float feedback_db;
-    float feedback_linear;
-    float midi_note_number;
-    float volume_recip;
-    float spread;
+    MKFLT delay_pointer; //
+    MKFLT wet_sample;
+    MKFLT output_sample;
+    MKFLT feedback_db;
+    MKFLT feedback_linear;
+    MKFLT midi_note_number;
+    MKFLT volume_recip;
+    MKFLT spread;
     int comb_count;
     //How many samples, including the fractional part, to delay the signal
-    float * delay_samples;
-    float sr;
-    float * input_buffer;
+    MKFLT * delay_samples;
+    MKFLT sr;
+    MKFLT * input_buffer;
     t_lin_interpolater * linear;
     t_pit_pitch_core * pitch_core;
     t_amp * amp_ptr;
 }t_mcm_multicomb;
 
-inline void v_mcm_run(t_mcm_multicomb*,float);
-inline void v_mcm_set(t_mcm_multicomb*, float,float,float);
-t_mcm_multicomb * g_mcm_get(int, float);
+inline void v_mcm_run(t_mcm_multicomb*,MKFLT);
+inline void v_mcm_set(t_mcm_multicomb*, MKFLT,MKFLT,MKFLT);
+t_mcm_multicomb * g_mcm_get(int, MKFLT);
 
 /* v_mcm_run(
  * t_mcm_multicomb*,
- * float input value (audio sample, -1 to 1, typically)
+ * MKFLT input value (audio sample, -1 to 1, typically)
  * );
  * This runs the filter.  You can then use the output sample in your plugin*/
-inline void v_mcm_run(t_mcm_multicomb* a_cmb_ptr,float a_value)
+inline void v_mcm_run(t_mcm_multicomb* a_cmb_ptr,MKFLT a_value)
 {
     a_cmb_ptr->input_buffer[(a_cmb_ptr->input_pointer)] = a_value;
     a_cmb_ptr->output_sample = 0.0f;
@@ -102,14 +102,14 @@ inline void v_mcm_run(t_mcm_multicomb* a_cmb_ptr,float a_value)
 
 /*v_mcm_set(
  * t_mcm_multicomb*,
- * float feedback (decibels -20 to 0)
- * float pitch (midi note number, 20 to 120),
- * float a_spread);
+ * MKFLT feedback (decibels -20 to 0)
+ * MKFLT pitch (midi note number, 20 to 120),
+ * MKFLT a_spread);
  *
  * Sets all parameters of the comb filters.
  */
-inline void v_mcm_set(t_mcm_multicomb* a_cmb_ptr, float a_feedback_db,
-        float a_midi_note_number, float a_spread)
+inline void v_mcm_set(t_mcm_multicomb* a_cmb_ptr, MKFLT a_feedback_db,
+        MKFLT a_midi_note_number, MKFLT a_spread)
 {
     /*Set feedback_linear, but only if it's changed since last time*/
     if((a_cmb_ptr->feedback_db) != a_feedback_db)
@@ -133,7 +133,7 @@ inline void v_mcm_set(t_mcm_multicomb* a_cmb_ptr, float a_feedback_db,
     {
         a_cmb_ptr->midi_note_number = a_midi_note_number;
         a_cmb_ptr->spread = a_spread;
-        float f_note = a_midi_note_number;
+        MKFLT f_note = a_midi_note_number;
         int f_i = 0;
         while(f_i < a_cmb_ptr->comb_count)
         {
@@ -149,9 +149,9 @@ inline void v_mcm_set(t_mcm_multicomb* a_cmb_ptr, float a_feedback_db,
 
 /* t_mcm_multicomb * g_mcm_get(
  * int a_comb_count,
- * float a_sr) //sample rate
+ * MKFLT a_sr) //sample rate
  */
-t_mcm_multicomb * g_mcm_get(int a_comb_count, float a_sr)
+t_mcm_multicomb * g_mcm_get(int a_comb_count, MKFLT a_sr)
 {
     t_mcm_multicomb * f_result;
 
@@ -161,7 +161,7 @@ t_mcm_multicomb * g_mcm_get(int a_comb_count, float a_sr)
     f_result->buffer_size = (int)((a_sr / 20.0f) + 300);
 
     buffer_alloc((void**)(&(f_result->input_buffer)),
-        sizeof(float) * (f_result->buffer_size));
+        sizeof(MKFLT) * (f_result->buffer_size));
 
     int f_i = 0;
 
@@ -179,14 +179,14 @@ t_mcm_multicomb * g_mcm_get(int a_comb_count, float a_sr)
     f_result->feedback_linear = 0.5f;
     f_result->midi_note_number = 60.0f;
 
-    f_result->volume_recip = 1.0f/(float)a_comb_count;
+    f_result->volume_recip = 1.0f/(MKFLT)a_comb_count;
 
-    lmalloc((void**)&f_result->delay_samples, sizeof(float) * a_comb_count);
+    lmalloc((void**)&f_result->delay_samples, sizeof(MKFLT) * a_comb_count);
 
     f_i = 0;
     while(f_i < a_comb_count)
     {
-        f_result->delay_samples[f_i] = 150.0f + (float)f_i;
+        f_result->delay_samples[f_i] = 150.0f + (MKFLT)f_i;
         ++f_i;
     }
 

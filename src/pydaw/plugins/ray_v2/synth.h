@@ -86,7 +86,7 @@ extern "C" {
 
 typedef struct {
     int oversample;
-    float os_recip;
+    MKFLT os_recip;
     PYFX_Data *os_buffer;
     PYFX_Data *output0;
     PYFX_Data *output1;
@@ -159,16 +159,16 @@ typedef struct {
     t_voc_voices * voices;
     long         sampleNo;
 
-    float fs;
+    MKFLT fs;
     t_rayv2_mono_modules * mono_modules;
 
-    float sv_pitch_bend_value;
-    float sv_last_note;  //For glide
-    float master_vol_lin;
+    MKFLT sv_pitch_bend_value;
+    MKFLT sv_last_note;  //For glide
+    MKFLT master_vol_lin;
 
     t_plugin_event_queue midi_queue;
     t_plugin_event_queue atm_queue;
-    float * port_table;
+    MKFLT * port_table;
     t_plugin_cc_map cc_map;
     PYFX_Descriptor * descriptor;
 } t_rayv2;

@@ -55,7 +55,7 @@ static void v_euphoria_on_stop(PYFX_Handle instance)
 }
 
 static void euphoriaConnectBuffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     if(a_is_sidechain)
     {
@@ -456,7 +456,7 @@ static void v_euphoria_load(PYFX_Handle instance,
 }
 
 static void v_euphoria_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_euphoria *plugin_data = (t_euphoria*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -714,14 +714,14 @@ static void add_sample_lms_euphoria(t_euphoria * plugin_data, int n)
             continue;
         }
 
-        float f_fade_vol = 1.0f;
+        MKFLT f_fade_vol = 1.0f;
         f_read_head = &f_pfx_sample->sample_read_heads;
 
         if(f_read_head->whole_number < f_pfx_sample->sample_fade_in_end_sample)
         {
-            float f_fade_in_inc = f_pfx_sample->sample_fade_in_inc;
-            float f_start_pos = f_sample->sampleStartPos;
-            float f_read_head_pos = (float)(f_read_head->whole_number);
+            MKFLT f_fade_in_inc = f_pfx_sample->sample_fade_in_inc;
+            MKFLT f_start_pos = f_sample->sampleStartPos;
+            MKFLT f_read_head_pos = (MKFLT)(f_read_head->whole_number);
 
             f_fade_vol =  (f_read_head_pos - f_start_pos) * f_fade_in_inc;
             f_fade_vol = (f_fade_vol * 18.0f) - 18.0f;
@@ -730,9 +730,9 @@ static void add_sample_lms_euphoria(t_euphoria * plugin_data, int n)
         else if(f_read_head->whole_number >
                 f_pfx_sample->sample_fade_out_start_sample)
         {
-            float f_sample_end_pos = f_sample->sampleEndPos;
-            float f_read_head_pos = (float)(f_read_head->whole_number);
-            float f_fade_out_dec = f_pfx_sample->sample_fade_out_dec;
+            MKFLT f_sample_end_pos = f_sample->sampleEndPos;
+            MKFLT f_read_head_pos = (MKFLT)(f_read_head->whole_number);
+            MKFLT f_fade_out_dec = f_pfx_sample->sample_fade_out_dec;
 
             f_fade_vol = (f_sample_end_pos - f_read_head_pos) * f_fade_out_dec;
             f_fade_vol = (f_fade_vol * 18.0f) - 18.0f;
@@ -899,9 +899,9 @@ static void v_euphoria_process_midi_event(
             int f_adsr_main_lin = (int)(*plugin_data->adsr_lin_main);
             f_voice->adsr_run_func = FP_ADSR_RUN[f_adsr_main_lin];
 
-            f_voice->keyboard_track = ((float)(a_event->note)) * 0.007874016f;
+            f_voice->keyboard_track = ((MKFLT)(a_event->note)) * 0.007874016f;
             f_voice->velocity_track =
-                ((float)(a_event->velocity)) * 0.007874016f;
+                ((MKFLT)(a_event->velocity)) * 0.007874016f;
 
             f_voice->sample_indexes_count = 0;
 
@@ -941,28 +941,28 @@ static void v_euphoria_process_midi_event(
                     {
                         f_sample->sampleEndPos =
                             (EUPHORIA_SINC_INTERPOLATION_POINTS_DIV2 +
-                            ((int)((float)(f_sample->wavpool_items->length
+                            ((int)((MKFLT)(f_sample->wavpool_items->length
                             - 5)) * (*f_sample->sampleEnds * .001)));
                     }
                     else
                     {
                         f_sample->sampleEndPos =
                             (EUPHORIA_SINC_INTERPOLATION_POINTS_DIV2 +
-                            ((int)((float)(f_sample->wavpool_items->length - 5))
+                            ((int)((MKFLT)(f_sample->wavpool_items->length - 5))
                             * (*f_sample->sampleLoopEnds * .001)));
                     }
 
                     if((f_sample->sampleEndPos) >
-                        ((float)(f_sample->wavpool_items->length)))
+                        ((MKFLT)(f_sample->wavpool_items->length)))
                     {
                         f_sample->sampleEndPos =
-                            (float)(f_sample->wavpool_items->length);
+                            (MKFLT)(f_sample->wavpool_items->length);
                     }
 
                     //get the fade in values
                     f_pfx_sample->sample_fade_in_end_sample =
                             (int)((*f_sample->sampleFadeInEnds) * 0.001f *
-                            (float)(f_sample->wavpool_items->length));
+                            (MKFLT)(f_sample->wavpool_items->length));
 
                     if(f_pfx_sample->sample_fade_in_end_sample <
                             (f_sample->sampleStartPos))
@@ -992,7 +992,7 @@ static void v_euphoria_process_midi_event(
                     //get the fade out values
                     f_pfx_sample->sample_fade_out_start_sample =
                             (int)((*f_sample->sampleFadeOutStarts) * 0.001f *
-                            (float)(f_sample->wavpool_items->length));
+                            (MKFLT)(f_sample->wavpool_items->length));
 
                     if(f_pfx_sample->sample_fade_out_start_sample <
                             (f_sample->sampleStartPos))
@@ -1030,10 +1030,10 @@ static void v_euphoria_process_midi_event(
                         (f_sample->sampleStartPos)); // 0.0f;
 
                     f_pfx_sample->vel_sens_output =
-                            (1.0f - (((float)(a_event->velocity) -
+                            (1.0f - (((MKFLT)(a_event->velocity) -
                             (*f_sample->sample_vel_low))
                             /
-                            ((float)(*f_sample->sample_vel_high) -
+                            ((MKFLT)(*f_sample->sample_vel_high) -
                             (*f_sample->sample_vel_low))))
                             * (*f_sample->sample_vel_sens) * -1.0f;
 
@@ -1148,7 +1148,7 @@ static void v_euphoria_process_midi_event(
             plugin_data->amp = f_db_to_linear_fast(*(plugin_data->master_vol));
 
             f_voice->note_f =
-                (float)f_note + (float)(*plugin_data->master_pitch);
+                (MKFLT)f_note + (MKFLT)(*plugin_data->master_pitch);
 
             f_voice->target_pitch = f_voice->note_f;
 
@@ -1170,21 +1170,21 @@ static void v_euphoria_process_midi_event(
             v_adsr_retrigger(&f_voice->adsr_filter);
             v_lfs_sync(&f_voice->lfo1, 0.0f, *(plugin_data->lfo_type));
 
-            float f_attack_a = (*(plugin_data->attack) * .01);
+            MKFLT f_attack_a = (*(plugin_data->attack) * .01);
             f_attack_a *= f_attack_a;
-            float f_decay_a = (*(plugin_data->decay) * .01);
+            MKFLT f_decay_a = (*(plugin_data->decay) * .01);
             f_decay_a *= f_decay_a;
-            float f_release_a = (*(plugin_data->release) * .01);
+            MKFLT f_release_a = (*(plugin_data->release) * .01);
             f_release_a *= f_release_a;
             FP_ADSR_SET[f_adsr_main_lin](&f_voice->adsr_amp,
                 f_attack_a, f_decay_a, (*(plugin_data->sustain)),
                 f_release_a);
 
-            float f_attack_f = (*(plugin_data->attack_f) * .01);
+            MKFLT f_attack_f = (*(plugin_data->attack_f) * .01);
             f_attack_f *= f_attack_f;
-            float f_decay_f = (*(plugin_data->decay_f) * .01);
+            MKFLT f_decay_f = (*(plugin_data->decay_f) * .01);
             f_decay_f *= f_decay_f;
-            float f_release_f = (*(plugin_data->release_f) * .01);
+            MKFLT f_release_f = (*(plugin_data->release_f) * .01);
             f_release_f *= f_release_f;
             v_adsr_set_adsr(&f_voice->adsr_filter,
                 f_attack_f, f_decay_f, (*(plugin_data->sustain_f) * .01),
@@ -1265,7 +1265,7 @@ static void v_run_lms_euphoria(
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
     }
 
-    float f_temp_sample0, f_temp_sample1;
+    MKFLT f_temp_sample0, f_temp_sample1;
 
     int f_monofx_index = 0;
 

@@ -23,23 +23,23 @@ extern "C" {
 
 typedef struct
 {
-    float wet_db;
-    float wet_linear;
-    float dry_db;
-    float dry_linear;
-    float output;
+    MKFLT wet_db;
+    MKFLT wet_linear;
+    MKFLT dry_db;
+    MKFLT dry_linear;
+    MKFLT output;
 }t_dw_dry_wet;
 
-inline void v_dw_set_dry_wet(t_dw_dry_wet*,float,float);
-inline void v_dw_run_dry_wet(t_dw_dry_wet*,float,float);
+inline void v_dw_set_dry_wet(t_dw_dry_wet*,MKFLT,MKFLT);
+inline void v_dw_run_dry_wet(t_dw_dry_wet*,MKFLT,MKFLT);
 t_dw_dry_wet* g_dw_get_dry_wet();
 
 /*inline void v_dw_set_dry_wet(
  * t_dw_dry_wet* a_dw,
- * float a_dry_db, //dry value in decibels, typically -50 to 0
- * float a_wet_db) //wet value in decibels, typically -50 to 0
+ * MKFLT a_dry_db, //dry value in decibels, typically -50 to 0
+ * MKFLT a_wet_db) //wet value in decibels, typically -50 to 0
  */
-inline void v_dw_set_dry_wet(t_dw_dry_wet* a_dw,float a_dry_db,float a_wet_db)
+inline void v_dw_set_dry_wet(t_dw_dry_wet* a_dw,MKFLT a_dry_db,MKFLT a_wet_db)
 {
     if((a_dw->dry_db) != (a_dry_db))
     {
@@ -56,10 +56,10 @@ inline void v_dw_set_dry_wet(t_dw_dry_wet* a_dw,float a_dry_db,float a_wet_db)
 
 /* inline void v_dw_run_dry_wet(
  * t_dw_dry_wet* a_dw,
- * float a_dry, //dry signal
- * float a_wet) //wet signal
+ * MKFLT a_dry, //dry signal
+ * MKFLT a_wet) //wet signal
  */
-inline void v_dw_run_dry_wet(t_dw_dry_wet* a_dw, float a_dry, float a_wet)
+inline void v_dw_run_dry_wet(t_dw_dry_wet* a_dw, MKFLT a_dry, MKFLT a_wet)
 {
     a_dw->output = ((a_dw->dry_linear) * a_dry) + ((a_dw->wet_linear) * a_wet);
 }

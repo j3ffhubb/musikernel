@@ -36,11 +36,11 @@ extern "C" {
 /*For time(affecting pitch) time stretching...  Since this is done
  offline anyways, it's not super optimized... */
 void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
-        float a_start_rate, float a_end_rate)
+        MKFLT a_start_rate, MKFLT a_end_rate)
 {
     SF_INFO info;
     SNDFILE *file;
-    float *tmpFrames;
+    MKFLT *tmpFrames;
 
     info.format = 0;
     file = sf_open(a_file_in, SFM_READ, &info);
@@ -57,8 +57,8 @@ void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
 
     //!!! complain also if more than 2 channels
 
-    tmpFrames = (float *)malloc(info.frames * info.channels * sizeof(float));
-    sf_readf_float(file, tmpFrames, info.frames);
+    tmpFrames = (MKFLT *)malloc(info.frames * info.channels * sizeof(MKFLT));
+    mk_read_audio(file, tmpFrames, info.frames);
 
     SF_INFO f_sf_info;
     f_sf_info.channels = info.channels;
@@ -66,15 +66,15 @@ void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
     f_sf_info.samplerate = info.samplerate;
     sf_close(file);
 
-    float f_sample_pos = 0.0;
+    MKFLT f_sample_pos = 0.0;
 
     long f_size = 0;
     long f_block_size = 5000;
 
-    float * f_output = (float*)malloc(sizeof(float) * (f_block_size * 2));
+    MKFLT * f_output = (MKFLT*)malloc(sizeof(MKFLT) * (f_block_size * 2));
 
-    float * f_buffer0 = 0;
-    float * f_buffer1 = 0;
+    MKFLT * f_buffer0 = 0;
+    MKFLT * f_buffer1 = 0;
     int f_i = 0;
 
     if(info.channels == 1)
@@ -83,8 +83,8 @@ void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
     }
     else if(info.channels == 2)
     {
-        f_buffer0 = (float*)malloc(sizeof(float) * info.frames);
-        f_buffer1 = (float*)malloc(sizeof(float) * info.frames);
+        f_buffer0 = (MKFLT*)malloc(sizeof(MKFLT) * info.frames);
+        f_buffer1 = (MKFLT*)malloc(sizeof(MKFLT) * info.frames);
 
         int f_i2 = 0;
         //De-interleave...
@@ -144,11 +144,11 @@ void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
 
         if(info.channels == 1)
         {
-            sf_writef_float(f_sndfile, f_output, f_size);
+            mk_write_audio(f_sndfile, f_output, f_size);
         }
         else if(info.channels == 2)
         {
-            sf_writef_float(f_sndfile, f_output, f_size / 2);
+            mk_write_audio(f_sndfile, f_output, f_size / 2);
         }
     }
 
@@ -175,11 +175,11 @@ void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
 /*For pitch(affecting time) pitch shifting...  Since this is done
  offline anyways, it's not super optimized... */
 void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
-        float a_start_pitch, float a_end_pitch)
+        MKFLT a_start_pitch, MKFLT a_end_pitch)
 {
     SF_INFO info;
     SNDFILE *file;
-    float *tmpFrames;
+    MKFLT *tmpFrames;
 
     info.format = 0;
     file = sf_open(a_file_in, SFM_READ, &info);
@@ -196,8 +196,8 @@ void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
 
     //!!! complain also if more than 2 channels
 
-    tmpFrames = (float *)malloc(info.frames * info.channels * sizeof(float));
-    sf_readf_float(file, tmpFrames, info.frames);
+    tmpFrames = (MKFLT *)malloc(info.frames * info.channels * sizeof(MKFLT));
+    mk_read_audio(file, tmpFrames, info.frames);
 
     SF_INFO f_sf_info;
     f_sf_info.channels = info.channels;
@@ -205,15 +205,15 @@ void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
     f_sf_info.samplerate = info.samplerate;
     sf_close(file);
 
-    float f_sample_pos = 0.0;
+    MKFLT f_sample_pos = 0.0;
 
     long f_size = 0;
     long f_block_size = 10000;
 
-    float * f_output = (float*)malloc(sizeof(float) * (f_block_size * 2));
+    MKFLT * f_output = (MKFLT*)malloc(sizeof(MKFLT) * (f_block_size * 2));
 
-    float * f_buffer0 = 0;
-    float * f_buffer1 = 0;
+    MKFLT * f_buffer0 = 0;
+    MKFLT * f_buffer1 = 0;
     int f_i = 0;
 
     t_pit_ratio * f_pit_ratio = g_pit_ratio();
@@ -224,8 +224,8 @@ void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
     }
     else if(info.channels == 2)
     {
-        f_buffer0 = (float*)malloc(sizeof(float) * info.frames);
-        f_buffer1 = (float*)malloc(sizeof(float) * info.frames);
+        f_buffer0 = (MKFLT*)malloc(sizeof(MKFLT) * info.frames);
+        f_buffer1 = (MKFLT*)malloc(sizeof(MKFLT) * info.frames);
 
         int f_i2 = 0;
         //De-interleave...
@@ -276,7 +276,7 @@ void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
             double f_rate = (((double)(a_end_pitch - a_start_pitch)) *
                 (f_sample_pos / ((double)(info.frames)))) + a_start_pitch;
 
-            float f_inc = f_pit_midi_note_to_ratio_fast(
+            MKFLT f_inc = f_pit_midi_note_to_ratio_fast(
                 60.0f, f_rate + 60.0f, f_pit_ratio);
 
             f_sample_pos += f_inc;
@@ -289,11 +289,11 @@ void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
 
         if(info.channels == 1)
         {
-            sf_writef_float(f_sndfile, f_output, f_size);
+            mk_write_audio(f_sndfile, f_output, f_size);
         }
         else if(info.channels == 2)
         {
-            sf_writef_float(f_sndfile, f_output, f_size / 2);
+            mk_write_audio(f_sndfile, f_output, f_size / 2);
         }
     }
 

@@ -27,23 +27,23 @@ extern "C" {
 
 typedef struct
 {
-    float BW, dB, pitch, exp_value, exp_db, d, B, d_times_B,
+    MKFLT BW, dB, pitch, exp_value, exp_db, d, B, d_times_B,
             w, w2, wQ, y2_0, y2_1, FIR_out_0, FIR_out_1, w2p1,
             coeff0, coeff1, coeff2, pi_div_sr;
-    float input0, input1, in0_m1, in0_m2, in1_m1, in1_m2;
-    float output0, output1, out0_m1, out0_m2, out1_m1, out1_m2;
-    float warp_input, warp_input_squared, warp_input_tripled,
+    MKFLT input0, input1, in0_m1, in0_m2, in1_m1, in1_m2;
+    MKFLT output0, output1, out0_m1, out0_m2, out1_m1, out1_m2;
+    MKFLT warp_input, warp_input_squared, warp_input_tripled,
             warp_outstream0, warp_outstream1, warp_output;
 
-    float coeff1_x_out_m1_0, coeff2_x_out_m2_0, iir_output0,
+    MKFLT coeff1_x_out_m1_0, coeff2_x_out_m2_0, iir_output0,
             coeff1_x_out_m1_1, coeff2_x_out_m2_1, iir_output1;
 
-    float last_pitch;
+    MKFLT last_pitch;
 }t_pkq_peak_eq;
 
 
-inline void v_pkq_calc_coeffs(t_pkq_peak_eq*, float, float, float);
-inline void v_pkq_run(t_pkq_peak_eq*, float, float);
+inline void v_pkq_calc_coeffs(t_pkq_peak_eq*, MKFLT, MKFLT, MKFLT);
+inline void v_pkq_run(t_pkq_peak_eq*, MKFLT, MKFLT);
 void v_pkq_free(t_pkq_peak_eq*);
 
 void v_pkq_free(t_pkq_peak_eq * a_pkq)
@@ -53,12 +53,12 @@ void v_pkq_free(t_pkq_peak_eq * a_pkq)
 
 /* inline void v_pkq_calc_coeffs(
  * t_pkq_peak_eq *a_pkq,
- * float a_pitch,
- * float a_bw,
- * float a_db)
+ * MKFLT a_pitch,
+ * MKFLT a_bw,
+ * MKFLT a_db)
  */
 inline void v_pkq_calc_coeffs(t_pkq_peak_eq * a_pkq,
-        float a_pitch, float a_bw, float a_db)
+        MKFLT a_pitch, MKFLT a_bw, MKFLT a_db)
 {
     if((a_db != (a_pkq->dB)) || (a_bw != (a_pkq->BW)))
     {
@@ -101,7 +101,7 @@ inline void v_pkq_calc_coeffs(t_pkq_peak_eq * a_pkq,
     a_pkq->coeff2 = (a_pkq->w2p1) - (a_pkq->wQ);
 }
 
-inline void v_pkq_run(t_pkq_peak_eq * a_pkq,float a_in0, float a_in1)
+inline void v_pkq_run(t_pkq_peak_eq * a_pkq,MKFLT a_in0, MKFLT a_in1)
 {
     a_pkq->in0_m2 = (a_pkq->in0_m1);
     a_pkq->in0_m1 = a_in0;
@@ -139,7 +139,7 @@ inline void v_pkq_run(t_pkq_peak_eq * a_pkq,float a_in0, float a_in1)
     a_pkq->out1_m1 = (a_pkq->iir_output1);
 }
 
-void g_pkq_init(t_pkq_peak_eq * f_result, float a_sample_rate)
+void g_pkq_init(t_pkq_peak_eq * f_result, MKFLT a_sample_rate)
 {
     f_result->B = 0.0f;
     f_result->FIR_out_0 = 0.0f;
@@ -186,12 +186,12 @@ void g_pkq_init(t_pkq_peak_eq * f_result, float a_sample_rate)
 typedef struct
 {
     t_pkq_peak_eq eqs[6];
-    float * knobs[6][3];  //freq, bw, gain
-    float output0;
-    float output1;
+    MKFLT * knobs[6][3];  //freq, bw, gain
+    MKFLT output0;
+    MKFLT output1;
 }t_eq6;
 
-void g_eq6_init(t_eq6 * f_result, float a_sr)
+void g_eq6_init(t_eq6 * f_result, MKFLT a_sr)
 {
     f_result->output0 = 0.0f;
     f_result->output1 = 0.0f;
@@ -205,7 +205,7 @@ void g_eq6_init(t_eq6 * f_result, float a_sr)
     }
 }
 
-void v_eq6_connect_port(t_eq6 * a_eq6, int a_port, float * a_ptr)
+void v_eq6_connect_port(t_eq6 * a_eq6, int a_port, MKFLT * a_ptr)
 {
     int f_eq_num = a_port / 3;
     int f_knob_num = a_port % 3;
@@ -229,7 +229,7 @@ inline void v_eq6_set(t_eq6 *a_eq6)
     }
 }
 
-inline void v_eq6_run(t_eq6 *a_eq6, float a_input0, float a_input1)
+inline void v_eq6_run(t_eq6 *a_eq6, MKFLT a_input0, MKFLT a_input1)
 {
     int f_i;
 

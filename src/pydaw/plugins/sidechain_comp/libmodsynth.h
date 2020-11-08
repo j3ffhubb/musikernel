@@ -28,9 +28,9 @@ typedef struct
     t_scc_sidechain_comp sidechain_comp;
 }t_scc_mono_modules;
 
-t_scc_mono_modules * v_scc_mono_init(float, int);
+t_scc_mono_modules * v_scc_mono_init(MKFLT, int);
 
-t_scc_mono_modules * v_scc_mono_init(float a_sr, int a_plugin_uid)
+t_scc_mono_modules * v_scc_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_scc_mono_modules * f_result;
     hpalloc((void**)&f_result, sizeof(t_scc_mono_modules));

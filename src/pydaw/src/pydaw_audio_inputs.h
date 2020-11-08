@@ -34,10 +34,10 @@ typedef struct
     int stereo_ch;
     int output_track;
     int output_mode;  //0=normal,1=sidechain,2=both
-    float vol, vol_linear;
+    MKFLT vol, vol_linear;
     SF_INFO sf_info;
     SNDFILE * sndfile;
-    float rec_buffers[2][PYDAW_AUDIO_INPUT_REC_BUFFER_SIZE]
+    MKFLT rec_buffers[2][PYDAW_AUDIO_INPUT_REC_BUFFER_SIZE]
         __attribute__((aligned(16)));
     int buffer_iterator[2];
     int current_buffer;
@@ -45,9 +45,9 @@ typedef struct
     int buffer_to_flush;
 }t_pyaudio_input;
 
-void g_pyaudio_input_init(t_pyaudio_input *, float);
+void g_pyaudio_input_init(t_pyaudio_input *, MKFLT);
 
-void g_pyaudio_input_init(t_pyaudio_input * f_result, float a_sr)
+void g_pyaudio_input_init(t_pyaudio_input * f_result, MKFLT a_sr)
 {
     f_result->channels = 1;
     f_result->stereo_ch = -1;

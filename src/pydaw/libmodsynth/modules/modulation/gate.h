@@ -25,20 +25,20 @@ typedef struct
 {
     t_state_variable_filter svf;
     t_audio_xfade xfade;
-    float last_cutoff;
-    float last_wet;
-    float output[2];
-    float value;
+    MKFLT last_cutoff;
+    MKFLT last_wet;
+    MKFLT output[2];
+    MKFLT value;
 }t_gat_gate;
 
-t_gat_gate * g_gat_get(float);
-void v_gat_set(t_gat_gate*, float, float);
-void v_gat_run(t_gat_gate*, float, float, float);
+t_gat_gate * g_gat_get(MKFLT);
+void v_gat_set(t_gat_gate*, MKFLT, MKFLT);
+void v_gat_run(t_gat_gate*, MKFLT, MKFLT, MKFLT);
 
 /*
- *  void v_gat_set(t_gat_gate* a_gat, float a_pitch)
+ *  void v_gat_set(t_gat_gate* a_gat, MKFLT a_pitch)
  */
-void v_gat_set(t_gat_gate* a_gat, float a_pitch, float a_wet)
+void v_gat_set(t_gat_gate* a_gat, MKFLT a_pitch, MKFLT a_wet)
 {
     if(a_pitch != a_gat->last_cutoff)
     {
@@ -55,9 +55,9 @@ void v_gat_set(t_gat_gate* a_gat, float a_pitch, float a_wet)
 }
 
 /*
- * void v_gat_run(t_gat_gate * a_gat, float a_on, float a_in0, float a_in1)
+ * void v_gat_run(t_gat_gate * a_gat, MKFLT a_on, MKFLT a_in0, MKFLT a_in1)
  */
-void v_gat_run(t_gat_gate * a_gat, float a_on, float a_in0, float a_in1)
+void v_gat_run(t_gat_gate * a_gat, MKFLT a_on, MKFLT a_in0, MKFLT a_in1)
 {
     a_gat->value = v_svf_run_2_pole_lp(&a_gat->svf, a_on);
 
@@ -67,7 +67,7 @@ void v_gat_run(t_gat_gate * a_gat, float a_on, float a_in0, float a_in1)
             &a_gat->xfade, a_in1, a_gat->value * a_in1);
 }
 
-void g_gat_init(t_gat_gate * f_result, float a_sr)
+void g_gat_init(t_gat_gate * f_result, MKFLT a_sr)
 {
     f_result->value = 0.0f;
     f_result->output[0] = 0.0f;

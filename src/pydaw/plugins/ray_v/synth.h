@@ -139,16 +139,16 @@ typedef struct {
     t_voc_voices * voices;
     long         sampleNo;
 
-    float fs;
+    MKFLT fs;
     t_rayv_mono_modules * mono_modules;
 
-    float sv_pitch_bend_value;
-    float sv_last_note;  //For glide
-    float master_vol_lin;
+    MKFLT sv_pitch_bend_value;
+    MKFLT sv_last_note;  //For glide
+    MKFLT master_vol_lin;
 
     t_plugin_event_queue midi_queue;
     t_plugin_event_queue atm_queue;
-    float * port_table;
+    MKFLT * port_table;
     t_plugin_cc_map cc_map;
     PYFX_Descriptor * descriptor;
 } t_rayv;

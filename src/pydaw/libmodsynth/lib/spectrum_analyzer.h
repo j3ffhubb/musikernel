@@ -33,14 +33,19 @@ extern "C" {
 
 typedef struct {
     int plugin_uid;
-    float * buffer;
+    MKFLT * buffer;
     int buf_pos;
+#ifdef MK_USE_DOUBLE
+    fftw_complex *output;
+    fftw_plan plan;
+#else
     fftwf_complex *output;
     fftwf_plan plan;
+#endif
     int height, width;
     int samples_count;
     int samples_count_div2;
-    float *samples;
+    MKFLT *samples;
     char * str_buf;
     char str_tmp[128];
 } t_spa_spectrum_analyzer;
@@ -50,50 +55,70 @@ typedef struct {
 #endif
 
 t_spa_spectrum_analyzer * g_spa_spectrum_analyzer_get(
-    int a_sample_count, int a_plugin_uid)
-{
-    t_spa_spectrum_analyzer * f_result =
-        (t_spa_spectrum_analyzer*)malloc(sizeof(t_spa_spectrum_analyzer));
-    register int f_i = 0;
+    int a_sample_count,
+    int a_plugin_uid
+){
+    t_spa_spectrum_analyzer * f_result = (t_spa_spectrum_analyzer*)malloc(
+        sizeof(t_spa_spectrum_analyzer))
+    ;
+    int f_i = 0;
 
-    lmalloc((void**)&f_result->buffer, sizeof(float) * a_sample_count);
+    lmalloc((void**)&f_result->buffer, sizeof(MKFLT) * a_sample_count);
 
     f_result->plugin_uid = a_plugin_uid;
     f_result->buf_pos = 0;
     f_result->samples_count = a_sample_count;
     f_result->samples_count_div2 = a_sample_count / 2;
 
+#ifdef MK_USE_DOUBLE
+    f_result->samples = fftw_alloc_real(a_sample_count);
+    f_result->output = fftw_alloc_complex(a_sample_count);
+#else
     f_result->samples = fftwf_alloc_real(a_sample_count);
     f_result->output = fftwf_alloc_complex(a_sample_count);
+#endif
 
-    while(f_i < f_result->samples_count)
+    for(f_i = 0; f_i < f_result->samples_count; ++f_i)
     {
         f_result->samples[f_i] = 0.0f;
         f_result->output[f_i] = 0.0f;
-        ++f_i;
     }
 
     f_result->str_buf = (char*)malloc(sizeof(char) * 15 * a_sample_count);
     f_result->str_buf[0] = '\0';
 
-    f_result->plan = g_fftwf_plan_dft_r2c_1d(
-        f_result->samples_count, f_result->samples, f_result->output, 0);
+    f_result->plan = g_fftw_plan_dft_r2c_1d(
+        f_result->samples_count,
+        f_result->samples,
+        f_result->output,
+        0
+    );
 
     return f_result;
 }
 
 static void g_spa_free(t_spa_spectrum_analyzer *a_spa)
 {
+#ifdef MK_USE_DOUBLE
+    fftw_destroy_plan(a_spa->plan);
+    fftw_free(a_spa->output);
+    fftw_free(a_spa->samples);
+#else
     fftwf_destroy_plan(a_spa->plan);
     fftwf_free(a_spa->output);
     fftwf_free(a_spa->samples);
+#endif
 }
 
 void v_spa_compute_fft(t_spa_spectrum_analyzer *a_spa)
 {
     register int f_i = 1;
 
+#ifdef MK_USE_DOUBLE
+    fftw_execute(a_spa->plan);
+#else
     fftwf_execute(a_spa->plan);
+#endif
 
     sprintf(a_spa->str_buf, "%i|spectrum|%f",
             a_spa->plugin_uid, cabs(a_spa->output[0]));
@@ -107,21 +132,23 @@ void v_spa_compute_fft(t_spa_spectrum_analyzer *a_spa)
 }
 
 /* void v_spa_run(struct t_spa_spectrum_analyzer *a_spa,
- * float * a_buf0, float * a_buf1, int a_count)
+ * MKFLT * a_buf0, MKFLT * a_buf1, int a_count)
  *
  * Check if a_spa->str_buf[0] == '\0', if not, send a configure message
  * and then set spa->str_buf[0] = '\0'
  */
-void v_spa_run(t_spa_spectrum_analyzer *a_spa,
-        float * a_buf0, float * a_buf1, int a_count)
-{
-    register int f_i = 0;
+void v_spa_run(
+    t_spa_spectrum_analyzer *a_spa,
+    MKFLT * a_buf0,
+    MKFLT * a_buf1,
+    int a_count
+){
+    int f_i;
 
-    while(f_i < a_count)
+    for(f_i = 0; f_i < a_count; ++f_i)
     {
         a_spa->samples[a_spa->buf_pos] = (a_buf0[f_i] + a_buf1[f_i]) * 0.5f;
         ++a_spa->buf_pos;
-        ++f_i;
 
         if(a_spa->buf_pos >= a_spa->samples_count)
         {

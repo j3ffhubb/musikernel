@@ -24,20 +24,20 @@ extern "C" {
 
 typedef struct
 {
-    float pitch;
-    float last_wet;
-    float output0, output1;
+    MKFLT pitch;
+    MKFLT last_wet;
+    MKFLT output0, output1;
     t_osc_simple_unison osc;
-    float osc_output;
+    MKFLT osc_output;
     t_audio_xfade xfade;
 }t_rmd_ring_mod;
 
-t_rmd_ring_mod * g_rmd_ring_mod_get(float);
-void v_rmd_ring_mod_set(t_rmd_ring_mod*, float, float);
-void v_rmd_ring_mod_run(t_rmd_ring_mod*, float, float);
+t_rmd_ring_mod * g_rmd_ring_mod_get(MKFLT);
+void v_rmd_ring_mod_set(t_rmd_ring_mod*, MKFLT, MKFLT);
+void v_rmd_ring_mod_run(t_rmd_ring_mod*, MKFLT, MKFLT);
 
 
-void g_rmd_init(t_rmd_ring_mod * f_result, float a_sr)
+void g_rmd_init(t_rmd_ring_mod * f_result, MKFLT a_sr)
 {
     g_osc_init_osc_simple_single(&f_result->osc, a_sr);
     v_osc_set_simple_osc_unison_type(&f_result->osc, 3);
@@ -50,7 +50,7 @@ void g_rmd_init(t_rmd_ring_mod * f_result, float a_sr)
     g_axf_init(&f_result->xfade, 0.5f);
 }
 
-t_rmd_ring_mod * g_rmd_ring_mod_get(float a_sr)
+t_rmd_ring_mod * g_rmd_ring_mod_get(MKFLT a_sr)
 {
     t_rmd_ring_mod * f_result;
     lmalloc((void**)&f_result, sizeof(t_rmd_ring_mod));
@@ -58,7 +58,7 @@ t_rmd_ring_mod * g_rmd_ring_mod_get(float a_sr)
     return f_result;
 }
 
-void v_rmd_ring_mod_set(t_rmd_ring_mod* a_rmd, float a_pitch, float a_wet)
+void v_rmd_ring_mod_set(t_rmd_ring_mod* a_rmd, MKFLT a_pitch, MKFLT a_wet)
 {
     if(a_rmd->last_wet != a_wet)
     {
@@ -73,7 +73,7 @@ void v_rmd_ring_mod_set(t_rmd_ring_mod* a_rmd, float a_pitch, float a_wet)
     }
 }
 
-void v_rmd_ring_mod_run(t_rmd_ring_mod* a_rmd, float a_input0, float a_input1)
+void v_rmd_ring_mod_run(t_rmd_ring_mod* a_rmd, MKFLT a_input0, MKFLT a_input1)
 {
     a_rmd->osc_output = f_osc_run_unison_osc(&a_rmd->osc);
 

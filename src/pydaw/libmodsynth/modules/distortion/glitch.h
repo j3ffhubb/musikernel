@@ -24,18 +24,18 @@ extern "C" {
 
 typedef struct
 {
-    float * buffer;
+    MKFLT * buffer;
     int buffer_size, buffer_ptr;
-    float last_pitch, last_repeat, last_wet;
+    MKFLT last_pitch, last_repeat, last_wet;
     int sample_count, repeat_count, is_repeating, current_repeat_count;
-    float sr, sample_tmp;
-    float output0, output1;
+    MKFLT sr, sample_tmp;
+    MKFLT output0, output1;
     t_audio_xfade xfade;
 }t_glc_glitch;
 
-t_glc_glitch * g_glc_glitch_get(float);
-void v_glc_glitch_set(t_glc_glitch*, float, float, float);
-void v_glc_glitch_run(t_glc_glitch*, float, float);
+t_glc_glitch * g_glc_glitch_get(MKFLT);
+void v_glc_glitch_set(t_glc_glitch*, MKFLT, MKFLT, MKFLT);
+void v_glc_glitch_run(t_glc_glitch*, MKFLT, MKFLT);
 void v_glc_glitch_free(t_glc_glitch*);
 
 void v_glc_glitch_free(t_glc_glitch * a_glc)
@@ -47,11 +47,11 @@ void v_glc_glitch_free(t_glc_glitch * a_glc)
     }
 }
 
-void g_glc_init(t_glc_glitch * f_result, float a_sr)
+void g_glc_init(t_glc_glitch * f_result, MKFLT a_sr)
 {
     f_result->buffer_size = (int)(a_sr * (1.0f/19.0f));
 
-    lmalloc((void**)&f_result->buffer, sizeof(float) * f_result->buffer_size);
+    lmalloc((void**)&f_result->buffer, sizeof(MKFLT) * f_result->buffer_size);
 
     int f_i = 0;
 
@@ -74,7 +74,7 @@ void g_glc_init(t_glc_glitch * f_result, float a_sr)
     g_axf_init(&f_result->xfade, -3.0f);
 }
 
-t_glc_glitch * g_glc_glitch_get(float a_sr)
+t_glc_glitch * g_glc_glitch_get(MKFLT a_sr)
 {
     t_glc_glitch * f_result;
 
@@ -83,8 +83,8 @@ t_glc_glitch * g_glc_glitch_get(float a_sr)
     return f_result;
 }
 
-void v_glc_glitch_set(t_glc_glitch* a_glc, float a_pitch, float a_repeat,
-        float a_wet)
+void v_glc_glitch_set(t_glc_glitch* a_glc, MKFLT a_pitch, MKFLT a_repeat,
+        MKFLT a_wet)
 {
     if(a_glc->last_pitch != a_pitch)
     {
@@ -111,7 +111,7 @@ inline void v_glc_glitch_retrigger(t_glc_glitch* a_glc)
     a_glc->buffer_ptr = 0;
 }
 
-void v_glc_glitch_run(t_glc_glitch* a_glc, float a_input0, float a_input1)
+void v_glc_glitch_run(t_glc_glitch* a_glc, MKFLT a_input0, MKFLT a_input1)
 {
     a_glc->output0 = f_axf_run_xfade(&a_glc->xfade, a_input0,
             a_glc->buffer[a_glc->buffer_ptr]);

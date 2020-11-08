@@ -91,7 +91,7 @@ void v_pydaw_activate(
     int a_thread_count,
     int a_set_thread_affinity,
     char* a_project_path,
-    float a_sr,
+    MKFLT a_sr,
     t_midi_device_list* a_midi_devices,
     int a_aux_threads
 ){

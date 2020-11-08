@@ -38,7 +38,7 @@ static void v_mk_vocoder_on_stop(PYFX_Handle instance)
 }
 
 static void v_mk_vocoder_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     t_mk_vocoder *plugin = (t_mk_vocoder*)instance;
 
@@ -98,7 +98,7 @@ static void v_mk_vocoder_load(PYFX_Handle instance,
 }
 
 static void v_mk_vocoder_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_mk_vocoder *plugin_data = (t_mk_vocoder*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -165,7 +165,7 @@ static void v_mk_vocoder_run(
     t_smoother_linear * f_modulator_smoother =
         &plugin_data->mono_modules->modulator_smoother;
 
-    float f_amp;
+    MKFLT f_amp;
 
     while(f_i < sample_count)
     {

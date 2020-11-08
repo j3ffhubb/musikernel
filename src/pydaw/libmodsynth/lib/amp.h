@@ -22,30 +22,30 @@ GNU General Public License for more details.
 extern "C" {
 #endif
 
-inline float f_db_to_linear(float);
-inline float f_linear_to_db(float);
-float f_db_to_linear_fast(float);
-float f_linear_to_db_fast(float);
-inline float f_linear_to_db_linear(float);
+inline MKFLT f_db_to_linear(MKFLT);
+inline MKFLT f_linear_to_db(MKFLT);
+MKFLT f_db_to_linear_fast(MKFLT);
+MKFLT f_linear_to_db_fast(MKFLT);
+inline MKFLT f_linear_to_db_linear(MKFLT);
 
 #ifdef	__cplusplus
 }
 #endif
 
-/* inline float f_db_to_linear(float a_db)
+/* inline MKFLT f_db_to_linear(MKFLT a_db)
  *
  * Convert decibels to linear amplitude
  */
-inline float f_db_to_linear(float a_db)
+inline MKFLT f_db_to_linear(MKFLT a_db)
 {
     return pow(10.0f, (0.05f * a_db));
 }
 
-/* inline float f_linear_to_db(float a_linear)
+/* inline MKFLT f_linear_to_db(MKFLT a_linear)
  *
  * Convert linear amplitude to decibels
  */
-inline float f_linear_to_db(float a_linear)
+inline MKFLT f_linear_to_db(MKFLT a_linear)
 {
     return 20.0f * log10(a_linear);
 }
@@ -56,7 +56,7 @@ inline float f_linear_to_db(float a_linear)
 #define arr_amp_db2a_count 545
 #define arr_amp_db2a_count_m1_f 544.0f
 
-static __thread float arr_amp_db2a[arr_amp_db2a_count]
+static __thread MKFLT arr_amp_db2a[arr_amp_db2a_count]
 __attribute__((aligned(CACHE_LINE_SIZE))) = {
 0.000010, 0.000010, 0.000011, 0.000011, 0.000011, 0.000012, 0.000012, 0.000012, 0.000013, 0.000013, 0.000013, 0.000014, 0.000014,
 0.000015, 0.000015, 0.000015, 0.000016, 0.000016, 0.000017, 0.000017, 0.000018, 0.000018, 0.000019, 0.000019, 0.000020, 0.000021,
@@ -103,7 +103,7 @@ __attribute__((aligned(CACHE_LINE_SIZE))) = {
 57.876198, 59.566216, 61.305580, 63.095734};
 
 
-/* float f_db_to_linear_fast(float a_db)
+/* MKFLT f_db_to_linear_fast(MKFLT a_db)
  *
  * Convert decibels to linear using an approximated table lookup
  *
@@ -112,9 +112,9 @@ __attribute__((aligned(CACHE_LINE_SIZE))) = {
  * Use the regular version if you may require more range, otherwise the values
  * will be clipped
  */
-float f_db_to_linear_fast(float a_db)
+MKFLT f_db_to_linear_fast(MKFLT a_db)
 {
-    float f_result = ((a_db + 100.0f) * 4.0f) - 1.0f;
+    MKFLT f_result = ((a_db + 100.0f) * 4.0f) - 1.0f;
 
     if((f_result) > arr_amp_db2a_count_m1_f)
     {
@@ -131,10 +131,10 @@ float f_db_to_linear_fast(float a_db)
 
 
 #define arr_amp_a2db_count 400
-#define arr_amp_a2db_count_float 400.0f
-#define arr_amp_a2db_count_float_m1 399.0f
+#define arr_amp_a2db_count_MKFLT 400.0f
+#define arr_amp_a2db_count_MKFLT_m1 399.0f
 
-static __thread float arr_amp_a2db[arr_amp_a2db_count]
+static __thread MKFLT arr_amp_a2db[arr_amp_a2db_count]
 __attribute__((aligned(CACHE_LINE_SIZE))) = {
 -100 ,-40.000000,-33.979401,-30.457575,-27.958801,-26.020601,-24.436975, -23.098040,-21.938202,-20.915152,-20.000002,-19.172148,-18.416376,
 -17.721134,-17.077440,-16.478176,-15.917601,-15.391022,-14.894549, -14.424928,-13.979400,-13.555614,-13.151546,-12.765442,-12.395774,
@@ -171,20 +171,20 @@ __attribute__((aligned(CACHE_LINE_SIZE))) = {
 11.709208,11.731739,11.754212,11.776628,11.798985,11.821285, 11.843528,11.865714,11.887844,11.909917,11.931934,11.953897,
 11.975802,11.997654,12.019451};
 
-/* float f_linear_to_db_fast(
- * float a_input  //Linear amplitude.  Typically 0 to 1
+/* MKFLT f_linear_to_db_fast(
+ * MKFLT a_input  //Linear amplitude.  Typically 0 to 1
  * )
  *
  * A fast, table-lookup based linear to decibels converter.
  * The range is 0 to 4, above 4 will clip at 4.
  */
-float f_linear_to_db_fast(float a_input)
+MKFLT f_linear_to_db_fast(MKFLT a_input)
 {
-    float f_result = (a_input  * 100.0f);
+    MKFLT f_result = (a_input  * 100.0f);
 
-    if((f_result) >= arr_amp_a2db_count_float)
+    if((f_result) >= arr_amp_a2db_count_MKFLT)
     {
-        f_result = arr_amp_a2db_count_float_m1;
+        f_result = arr_amp_a2db_count_MKFLT_m1;
     }
 
     if((f_result) < 0.0f)
@@ -196,14 +196,14 @@ float f_linear_to_db_fast(float a_input)
 }
 
 
-/* inline float f_linear_to_db_linear(float a_input)
+/* inline MKFLT f_linear_to_db_linear(MKFLT a_input)
  *
  * This takes a 0 to 1 signal and approximates it to a useful range with a logarithmic decibel curve
  * Typical use would be on an envelope that controls the amplitude of an audio signal
  */
-inline float f_linear_to_db_linear(float a_input)
+inline MKFLT f_linear_to_db_linear(MKFLT a_input)
 {
-    float f_result = ((a_input) * 30.0f) - 30.0f;
+    MKFLT f_result = ((a_input) * 30.0f) - 30.0f;
 
     return f_db_to_linear_fast((f_result));
 }

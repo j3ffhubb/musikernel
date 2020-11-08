@@ -78,7 +78,7 @@ static void v_rayv2_on_stop(PYFX_Handle instance)
 }
 
 static void v_rayv2_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     if(a_is_sidechain)
     {
@@ -295,12 +295,12 @@ static PYFX_Handle g_rayv2_instantiate(PYFX_Descriptor * descriptor,
             plugin_data->oversample = 2;
         }
         a_sr *= plugin_data->oversample;
-        plugin_data->os_recip = 1.0f / (float)plugin_data->oversample;
+        plugin_data->os_recip = 1.0f / (MKFLT)plugin_data->oversample;
     }
 
     plugin_data->fs = a_sr;
     hpalloc((void**)&plugin_data->os_buffer,
-        sizeof(float) * 4096 * plugin_data->oversample);
+        sizeof(MKFLT) * 4096 * plugin_data->oversample);
 
     int f_i;
 
@@ -340,7 +340,7 @@ static void v_rayv2_load(PYFX_Handle instance,
 }
 
 static void v_rayv2_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_rayv2 *plugin_data = (t_rayv2*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -375,9 +375,9 @@ static void v_rayv2_process_midi_event(
             v_nosvf_velocity_mod(&f_voice->svf_filter,
                 a_event->velocity, (*plugin_data->filter_vel) * 0.01f);
 
-            float f_master_pitch = (*plugin_data->master_pitch);
+            MKFLT f_master_pitch = (*plugin_data->master_pitch);
 
-            f_voice->note_f = (float)a_event->note + f_master_pitch;
+            f_voice->note_f = (MKFLT)a_event->note + f_master_pitch;
             f_voice->note = a_event->note + (int)(f_master_pitch);
 
             f_voice->filter_keytrk =
@@ -431,21 +431,21 @@ static void v_rayv2_process_midi_event(
             v_lfs_sync(&f_voice->lfo1,
                 *plugin_data->lfo_phase * 0.01f, *plugin_data->lfo_type);
 
-            float f_attack = *(plugin_data->attack) * .01;
+            MKFLT f_attack = *(plugin_data->attack) * .01;
             f_attack = (f_attack) * (f_attack);
-            float f_decay = *(plugin_data->decay) * .01;
+            MKFLT f_decay = *(plugin_data->decay) * .01;
             f_decay = (f_decay) * (f_decay);
-            float f_release = *(plugin_data->release) * .01;
+            MKFLT f_release = *(plugin_data->release) * .01;
             f_release = (f_release) * (f_release);
 
             FP_ADSR_SET[f_adsr_main_lin](&f_voice->adsr_amp,
                 f_attack, f_decay, *(plugin_data->sustain), f_release);
 
-            float f_attack_f = *(plugin_data->attack_f) * .01;
+            MKFLT f_attack_f = *(plugin_data->attack_f) * .01;
             f_attack_f = (f_attack_f) * (f_attack_f);
-            float f_decay_f = *(plugin_data->decay_f) * .01;
+            MKFLT f_decay_f = *(plugin_data->decay_f) * .01;
             f_decay_f = (f_decay_f) * (f_decay_f);
-            float f_release_f = *(plugin_data->release_f) * .01;
+            MKFLT f_release_f = *(plugin_data->release_f) * .01;
             f_release_f = (f_release_f) * (f_release_f);
 
             v_adsr_set_adsr(&f_voice->adsr_filter,
@@ -574,7 +574,7 @@ static void v_run_rayv2(
     t_plugin_event_queue_item * f_midi_item;
 
     memset(plugin_data->os_buffer, 0,
-        sizeof(float) * sample_count * plugin_data->oversample);
+        sizeof(MKFLT) * sample_count * plugin_data->oversample);
 
     for(f_i = 0; f_i < sample_count; ++f_i)
     {
@@ -633,12 +633,12 @@ static void v_run_rayv2(
         ++plugin_data->sampleNo;
     }
 
-    float f_avg;
-    float *f_os_buffer = plugin_data->os_buffer;
-    float *f_output0 = plugin_data->output0;
-    float *f_output1 = plugin_data->output1;
+    MKFLT f_avg;
+    MKFLT *f_os_buffer = plugin_data->os_buffer;
+    MKFLT *f_output0 = plugin_data->output0;
+    MKFLT *f_output1 = plugin_data->output1;
     const int os_count = plugin_data->oversample;
-    const float os_recip = plugin_data->os_recip;
+    const MKFLT os_recip = plugin_data->os_recip;
 
     for(f_i = f_i2 = 0; f_i < sample_count; ++f_i)
     {
@@ -681,7 +681,7 @@ static void v_run_rayv2_voice(t_rayv2 *plugin_data,
         }
     }
 
-    float current_sample = 0.0f;
+    MKFLT current_sample = 0.0f;
 
     f_rmp_run_ramp_curve(&a_voice->pitch_env);
     f_rmp_run_ramp(&a_voice->glide_env);
@@ -698,7 +698,7 @@ static void v_run_rayv2_voice(t_rayv2 *plugin_data,
         (*plugin_data->lfo_pitch + (*plugin_data->lfo_pitch_fine * 0.01f))
         * (a_voice->lfo1.output);
 
-    float f_pb = plugin_data->mono_modules->pitchbend_smoother.last_value;
+    MKFLT f_pb = plugin_data->mono_modules->pitchbend_smoother.last_value;
 
     a_voice->base_pitch =
         (a_voice->glide_env.output_multiplied) +

@@ -43,7 +43,7 @@ extern "C" {
 
 typedef struct
 {
-    float filter_input, filter_last_input, bp_m1, lp_m1, hp, lp, bp;
+    MKFLT filter_input, filter_last_input, bp_m1, lp_m1, hp, lp, bp;
 
 }t_svf_kernel;
 
@@ -51,45 +51,45 @@ typedef struct
 typedef struct
 {
     //t_smoother_linear * cutoff_smoother;
-    float cutoff_note, cutoff_hz, cutoff_filter, pi2_div_sr, sr,
+    MKFLT cutoff_note, cutoff_hz, cutoff_filter, pi2_div_sr, sr,
             filter_res, filter_res_db, velocity_cutoff; //, velocity_cutoff_amt;
 
-    float cutoff_base, cutoff_mod, cutoff_last,  velocity_mod_amt;
+    MKFLT cutoff_base, cutoff_mod, cutoff_last,  velocity_mod_amt;
     /*For the eq*/
-    float gain_db, gain_linear;
+    MKFLT gain_db, gain_linear;
     t_svf_kernel filter_kernels [SVF_MAX_CASCADE];
 } t_state_variable_filter;
 
 //Used to switch between values
-typedef float (*fp_svf_run_filter)(t_state_variable_filter*,float);
+typedef MKFLT (*fp_svf_run_filter)(t_state_variable_filter*,MKFLT);
 
 /*The int is the number of cascaded filter kernels*/
 inline fp_svf_run_filter svf_get_run_filter_ptr(int,int);
 
 inline void v_svf_set_input_value(t_state_variable_filter*,
-        t_svf_kernel *, float);
+        t_svf_kernel *, MKFLT);
 
-inline float v_svf_run_2_pole_lp(t_state_variable_filter*, float);
-inline float v_svf_run_4_pole_lp(t_state_variable_filter*, float);
+inline MKFLT v_svf_run_2_pole_lp(t_state_variable_filter*, MKFLT);
+inline MKFLT v_svf_run_4_pole_lp(t_state_variable_filter*, MKFLT);
 
-inline float v_svf_run_2_pole_hp(t_state_variable_filter*, float);
-inline float v_svf_run_4_pole_hp(t_state_variable_filter*, float);
+inline MKFLT v_svf_run_2_pole_hp(t_state_variable_filter*, MKFLT);
+inline MKFLT v_svf_run_4_pole_hp(t_state_variable_filter*, MKFLT);
 
-inline float v_svf_run_2_pole_bp(t_state_variable_filter*, float);
-inline float v_svf_run_4_pole_bp(t_state_variable_filter*, float);
+inline MKFLT v_svf_run_2_pole_bp(t_state_variable_filter*, MKFLT);
+inline MKFLT v_svf_run_4_pole_bp(t_state_variable_filter*, MKFLT);
 
-inline float v_svf_run_2_pole_notch(t_state_variable_filter*, float);
-inline float v_svf_run_4_pole_notch(t_state_variable_filter*, float);
+inline MKFLT v_svf_run_2_pole_notch(t_state_variable_filter*, MKFLT);
+inline MKFLT v_svf_run_4_pole_notch(t_state_variable_filter*, MKFLT);
 
-inline float v_svf_run_2_pole_eq(t_state_variable_filter*, float);
-inline float v_svf_run_4_pole_eq(t_state_variable_filter*, float);
+inline MKFLT v_svf_run_2_pole_eq(t_state_variable_filter*, MKFLT);
+inline MKFLT v_svf_run_4_pole_eq(t_state_variable_filter*, MKFLT);
 
-inline float v_svf_run_no_filter(t_state_variable_filter*, float);
+inline MKFLT v_svf_run_no_filter(t_state_variable_filter*, MKFLT);
 
-inline float v_svf_run_2_pole_allpass(t_state_variable_filter*, float);
+inline MKFLT v_svf_run_2_pole_allpass(t_state_variable_filter*, MKFLT);
 
-inline void v_svf_set_eq(t_state_variable_filter*, float);
-inline void v_svf_set_eq4(t_state_variable_filter*, float);
+inline void v_svf_set_eq(t_state_variable_filter*, MKFLT);
+inline void v_svf_set_eq4(t_state_variable_filter*, MKFLT);
 
 inline void v_svf_reset(t_state_variable_filter*);
 
@@ -109,20 +109,20 @@ inline void v_svf_reset(t_state_variable_filter * a_svf)
     }
 }
 
-/* inline float v_svf_run_no_filter(
+/* inline MKFLT v_svf_run_no_filter(
  * t_state_variable_filter* a_svf,
- * float a_in) //audio input
+ * MKFLT a_in) //audio input
  *
  * This is for allowing a filter to be turned off by running a
  * function pointer.  a_in is returned unmodified.
  */
-inline float v_svf_run_no_filter(
-    t_state_variable_filter* a_svf, float a_in)
+inline MKFLT v_svf_run_no_filter(
+    t_state_variable_filter* a_svf, MKFLT a_in)
 {
     return a_in;
 }
 
-inline void v_svf_set_eq(t_state_variable_filter* a_svf, float a_gain)
+inline void v_svf_set_eq(t_state_variable_filter* a_svf, MKFLT a_gain)
 {
     if(a_gain != (a_svf->gain_db))
     {
@@ -132,7 +132,7 @@ inline void v_svf_set_eq(t_state_variable_filter* a_svf, float a_gain)
 }
 
 inline void v_svf_set_eq4(t_state_variable_filter* a_svf,
-        float a_gain)
+        MKFLT a_gain)
 {
     if(a_gain != (a_svf->gain_db))
     {
@@ -222,17 +222,17 @@ inline fp_svf_run_filter svf_get_run_filter_ptr(int a_cascades, int a_filter_typ
 /* inline void v_svf_set_input_value(
  * t_state_variable_filter * a_svf,
  * t_svf_kernel * a_kernel,
- * float a_input_value) //the audio input to filter
+ * MKFLT a_input_value) //the audio input to filter
  *
  * The main action to run the filter kernel*/
 inline void v_svf_set_input_value(
     t_state_variable_filter* a_svf,
     t_svf_kernel*  a_kernel,
-    float a_input_value
+    MKFLT a_input_value
 ){
     a_kernel->filter_input = a_input_value;
 
-    register float oversample_iterator = 0.0f;
+    register MKFLT oversample_iterator = 0.0f;
 
     while((oversample_iterator) < 1.0f)
     {
@@ -256,8 +256,8 @@ inline void v_svf_set_input_value(
 
 
 
-inline float v_svf_run_2_pole_lp(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_2_pole_lp(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
@@ -265,8 +265,8 @@ inline float v_svf_run_2_pole_lp(t_state_variable_filter* a_svf,
 }
 
 
-inline float v_svf_run_4_pole_lp(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_4_pole_lp(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[1],
@@ -275,16 +275,16 @@ inline float v_svf_run_4_pole_lp(t_state_variable_filter* a_svf,
     return (a_svf->filter_kernels[1].lp);
 }
 
-inline float v_svf_run_2_pole_hp(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_2_pole_hp(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     return (a_svf->filter_kernels[0].hp);
 }
 
 
-inline float v_svf_run_4_pole_hp(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_4_pole_hp(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[1],
@@ -294,16 +294,16 @@ inline float v_svf_run_4_pole_hp(t_state_variable_filter* a_svf,
 }
 
 
-inline float v_svf_run_2_pole_bp(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_2_pole_bp(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
     return (a_svf->filter_kernels[0].bp);
 }
 
-inline float v_svf_run_4_pole_bp(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_4_pole_bp(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[1],
@@ -312,16 +312,16 @@ inline float v_svf_run_4_pole_bp(t_state_variable_filter* a_svf,
     return (a_svf->filter_kernels[1].bp);
 }
 
-inline float v_svf_run_2_pole_notch(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_2_pole_notch(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
     return (a_svf->filter_kernels[0].hp) + (a_svf->filter_kernels[0].lp);
 }
 
-inline float v_svf_run_4_pole_notch(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_4_pole_notch(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
@@ -331,8 +331,8 @@ inline float v_svf_run_4_pole_notch(t_state_variable_filter* a_svf,
     return (a_svf->filter_kernels[1].hp) + (a_svf->filter_kernels[1].lp);
 }
 
-inline float v_svf_run_2_pole_allpass(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_2_pole_allpass(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
@@ -340,8 +340,8 @@ inline float v_svf_run_2_pole_allpass(t_state_variable_filter* a_svf,
             (a_svf->filter_kernels[0].bp);
 }
 
-inline float v_svf_run_2_pole_eq(t_state_variable_filter* a_svf,
-        float a_input)
+inline MKFLT v_svf_run_2_pole_eq(t_state_variable_filter* a_svf,
+        MKFLT a_input)
 {
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
@@ -350,9 +350,9 @@ inline float v_svf_run_2_pole_eq(t_state_variable_filter* a_svf,
 }
 
 
-inline float v_svf_run_4_pole_eq(
+inline MKFLT v_svf_run_4_pole_eq(
     t_state_variable_filter* a_svf,
-    float a_input
+    MKFLT a_input
 ){
     v_svf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_svf_set_input_value(
@@ -371,34 +371,34 @@ inline float v_svf_run_4_pole_eq(
 }
 
 inline void v_svf_set_cutoff(t_state_variable_filter*);
-void v_svf_set_res(t_state_variable_filter*,  float);
-t_state_variable_filter * g_svf_get(float);
-inline void v_svf_set_cutoff_base(t_state_variable_filter*, float);
-inline void v_svf_add_cutoff_mod(t_state_variable_filter*, float);
-inline void v_svf_velocity_mod(t_state_variable_filter*,float);
+void v_svf_set_res(t_state_variable_filter*,  MKFLT);
+t_state_variable_filter * g_svf_get(MKFLT);
+inline void v_svf_set_cutoff_base(t_state_variable_filter*, MKFLT);
+inline void v_svf_add_cutoff_mod(t_state_variable_filter*, MKFLT);
+inline void v_svf_velocity_mod(t_state_variable_filter*,MKFLT);
 
-/* inline void v_svf_velocity_mod(t_state_variable_filter* a_svf, float a_velocity)
+/* inline void v_svf_velocity_mod(t_state_variable_filter* a_svf, MKFLT a_velocity)
  */
 inline void v_svf_velocity_mod(t_state_variable_filter* a_svf,
-        float a_velocity)
+        MKFLT a_velocity)
 {
     a_svf->velocity_cutoff = ((a_velocity) * .2f) - 24.0f;
     a_svf->velocity_mod_amt = a_velocity * 0.007874016f;
 }
 
 /* inline void v_svf_set_cutoff_base(
- * t_state_variable_filter* a_svf, float a_midi_note_number)
+ * t_state_variable_filter* a_svf, MKFLT a_midi_note_number)
  * Set the base pitch of the filter*/
 inline void v_svf_set_cutoff_base(t_state_variable_filter* a_svf,
-        float a_midi_note_number)
+        MKFLT a_midi_note_number)
 {
     a_svf->cutoff_base = a_midi_note_number;
 }
 
 /* inline void v_svf_add_cutoff_mod(
- * t_state_variable_filter* a_svf, float a_midi_note_number)
+ * t_state_variable_filter* a_svf, MKFLT a_midi_note_number)
  * Modulate the filters cutoff with an envelope, LFO, etc...*/
-inline void v_svf_add_cutoff_mod(t_state_variable_filter* a_svf, float a_midi_note_number)
+inline void v_svf_add_cutoff_mod(t_state_variable_filter* a_svf, MKFLT a_midi_note_number)
 {
     a_svf->cutoff_mod = (a_svf->cutoff_mod) + a_midi_note_number;
 }
@@ -437,10 +437,10 @@ inline void v_svf_set_cutoff(t_state_variable_filter * a_svf)
 
 /* void v_svf_set_res(
  * t_state_variable_filter * a_svf,
- * float a_db)   //-100 to 0 is the expected range
+ * MKFLT a_db)   //-100 to 0 is the expected range
  *
  */
-void v_svf_set_res(t_state_variable_filter * a_svf, float a_db)
+void v_svf_set_res(t_state_variable_filter * a_svf, MKFLT a_db)
 {
     /*Don't calculate it again if it hasn't changed*/
     if((a_svf->filter_res_db) == a_db)
@@ -462,9 +462,9 @@ void v_svf_set_res(t_state_variable_filter * a_svf, float a_db)
     a_svf->filter_res = (1.0f - (f_db_to_linear_fast(a_db))) * 2.0f;
 }
 
-void g_svf_init(t_state_variable_filter * f_svf, float a_sample_rate)
+void g_svf_init(t_state_variable_filter * f_svf, MKFLT a_sample_rate)
 {
-    f_svf->sr = a_sample_rate * ((float)(SVF_OVERSAMPLE_MULTIPLIER));
+    f_svf->sr = a_sample_rate * ((MKFLT)(SVF_OVERSAMPLE_MULTIPLIER));
     f_svf->pi2_div_sr = (PI2 / (f_svf->sr));
 
     int f_i = 0;
@@ -497,9 +497,9 @@ void g_svf_init(t_state_variable_filter * f_svf, float a_sample_rate)
     v_svf_set_cutoff(f_svf);
 }
 
-/* t_state_variable_filter * g_svf_get(float a_sample_rate)
+/* t_state_variable_filter * g_svf_get(MKFLT a_sample_rate)
  */
-t_state_variable_filter * g_svf_get(float a_sample_rate)
+t_state_variable_filter * g_svf_get(MKFLT a_sample_rate)
 {
     t_state_variable_filter * f_svf;
     lmalloc((void**)&f_svf, sizeof(t_state_variable_filter));

@@ -77,7 +77,7 @@ static void v_rayv_on_stop(PYFX_Handle instance)
 }
 
 static void v_rayv_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     if(a_is_sidechain)
     {
@@ -292,7 +292,7 @@ static void v_rayv_load(PYFX_Handle instance,
 }
 
 static void v_rayv_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_rayv *plugin_data = (t_rayv*)Instance;
     plugin_data->port_table[a_port] = a_value;
@@ -329,10 +329,10 @@ static void v_rayv_process_midi_event(
             v_svf_velocity_mod(&plugin_data->data[f_voice]->svf_filter,
                     a_event->velocity);
 
-            float f_master_pitch = (*plugin_data->master_pitch);
+            MKFLT f_master_pitch = (*plugin_data->master_pitch);
 
             plugin_data->data[f_voice]->note_f =
-                    (float)a_event->note + f_master_pitch;
+                    (MKFLT)a_event->note + f_master_pitch;
             plugin_data->data[f_voice]->note =
                     a_event->note + (int)(f_master_pitch);
 
@@ -383,22 +383,22 @@ static void v_rayv_process_midi_event(
                     *plugin_data->lfo_phase * 0.01f,
                     *plugin_data->lfo_type);
 
-            float f_attack = *(plugin_data->attack) * .01;
+            MKFLT f_attack = *(plugin_data->attack) * .01;
             f_attack = (f_attack) * (f_attack);
-            float f_decay = *(plugin_data->decay) * .01;
+            MKFLT f_decay = *(plugin_data->decay) * .01;
             f_decay = (f_decay) * (f_decay);
-            float f_release = *(plugin_data->release) * .01;
+            MKFLT f_release = *(plugin_data->release) * .01;
             f_release = (f_release) * (f_release);
 
             FP_ADSR_SET[f_adsr_main_lin](&plugin_data->data[f_voice]->adsr_amp,
                     (f_attack), (f_decay), *(plugin_data->sustain),
                     (f_release));
 
-            float f_attack_f = *(plugin_data->attack_f) * .01;
+            MKFLT f_attack_f = *(plugin_data->attack_f) * .01;
             f_attack_f = (f_attack_f) * (f_attack_f);
-            float f_decay_f = *(plugin_data->decay_f) * .01;
+            MKFLT f_decay_f = *(plugin_data->decay_f) * .01;
             f_decay_f = (f_decay_f) * (f_decay_f);
-            float f_release_f = *(plugin_data->release_f) * .01;
+            MKFLT f_release_f = *(plugin_data->release_f) * .01;
             f_release_f = (f_release_f) * (f_release_f);
 
             v_adsr_set_adsr(&plugin_data->data[f_voice]->adsr_filter,

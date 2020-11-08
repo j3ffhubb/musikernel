@@ -20,7 +20,7 @@ extern "C" {
 
 #define plain_saw_count 1200
 
-float plain_saw_array[plain_saw_count] __attribute__((aligned(16))) = {
+MKFLT plain_saw_array[plain_saw_count] __attribute__((aligned(16))) = {
 -0.007839f, -0.006476f, -0.005113f, -0.003750f, -0.002388f, -0.001025f, 0.000338f, 0.001701f, 0.003064f, 0.004427f, 0.005789f, 0.007152f,
 0.008515f, 0.009878f, 0.011241f, 0.012604f, 0.013966f, 0.015329f, 0.016692f, 0.018055f, 0.019418f, 0.020780f, 0.022143f, 0.023506f,
 0.024869f, 0.026232f, 0.027595f, 0.028957f, 0.030320f, 0.031683f, 0.033046f, 0.034409f, 0.035772f, 0.037134f, 0.038497f, 0.039860f,
@@ -126,7 +126,7 @@ float plain_saw_array[plain_saw_count] __attribute__((aligned(16))) = {
 
 #define superbsaw_count 1200
 
-float superbsaw_array[superbsaw_count] __attribute__((aligned(16))) = {
+MKFLT superbsaw_array[superbsaw_count] __attribute__((aligned(16))) = {
 0.404955f, 0.404228f, 0.403491f, 0.402746f, 0.401992f, 0.401230f, 0.400459f, 0.399679f, 0.398891f, 0.398095f, 0.397290f, 0.396477f,
 0.395655f, 0.394825f, 0.393987f, 0.393141f, 0.392287f, 0.391425f, 0.390554f, 0.389676f, 0.388790f, 0.387896f, 0.386994f, 0.386084f,
 0.385167f, 0.384242f, 0.383309f, 0.382369f, 0.381421f, 0.380465f, 0.379503f, 0.378533f, 0.377555f, 0.376570f, 0.375578f, 0.374579f,
@@ -232,7 +232,7 @@ float superbsaw_array[superbsaw_count] __attribute__((aligned(16))) = {
 
 #define viralsaw_count 1200
 
-float viralsaw_array[viralsaw_count] __attribute__((aligned(16))) = {
+MKFLT viralsaw_array[viralsaw_count] __attribute__((aligned(16))) = {
 0.327097f, 0.334336f, 0.333261f, 0.326450f, 0.323610f, 0.329375f, 0.352511f, 0.366912f, 0.367124f, 0.367780f, 0.379936f, 0.397325f,
 0.423992f, 0.440868f, 0.449445f, 0.454089f, 0.449414f, 0.444944f, 0.425424f, 0.398703f, 0.361917f, 0.326202f, 0.290671f, 0.264511f,
 0.265486f, 0.288015f, 0.305601f, 0.331041f, 0.341297f, 0.389137f, 0.449440f, 0.495725f, 0.506133f, 0.474564f, 0.406667f, 0.321503f,
@@ -338,7 +338,7 @@ float viralsaw_array[viralsaw_count] __attribute__((aligned(16))) = {
 
 #define soft_saw_count 1200
 
-float soft_saw_array[soft_saw_count] __attribute__((aligned(16))) = {
+MKFLT soft_saw_array[soft_saw_count] __attribute__((aligned(16))) = {
 0.147352f, 0.144996f, 0.143031f, 0.141601f, 0.140789f, 0.140067f, 0.138571f, 0.134571f, 0.128080f, 0.120437f, 0.111784f, 0.101935f,
 0.091628f, 0.080776f, 0.070290f, 0.061176f, 0.052842f, 0.045122f, 0.037667f, 0.030562f, 0.024572f, 0.019113f, 0.014329f, 0.011256f,
 0.009313f, 0.008986f, 0.010199f, 0.013033f, 0.015992f, 0.017744f, 0.018425f, 0.017054f, 0.014695f, 0.011548f, 0.007833f, 0.003577f,
@@ -444,7 +444,7 @@ float soft_saw_array[soft_saw_count] __attribute__((aligned(16))) = {
 
 #define mid_saw_count 1200
 
-float mid_saw_array[mid_saw_count] __attribute__((aligned(16))) = {
+MKFLT mid_saw_array[mid_saw_count] __attribute__((aligned(16))) = {
 0.041061f, 0.041234f, 0.041406f, 0.041579f, 0.041751f, 0.041923f, 0.042095f, 0.042267f, 0.042439f, 0.042610f, 0.042782f, 0.042953f,
 0.043124f, 0.043295f, 0.043466f, 0.043637f, 0.043808f, 0.043978f, 0.044149f, 0.044319f, 0.044489f, 0.044659f, 0.044829f, 0.044998f,
 0.045168f, 0.045337f, 0.045506f, 0.045675f, 0.045844f, 0.046013f, 0.046182f, 0.046350f, 0.046518f, 0.046686f, 0.046854f, 0.047022f,
@@ -550,7 +550,7 @@ float mid_saw_array[mid_saw_count] __attribute__((aligned(16))) = {
 
 #define lush_saw_count 1200
 
-float lush_saw_array[lush_saw_count] __attribute__((aligned(16))) = {
+MKFLT lush_saw_array[lush_saw_count] __attribute__((aligned(16))) = {
 0.070129f, 0.071874f, 0.073616f, 0.075356f, 0.077094f, 0.078828f, 0.080561f, 0.082291f, 0.084018f, 0.085743f, 0.087465f, 0.089185f,
 0.090902f, 0.092617f, 0.094329f, 0.096039f, 0.097747f, 0.099452f, 0.101154f, 0.102854f, 0.104552f, 0.106247f, 0.107940f, 0.109631f,
 0.111319f, 0.113004f, 0.114687f, 0.116368f, 0.118046f, 0.119722f, 0.121395f, 0.123066f, 0.124735f, 0.126401f, 0.128065f, 0.129726f,
@@ -656,7 +656,7 @@ float lush_saw_array[lush_saw_count] __attribute__((aligned(16))) = {
 
 #define evil_square_count 1200
 
-float evil_square_array[evil_square_count] __attribute__((aligned(16))) = {
+MKFLT evil_square_array[evil_square_count] __attribute__((aligned(16))) = {
 0.985879f, 0.756520f, 0.668010f, 0.655388f, 0.516794f, 0.560619f, 0.491958f, 0.494434f, 0.409668f, 0.348045f, 0.471600f, 0.381877f,
 0.398155f, 0.432094f, 0.320022f, 0.329253f, 0.366993f, 0.385926f, 0.312149f, 0.305202f, 0.358615f, 0.261188f, 0.304136f, 0.345213f,
 0.359916f, 0.330088f, 0.221597f, 0.379563f, 0.278456f, 0.267897f, 0.351408f, 0.272839f, 0.263967f, 0.271009f, 0.268541f, 0.237003f,
@@ -762,7 +762,7 @@ float evil_square_array[evil_square_count] __attribute__((aligned(16))) = {
 
 #define punchy_square_count 1200
 
-float punchy_square_array[punchy_square_count] __attribute__((aligned(16))) = {
+MKFLT punchy_square_array[punchy_square_count] __attribute__((aligned(16))) = {
 -0.086257f, -0.085367f, -0.091424f, -0.101596f, -0.109774f, -0.108993f, -0.093244f, -0.058558f, -0.003436f, 0.071217f, 0.162488f, 0.266010f,
 0.376588f, 0.488774f, 0.597359f, 0.697756f, 0.786245f, 0.860113f, 0.917685f, 0.958273f, 0.982069f, 0.990000f, 0.983558f, 0.964634f,
 0.935353f, 0.897932f, 0.854558f, 0.807292f, 0.757998f, 0.708295f, 0.659532f, 0.612783f, 0.568854f, 0.528302f, 0.491461f, 0.458476f,
@@ -868,7 +868,7 @@ float punchy_square_array[punchy_square_count] __attribute__((aligned(16))) = {
 
 #define soft_square_count 1200
 
-float soft_square_array[soft_square_count] __attribute__((aligned(16))) = {
+MKFLT soft_square_array[soft_square_count] __attribute__((aligned(16))) = {
 0.205294f, 0.205659f, 0.201813f, 0.195760f, 0.190124f, 0.189222f, 0.196483f, 0.213882f, 0.242666f, 0.282718f, 0.332855f, 0.391153f,
 0.455140f, 0.522718f, 0.591202f, 0.658136f, 0.721499f, 0.779317f, 0.830468f, 0.874572f, 0.911031f, 0.939910f, 0.961657f, 0.976738f,
 0.985734f, 0.989888f, 0.990000f, 0.986401f, 0.979893f, 0.971369f, 0.961218f, 0.949711f, 0.937626f, 0.925306f, 0.913032f, 0.901231f,
@@ -974,7 +974,7 @@ float soft_square_array[soft_square_count] __attribute__((aligned(16))) = {
 
 #define pink_glitch_count 1200
 
-float pink_glitch_array[pink_glitch_count] __attribute__((aligned(16))) = {
+MKFLT pink_glitch_array[pink_glitch_count] __attribute__((aligned(16))) = {
 0.249594f, 0.190214f, 0.110497f, 0.022413f, -0.032428f, -0.053259f, -0.012545f, 0.004162f, 0.029873f, 0.082478f, 0.107270f, 0.134238f,
 0.121275f, 0.100527f, 0.096855f, 0.037102f, -0.049635f, -0.106694f, -0.134142f, -0.131868f, -0.098549f, -0.074603f, -0.088725f, -0.069200f,
 0.008691f, 0.140376f, 0.231102f, 0.254902f, 0.257518f, 0.210447f, 0.178586f, 0.165382f, 0.132408f, 0.074793f, 0.038248f, 0.074966f,
@@ -1080,7 +1080,7 @@ float pink_glitch_array[pink_glitch_count] __attribute__((aligned(16))) = {
 
 #define white_glitch_count 1200
 
-float white_glitch_array[white_glitch_count] __attribute__((aligned(16))) = {
+MKFLT white_glitch_array[white_glitch_count] __attribute__((aligned(16))) = {
 -0.059280f, -0.018552f, 0.050702f, -0.065081f, 0.133528f, 0.226431f, 0.327102f, 0.059268f, 0.126628f, -0.044956f, -0.102004f, 0.154192f,
 0.011477f, 0.059027f, 0.231712f, 0.126588f, 0.073679f, 0.165649f, 0.242075f, 0.215547f, 0.421827f, 0.518725f, 0.574005f, 0.381703f,
 0.267408f, 0.503118f, 0.556335f, 0.322930f, 0.280090f, 0.390192f, 0.353661f, 0.302068f, 0.128837f, 0.112170f, 0.178456f, -0.048732f,
@@ -1186,7 +1186,7 @@ float white_glitch_array[white_glitch_count] __attribute__((aligned(16))) = {
 
 #define acid_count 1200
 
-float acid_array[acid_count] __attribute__((aligned(16))) = {
+MKFLT acid_array[acid_count] __attribute__((aligned(16))) = {
 0.975014f, 0.973339f, 0.972238f, 0.971597f, 0.971292f, 0.971210f, 0.971259f, 0.971372f, 0.971504f, 0.971627f, 0.971728f, 0.971804f,
 0.971856f, 0.971887f, 0.971903f, 0.971910f, 0.971910f, 0.971907f, 0.971904f, 0.971902f, 0.971900f, 0.971898f, 0.971897f, 0.971895f,
 0.971894f, 0.971893f, 0.971893f, 0.971892f, 0.971891f, 0.971891f, 0.971890f, 0.971736f, 0.971768f, 0.972448f, 0.973487f, 0.973975f,
@@ -1292,7 +1292,7 @@ float acid_array[acid_count] __attribute__((aligned(16))) = {
 
 #define screetch_count 1200
 
-float screetch_array[screetch_count] __attribute__((aligned(16))) = {
+MKFLT screetch_array[screetch_count] __attribute__((aligned(16))) = {
 0.036163f, 0.020458f, -0.040576f, -0.093457f, -0.097722f, -0.038821f, 0.075869f, 0.226591f, 0.390327f, 0.541582f, 0.681766f, 0.811981f,
 0.915678f, 0.967888f, 0.947129f, 0.836786f, 0.642517f, 0.388699f, 0.108142f, -0.167532f, -0.414027f, -0.616768f, -0.770477f, -0.877124f,
 -0.943332f, -0.977921f, -0.990000f, -0.987717f, -0.977608f, -0.964420f, -0.951245f, -0.939819f, -0.930880f, -0.924502f, -0.920382f, -0.918047f,
@@ -1398,7 +1398,7 @@ float screetch_array[screetch_count] __attribute__((aligned(16))) = {
 
 #define thick_bass_count 1200
 
-float thick_bass_array[thick_bass_count] __attribute__((aligned(16))) = {
+MKFLT thick_bass_array[thick_bass_count] __attribute__((aligned(16))) = {
 0.450352f, 0.465617f, 0.481267f, 0.497045f, 0.512583f, 0.527435f, 0.541115f, 0.553129f, 0.562994f, 0.570267f, 0.574553f, 0.575529f,
 0.572944f, 0.566629f, 0.556501f, 0.542559f, 0.524885f, 0.503639f, 0.479051f, 0.451416f, 0.421083f, 0.388446f, 0.353938f, 0.318015f,
 0.281151f, 0.243829f, 0.206526f, 0.169711f, 0.133836f, 0.099327f, 0.066578f, 0.035949f, 0.007760f, -0.017712f, -0.040235f, -0.059624f,
@@ -1504,7 +1504,7 @@ float thick_bass_array[thick_bass_count] __attribute__((aligned(16))) = {
 
 #define rattler_count 1200
 
-float rattler_array[rattler_count] __attribute__((aligned(16))) = {
+MKFLT rattler_array[rattler_count] __attribute__((aligned(16))) = {
 -0.825286f, -0.831746f, -0.838099f, -0.844259f, -0.850169f, -0.855791f, -0.861108f, -0.866117f, -0.870823f, -0.875243f, -0.879396f, -0.883308f,
 -0.887002f, -0.890507f, -0.893850f, -0.897055f, -0.900146f, -0.903145f, -0.906072f, -0.908943f, -0.911772f, -0.914572f, -0.917352f, -0.920119f,
 -0.922879f, -0.925633f, -0.928384f, -0.931131f, -0.933873f, -0.936607f, -0.939329f, -0.942036f, -0.944721f, -0.947379f, -0.950005f, -0.952592f,
@@ -1610,7 +1610,7 @@ float rattler_array[rattler_count] __attribute__((aligned(16))) = {
 
 #define deep_saw_count 1200
 
-float deep_saw_array[deep_saw_count] __attribute__((aligned(16))) = {
+MKFLT deep_saw_array[deep_saw_count] __attribute__((aligned(16))) = {
 0.458748f, 0.459068f, 0.459384f, 0.459676f, 0.459953f, 0.460239f, 0.460569f, 0.460983f, 0.461520f, 0.462216f, 0.463103f, 0.464205f,
 0.465541f, 0.467121f, 0.468948f, 0.471019f, 0.473323f, 0.475846f, 0.478567f, 0.481463f, 0.484506f, 0.487670f, 0.490923f, 0.494235f,
 0.497577f, 0.500918f, 0.504231f, 0.507489f, 0.510668f, 0.513745f, 0.516700f, 0.519516f, 0.522178f, 0.524673f, 0.526992f, 0.529129f,
@@ -1715,7 +1715,7 @@ float deep_saw_array[deep_saw_count] __attribute__((aligned(16))) = {
 
 #define sine_count 1200
 
-float sine_array[sine_count] __attribute__((aligned(16))) = {
+MKFLT sine_array[sine_count] __attribute__((aligned(16))) = {
     0.0f, 0.0052359638f, 0.0104717841f, 0.0157073173f, 0.0209424199f, 0.0261769483f, 0.0314107591f, 0.0366437087f, 0.0418756537f, 0.0471064507f, 0.0523359562f, 0.057564027f,
 0.0627905195f, 0.0680152907f, 0.0732381971f, 0.0784590957f, 0.0836778433f, 0.0888942969f, 0.0941083133f, 0.0993197497f, 0.1045284633f, 0.1097343111f, 0.1149371505f, 0.1201368388f,
 0.1253332336f, 0.1305261922f, 0.1357155724f, 0.1409012319f, 0.1460830286f, 0.1512608202f, 0.156434465f, 0.1616038211f, 0.1667687467f, 0.1719291003f, 0.1770847403f, 0.1822355255f,
@@ -1833,7 +1833,7 @@ float sine_array[sine_count] __attribute__((aligned(16))) = {
 typedef struct st_wavetable
 {
     int length;
-    float * wavetable;
+    MKFLT * wavetable;
 }t_wavetable;
 
 t_wavetable * g_wavetable_get();
@@ -1844,7 +1844,7 @@ t_wavetable * g_wavetable_get()
     hpalloc((void**)&f_result, (sizeof(t_wavetable)));
 
     hpalloc((void**)&f_result->wavetable,
-        (sizeof(float) * WT_FRAMES_PER_CYCLE));
+        (sizeof(MKFLT) * WT_FRAMES_PER_CYCLE));
 
     f_result->length = WT_FRAMES_PER_CYCLE;
     return f_result;
@@ -1857,10 +1857,10 @@ typedef struct
 }t_wt_wavetables;
 
 
-void v_wt_set_wavetable(t_wt_wavetables* a_wt, int a_index, float * a_arr,
+void v_wt_set_wavetable(t_wt_wavetables* a_wt, int a_index, MKFLT * a_arr,
         int a_count, pthread_spinlock_t * a_spinlock, int * a_reset_var)
 {
-    float * f_old = a_wt->tables[a_index]->wavetable;
+    MKFLT * f_old = a_wt->tables[a_index]->wavetable;
 
     if(a_spinlock)
     {

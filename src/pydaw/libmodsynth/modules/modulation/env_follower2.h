@@ -23,12 +23,12 @@ extern "C" {
 
 typedef struct
 {
-    float attack;
-    float release;
-    float a_coeff;
-    float r_coeff;
-    float envelope;
-    float sample_rate;
+    MKFLT attack;
+    MKFLT release;
+    MKFLT a_coeff;
+    MKFLT r_coeff;
+    MKFLT envelope;
+    MKFLT sample_rate;
 }t_enf2_env_follower;
 
 #ifdef	__cplusplus
@@ -36,7 +36,7 @@ typedef struct
 #endif
 
 
-void g_enf_init(t_enf2_env_follower* self, float a_sr)
+void g_enf_init(t_enf2_env_follower* self, MKFLT a_sr)
 {
     self->envelope = 0.0f;
     self->sample_rate = a_sr;
@@ -44,7 +44,7 @@ void g_enf_init(t_enf2_env_follower* self, float a_sr)
     self->release = -1.234f;
 }
 
-void v_enf_set(t_enf2_env_follower* self, float a_attack, float a_release)
+void v_enf_set(t_enf2_env_follower* self, MKFLT a_attack, MKFLT a_release)
 {
     if(self->attack != a_attack)
     {
@@ -59,9 +59,9 @@ void v_enf_set(t_enf2_env_follower* self, float a_attack, float a_release)
     }
 }
 
-void v_enf_run(t_enf2_env_follower* self, float a_input)
+void v_enf_run(t_enf2_env_follower* self, MKFLT a_input)
 {
-    float tmp = f_lms_abs(a_input);
+    MKFLT tmp = f_lms_abs(a_input);
     if(tmp > self->envelope)
     {
         self->envelope = self->a_coeff * (self->envelope - tmp) + tmp;

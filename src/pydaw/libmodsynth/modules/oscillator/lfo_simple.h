@@ -24,20 +24,20 @@ extern "C" {
 
 typedef struct st_lfs_lfo
 {
-    float inc, sr, sr_recip, output;
+    MKFLT inc, sr, sr_recip, output;
     t_osc_core osc_core;
     fp_get_osc_func_ptr osc_ptr;
 }t_lfs_lfo;
 
-inline void v_lfs_sync(t_lfs_lfo *,float,int);
-inline void v_lfs_set(t_lfs_lfo *, float);
+inline void v_lfs_sync(t_lfs_lfo *,MKFLT,int);
+inline void v_lfs_set(t_lfs_lfo *, MKFLT);
 inline void v_lfs_run(t_lfs_lfo *);
-t_lfs_lfo * g_lfs_get(float);
+t_lfs_lfo * g_lfs_get(MKFLT);
 void v_lfs_free(t_lfs_lfo * );
 
 /* inline void v_lfs_sync(
  * t_lfs_lfo * a_lfs,
- * float a_phase,  //the phase to resync to.  Range:  0 to .9999
+ * MKFLT a_phase,  //the phase to resync to.  Range:  0 to .9999
  * int a_type)  //The type of LFO.  See types below
  *
  * Types:
@@ -45,7 +45,7 @@ void v_lfs_free(t_lfs_lfo * );
  * 1 : Sine
  * 2 : Triangle
  */
-inline void v_lfs_sync(t_lfs_lfo * a_lfs, float a_phase, int a_type)
+inline void v_lfs_sync(t_lfs_lfo * a_lfs, MKFLT a_phase, int a_type)
 {
     a_lfs->osc_core.output = a_phase;
 
@@ -68,11 +68,11 @@ inline void v_lfs_sync(t_lfs_lfo * a_lfs, float a_phase, int a_type)
 
 /* void v_osc_set_hz(
  * t_lfs_lfo * a_lfs_ptr,
- * float a_hz)  //the pitch of the oscillator in hz, typically 0.1 to 10000
+ * MKFLT a_hz)  //the pitch of the oscillator in hz, typically 0.1 to 10000
  *
  * For setting LFO frequency.
  */
-inline void v_lfs_set(t_lfs_lfo * a_lfs_ptr, float a_hz)
+inline void v_lfs_set(t_lfs_lfo * a_lfs_ptr, MKFLT a_hz)
 {
     a_lfs_ptr->inc =  a_hz * a_lfs_ptr->sr_recip;
 }
@@ -85,7 +85,7 @@ inline void v_lfs_run(t_lfs_lfo * a_lfs)
     a_lfs->output = a_lfs->osc_ptr(&a_lfs->osc_core);
 }
 
-void g_lfs_init(t_lfs_lfo * f_result, float a_sr)
+void g_lfs_init(t_lfs_lfo * f_result, MKFLT a_sr)
 {
     f_result->inc = 0.0f;
     g_init_osc_core(&f_result->osc_core);
@@ -95,7 +95,7 @@ void g_lfs_init(t_lfs_lfo * f_result, float a_sr)
     f_result->sr_recip = 1.0f / a_sr;
 }
 
-t_lfs_lfo * g_lfs_get(float a_sr)
+t_lfs_lfo * g_lfs_get(MKFLT a_sr)
 {
     t_lfs_lfo * f_result;
     lmalloc((void**)&f_result, sizeof(t_lfs_lfo));

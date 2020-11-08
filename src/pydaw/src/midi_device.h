@@ -57,7 +57,7 @@ typedef struct
     t_midi_device devices[MK_MAX_MIDI_DEVICE_COUNT];
 }t_midi_device_list;
 
-void midiDeviceRead(t_midi_device *, float, unsigned long);
+void midiDeviceRead(t_midi_device *, MKFLT, unsigned long);
 void midiPoll(t_midi_device * self);
 
 #ifdef	__cplusplus
@@ -309,7 +309,7 @@ void midiPoll(t_midi_device * self)
 }
 
 
-void midiDeviceRead(t_midi_device * self, float sample_rate,
+void midiDeviceRead(t_midi_device * self, MKFLT sample_rate,
         unsigned long framesPerBuffer)
 {
     struct timeval tv, evtv, diff;

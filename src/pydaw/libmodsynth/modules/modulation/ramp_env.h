@@ -24,25 +24,25 @@ extern "C" {
 
 typedef struct st_ramp_env
 {
-    float output;  //if == 1, the ramp can be considered finished running
-    float output_multiplied;
-    float ramp_time;
-    float ramp_inc;
-    float sr;
-    float sr_recip;
-    float output_multiplier;
-    float curve;  //0.0-1.0, for the interpolator
-    float last_curve;  //0.0-1.0, for the interpolator
-    float curve_table[5];
+    MKFLT output;  //if == 1, the ramp can be considered finished running
+    MKFLT output_multiplied;
+    MKFLT ramp_time;
+    MKFLT ramp_inc;
+    MKFLT sr;
+    MKFLT sr_recip;
+    MKFLT output_multiplier;
+    MKFLT curve;  //0.0-1.0, for the interpolator
+    MKFLT last_curve;  //0.0-1.0, for the interpolator
+    MKFLT curve_table[5];
 }t_ramp_env;
 
 
 inline void f_rmp_run_ramp(t_ramp_env*);
-void v_rmp_retrigger(t_ramp_env*,float,float);
-void v_rmp_retrigger_glide_t(t_ramp_env*,float,float,float);
-void v_rmp_retrigger_glide_r(t_ramp_env*,float,float,float);
-void v_rmp_set_time(t_ramp_env*,float);
-t_ramp_env * g_rmp_get_ramp_env(float);
+void v_rmp_retrigger(t_ramp_env*,MKFLT,MKFLT);
+void v_rmp_retrigger_glide_t(t_ramp_env*,MKFLT,MKFLT,MKFLT);
+void v_rmp_retrigger_glide_r(t_ramp_env*,MKFLT,MKFLT,MKFLT);
+void v_rmp_set_time(t_ramp_env*,MKFLT);
+t_ramp_env * g_rmp_get_ramp_env(MKFLT);
 
 
 
@@ -86,11 +86,11 @@ inline void f_rmp_run_ramp_curve(t_ramp_env* a_rmp_ptr)
 
 /* void v_rmp_set_time(
  * t_ramp_env* a_rmp_ptr,
- * float a_time)  //time in seconds
+ * MKFLT a_time)  //time in seconds
  *
  * Set envelope time without retriggering the envelope
  */
-void v_rmp_set_time(t_ramp_env* a_rmp_ptr,float a_time)
+void v_rmp_set_time(t_ramp_env* a_rmp_ptr,MKFLT a_time)
 {
     a_rmp_ptr->ramp_time = a_time;
 
@@ -109,12 +109,12 @@ void v_rmp_set_time(t_ramp_env* a_rmp_ptr,float a_time)
 
 /* void v_rmp_set_time(
  * t_ramp_env* a_rmp_ptr,
- * float a_time,  //time in seconds
- * float a_curve) // 0.0 to 1.0
+ * MKFLT a_time,  //time in seconds
+ * MKFLT a_curve) // 0.0 to 1.0
  *
  * Retrigger when using with
  */
-void v_rmp_retrigger_curve(t_ramp_env* a_rmp_ptr, float a_time, float a_multiplier, float a_curve)
+void v_rmp_retrigger_curve(t_ramp_env* a_rmp_ptr, MKFLT a_time, MKFLT a_multiplier, MKFLT a_curve)
 {
     v_rmp_retrigger(a_rmp_ptr, a_time, a_multiplier);
 
@@ -129,10 +129,10 @@ void v_rmp_retrigger_curve(t_ramp_env* a_rmp_ptr, float a_time, float a_multipli
 
 /*void v_rmp_retrigger(
  * t_ramp_env* a_rmp_ptr,
- * float a_time,
- * float a_multiplier)
+ * MKFLT a_time,
+ * MKFLT a_multiplier)
  */
-void v_rmp_retrigger(t_ramp_env* a_rmp_ptr, float a_time, float a_multiplier)
+void v_rmp_retrigger(t_ramp_env* a_rmp_ptr, MKFLT a_time, MKFLT a_multiplier)
 {
     a_rmp_ptr->output = 0.0f;
     a_rmp_ptr->ramp_time = a_time;
@@ -153,7 +153,7 @@ void v_rmp_retrigger(t_ramp_env* a_rmp_ptr, float a_time, float a_multiplier)
 }
 
 /*Glide with constant time in seconds*/
-void v_rmp_retrigger_glide_t(t_ramp_env* a_rmp_ptr, float a_time, float a_current_note, float a_next_note)
+void v_rmp_retrigger_glide_t(t_ramp_env* a_rmp_ptr, MKFLT a_time, MKFLT a_current_note, MKFLT a_next_note)
 {
     a_rmp_ptr->ramp_time = a_time;
 
@@ -175,7 +175,7 @@ void v_rmp_retrigger_glide_t(t_ramp_env* a_rmp_ptr, float a_time, float a_curren
 }
 
 /*Glide with constant rate in seconds-per-octave*/
-void v_rmp_retrigger_glide_r(t_ramp_env* a_rmp_ptr, float a_time, float a_current_note, float a_next_note)
+void v_rmp_retrigger_glide_r(t_ramp_env* a_rmp_ptr, MKFLT a_time, MKFLT a_current_note, MKFLT a_next_note)
 {
     a_rmp_ptr->output = 0.0f;
     a_rmp_ptr->output_multiplier = a_next_note - a_current_note;
@@ -195,7 +195,7 @@ void v_rmp_retrigger_glide_r(t_ramp_env* a_rmp_ptr, float a_time, float a_curren
     }
 }
 
-void g_rmp_init(t_ramp_env * f_result, float a_sr)
+void g_rmp_init(t_ramp_env * f_result, MKFLT a_sr)
 {
     f_result->sr = a_sr;
     f_result->sr_recip = 1.0f/a_sr;
@@ -214,10 +214,10 @@ void g_rmp_init(t_ramp_env * f_result, float a_sr)
 }
 
 /*t_ramp_env * g_rmp_get_ramp_env(
- * float a_sr  //sample rate
+ * MKFLT a_sr  //sample rate
  * )
  */
-t_ramp_env * g_rmp_get_ramp_env(float a_sr)
+t_ramp_env * g_rmp_get_ramp_env(MKFLT a_sr)
 {
     t_ramp_env * f_result;
     lmalloc((void**)&f_result, sizeof(t_ramp_env));

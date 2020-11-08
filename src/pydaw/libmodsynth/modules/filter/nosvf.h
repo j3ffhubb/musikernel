@@ -44,52 +44,52 @@ extern "C" {
 
 typedef struct
 {
-    float bp_m1, lp_m1, hp, lp, bp;
+    MKFLT bp_m1, lp_m1, hp, lp, bp;
 }t_nosvf_kernel;
 
 
 typedef struct
 {
     //t_smoother_linear * cutoff_smoother;
-    float cutoff_note, cutoff_hz, cutoff_filter, pi2_div_sr, sr,
+    MKFLT cutoff_note, cutoff_hz, cutoff_filter, pi2_div_sr, sr,
             filter_res, filter_res_db, velocity_cutoff; //, velocity_cutoff_amt;
 
-    float cutoff_base, cutoff_mod, cutoff_last;
+    MKFLT cutoff_base, cutoff_mod, cutoff_last;
     /*For the eq*/
-    float gain_db, gain_linear;
+    MKFLT gain_db, gain_linear;
     t_nosvf_kernel filter_kernels [NOSVF_MAX_CASCADE];
 } t_nosvf_filter;
 
 //Used to switch between values
-typedef float (*fp_nosvf_run_filter)(t_nosvf_filter*,float);
+typedef MKFLT (*fp_nosvf_run_filter)(t_nosvf_filter*,MKFLT);
 
 /*The int is the number of cascaded filter kernels*/
 inline fp_nosvf_run_filter nosvf_get_run_filter_ptr(int,int);
 
-inline void v_nosvf_set_input_value(t_nosvf_filter*, t_nosvf_kernel *, float);
+inline void v_nosvf_set_input_value(t_nosvf_filter*, t_nosvf_kernel *, MKFLT);
 
-inline float v_nosvf_run_2_pole_lp(t_nosvf_filter*, float);
-inline float v_nosvf_run_4_pole_lp(t_nosvf_filter*, float);
-inline float v_nosvf_run_6_pole_lp(t_nosvf_filter*, float);
+inline MKFLT v_nosvf_run_2_pole_lp(t_nosvf_filter*, MKFLT);
+inline MKFLT v_nosvf_run_4_pole_lp(t_nosvf_filter*, MKFLT);
+inline MKFLT v_nosvf_run_6_pole_lp(t_nosvf_filter*, MKFLT);
 
-inline float v_nosvf_run_2_pole_hp(t_nosvf_filter*, float);
-inline float v_nosvf_run_4_pole_hp(t_nosvf_filter*, float);
+inline MKFLT v_nosvf_run_2_pole_hp(t_nosvf_filter*, MKFLT);
+inline MKFLT v_nosvf_run_4_pole_hp(t_nosvf_filter*, MKFLT);
 
-inline float v_nosvf_run_2_pole_bp(t_nosvf_filter*, float);
-inline float v_nosvf_run_4_pole_bp(t_nosvf_filter*, float);
+inline MKFLT v_nosvf_run_2_pole_bp(t_nosvf_filter*, MKFLT);
+inline MKFLT v_nosvf_run_4_pole_bp(t_nosvf_filter*, MKFLT);
 
-inline float v_nosvf_run_2_pole_notch(t_nosvf_filter*, float);
-inline float v_nosvf_run_4_pole_notch(t_nosvf_filter*, float);
+inline MKFLT v_nosvf_run_2_pole_notch(t_nosvf_filter*, MKFLT);
+inline MKFLT v_nosvf_run_4_pole_notch(t_nosvf_filter*, MKFLT);
 
-inline float v_nosvf_run_2_pole_eq(t_nosvf_filter*, float);
-inline float v_nosvf_run_4_pole_eq(t_nosvf_filter*, float);
+inline MKFLT v_nosvf_run_2_pole_eq(t_nosvf_filter*, MKFLT);
+inline MKFLT v_nosvf_run_4_pole_eq(t_nosvf_filter*, MKFLT);
 
-inline float v_nosvf_run_no_filter(t_nosvf_filter*, float);
+inline MKFLT v_nosvf_run_no_filter(t_nosvf_filter*, MKFLT);
 
-inline float v_nosvf_run_2_pole_allpass(t_nosvf_filter*, float);
+inline MKFLT v_nosvf_run_2_pole_allpass(t_nosvf_filter*, MKFLT);
 
-inline void v_nosvf_set_eq(t_nosvf_filter*, float);
-inline void v_nosvf_set_eq4(t_nosvf_filter*, float);
+inline void v_nosvf_set_eq(t_nosvf_filter*, MKFLT);
+inline void v_nosvf_set_eq4(t_nosvf_filter*, MKFLT);
 
 inline void v_nosvf_reset(t_nosvf_filter*);
 
@@ -120,20 +120,20 @@ __attribute__((aligned(CACHE_LINE_SIZE))) = {
     v_nosvf_run_no_filter
 };
 
-/* inline float v_nosvf_run_no_filter(
+/* inline MKFLT v_nosvf_run_no_filter(
  * t_nosvf_filter* a_svf,
- * float a_in) //audio input
+ * MKFLT a_in) //audio input
  *
  * This is for allowing a filter to be turned off by running a
  * function pointer.  a_in is returned unmodified.
  */
-inline float v_nosvf_run_no_filter(
-    t_nosvf_filter* a_svf, float a_in)
+inline MKFLT v_nosvf_run_no_filter(
+    t_nosvf_filter* a_svf, MKFLT a_in)
 {
     return a_in;
 }
 
-inline void v_nosvf_set_eq(t_nosvf_filter* a_svf, float a_gain)
+inline void v_nosvf_set_eq(t_nosvf_filter* a_svf, MKFLT a_gain)
 {
     if(a_gain != (a_svf->gain_db))
     {
@@ -143,7 +143,7 @@ inline void v_nosvf_set_eq(t_nosvf_filter* a_svf, float a_gain)
 }
 
 inline void v_nosvf_set_eq4(t_nosvf_filter* a_svf,
-        float a_gain)
+        MKFLT a_gain)
 {
     if(a_gain != (a_svf->gain_db))
     {
@@ -231,11 +231,11 @@ inline fp_nosvf_run_filter nosvf_get_run_filter_ptr(int a_cascades, int a_filter
 /* inline void v_nosvf_set_input_value(
  * t_nosvf_filter * a_svf,
  * t_nosvf_kernel * a_kernel,
- * float a_input_value) //the audio input to filter
+ * MKFLT a_input_value) //the audio input to filter
  *
  * The main action to run the filter kernel*/
 inline void v_nosvf_set_input_value(t_nosvf_filter * a_svf,
-        t_nosvf_kernel *  a_kernel, float a_input_value)
+        t_nosvf_kernel *  a_kernel, MKFLT a_input_value)
 {
     a_kernel->hp = a_input_value -
         (((a_kernel->bp_m1) * (a_svf->filter_res)) + (a_kernel->lp_m1));
@@ -248,8 +248,8 @@ inline void v_nosvf_set_input_value(t_nosvf_filter * a_svf,
     a_kernel->lp_m1 = f_remove_denormal((a_kernel->lp));
 }
 
-inline float v_nosvf_run_2_pole_lp(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_2_pole_lp(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
@@ -257,8 +257,8 @@ inline float v_nosvf_run_2_pole_lp(t_nosvf_filter* a_svf,
 }
 
 
-inline float v_nosvf_run_4_pole_lp(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_4_pole_lp(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[1],
@@ -267,8 +267,8 @@ inline float v_nosvf_run_4_pole_lp(t_nosvf_filter* a_svf,
     return (a_svf->filter_kernels[1].lp);
 }
 
-inline float v_nosvf_run_6_pole_lp(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_6_pole_lp(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[1],
@@ -279,16 +279,16 @@ inline float v_nosvf_run_6_pole_lp(t_nosvf_filter* a_svf,
     return (a_svf->filter_kernels[2].lp);
 }
 
-inline float v_nosvf_run_2_pole_hp(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_2_pole_hp(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     return (a_svf->filter_kernels[0].hp);
 }
 
 
-inline float v_nosvf_run_4_pole_hp(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_4_pole_hp(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[1],
@@ -298,16 +298,16 @@ inline float v_nosvf_run_4_pole_hp(t_nosvf_filter* a_svf,
 }
 
 
-inline float v_nosvf_run_2_pole_bp(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_2_pole_bp(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
     return (a_svf->filter_kernels[0].bp);
 }
 
-inline float v_nosvf_run_4_pole_bp(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_4_pole_bp(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[1],
@@ -316,16 +316,16 @@ inline float v_nosvf_run_4_pole_bp(t_nosvf_filter* a_svf,
     return (a_svf->filter_kernels[1].bp);
 }
 
-inline float v_nosvf_run_2_pole_notch(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_2_pole_notch(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
     return (a_svf->filter_kernels[0].hp) + (a_svf->filter_kernels[0].lp);
 }
 
-inline float v_nosvf_run_4_pole_notch(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_4_pole_notch(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
@@ -335,8 +335,8 @@ inline float v_nosvf_run_4_pole_notch(t_nosvf_filter* a_svf,
     return (a_svf->filter_kernels[1].hp) + (a_svf->filter_kernels[1].lp);
 }
 
-inline float v_nosvf_run_2_pole_allpass(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_2_pole_allpass(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
@@ -344,8 +344,8 @@ inline float v_nosvf_run_2_pole_allpass(t_nosvf_filter* a_svf,
             (a_svf->filter_kernels[0].bp);
 }
 
-inline float v_nosvf_run_2_pole_eq(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_2_pole_eq(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
 
@@ -354,8 +354,8 @@ inline float v_nosvf_run_2_pole_eq(t_nosvf_filter* a_svf,
 }
 
 
-inline float v_nosvf_run_4_pole_eq(t_nosvf_filter* a_svf,
-        float a_input)
+inline MKFLT v_nosvf_run_4_pole_eq(t_nosvf_filter* a_svf,
+        MKFLT a_input)
 {
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[0], a_input);
     v_nosvf_set_input_value(a_svf, &a_svf->filter_kernels[1],
@@ -367,35 +367,35 @@ inline float v_nosvf_run_4_pole_eq(t_nosvf_filter* a_svf,
 }
 
 inline void v_nosvf_set_cutoff(t_nosvf_filter*);
-void v_nosvf_set_res(t_nosvf_filter*,  float);
-t_nosvf_filter * g_nosvf_get(float);
-inline void v_nosvf_set_cutoff_base(t_nosvf_filter*, float);
-inline void v_nosvf_add_cutoff_mod(t_nosvf_filter*, float);
-inline void v_nosvf_velocity_mod(t_nosvf_filter*, float, float);
+void v_nosvf_set_res(t_nosvf_filter*,  MKFLT);
+t_nosvf_filter * g_nosvf_get(MKFLT);
+inline void v_nosvf_set_cutoff_base(t_nosvf_filter*, MKFLT);
+inline void v_nosvf_add_cutoff_mod(t_nosvf_filter*, MKFLT);
+inline void v_nosvf_velocity_mod(t_nosvf_filter*, MKFLT, MKFLT);
 
-/* inline void v_nosvf_velocity_mod(t_nosvf_filter* a_svf, float a_velocity)
+/* inline void v_nosvf_velocity_mod(t_nosvf_filter* a_svf, MKFLT a_velocity)
  */
 inline void v_nosvf_velocity_mod(t_nosvf_filter* a_svf,
-        float a_velocity, float a_amt)
+        MKFLT a_velocity, MKFLT a_amt)
 {
     a_velocity *= 0.007874016f;
     a_svf->velocity_cutoff = ((a_velocity * 24.0f) - 24.0f) * a_amt;
 }
 
 /* inline void v_nosvf_set_cutoff_base(
- * t_nosvf_filter* a_svf, float a_midi_note_number)
+ * t_nosvf_filter* a_svf, MKFLT a_midi_note_number)
  * Set the base pitch of the filter*/
 inline void v_nosvf_set_cutoff_base(t_nosvf_filter* a_svf,
-        float a_midi_note_number)
+        MKFLT a_midi_note_number)
 {
     a_svf->cutoff_base = a_midi_note_number;
 }
 
 /* inline void v_nosvf_add_cutoff_mod(
- * t_nosvf_filter* a_svf, float a_midi_note_number)
+ * t_nosvf_filter* a_svf, MKFLT a_midi_note_number)
  * Modulate the filters cutoff with an envelope, LFO, etc...*/
 inline void v_nosvf_add_cutoff_mod(t_nosvf_filter* a_svf,
-        float a_midi_note_number)
+        MKFLT a_midi_note_number)
 {
     a_svf->cutoff_mod = (a_svf->cutoff_mod) + a_midi_note_number;
 }
@@ -434,10 +434,10 @@ inline void v_nosvf_set_cutoff(t_nosvf_filter * a_svf)
 
 /* void v_nosvf_set_res(
  * t_nosvf_filter * a_svf,
- * float a_db)   //-100 to 0 is the expected range
+ * MKFLT a_db)   //-100 to 0 is the expected range
  *
  */
-void v_nosvf_set_res(t_nosvf_filter * a_svf, float a_db)
+void v_nosvf_set_res(t_nosvf_filter * a_svf, MKFLT a_db)
 {
     /*Don't calculate it again if it hasn't changed*/
     if((a_svf->filter_res_db) == a_db)
@@ -459,7 +459,7 @@ void v_nosvf_set_res(t_nosvf_filter * a_svf, float a_db)
     a_svf->filter_res = (1.0f - (f_db_to_linear_fast(a_db))) * 2.0f;
 }
 
-void g_nosvf_init(t_nosvf_filter * f_svf, float a_sample_rate)
+void g_nosvf_init(t_nosvf_filter * f_svf, MKFLT a_sample_rate)
 {
     f_svf->sr = a_sample_rate;
     f_svf->pi2_div_sr = (PI2 / (f_svf->sr));
@@ -493,9 +493,9 @@ void g_nosvf_init(t_nosvf_filter * f_svf, float a_sample_rate)
     v_nosvf_set_cutoff(f_svf);
 }
 
-/* t_nosvf_filter * g_nosvf_get(float a_sample_rate)
+/* t_nosvf_filter * g_nosvf_get(MKFLT a_sample_rate)
  */
-t_nosvf_filter * g_nosvf_get(float a_sample_rate)
+t_nosvf_filter * g_nosvf_get(MKFLT a_sample_rate)
 {
     t_nosvf_filter * f_svf;
     lmalloc((void**)&f_svf, sizeof(t_nosvf_filter));

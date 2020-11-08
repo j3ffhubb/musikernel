@@ -40,16 +40,16 @@ typedef struct
     t_lms_delay * delay;
     t_smoother_linear * time_smoother;
 
-    float current_sample0;
-    float current_sample1;
+    MKFLT current_sample0;
+    MKFLT current_sample1;
 
-    float vol_linear;
+    MKFLT vol_linear;
 
 }t_mkdelay_mono_modules;
 
-t_mkdelay_mono_modules * v_mkdelay_mono_init(float, int);
+t_mkdelay_mono_modules * v_mkdelay_mono_init(MKFLT, int);
 
-t_mkdelay_mono_modules * v_mkdelay_mono_init(float a_sr, int a_plugin_uid)
+t_mkdelay_mono_modules * v_mkdelay_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_mkdelay_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_mkdelay_mono_modules));

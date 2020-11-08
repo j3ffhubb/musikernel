@@ -25,7 +25,7 @@ extern "C" {
 
 typedef struct st_clipper
 {
-    float clip_high, clip_low, input_gain_linear, clip_db, in_db, result;
+    MKFLT clip_high, clip_low, input_gain_linear, clip_db, in_db, result;
 #ifdef CLP_DEBUG_MODE
     int debug_counter;
 #endif
@@ -33,19 +33,19 @@ typedef struct st_clipper
 
 /*Set the values of a clipper struct symmetrically,
  * ie: value of .75 clips at .75 and -.75*/
-void v_clp_set_clip_sym(t_clipper *, float);
-void v_clp_set_in_gain(t_clipper *, float);
+void v_clp_set_clip_sym(t_clipper *, MKFLT);
+void v_clp_set_in_gain(t_clipper *, MKFLT);
 t_clipper * g_clp_get_clipper();
 void v_clp_free(t_clipper *);
-inline float f_clp_clip(t_clipper*, float);
+inline MKFLT f_clp_clip(t_clipper*, MKFLT);
 
 /*v_clp_set_clip_sym(
  * t_clipper*,
- * float a_db //Threshold to clip at, in decibel,
+ * MKFLT a_db //Threshold to clip at, in decibel,
  * ie:  -6db = clipping at .5 and -.5
  * )
  */
-void v_clp_set_clip_sym(t_clipper * a_clp, float a_db)
+void v_clp_set_clip_sym(t_clipper * a_clp, MKFLT a_db)
 {
     /*Already set, don't set again*/
     if(a_db == (a_clp->clip_db))
@@ -53,7 +53,7 @@ void v_clp_set_clip_sym(t_clipper * a_clp, float a_db)
 
     a_clp->clip_db = a_db;
 
-    float f_value = f_db_to_linear_fast(a_db);
+    MKFLT f_value = f_db_to_linear_fast(a_db);
 
 #ifdef CLP_DEBUG_MODE
         printf("Clipper value == %f", f_value);
@@ -65,11 +65,11 @@ void v_clp_set_clip_sym(t_clipper * a_clp, float a_db)
 
 /*void v_clp_set_in_gain(
  * t_clipper*,
- * float a_db   //gain in dB to apply to the input signal before clipping it,
+ * MKFLT a_db   //gain in dB to apply to the input signal before clipping it,
  * usually a value between 0 and 36
  * )
  */
-void v_clp_set_in_gain(t_clipper * a_clp, float a_db)
+void v_clp_set_in_gain(t_clipper * a_clp, MKFLT a_db)
 {
     if((a_clp->in_db) != a_db)
     {
@@ -97,14 +97,14 @@ t_clipper * g_clp_get_clipper()
     return f_result;
 };
 
-/* inline float f_clp_clip(
+/* inline MKFLT f_clp_clip(
  * t_clipper *,
- * float a_input  //value to be clipped
+ * MKFLT a_input  //value to be clipped
  * )
  *
- * This function performs the actual clipping, and returns a float
+ * This function performs the actual clipping, and returns a MKFLT
  */
-inline float f_clp_clip(t_clipper * a_clp, float a_input)
+inline MKFLT f_clp_clip(t_clipper * a_clp, MKFLT a_input)
 {
     a_clp->result = a_input * (a_clp->input_gain_linear);
 

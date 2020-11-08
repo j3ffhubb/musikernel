@@ -28,9 +28,9 @@ typedef struct
     t_lim_limiter limiter;
 }t_mk_lim_mono_modules;
 
-t_mk_lim_mono_modules * v_mk_lim_mono_init(float, int);
+t_mk_lim_mono_modules * v_mk_lim_mono_init(MKFLT, int);
 
-t_mk_lim_mono_modules * v_mk_lim_mono_init(float a_sr, int a_plugin_uid)
+t_mk_lim_mono_modules * v_mk_lim_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_mk_lim_mono_modules * f_result;
     hpalloc((void**)&f_result, sizeof(t_mk_lim_mono_modules));

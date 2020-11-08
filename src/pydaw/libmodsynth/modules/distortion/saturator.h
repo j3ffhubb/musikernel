@@ -23,20 +23,20 @@ extern "C" {
 
 typedef struct st_sat_saturator
 {
-    float output0;
-    float output1;
-    float a;
-    float b;
-    float amount;
-    float last_ingain;
-    float last_outgain;
-    float ingain_lin;
-    float outgain_lin;
+    MKFLT output0;
+    MKFLT output1;
+    MKFLT a;
+    MKFLT b;
+    MKFLT amount;
+    MKFLT last_ingain;
+    MKFLT last_outgain;
+    MKFLT ingain_lin;
+    MKFLT outgain_lin;
 }t_sat_saturator;
 
 t_sat_saturator * g_sat_get();
-inline void v_sat_set(t_sat_saturator*,float,float,float);
-inline void v_sat_run(t_sat_saturator*,float,float);
+inline void v_sat_set(t_sat_saturator*,MKFLT,MKFLT,MKFLT);
+inline void v_sat_run(t_sat_saturator*,MKFLT,MKFLT);
 void v_sat_free(t_sat_saturator*);
 
 void v_sat_free(t_sat_saturator * a_sat)
@@ -44,8 +44,8 @@ void v_sat_free(t_sat_saturator * a_sat)
     free(a_sat);
 }
 
-inline void v_sat_set(t_sat_saturator* a_sat, float a_ingain, float a_amt,
-        float a_outgain)
+inline void v_sat_set(t_sat_saturator* a_sat, MKFLT a_ingain, MKFLT a_amt,
+        MKFLT a_outgain)
 {
     if(a_ingain != (a_sat->last_ingain))
     {
@@ -67,7 +67,7 @@ inline void v_sat_set(t_sat_saturator* a_sat, float a_ingain, float a_amt,
     }
 }
 
-inline void v_sat_run(t_sat_saturator* a_sat, float a_in0, float a_in1)
+inline void v_sat_run(t_sat_saturator* a_sat, MKFLT a_in0, MKFLT a_in1)
 {
     a_sat->output0 = f_lms_min(
         f_lms_max(

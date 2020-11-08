@@ -14,10 +14,10 @@ GNU General Public License for more details.
 #ifndef CONSTANTS_H
 #define	CONSTANTS_H
 
-const float PI = 3.141592654f;
-const float PI2 = 6.283185307f;
-const float base_a4 = 440.0f;
-const float base_a4_recip = 1.0f / 440.0f;
+const MKFLT PI = 3.141592654f;
+const MKFLT PI2 = 6.283185307f;
+const MKFLT base_a4 = 440.0f;
+const MKFLT base_a4_recip = 1.0f / 440.0f;
 
 #endif	/* CONSTANTS_H */
 

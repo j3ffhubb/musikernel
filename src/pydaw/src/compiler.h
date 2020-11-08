@@ -21,6 +21,17 @@ GNU General Public License for more details.
 
 #include "libshds.h"
 
+//#define MK_USE_DOUBLE
+#ifdef MK_USE_DOUBLE
+#define MKFLT double
+#define mk_write_audio sf_writef_double
+#define mk_read_audio sf_readf_double
+#else
+#define MKFLT float
+#define mk_write_audio sf_writef_float
+#define mk_read_audio sf_readf_float
+#endif
+
 #ifdef __APPLE__
 
     #include <libkern/OSAtomic.h>

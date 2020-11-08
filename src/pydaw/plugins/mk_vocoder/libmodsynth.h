@@ -30,9 +30,9 @@ typedef struct
     t_smoother_linear modulator_smoother;
 }t_mk_vocoder_mono_modules;
 
-t_mk_vocoder_mono_modules * v_mk_vocoder_mono_init(float, int);
+t_mk_vocoder_mono_modules * v_mk_vocoder_mono_init(MKFLT, int);
 
-t_mk_vocoder_mono_modules * v_mk_vocoder_mono_init(float a_sr, int a_plugin_uid)
+t_mk_vocoder_mono_modules * v_mk_vocoder_mono_init(MKFLT a_sr, int a_plugin_uid)
 {
     t_mk_vocoder_mono_modules * a_mono;
     hpalloc((void**)&a_mono, sizeof(t_mk_vocoder_mono_modules));

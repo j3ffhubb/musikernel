@@ -20,10 +20,25 @@ GNU General Public License for more details.
 pthread_mutex_t FFTW_LOCK;
 int FFTW_LOCK_INIT = 0;
 
-fftwf_plan g_fftwf_plan_dft_r2c_1d(
-int a_size, float * a_in, fftwf_complex * a_out, unsigned a_flags)
-{
+#ifdef MK_USE_DOUBLE
+fftw_plan g_fftw_plan_dft_r2c_1d(
+#else
+fftwf_plan g_fftw_plan_dft_r2c_1d(
+#endif
+    int a_size,
+    MKFLT * a_in,
+#ifdef MK_USE_DOUBLE
+    fftw_complex * a_out,
+#else
+    fftwf_complex * a_out,
+#endif
+    unsigned a_flags
+){
+#ifdef MK_USE_DOUBLE
+    fftw_plan f_result;
+#else
     fftwf_plan f_result;
+#endif
 
     if(!FFTW_LOCK_INIT)
     {
@@ -32,7 +47,11 @@ int a_size, float * a_in, fftwf_complex * a_out, unsigned a_flags)
     }
 
     pthread_mutex_lock(&FFTW_LOCK);
+#ifdef MK_USE_DOUBLE
+    f_result = fftw_plan_dft_r2c_1d(a_size, a_in, a_out, a_flags);
+#else
     f_result = fftwf_plan_dft_r2c_1d(a_size, a_in, a_out, a_flags);
+#endif
     pthread_mutex_unlock(&FFTW_LOCK);
 
     return f_result;

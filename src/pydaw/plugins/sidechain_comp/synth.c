@@ -39,7 +39,7 @@ static void v_scc_on_stop(PYFX_Handle instance)
 }
 
 static void v_scc_connect_buffer(PYFX_Handle instance, int a_index,
-        float * DataLocation, int a_is_sidechain)
+        MKFLT * DataLocation, int a_is_sidechain)
 {
     t_scc *plugin = (t_scc*)instance;
 
@@ -124,7 +124,7 @@ static void v_scc_load(PYFX_Handle instance,
 }
 
 static void v_scc_set_port_value(PYFX_Handle Instance,
-        int a_port, float a_value)
+        int a_port, MKFLT a_value)
 {
     t_scc *plugin_data = (t_scc*)Instance;
     plugin_data->port_table[a_port] = a_value;
