@@ -1860,9 +1860,12 @@ class AbstractFileBrowserWidget():
 
     def on_bookmark_save_as(self):
         f_file, f_filter = QFileDialog.getSaveFileName(
-            parent=self.bookmarks_tab, caption=_('Save bookmark file...'),
+            parent=self.bookmarks_tab,
+            caption=_('Save bookmark file...'),
             directory=pydaw_util.global_home,
-            filter=BM_FILE_DIALOG_STRING)
+            filter=BM_FILE_DIALOG_STRING,
+            options=QFileDialog.DontUseNativeDialog,
+        )
         if not f_file is None and not str(f_file) == "":
             f_file = str(f_file)
             if not f_file.endswith(".pybm4"):
@@ -1871,9 +1874,12 @@ class AbstractFileBrowserWidget():
 
     def on_bookmark_open(self):
         f_file, f_filter = QFileDialog.getOpenFileName(
-            parent=self.bookmarks_tab, caption=_('Open bookmark file...'),
+            parent=self.bookmarks_tab,
+            caption=_('Open bookmark file...'),
             directory=pydaw_util.global_home,
-            filter=BM_FILE_DIALOG_STRING)
+            filter=BM_FILE_DIALOG_STRING,
+            options=QFileDialog.DontUseNativeDialog,
+        )
         if not f_file is None and not str(f_file) == "":
             f_file = str(f_file)
             shutil.copy(f_file, pydaw_util.BOOKMARKS_FILE)
@@ -2586,9 +2592,12 @@ class pydaw_preset_manager_widget:
 
     def on_open_bank(self):
         f_file, f_filter = QFileDialog.getOpenFileName(
-            parent=self.group_box, caption=_('Open preset bank...'),
+            parent=self.group_box,
+            caption=_('Open preset bank...'),
             directory=pydaw_util.global_home,
-            filter=PRESET_FILE_DIALOG_STRING)
+            filter=PRESET_FILE_DIALOG_STRING,
+            options=QFileDialog.DontUseNativeDialog,
+        )
         if not f_file is None and not str(f_file) == "":
             f_file = str(f_file)
             self.preset_path = f_file

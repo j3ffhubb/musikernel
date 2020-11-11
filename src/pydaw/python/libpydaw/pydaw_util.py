@@ -266,8 +266,11 @@ def new_project(a_parent=None):
         f_last_dir = global_pydaw_home
         while True:
             f_file = QFileDialog.getExistingDirectory(
-                a_parent, 'New Project', f_last_dir,
-                QFileDialog.ShowDirsOnly)
+                a_parent,
+                'New Project',
+                f_last_dir,
+                QFileDialog.ShowDirsOnly  | QFileDialog.DontUseNativeDialog,
+            )
             if f_file and str(f_file):
                 f_file = str(f_file)
                 f_last_dir = f_file
@@ -285,9 +288,12 @@ def new_project(a_parent=None):
 def open_project(a_parent=None):
     try:
         f_file, f_filter = QFileDialog.getOpenFileName(
-            parent=a_parent, caption='Open Project',
+            parent=a_parent,
+            caption='Open Project',
             directory=global_default_project_folder,
-            filter=global_pydaw_file_type_string)
+            filter=global_pydaw_file_type_string,
+            options=QFileDialog.DontUseNativeDialog,
+        )
         if f_file is None:
             return False
         f_file_str = str(f_file)

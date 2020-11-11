@@ -744,8 +744,11 @@ class MkMainWindow(QMainWindow):
             f_last_dir = pydaw_util.global_pydaw_home
             while True:
                 f_new_file = QFileDialog.getExistingDirectory(
-                    self, _("Save copy of project as..."), f_last_dir,
-                    QFileDialog.ShowDirsOnly)
+                    MAIN_WINDOW,
+                    _("Save copy of project as..."),
+                    f_last_dir,
+                    QFileDialog.ShowDirsOnly | QFileDialog.DontUseNativeDialog,
+                )
                 if f_new_file and str(f_new_file):
                     f_new_file = str(f_new_file)
                     f_last_dir = f_new_file
@@ -838,11 +841,17 @@ class MkMainWindow(QMainWindow):
     def on_open_theme(self):
         try:
             f_file, f_filter = QFileDialog.getOpenFileName(
-                self, _("Open a theme file"),
+                MAIN_WINDOW,
+                _("Open a theme file"),
                 os.path.join(
-                    pydaw_util.INSTALL_PREFIX, "lib",
-                    global_pydaw_version_string,"themes"),
-                "MusiKernel Style(*.pytheme)")
+                    pydaw_util.INSTALL_PREFIX,
+                    "lib",
+                    global_pydaw_version_string,
+                    "themes",
+                ),
+                "MusiKernel Style(*.pytheme)",
+                options=QFileDialog.DontUseNativeDialog,
+            )
             if f_file and str(f_file):
                 f_file = str(f_file)
                 f_style = pydaw_read_file_text(f_file)
@@ -999,8 +1008,12 @@ class MkMainWindow(QMainWindow):
                 if not os.path.isdir(self.last_ac_dir):
                     self.last_ac_dir = global_home
                 if f_batch_checkbox.isChecked():
-                    f_dir = QFileDialog.getExistingDirectory(f_window,
-                        _("Open Folder"), self.last_ac_dir)
+                    f_dir = QFileDialog.getExistingDirectory(
+                        MAIN_WINDOW,
+                        _("Open Folder"),
+                        self.last_ac_dir,
+                        options=QFileDialog.DontUseNativeDialog,
+                    )
                     if f_dir is None:
                         return
                     f_dir = str(f_dir)
@@ -1010,10 +1023,14 @@ class MkMainWindow(QMainWindow):
                     self.last_ac_dir = f_dir
                 else:
                     f_file_name, f_filter = QFileDialog.getOpenFileName(
-                        f_window, _("Select a file name to save to..."),
+                        MAIN_WINDOW,
+                        _("Select a file name to save to..."),
                         self.last_ac_dir,
                         filter=_("Audio Files {}").format(
-                        '(*.wav *.{})'.format(a_label)))
+                            '(*.wav *.{})'.format(a_label)
+                        ),
+                        options=QFileDialog.DontUseNativeDialog,
+                    )
                     if f_file_name and str(f_file_name):
                         f_name.setText(str(f_file_name))
                         self.last_ac_dir = os.path.dirname(f_file_name)
@@ -1031,8 +1048,12 @@ class MkMainWindow(QMainWindow):
                 if not os.path.isdir(self.last_ac_dir):
                     self.last_ac_dir = global_home
                 if f_batch_checkbox.isChecked():
-                    f_dir = QFileDialog.getExistingDirectory(f_window,
-                        _("Open Folder"), self.last_ac_dir)
+                    f_dir = QFileDialog.getExistingDirectory(
+                        MAIN_WINDOW,
+                        _("Open Folder"),
+                        self.last_ac_dir,
+                        options=QFileDialog.DontUseNativeDialog,
+                    )
                     if f_dir is None:
                         return
                     f_dir = str(f_dir)
@@ -1042,8 +1063,11 @@ class MkMainWindow(QMainWindow):
                     self.last_ac_dir = f_dir
                 else:
                     f_file_name, f_filter = QFileDialog.getSaveFileName(
-                        f_window, _("Select a file name to save to..."),
-                        self.last_ac_dir)
+                        MAIN_WINDOW,
+                        _("Select a file name to save to..."),
+                        self.last_ac_dir,
+                        options=QFileDialog.DontUseNativeDialog,
+                    )
                     if f_file_name and str(f_file_name):
                         f_file_name = str(f_file_name)
                         if not f_file_name.endswith(self.ac_ext):
