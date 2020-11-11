@@ -886,8 +886,12 @@ class pydaw_wave_editor_widget:
             f_pitch = f_pitch_shift.value()
 
             f_file, f_filter = QFileDialog.getSaveFileName(
-                self.widget, "Save file as...", self.last_offline_dir,
-                filter="Wav File (*.wav)")
+                MAIN_WINDOW,
+                "Save file as...",
+                self.last_offline_dir,
+                filter="Wav File (*.wav)",
+                options=QFileDialog.DontUseNativeDialog,
+            )
             if f_file is None:
                 return
             f_file = str(f_file)
@@ -1005,8 +1009,11 @@ class pydaw_wave_editor_widget:
                 if not os.path.isdir(self.last_offline_dir):
                     self.last_offline_dir = global_home
                 f_file_name, f_filter = QFileDialog.getSaveFileName(
-                    f_window, _("Select a file name to save to..."),
-                    self.last_offline_dir)
+                    MAIN_WINDOW,
+                    _("Select a file name to save to..."),
+                    self.last_offline_dir,
+                    options=QFileDialog.DontUseNativeDialog,
+                )
                 f_file_name = str(f_file_name)
                 if not f_file_name is None and f_file_name != "":
                     if not f_file_name.endswith(".wav"):

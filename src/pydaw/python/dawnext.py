@@ -4238,9 +4238,11 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
     def save_a_copy(self):
         global LAST_AUDIO_ITEM_DIR
         f_file, f_filter = QFileDialog.getSaveFileName(
-            parent=AUDIO_SEQ,
+            parent=MAIN_WINDOW,
             caption=_('Save audio item as .wav'),
-            directory=LAST_AUDIO_ITEM_DIR)
+            directory=LAST_AUDIO_ITEM_DIR,
+            options=QFileDialog.DontUseNativeDialog,
+        )
         if not f_file is None and not str(f_file) == "":
             f_file = str(f_file)
             if not f_file.endswith(".wav"):
@@ -9150,8 +9152,11 @@ class MainWindow(QScrollArea):
                 self.last_offline_dir = global_home
             if f_stem_render_checkbox.isChecked():
                 f_file = QFileDialog.getExistingDirectory(
-                    self, _('Select an empty directory to render stems to'),
-                    self.last_offline_dir, QFileDialog.ShowDirsOnly)
+                    MAIN_WINDOW,
+                    _('Select an empty directory to render stems to'),
+                    self.last_offline_dir,
+                    QFileDialog.ShowDirsOnly | QFileDialog.DontUseNativeDialog,
+                )
                 if f_file and str(f_file):
                     if os.listdir(f_file):
                         QMessageBox.warning(
@@ -9162,8 +9167,11 @@ class MainWindow(QScrollArea):
                         self.last_offline_dir = f_file
             else:
                 f_file_name, f_filter = QFileDialog.getSaveFileName(
-                    f_window, _("Select a file name to save to..."),
-                    self.last_offline_dir)
+                    MAIN_WINDOW,
+                    _("Select a file name to save to..."),
+                    self.last_offline_dir,
+                    options=QFileDialog.DontUseNativeDialog,
+                )
                 f_file_name = str(f_file_name)
                 if f_file_name and str(f_file_name):
                     if not f_file_name.endswith(".wav"):
