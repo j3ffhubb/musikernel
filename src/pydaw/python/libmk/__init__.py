@@ -243,7 +243,12 @@ class TrackColors:
         self.brushes = {}
 
     def pick_color(self, a_track_num):
-        color = QColorDialog.getColor(QColor(self.get_color(a_track_num)))
+        color = QColorDialog.getColor(
+            QColor(
+                self.get_color(a_track_num)
+            ),
+            options=QColorDialog.DontUseNativeDialog,
+        )
         if color.isValid():
             self.set_color(a_track_num, color)
             return True
