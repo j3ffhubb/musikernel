@@ -28,7 +28,7 @@ GNU General Public License for more details.
 
 
 #define PYDAW_MAX_AUDIO_ITEM_COUNT 256
-#define PYDAW_MAX_WAV_POOL_ITEM_COUNT 500
+#define PYDAW_MAX_WAV_POOL_ITEM_COUNT 1500
 
 #define PYDAW_AUDIO_ITEM_PADDING 64
 #define PYDAW_AUDIO_ITEM_PADDING_DIV2 32
@@ -358,41 +358,33 @@ void v_wav_pool_item_free(t_wav_pool_item *a_wav_pool_item)
     free(a_wav_pool_item);
 }
 
-t_wav_pool * g_wav_pool_get(MKFLT a_sr)
-{
+t_wav_pool * g_wav_pool_get(MKFLT a_sr){
     t_wav_pool * f_result;
     hpalloc((void**)&f_result, sizeof(t_wav_pool));
 
     f_result->sample_rate = a_sr;
     f_result->count = 0;
 
-    int f_i = 0;
-    while(f_i < PYDAW_MAX_WAV_POOL_ITEM_COUNT)
-    {
+    int f_i;
+    for(f_i = 0; f_i < PYDAW_MAX_WAV_POOL_ITEM_COUNT; ++f_i){
         f_result->items[f_i].uid = -1;
-        ++f_i;
     }
     return f_result;
 }
 
-void v_wav_pool_remove_item(t_wav_pool* a_wav_pool, int a_uid)
-{
-    if(USE_HUGEPAGES)
-    {
+void v_wav_pool_remove_item(t_wav_pool* a_wav_pool, int a_uid){
+    if(USE_HUGEPAGES){
         printf("Using hugepages, not freeing wav_pool uid %i\n", a_uid);
         return;
     }
 
     int f_i = 0;
     t_wav_pool_item * f_item = &a_wav_pool->items[a_uid];
-    if(f_item->is_loaded)
-    {
+    if(f_item->is_loaded){
         f_item->is_loaded = 0;
-        for(f_i = 0; f_i < f_item->channels; ++f_i)
-        {
+        for(f_i = 0; f_i < f_item->channels; ++f_i){
             MKFLT * f_data = f_item->samples[f_i];
-            if(f_data)
-            {
+            if(f_data){
                 free(f_data);
                 printf("free'd %f MB\n",
                     ((MKFLT)f_item->length / (1024. * 1024.)) * 4.0);
@@ -403,48 +395,55 @@ void v_wav_pool_remove_item(t_wav_pool* a_wav_pool, int a_uid)
 }
 
 t_wav_pool_item * v_wav_pool_add_item(
-    t_wav_pool* a_wav_pool, int a_uid, char * a_file_path)
-{
+    t_wav_pool* a_wav_pool,
+    int a_uid,
+    char * a_file_path
+){
     char f_path[2048];
 
     int f_pos = 2;
 
-    if(a_file_path[0] != '/' && a_file_path[1] == ':')
-    {
+    if(a_file_path[0] != '/' && a_file_path[1] == ':'){
         char f_file_path[2048];
 
         f_file_path[0] = a_file_path[0];
-        while(1)
-        {
+        while(1){
             f_file_path[f_pos - 1] = a_file_path[f_pos];
-            if(a_file_path[f_pos] == '\0')
-            {
+            if(a_file_path[f_pos] == '\0'){
                 break;
             }
             ++f_pos;
         }
 
-        printf("\nv_wav_pool_add_item:  '%s' '%s'\n",
-            a_wav_pool->samples_folder, f_file_path);
+        printf(
+            "\nv_wav_pool_add_item:  '%s' '%s'\n",
+            a_wav_pool->samples_folder,
+            f_file_path
+        );
 
-        sprintf(f_path, "%s%s%s", a_wav_pool->samples_folder,
-            PATH_SEP, f_file_path);
+        sprintf(
+            f_path,
+            "%s%s%s",
+            a_wav_pool->samples_folder,
+            PATH_SEP,
+            f_file_path
+        );
     }
-    else
-    {
-        if(a_file_path[0] == '/')
-        {
+    else{
+        if(a_file_path[0] == '/'){
             sprintf(f_path, "%s%s", a_wav_pool->samples_folder, a_file_path);
-        }
-        else
-        {
+        } else {
             sprintf(f_path, "%s%s%s", a_wav_pool->samples_folder,
                 PATH_SEP, a_file_path);
         }
     }
 
-    g_wav_pool_item_init(&a_wav_pool->items[a_uid], a_uid, f_path,
-            a_wav_pool->sample_rate);
+    g_wav_pool_item_init(
+        &a_wav_pool->items[a_uid],
+        a_uid,
+        f_path,
+        a_wav_pool->sample_rate
+    );
     ++a_wav_pool->count;
     return &a_wav_pool->items[a_uid];
 }
@@ -453,13 +452,13 @@ t_wav_pool_item * v_wav_pool_add_item(
 void v_wav_pool_add_items(t_wav_pool* a_wav_pool, char * a_file_path)
 {
     a_wav_pool->count = 0;
-    t_2d_char_array * f_arr = g_get_2d_array_from_file(a_file_path,
-            PYDAW_LARGE_STRING);
-    while(1)
-    {
+    t_2d_char_array * f_arr = g_get_2d_array_from_file(
+        a_file_path,
+        PYDAW_LARGE_STRING
+    );
+    while(1){
         v_iterate_2d_char_array(f_arr);
-        if(f_arr->eof)
-        {
+        if(f_arr->eof){
             break;
         }
         int f_uid = atoi(f_arr->current_str);
@@ -468,22 +467,19 @@ void v_wav_pool_add_items(t_wav_pool* a_wav_pool, char * a_file_path)
     }
 }
 
-t_wav_pool_item * g_wav_pool_get_item_by_uid(t_wav_pool* a_wav_pool, int a_uid)
-{
-    if(a_wav_pool->items[a_uid].uid == a_uid)
-    {
-        if(!a_wav_pool->items[a_uid].is_loaded)
-        {
-            if(!i_wav_pool_item_load(&a_wav_pool->items[a_uid], 1))
-            {
+t_wav_pool_item * g_wav_pool_get_item_by_uid(
+    t_wav_pool* a_wav_pool,
+    int a_uid
+){
+    if(a_wav_pool->items[a_uid].uid == a_uid){
+        if(!a_wav_pool->items[a_uid].is_loaded){
+            if(!i_wav_pool_item_load(&a_wav_pool->items[a_uid], 1)){
                 printf("Failed to load file\n");
                 return 0;
             }
         }
         return &a_wav_pool->items[a_uid];
-    }
-    else
-    {
+    } else {
         printf("Couldn't find uid\n");
     }
 
@@ -498,24 +494,20 @@ void v_pydaw_audio_item_free(t_pydaw_audio_item* a_audio_item)
     //{ }
     //if(a_audio_item->sample_read_head)
     //{}
-    if(!a_audio_item)
-    {
+    if(!a_audio_item){
         return;
     }
 
-    if(a_audio_item->paif)
-    {
+    if(a_audio_item->paif){
         v_paif_free(a_audio_item->paif);
     }
 
-    if(a_audio_item)
-    {
+    if(a_audio_item){
         free(a_audio_item);
     }
 }
 
-t_pydaw_audio_item * g_pydaw_audio_item_get(MKFLT a_sr)
-{
+t_pydaw_audio_item * g_pydaw_audio_item_get(MKFLT a_sr){
     int f_i;
     t_pydaw_audio_item * f_result;
 
@@ -526,16 +518,17 @@ t_pydaw_audio_item * g_pydaw_audio_item_get(MKFLT a_sr)
     f_result->uid = -1;
     g_pit_ratio_init(&f_result->pitch_ratio_ptr);
 
-    for(f_i = 0; f_i < MK_AUDIO_ITEM_SEND_COUNT; ++f_i)
-    {
+    for(f_i = 0; f_i < MK_AUDIO_ITEM_SEND_COUNT; ++f_i){
         g_adsr_init(&f_result->adsrs[f_i], a_sr);
         v_adsr_set_adsr(&f_result->adsrs[f_i], 0.003f, 0.1f, 1.0f, 0.2f);
         v_adsr_retrigger(&f_result->adsrs[f_i]);
         f_result->adsrs[f_i].stage = ADSR_STAGE_OFF;
         g_ifh_init(&f_result->sample_read_heads[f_i]);
         g_svf_init(&f_result->lp_filters[f_i], a_sr);
-        v_svf_set_cutoff_base(&f_result->lp_filters[f_i],
-            f_pit_hz_to_midi_note(7200.0f));
+        v_svf_set_cutoff_base(
+            &f_result->lp_filters[f_i],
+            f_pit_hz_to_midi_note(7200.0f)
+        );
         v_svf_set_res(&f_result->lp_filters[f_i], -15.0f);
         v_svf_set_cutoff(&f_result->lp_filters[f_i]);
         f_result->vols[f_i] = 0.0f;
@@ -545,8 +538,7 @@ t_pydaw_audio_item * g_pydaw_audio_item_get(MKFLT a_sr)
     return f_result;
 }
 
-t_pydaw_audio_items * g_pydaw_audio_items_get(int a_sr)
-{
+t_pydaw_audio_items * g_pydaw_audio_items_get(int a_sr){
     t_pydaw_audio_items * f_result;
 
     lmalloc((void**)&f_result, sizeof(t_pydaw_audio_items));
@@ -555,17 +547,14 @@ t_pydaw_audio_items * g_pydaw_audio_items_get(int a_sr)
 
     int f_i, f_i2;
 
-    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i)
-    {
+    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i){
         f_result->items[f_i] = 0; //g_pydaw_audio_item_get((MKFLT)(a_sr));
     }
 
-    for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i)
-    {
+    for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i){
         f_result->index_counts[f_i] = 0;
 
-        for(f_i2 = 0; f_i2 < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i2)
-        {
+        for(f_i2 = 0; f_i2 < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i2){
             f_result->indexes[f_i][f_i2].item_num = 0;
             f_result->indexes[f_i][f_i2].send_num = 0;
         }
@@ -579,27 +568,24 @@ t_pydaw_audio_items * g_pydaw_audio_items_get(int a_sr)
  *
  */
 t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
-        t_2d_char_array * f_current_string,
-        t_pydaw_audio_items * a_items, t_wav_pool * a_wav_pool,
-        t_wav_pool_item * a_wav_item)
-{
+    t_2d_char_array * f_current_string,
+    t_pydaw_audio_items * a_items,
+    t_wav_pool * a_wav_pool,
+    t_wav_pool_item * a_wav_item
+){
     t_pydaw_audio_item * f_result;
 
     v_iterate_2d_char_array(f_current_string);
 
-    if(f_current_string->eof)
-    {
+    if(f_current_string->eof){
         return 0;
     }
 
     int f_index = atoi(f_current_string->current_str);
 
-    if(a_items)
-    {
+    if(a_items){
         f_result = a_items->items[f_index];
-    }
-    else
-    {
+    } else {
         f_result = g_pydaw_audio_item_get(a_sr);
     }
 
@@ -608,20 +594,21 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
     v_iterate_2d_char_array(f_current_string);
     f_result->uid = atoi(f_current_string->current_str);
 
-    if(a_wav_item)
-    {
+    if(a_wav_item){
         f_result->wav_pool_item = a_wav_item;
-    }
-    else
-    {
-        f_result->wav_pool_item =
-            g_wav_pool_get_item_by_uid(a_wav_pool, f_result->uid);
+    } else {
+        f_result->wav_pool_item = g_wav_pool_get_item_by_uid(
+            a_wav_pool,
+            f_result->uid
+        );
 
-        if(!f_result->wav_pool_item)
-        {
+        if(!f_result->wav_pool_item){
             printf("####################\n\n");
-            printf("ERROR:  g_audio_item_load_single failed for uid %i, "
-                    "not found\n\n", f_result->uid);
+            printf(
+                "ERROR:  g_audio_item_load_single failed for uid %i, "
+                "not found\n\n",
+                f_result->uid
+            );
             printf("####################\n\n");
             return 0;
         }
@@ -629,38 +616,32 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
     v_iterate_2d_char_array(f_current_string);
     MKFLT f_sample_start = atof(f_current_string->current_str) * 0.001f;
 
-    if(f_sample_start < 0.0f)
-    {
+    if(f_sample_start < 0.0f){
         f_sample_start = 0.0f;
-    }
-    else if(f_sample_start > 0.999f)
-    {
+    } else if(f_sample_start > 0.999f){
         f_sample_start = 0.999f;
     }
 
     f_result->sample_start = f_sample_start;
 
     f_result->sample_start_offset =
-            (int)((f_result->sample_start *
-            ((MKFLT)f_result->wav_pool_item->length))) +
-            PYDAW_AUDIO_ITEM_PADDING_DIV2;
+        (int)((f_result->sample_start *
+        ((MKFLT)f_result->wav_pool_item->length))) +
+        PYDAW_AUDIO_ITEM_PADDING_DIV2;
 
     v_iterate_2d_char_array(f_current_string);
     MKFLT f_sample_end = atof(f_current_string->current_str) * 0.001f;
 
-    if(f_sample_end < 0.001f)
-    {
+    if(f_sample_end < 0.001f){
         f_sample_end = 0.001f;
-    }
-    else if(f_sample_end > 1.0f)
-    {
+    } else if(f_sample_end > 1.0f){
         f_sample_end = 1.0f;
     }
 
     f_result->sample_end = f_sample_end;
 
     f_result->sample_end_offset = (int)((f_result->sample_end *
-            ((MKFLT)f_result->wav_pool_item->length)));
+        ((MKFLT)f_result->wav_pool_item->length)));
 
     v_iterate_2d_char_array(f_current_string);
     f_result->start_bar = atoi(f_current_string->current_str);
@@ -692,7 +673,6 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
 
     //lane, not used by the back-end
     v_iterate_2d_char_array(f_current_string);
-
 
     v_iterate_2d_char_array(f_current_string);
     f_result->pitch_shift_end = atof(f_current_string->current_str);
@@ -740,114 +720,108 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
     v_iterate_2d_char_array(f_current_string);
     f_result->sidechain[2] = atoi(f_current_string->current_str);
 
-    if(f_result->sample_start_offset < PYDAW_AUDIO_ITEM_PADDING_DIV2)
-    {
-        printf("f_result->sample_start_offset <= PYDAW_AUDIO_ITEM_PADDING_DIV2"
-                " %i %i\n", f_result->sample_start_offset,
-                PYDAW_AUDIO_ITEM_PADDING_DIV2);
+    if(f_result->sample_start_offset < PYDAW_AUDIO_ITEM_PADDING_DIV2){
+        printf(
+            "f_result->sample_start_offset <= PYDAW_AUDIO_ITEM_PADDING_DIV2"
+            " %i %i\n",
+            f_result->sample_start_offset,
+            PYDAW_AUDIO_ITEM_PADDING_DIV2
+        );
         f_result->sample_start_offset = PYDAW_AUDIO_ITEM_PADDING_DIV2;
     }
 
-    if(f_result->sample_end_offset < PYDAW_AUDIO_ITEM_PADDING_DIV2)
-    {
-        printf("f_result->sample_end_offset <= PYDAW_AUDIO_ITEM_PADDING_DIV2"
-                " %i %i\n", f_result->sample_end_offset,
-                PYDAW_AUDIO_ITEM_PADDING_DIV2);
+    if(f_result->sample_end_offset < PYDAW_AUDIO_ITEM_PADDING_DIV2){
+        printf(
+            "f_result->sample_end_offset <= PYDAW_AUDIO_ITEM_PADDING_DIV2"
+            " %i %i\n",
+            f_result->sample_end_offset,
+            PYDAW_AUDIO_ITEM_PADDING_DIV2
+        );
         f_result->sample_end_offset = PYDAW_AUDIO_ITEM_PADDING_DIV2;
     }
 
-    if(f_result->sample_start_offset > f_result->wav_pool_item->length)
-    {
-        printf("f_result->sample_start_offset >= "
-                "f_result->wav_pool_item->length %i %i\n",
-                f_result->sample_start_offset, f_result->wav_pool_item->length);
+    if(f_result->sample_start_offset > f_result->wav_pool_item->length){
+        printf(
+            "f_result->sample_start_offset >= "
+            "f_result->wav_pool_item->length %i %i\n",
+            f_result->sample_start_offset,
+            f_result->wav_pool_item->length
+        );
         f_result->sample_start_offset = f_result->wav_pool_item->length;
     }
 
-    if(f_result->sample_end_offset > f_result->wav_pool_item->length)
-    {
-        printf("f_result->sample_end_offset >= f_result->wav_pool_item->length"
-                " %i %i\n", f_result->sample_end_offset,
-                f_result->wav_pool_item->length);
+    if(f_result->sample_end_offset > f_result->wav_pool_item->length){
+        printf(
+            "f_result->sample_end_offset >= f_result->wav_pool_item->length"
+            " %i %i\n",
+            f_result->sample_end_offset,
+            f_result->wav_pool_item->length
+        );
         f_result->sample_end_offset = f_result->wav_pool_item->length;
     }
 
-    if(f_result->is_reversed)
-    {
+    if(f_result->is_reversed){
         int f_old_start = f_result->sample_start_offset;
         int f_old_end = f_result->sample_end_offset;
         f_result->sample_start_offset =
-                f_result->wav_pool_item->length - f_old_end;
+            f_result->wav_pool_item->length - f_old_end;
         f_result->sample_end_offset =
-                f_result->wav_pool_item->length - f_old_start;
+            f_result->wav_pool_item->length - f_old_start;
     }
 
     f_result->sample_fade_in_end =
-            f_result->sample_end_offset - f_result->sample_start_offset;
+        f_result->sample_end_offset - f_result->sample_start_offset;
     f_result->sample_fade_in_end =
-            f_result->sample_start_offset +
-            ((int)((MKFLT)(f_result->sample_fade_in_end) *
-            f_result->sample_fade_in)) + PYDAW_AUDIO_ITEM_PADDING_DIV2;
+        f_result->sample_start_offset +
+        ((int)((MKFLT)(f_result->sample_fade_in_end) *
+        f_result->sample_fade_in)) + PYDAW_AUDIO_ITEM_PADDING_DIV2;
 
     // Anything less than this will use a linear fade
     int max_linear = f_result->wav_pool_item->sample_rate / 10;
 
-    if(f_result->sample_fade_in_end < max_linear)
-    {
+    if(f_result->sample_fade_in_end < max_linear){
         f_result->is_linear_fade_in = 1;
-    }
-    else
-    {
+    } else {
         printf("Non-linear fade in\n");
         f_result->is_linear_fade_in = 0;
     }
 
     f_result->sample_fade_out_start =
-            f_result->sample_end_offset - f_result->sample_start_offset;
+        f_result->sample_end_offset - f_result->sample_start_offset;
     f_result->sample_fade_out_start =
-            f_result->sample_start_offset +
-            ((int)((MKFLT)(f_result->sample_fade_out_start) *
-            f_result->sample_fade_out)) + PYDAW_AUDIO_ITEM_PADDING_DIV2;
+        f_result->sample_start_offset +
+        ((int)((MKFLT)(f_result->sample_fade_out_start) *
+        f_result->sample_fade_out)) + PYDAW_AUDIO_ITEM_PADDING_DIV2;
 
     int f_fade_diff = (f_result->sample_fade_in_end -
         f_result->sample_start_offset - (PYDAW_AUDIO_ITEM_PADDING_DIV2));
 
-    if(f_fade_diff > 0)
-    {
+    if(f_fade_diff > 0){
         f_result->sample_fade_in_divisor = 1.0f / (MKFLT)f_fade_diff;
-    }
-    else
-    {
+    } else {
         f_result->sample_fade_in_divisor = 0.0f;
     }
 
     f_fade_diff =
         (f_result->sample_end_offset - f_result->sample_fade_out_start);
 
-    if(f_fade_diff < max_linear)
-    {
+    if(f_fade_diff < max_linear){
         f_result->is_linear_fade_out = 1;
-    }
-    else
-    {
+    } else {
         printf("Non-linear fade out\n");
         f_result->is_linear_fade_out = 0;
     }
 
-    if(f_fade_diff > 0)
-    {
+    if(f_fade_diff > 0){
         f_result->sample_fade_out_divisor = 1.0f / (MKFLT)f_fade_diff;
-    }
-    else
-    {
+    } else {
         f_result->sample_fade_out_divisor = 0.0f;
     }
 
     f_result->adjusted_start_beat =
-            ((MKFLT)f_result->start_bar * 4) + f_result->start_beat;
+        ((MKFLT)f_result->start_bar * 4) + f_result->start_beat;
 
-    if(f_result->is_reversed)
-    {
+    if(f_result->is_reversed){
         f_result->sample_fade_in_end =
                 f_result->sample_end_offset - (f_result->sample_fade_in_end -
                 f_result->sample_start_offset);
@@ -858,8 +832,7 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
 
     f_result->ratio = f_result->wav_pool_item->ratio_orig;
 
-    switch(f_result->timestretch_mode)
-    {
+    switch(f_result->timestretch_mode){
         //case 0:  //None
         //    break;
         case 1:  //Pitch affecting time
@@ -906,29 +879,28 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
     return f_result;
 }
 
-void v_pydaw_audio_item_set_fade_vol(t_pydaw_audio_item *self,
-        int a_send_num)
-{
+void v_pydaw_audio_item_set_fade_vol(
+    t_pydaw_audio_item *self,
+    int a_send_num
+){
     t_int_frac_read_head * read_head =
         &self->sample_read_heads[a_send_num];
 
-    if(self->is_reversed)
-    {
-        if(read_head->whole_number > self->sample_fade_in_end &&
-           self->sample_fade_in_divisor != 0.0f)
-        {
+    if(self->is_reversed){
+        if(
+            read_head->whole_number > self->sample_fade_in_end
+            &&
+            self->sample_fade_in_divisor != 0.0f
+        ){
             self->fade_vols[a_send_num] =
                 ((MKFLT)(self->sample_read_heads[a_send_num].whole_number) -
                 self->sample_fade_in_end - PYDAW_AUDIO_ITEM_PADDING_DIV2)
                 * self->sample_fade_in_divisor;
 
-            if(self->is_linear_fade_in)
-            {
+            if(self->is_linear_fade_in){
                 self->fade_vols[a_send_num] =
                     1.0f - self->fade_vols[a_send_num];
-            }
-            else
-            {
+            } else {
                 self->fade_vols[a_send_num] =
                     ((1.0f - self->fade_vols[a_send_num]) * self->fadein_vol)
                     - self->fadein_vol;
@@ -936,21 +908,19 @@ void v_pydaw_audio_item_set_fade_vol(t_pydaw_audio_item *self,
                 self->fade_vols[a_send_num] =
                     f_db_to_linear_fast(self->fade_vols[a_send_num]);
             }
-        }
-        else if(read_head->whole_number <= self->sample_fade_out_start &&
-                self->sample_fade_out_divisor != 0.0f)
-        {
-            self->fade_vols[a_send_num] =
-                ((MKFLT)(self->sample_fade_out_start - read_head->whole_number))
-                * self->sample_fade_out_divisor;
+        } else if(
+            read_head->whole_number <= self->sample_fade_out_start
+            &&
+            self->sample_fade_out_divisor != 0.0f
+        ){
+            self->fade_vols[a_send_num] = ((MKFLT)(
+                    self->sample_fade_out_start - read_head->whole_number)
+                ) * self->sample_fade_out_divisor;
 
-            if(self->is_linear_fade_out)
-            {
+            if(self->is_linear_fade_out){
                 self->fade_vols[a_send_num] =
                     1.0f - self->fade_vols[a_send_num];
-            }
-            else
-            {
+            } else {
                 self->fade_vols[a_send_num] =
                     ((1.0f - self->fade_vols[a_send_num])
                     * self->fadeout_vol) - self->fadeout_vol;
@@ -959,29 +929,24 @@ void v_pydaw_audio_item_set_fade_vol(t_pydaw_audio_item *self,
                 self->fade_vols[a_send_num] =
                     f_db_to_linear_fast(self->fade_vols[a_send_num]);
             }
-        }
-        else
-        {
+        } else {
             self->fade_vols[a_send_num] = 1.0f;
         }
-    }
-    else
-    {
-        if(read_head->whole_number < self->sample_fade_in_end &&
-           self->sample_fade_in_divisor != 0.0f)
-        {
+    } else {
+        if(
+            read_head->whole_number < self->sample_fade_in_end
+            &&
+            self->sample_fade_in_divisor != 0.0f
+        ){
             self->fade_vols[a_send_num] =
                 ((MKFLT)(self->sample_fade_in_end -
                 read_head->whole_number - PYDAW_AUDIO_ITEM_PADDING_DIV2))
                 * self->sample_fade_in_divisor;
 
-            if(self->is_linear_fade_in)
-            {
+            if(self->is_linear_fade_in){
                 self->fade_vols[a_send_num] =
                     1.0f - self->fade_vols[a_send_num];
-            }
-            else
-            {
+            } else {
                 self->fade_vols[a_send_num] =
                     ((1.0f - self->fade_vols[a_send_num])
                     * self->fadein_vol) - self->fadein_vol;
@@ -993,21 +958,19 @@ void v_pydaw_audio_item_set_fade_vol(t_pydaw_audio_item *self,
                     v_svf_run_2_pole_lp(&self->lp_filters[a_send_num],
                     self->fade_vols[a_send_num]);
             }
-        }
-        else if(read_head->whole_number >= self->sample_fade_out_start &&
-                self->sample_fade_out_divisor != 0.0f)
-        {
+        } else if(
+            read_head->whole_number >= self->sample_fade_out_start
+            &&
+            self->sample_fade_out_divisor != 0.0f
+        ){
             self->fade_vols[a_send_num] =
                 ((MKFLT)(self->sample_read_heads[a_send_num].whole_number -
                 self->sample_fade_out_start)) * self->sample_fade_out_divisor;
 
-            if(self->is_linear_fade_out)
-            {
+            if(self->is_linear_fade_out){
                 self->fade_vols[a_send_num] =
                     1.0f - self->fade_vols[a_send_num];
-            }
-            else
-            {
+            } else {
                 self->fade_vols[a_send_num] =
                     ((1.0f - self->fade_vols[a_send_num]) *
                     self->fadeout_vol) - self->fadeout_vol;
@@ -1018,19 +981,15 @@ void v_pydaw_audio_item_set_fade_vol(t_pydaw_audio_item *self,
                     v_svf_run_2_pole_lp(&self->lp_filters[a_send_num],
                     self->fade_vols[a_send_num]);
             }
-        }
-        else
-        {
+        } else {
             self->fade_vols[a_send_num] = 1.0f;
         }
     }
 }
 
-void v_pydaw_audio_items_free(t_pydaw_audio_items *a_audio_items)
-{
+void v_pydaw_audio_items_free(t_pydaw_audio_items *a_audio_items){
     int f_i;
-    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i)
-    {
+    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i){
         v_pydaw_audio_item_free(a_audio_items->items[f_i]);
         a_audio_items->items[f_i] = NULL;
     }
