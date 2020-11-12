@@ -270,11 +270,12 @@ void g_dn_instantiate()
     dawnext = g_dawnext_get();
 }
 
-void v_dn_reset_audio_item_read_heads(t_dawnext * self,
-        t_pydaw_audio_items * f_audio_items, double a_start_offset)
-{
-    if(!f_audio_items)
-    {
+void v_dn_reset_audio_item_read_heads(
+    t_dawnext * self,
+    t_pydaw_audio_items * f_audio_items,
+    double a_start_offset
+){
+    if(!f_audio_items){
         return;
     }
 
@@ -284,44 +285,41 @@ void v_dn_reset_audio_item_read_heads(t_dawnext * self,
     t_pydaw_audio_item * f_audio_item;
     MKFLT f_tempo = self->ts[0].tempo;
 
-    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i)
-    {
-        if(f_audio_items->items[f_i])
-        {
+    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i){
+        if(f_audio_items->items[f_i]){
             f_audio_item = f_audio_items->items[f_i];
             double f_start_beat = f_audio_item->start_beat + a_start_offset;
 
-            double f_end_beat =
-                f_start_beat + f_pydaw_samples_to_beat_count(
-                    (f_audio_item->sample_end_offset -
-                     f_audio_item->sample_start_offset),
-                    f_tempo, f_sr);
+            double f_end_beat = f_start_beat + f_pydaw_samples_to_beat_count(
+                f_audio_item->sample_end_offset -
+                    f_audio_item->sample_start_offset,
+                f_tempo,
+                f_sr
+            );
 
-            if(f_start_beat < f_end_beat)
-            {
+            if(f_start_beat < f_end_beat){
                 int f_sample_start = i_beat_count_to_samples(
-                    f_start_beat, f_tempo, f_sr);
+                    f_start_beat,
+                    f_tempo,
+                    f_sr
+                );
 
-                if(f_sample_start < 0)
-                {
+                if(f_sample_start < 0){
                     f_sample_start = 0;
                 }
 
-                for(f_i2 = 0; f_i2 < MK_AUDIO_ITEM_SEND_COUNT; ++f_i2)
-                {
-                    if(f_audio_item->is_reversed)
-                    {
+                for(f_i2 = 0; f_i2 < MK_AUDIO_ITEM_SEND_COUNT; ++f_i2){
+                    if(f_audio_item->is_reversed){
                         v_ifh_retrigger(
                             &f_audio_item->sample_read_heads[f_i2],
-                            f_audio_item->sample_end_offset -
-                            f_sample_start);
-                    }
-                    else
-                    {
+                            f_audio_item->sample_end_offset - f_sample_start
+                        );
+                    } else {
                         v_ifh_retrigger(
                             &f_audio_item->sample_read_heads[f_i2],
                             f_audio_item->sample_start_offset +
-                            f_sample_start);
+                            f_sample_start
+                        );
                     }
 
                     v_adsr_retrigger(&f_audio_item->adsrs[f_i2]);
@@ -334,12 +332,10 @@ void v_dn_reset_audio_item_read_heads(t_dawnext * self,
 
 /* void v_dn_zero_all_buffers(t_pydaw_data * self)
  */
-void v_dn_zero_all_buffers(t_dawnext * self)
-{
+void v_dn_zero_all_buffers(t_dawnext * self){
     int f_i;
     MKFLT ** f_buff;
-    for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i)
-    {
+    for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i){
         f_buff = self->track_pool[f_i]->buffers;
         v_pydaw_zero_buffer(f_buff, FRAMES_PER_BUFFER);
     }
@@ -348,46 +344,39 @@ void v_dn_zero_all_buffers(t_dawnext * self)
 /* void v_dn_panic(t_pydaw_data * self)
  *
  */
-void v_dn_panic(t_dawnext * self)
-{
-    register int f_i = 0;
-    register int f_i2 = 0;
+void v_dn_panic(t_dawnext * self){
+    int f_i;
+    int f_i2;
     t_pytrack * f_track;
     t_pydaw_plugin * f_plugin;
 
-    while(f_i < DN_TRACK_COUNT)
-    {
+    for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i){
         f_track = self->track_pool[f_i];
 
-        f_i2 = 0;
-        while(f_i2 < MAX_PLUGIN_TOTAL_COUNT)
-        {
+        for(f_i2 = 0; f_i2 < MAX_PLUGIN_TOTAL_COUNT; ++f_i2){
             f_plugin = f_track->plugins[f_i2];
-            if(f_plugin && f_plugin->descriptor->panic)
-            {
+            if(f_plugin && f_plugin->descriptor->panic){
                 f_plugin->descriptor->panic(f_plugin->PYFX_handle);
             }
-            ++f_i2;
         }
-
-        ++f_i;
     }
-
     v_dn_zero_all_buffers(self);
 }
 
 
-void v_dn_song_free(t_dn_song * a_dn_song)
-{
-    if(a_dn_song->regions)
-    {
+void v_dn_song_free(t_dn_song * a_dn_song){
+    if(a_dn_song->regions){
         free(a_dn_song->regions);
     }
 }
 
-void v_dn_paif_set_control(t_dawnext * self,
-        int a_item_index, int a_audio_item_index, int a_port, MKFLT a_val)
-{
+void v_dn_paif_set_control(
+    t_dawnext * self,
+    int a_item_index,
+    int a_audio_item_index,
+    int a_port,
+    MKFLT a_val
+){
     int f_effect_index = a_port / 4;
     int f_control_index = a_port % 4;
 
@@ -399,29 +388,22 @@ void v_dn_paif_set_control(t_dawnext * self,
 
     MKFLT f_sr = musikernel->thread_storage[0].sample_rate;
 
-    if(!f_region)
-    {
+    if(!f_region){
         f_region = g_paif8_get();
         pthread_spin_lock(&musikernel->main_lock);
         f_audio_item->paif = f_region;
         pthread_spin_unlock(&musikernel->main_lock);
     }
 
-    if(!f_region->loaded)
-    {
+    if(!f_region->loaded){
         t_per_audio_item_fx * f_items[8];
-        int f_i = 0;
-        while(f_i < 8)
-        {
+        int f_i;
+        for(f_i = 0; f_i < 8; ++f_i){
             f_items[f_i] = g_paif_get(f_sr);
-            ++f_i;
         }
         pthread_spin_lock(&musikernel->main_lock);
-        f_i = 0;
-        while(f_i < 8)
-        {
+        for(f_i = 0; f_i < 8; ++f_i){
             f_region->items[f_i] = f_items[f_i];
-            ++f_i;
         }
         f_region->loaded = 1;
         pthread_spin_unlock(&musikernel->main_lock);
@@ -431,17 +413,14 @@ void v_dn_paif_set_control(t_dawnext * self,
 
     pthread_spin_lock(&musikernel->main_lock);
 
-    if(f_control_index == 3)
-    {
+    if(f_control_index == 3){
         int f_fx_index = (int)a_val;
         f_item->fx_type = f_fx_index;
         f_item->func_ptr = g_mf3_get_function_pointer(f_fx_index);
 
         v_mf3_set(f_item->mf3, f_item->a_knobs[0],
             f_item->a_knobs[1], f_item->a_knobs[2]);
-    }
-    else
-    {
+    } else {
         f_region->items[
             f_effect_index]->a_knobs[f_control_index] = a_val;
 
@@ -453,8 +432,7 @@ void v_dn_paif_set_control(t_dawnext * self,
 
 }
 
-void v_dn_osc_send(t_osc_send_data * a_buffers)
-{
+void v_dn_osc_send(t_osc_send_data * a_buffers){
     int f_i;
     t_pkm_peak_meter * f_pkm;
 
@@ -465,13 +443,16 @@ void v_dn_osc_send(t_osc_send_data * a_buffers)
     sprintf(a_buffers->f_tmp2, "%i:%f:%f", 0, f_pkm->value[0], f_pkm->value[1]);
     v_pkm_reset(f_pkm);
 
-    for(f_i = 1; f_i < DN_TRACK_COUNT; ++f_i)
-    {
+    for(f_i = 1; f_i < DN_TRACK_COUNT; ++f_i){
         f_pkm = dawnext->track_pool[f_i]->peak_meter;
-        if(!f_pkm->dirty)  //has ran since last v_pkm_reset())
-        {
-            sprintf(a_buffers->f_tmp1, "|%i:%f:%f",
-                f_i, f_pkm->value[0], f_pkm->value[1]);
+        if(!f_pkm->dirty){  //has ran since last v_pkm_reset())
+            sprintf(
+                a_buffers->f_tmp1,
+                "|%i:%f:%f",
+                f_i,
+                f_pkm->value[0],
+                f_pkm->value[1]
+            );
             v_pkm_reset(f_pkm);
             strcat(a_buffers->f_tmp2, a_buffers->f_tmp1);
         }
@@ -482,24 +463,25 @@ void v_dn_osc_send(t_osc_send_data * a_buffers)
     a_buffers->f_tmp1[0] = '\0';
     a_buffers->f_tmp2[0] = '\0';
 
-    if(musikernel->playback_mode > 0 && !musikernel->is_offline_rendering)
-    {
-        sprintf(a_buffers->f_msg, "%f",
-            dawnext->ts[0].ml_current_beat);
+    if(musikernel->playback_mode > 0 && !musikernel->is_offline_rendering){
+        sprintf(
+            a_buffers->f_msg,
+            "%f",
+            dawnext->ts[0].ml_current_beat
+        );
         v_queue_osc_message("cur", a_buffers->f_msg);
     }
 
-    if(musikernel->osc_queue_index > 0)
-    {
-        f_i = 0;
-
-        while(f_i < musikernel->osc_queue_index)
-        {
-            strcpy(a_buffers->osc_queue_keys[f_i],
-                musikernel->osc_queue_keys[f_i]);
-            strcpy(a_buffers->osc_queue_vals[f_i],
-                musikernel->osc_queue_vals[f_i]);
-            ++f_i;
+    if(musikernel->osc_queue_index > 0){
+        for(f_i = 0; f_i < musikernel->osc_queue_index; ++f_i){
+            strcpy(
+                a_buffers->osc_queue_keys[f_i],
+                musikernel->osc_queue_keys[f_i]
+            );
+            strcpy(
+                a_buffers->osc_queue_vals[f_i],
+                musikernel->osc_queue_vals[f_i]
+            );
         }
 
         pthread_spin_lock(&musikernel->main_lock);
@@ -508,10 +490,14 @@ void v_dn_osc_send(t_osc_send_data * a_buffers)
 
         while(f_i < musikernel->osc_queue_index)
         {
-            strcpy(a_buffers->osc_queue_keys[f_i],
-                musikernel->osc_queue_keys[f_i]);
-            strcpy(a_buffers->osc_queue_vals[f_i],
-                musikernel->osc_queue_vals[f_i]);
+            strcpy(
+                a_buffers->osc_queue_keys[f_i],
+                musikernel->osc_queue_keys[f_i]
+            );
+            strcpy(
+                a_buffers->osc_queue_vals[f_i],
+                musikernel->osc_queue_vals[f_i]
+            );
             ++f_i;
         }
 
@@ -520,17 +506,17 @@ void v_dn_osc_send(t_osc_send_data * a_buffers)
 
         pthread_spin_unlock(&musikernel->main_lock);
 
-        f_i = 0;
-
         a_buffers->f_tmp1[0] = '\0';
 
-        while(f_i < f_index)
+        for(f_i = 0; f_i < f_index; ++f_i)
         {
-            sprintf(a_buffers->f_tmp2, "%s|%s\n",
+            sprintf(
+                a_buffers->f_tmp2,
+                "%s|%s\n",
                 a_buffers->osc_queue_keys[f_i],
-                a_buffers->osc_queue_vals[f_i]);
+                a_buffers->osc_queue_vals[f_i]
+            );
             strcat(a_buffers->f_tmp1, a_buffers->f_tmp2);
-            ++f_i;
         }
 
         if(!musikernel->is_offline_rendering)
@@ -541,9 +527,13 @@ void v_dn_osc_send(t_osc_send_data * a_buffers)
 }
 
 
-void v_dn_sum_track_outputs(t_dawnext * self, t_pytrack * a_track,
-        int a_sample_count, int a_playback_mode, t_dn_thread_storage * a_ts)
-{
+void v_dn_sum_track_outputs(
+    t_dawnext * self,
+    t_pytrack * a_track,
+    int a_sample_count,
+    int a_playback_mode,
+    t_dn_thread_storage * a_ts
+){
     int f_bus_num;
     register int f_i2;
     t_pytrack * f_bus;
@@ -552,10 +542,15 @@ void v_dn_sum_track_outputs(t_dawnext * self, t_pytrack * a_track,
     MKFLT ** f_buff;
     MKFLT ** f_track_buff = a_track->buffers;
 
-    if((!a_track->mute)
-       &&
-       ((!self->is_soloed) || (self->is_soloed && a_track->solo)))
-    {
+    if(
+        !a_track->mute
+        &&
+        (
+            !self->is_soloed
+            ||
+            (self->is_soloed && a_track->solo)
+        )
+    ){
         if(a_track->fade_state == FADE_STATE_FADED)
         {
             a_track->fade_state = FADE_STATE_RETURNING;
