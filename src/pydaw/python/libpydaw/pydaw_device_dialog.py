@@ -161,6 +161,7 @@ class pydaw_device_dialog:
                 "for shared libraries.")
             raise NotImplementedError
 
+        print("Loading Portaudio library")
         ctypes.cdll.LoadLibrary(f_portaudio_so_path)
         self.pyaudio = ctypes.CDLL(f_portaudio_so_path)
         self.pyaudio.Pa_GetDeviceInfo.restype = ctypes.POINTER(
@@ -172,21 +173,28 @@ class pydaw_device_dialog:
         self.pyaudio.Pa_IsFormatSupported.argstype = [
             ctypes.POINTER(portaudio.PaStreamParameters),
             ctypes.POINTER(portaudio.PaStreamParameters), ctypes.c_double]
+        print("Initializing Portaudio")
         self.pyaudio.Pa_Initialize()
 
+        print("Loading PortMIDI library")
         ctypes.cdll.LoadLibrary(f_pm_dll)
         self.pypm = ctypes.CDLL(f_pm_dll)
         self.pypm.Pm_GetDeviceInfo.restype = ctypes.POINTER(
             portmidi.PmDeviceInfo)
+        print("Initializing PortMIDI")
         self.pypm.Pm_Initialize()
         self.devices_open = True
+        print("Finished opening hardware devices")
 
     def close_devices(self):
         if self.devices_open:
             import _ctypes
             import gc
+            print("Terminating Portaudio")
             self.pyaudio.Pa_Terminate()
+            print("Terminating PortMIDI")
             self.pypm.Pm_Terminate()
+            print("Cleaning up...")
             for x in (self.pyaudio._handle, self.pypm._handle):
                 if pydaw_util.IS_WINDOWS:
                     _ctypes.FreeLibrary(x)
@@ -197,6 +205,7 @@ class pydaw_device_dialog:
             gc.collect()
             self.devices_open = False
             time.sleep(0.5)  # Give the kernel audio API time to close
+            print("Finished")
         else:
             pass
 #            print("close_devices called, but devices are not open")
@@ -208,7 +217,9 @@ class pydaw_device_dialog:
             if a_splash_screen:
                 a_splash_screen.hide()
             self.show_device_dialog(
-                _("No device configuration found"), a_exit_on_cancel=True)
+                _("No device configuration found"),
+                a_exit_on_cancel=True,
+            )
             if a_splash_screen:
                 a_splash_screen.show()
             return
@@ -217,7 +228,9 @@ class pydaw_device_dialog:
             if a_splash_screen:
                 a_splash_screen.hide()
             self.show_device_dialog(
-                _("Invalid device configuration"), a_exit_on_cancel=True)
+                _("Invalid device configuration"),
+                a_exit_on_cancel=True,
+            )
             if a_splash_screen:
                 a_splash_screen.show()
             return
@@ -269,7 +282,8 @@ class pydaw_device_dialog:
                     _("Device not found: {}\n\n"
                     "If this is not expected, then another application "
                     "may be using the device").format(f_device_str),
-                    a_exit_on_cancel=True)
+                    a_exit_on_cancel=True,
+                )
                 if a_splash_screen:
                     a_splash_screen.show()
             else:
@@ -277,12 +291,16 @@ class pydaw_device_dialog:
                     a_splash_screen.hide()
                 self.show_device_dialog(
                     _("Device not found: {}").format(f_device_str),
-                    a_exit_on_cancel=True)
+                    a_exit_on_cancel=True,
+                )
                 if a_splash_screen:
                     a_splash_screen.show()
 
-
-    def show_device_dialog(self, a_msg=None, a_exit_on_cancel=False):
+    def show_device_dialog(
+        self,
+        a_msg=None,
+        a_exit_on_cancel=False,
+    ):
         self.dialog_result = False
         self.open_devices()
         if self.is_running:
@@ -290,6 +308,7 @@ class pydaw_device_dialog:
         else:
             f_window = QWidget()
             f_window.setObjectName("plugin_ui")
+        print("Created dialog window, adding widgets")
 
         def f_close_event(a_self=None, a_event=None):
             self.close_devices()
@@ -344,10 +363,17 @@ class pydaw_device_dialog:
         if pydaw_util.IS_LINUX:
             f_window_layout.addWidget(QLabel(_("Audio Engine")), 40, 0)
             f_audio_engine_combobox = QComboBox()
-            f_audio_engine_combobox.addItems(
-                [_("Normal"), _("Elevated"), _("Elevated(sandbox)"),
-                 _("Debug"), _("GDB"), _("Valgrind"),
-                 _("GUI Only"), _("No Audio"), _("Module")])
+            f_audio_engine_combobox.addItems([
+                _("Normal"),
+                _("Elevated"),
+                _("Elevated(sandbox)"),
+                _("Debug"),
+                _("GDB"),
+                _("Valgrind"),
+                _("GUI Only"),
+                _("No Audio"),
+                _("Module")
+            ])
             f_audio_engine_combobox.setToolTip(f_device_tooltip)
             f_window_layout.addWidget(f_audio_engine_combobox, 40, 1)
 
@@ -389,7 +415,9 @@ class pydaw_device_dialog:
         for i in range(f_count):
             f_host_api_names.append(
                 self.pyaudio.Pa_GetHostApiInfo(
-                i).contents.name.decode(global_encoding))
+                    i
+                ).contents.name.decode(global_encoding)
+            )
 
         f_count = self.pyaudio.Pa_GetDeviceCount()
 
@@ -397,6 +425,7 @@ class pydaw_device_dialog:
         f_name_to_index = {x:{} for x in f_host_api_names}
         f_host_api_device_names = {x:[] for x in f_host_api_names}
 
+        print("Enumerating audio devices")
         for i in range(f_count):
             f_dev = self.pyaudio.Pa_GetDeviceInfo(i)
             f_dev_name = f_dev.contents.name.decode(global_encoding)
@@ -411,6 +440,7 @@ class pydaw_device_dialog:
             f_name_to_index[f_host_api][f_dev_name] = i
             f_result_dict[f_host_api][f_dev_name] = f_dev.contents
             f_host_api_device_names[f_host_api].append(f_dev_name)
+        print("Finished enumerating audio devices")
 
         f_host_api_input_names = {
             k:[x for x in v if f_result_dict[k][x].maxInputChannels]
@@ -460,6 +490,7 @@ class pydaw_device_dialog:
 
         self.midi_in_checkboxes = {}
 
+        print("Enumerating MIDI devices")
         for loop in range(self.pypm.Pm_CountDevices()):
             f_midi_device = self.pypm.Pm_GetDeviceInfo(loop)
             f_midi_device_name = \
@@ -478,6 +509,7 @@ class pydaw_device_dialog:
             for f_cbox in sorted(
             self.midi_in_checkboxes, key=lambda x: x.lower()):
                 f_midi_in_layout.addWidget(self.midi_in_checkboxes[f_cbox])
+        print("Finished enumerating MIDI devices")
 
         f_midi_in_layout.addItem(
             QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Expanding))
@@ -542,7 +574,6 @@ class pydaw_device_dialog:
             f_audio_in_spinbox.setValue(
                     f_in_count if f_in_count < 16 else 16)
 
-
         def on_ok(a_self=None):
             if self.device_name == "default":
                 f_warn_result = QMessageBox.question(
@@ -582,12 +613,23 @@ class pydaw_device_dialog:
                 #This doesn't work if the device is open already,
                 #so skip the test, and if it fails the
                 #user will be prompted again next time MusiKernel starts
-                if f_audio_engine != 7 or \
-                not self.is_running or \
-                "name" not in pydaw_util.global_device_val_dict or \
-                pydaw_util.global_device_val_dict["name"] != self.device_name:
-                    if (pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX) \
-                    and f_audio_inputs:
+                if (
+                    f_audio_engine != 7
+                    or
+                    not self.is_running
+                    or
+                    "name" not in pydaw_util.global_device_val_dict
+                    or (
+                        pydaw_util.global_device_val_dict["name"]
+                        !=
+                        self.device_name
+                    )
+                ):
+                    if (
+                        (pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX)
+                        and
+                        f_audio_inputs
+                    ):
                         f_input = portaudio.PaStreamParameters(
                             f_name_to_index[self.subsystem][self.device_name],
                             f_audio_inputs, portaudio.paInt16,
@@ -655,7 +697,10 @@ class pydaw_device_dialog:
                 input_combobox_changed)
 
         f_subsystem_combobox.addItems(
-            sorted(f_host_api_device_names, key=lambda x: x.lower()))
+            sorted(
+                f_host_api_device_names, key=lambda x: x.lower()
+            )
+        )
 
         if "hostApi" in pydaw_util.global_device_val_dict:
             f_host_api = pydaw_util.global_device_val_dict["hostApi"]
@@ -677,8 +722,11 @@ class pydaw_device_dialog:
                                 f_device_name_combobox.setCurrentIndex(
                                     f_device_name_combobox.findText(f_dev))
                                 break
-                if (pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX) and \
-                "inputName" in pydaw_util.global_device_val_dict:
+                if (
+                    (pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX)
+                    and
+                    "inputName" in pydaw_util.global_device_val_dict
+                ):
                     f_name = pydaw_util.global_device_val_dict["inputName"]
                     if f_name in f_result_dict[self.subsystem]:
                         f_input_name_combobox.setCurrentIndex(
@@ -728,6 +776,7 @@ class pydaw_device_dialog:
         if a_msg is not None:
             QMessageBox.warning(f_window, _("Error"), a_msg)
 
+        print("Setting dialog size")
         f_screen = QDesktopWidget().screenGeometry()
         f_size = f_window.geometry()
         f_hpos = (f_screen.width() - f_size.width()) / 2
@@ -735,6 +784,7 @@ class pydaw_device_dialog:
         f_window.move(f_hpos, f_vpos)
         latency_changed()
         f_window.raise_()
+        print("Showing dialog")
         if self.is_running:
             f_window.exec_()
         else:
