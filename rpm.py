@@ -214,7 +214,6 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/python/mkplugins/__init__.py
 %{{_usr}}/lib/{0}/pydaw/python/mkplugins/euphoria.py
 %{{_usr}}/lib/{0}/pydaw/python/mkplugins/modulex.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/rayv.py
 %{{_usr}}/lib/{0}/pydaw/python/mkplugins/rayv2.py
 %{{_usr}}/lib/{0}/pydaw/python/mkplugins/wayv.py
 
