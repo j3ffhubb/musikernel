@@ -81,15 +81,15 @@ $(PYDAW_VERSION)-engine: $(C_OBJS)
 
 # --------------------------------------------------------------
 install_non_linux:
-	rm -rf python/*.pyc python/libpydaw/*.pyc python/*~ \
-	python/libpydaw/*~ python/core python/*/__pycache__ \
-	python/mkplugins/__pycache__
+	rm -rf mkpy/*.pyc mkpy/libpydaw/*.pyc mkpy/*~ \
+	mkpy/libpydaw/*~ mkpy/core mkpy/*/__pycache__ \
+	mkpy/mkplugins/__pycache__
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -m 755 $(PYDAW_VERSION).py $(DESTDIR)$(PREFIX)/bin
 	install -s -m 755 $(PYDAW_VERSION)-engine $(DESTDIR)$(PREFIX)/bin
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw
-	cp -r python $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw
+	cp -r mkpy $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw/mkengine
 	install -m 555 $(PYDAW_VERSION).dll \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw/mkengine || \
@@ -100,7 +100,6 @@ install_non_linux:
 	cp -r themes $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	cp -r presets $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	cp -r share $(DESTDIR)$(PREFIX)
-	#locale/Makefile.py $(DESTDIR)$(PREFIX)
 	install -m 644 ../major-version.txt \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	install -m 644 ../minor-version.txt \
@@ -112,9 +111,9 @@ install_non_linux:
                 fi
 
 install:
-	rm -rf python/*.pyc python/libpydaw/*.pyc python/*~ \
-	python/libpydaw/*~ python/core python/*/__pycache__ \
-	python/mkplugins/__pycache__
+	rm -rf mkpy/*.pyc mkpy/libpydaw/*.pyc mkpy/*~ \
+	mkpy/libpydaw/*~ mkpy/core mkpy/*/__pycache__ \
+	mkpy/mkplugins/__pycache__
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -m 755 $(PYDAW_VERSION).py $(DESTDIR)$(PREFIX)/bin
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
@@ -123,7 +122,7 @@ install:
 	install -s -m 4755 $(PYDAW_VERSION)-engine $(DESTDIR)$(PREFIX)/bin
 	install -s -m 755 $(PYDAW_VERSION)-engine \
 	$(DESTDIR)$(PREFIX)/bin/$(PYDAW_VERSION)-engine-no-root
-	cp -r python $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw
+	cp -r mkpy $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw/mkengine
 	install -m 555 $(PYDAW_VERSION).dll \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/pydaw/mkengine || \
@@ -132,7 +131,6 @@ install:
 	cp -r themes $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	cp -r presets $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	cp -r share $(DESTDIR)$(PREFIX)
-	#locale/Makefile.py $(DESTDIR)$(PREFIX)
 	install -m 644 ../major-version.txt \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	install -m 644 ../minor-version.txt \
@@ -144,7 +142,7 @@ install:
                 fi
 
 clean:
-	rm -f src/*.o *.so $(PYDAW_VERSION)-engine* core python/core  \
+	rm -f src/*.o *.so $(PYDAW_VERSION)-engine* core mkpy/core  \
 	*.pyo *.pyc */*.pyo */*.pyc */*/*.pyo */*/*.pyc \
 	*~ */*~ */*/*~ */*/*/*~
 

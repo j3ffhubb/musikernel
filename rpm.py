@@ -16,7 +16,7 @@ import os
 import sys
 import shutil
 
-DELETE_ME = 'src/pydaw/python/__pycache__'
+DELETE_ME = 'src/pydaw/mkpy/__pycache__'
 
 IS_INSTALL = "-i" in sys.argv
 
@@ -143,27 +143,27 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755, root, root) %{{_usr}}/bin/{0}.py
 %attr(755, root, root) %{{_usr}}/bin/{0}-engine-dbg
 %attr(755, root, root) %{{_usr}}/bin/{0}-engine-no-root
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_paulstretch.py
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/python/musikernel.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/pydaw_paulstretch.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/musikernel.py
 %attr(755, root, root) %{{_usr}}/lib/{0}/sbsms/bin/sbsms
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/python/libpydaw/project_recover.py
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_device_dialog.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/project_recover.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/pydaw_device_dialog.py
 
 %{{_usr}}/lib/{0}/pydaw/mkengine/{0}.so
 %{{_usr}}/lib/{0}/presets/MODULEX.mkp
 %{{_usr}}/lib/{0}/presets/RAYV.mkp
 %{{_usr}}/lib/{0}/presets/RAYV2.mkp
 %{{_usr}}/lib/{0}/presets/WAYV.mkp
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/liblo.*.so
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/portaudio.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/portmidi.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_history.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_util.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/pydaw_widgets.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/staging.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/super_formant_maker.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/translate.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/liblo.*.so
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/portaudio.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/portmidi.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/pydaw_history.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/pydaw_util.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/pydaw_widgets.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/staging.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/super_formant_maker.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/translate.py
 %{{_usr}}/lib/{0}/major-version.txt
 %{{_usr}}/lib/{0}/minor-version.txt
 
@@ -200,70 +200,68 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/share/applications/{0}.desktop
 %{{_usr}}/share/doc/{0}/copyright
 %{{_usr}}/share/pixmaps/{0}.png
-#%%{{_usr}}/share/locale/pt_PT/LC_MESSAGES/{0}.mo
-#%%{{_usr}}/share/locale/de/LC_MESSAGES/{0}.mo
-#%%{{_usr}}/share/locale/fr/LC_MESSAGES/{0}.mo
-%{{_usr}}/lib/{0}/pydaw/python/splash.png
-%{{_usr}}/lib/{0}/pydaw/python/wavefile/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/wavefile/libsndfile.py
-%{{_usr}}/lib/{0}/pydaw/python/wavefile/wavefile.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/splash.png
+%{{_usr}}/lib/{0}/pydaw/mkpy/wavefile/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/wavefile/libsndfile.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/wavefile/wavefile.py
 
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/strings.py
-%{{_usr}}/lib/{0}/pydaw/python/libpydaw/scales.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/strings.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/scales.py
 
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/euphoria.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/modulex.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/rayv2.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/wayv.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/euphoria.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/modulex.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/rayv2.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/wayv.py
 
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/mk_delay.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/mk_eq.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/simple_fader.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/simple_reverb.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/trigger_fx.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/mk_delay.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/mk_eq.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/simple_fader.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/simple_reverb.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/trigger_fx.py
 
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/sidechain_comp.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/sidechain_comp.py
 
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/mk_channel.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/xfade.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/mk_channel.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/xfade.py
 
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/mk_compressor.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/mk_compressor.py
 
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/mk_vocoder.py
-%{{_usr}}/lib/{0}/pydaw/python/mkplugins/mk_limiter.py
-%{{_usr}}/lib/{0}/pydaw/python/libmk/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/libmk/mk_project.py
-%{{_usr}}/lib/{0}/pydaw/python/wavenext.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/mk_vocoder.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/mk_limiter.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/wavenext.py
 
-%{{_usr}}/lib/{0}/pydaw/python/dawnext.py
-%{{_usr}}/lib/{0}/pydaw/python/libdawnext/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/libdawnext/osc.py
-%{{_usr}}/lib/{0}/pydaw/python/libdawnext/project.py
-%{{_usr}}/lib/{0}/pydaw/python/libdawnext/strings.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/dawnext.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/osc.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/project.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/strings.py
 
-%{{_usr}}/lib/{0}/pydaw/python/mido/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/backends/__init__.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/backends/backend.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/backends/portmidi.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/backends/portmidi_init.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/backends/pygame.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/backends/rtmidi.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/backends/test_backend.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/messages.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/midifiles.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/midifiles_meta.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/parser.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/ports.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/sockets.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/syx.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/test_messages.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/test_midifiles.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/test_parser.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/test_ports.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/test_sockets.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/test_string_format.py
-%{{_usr}}/lib/{0}/pydaw/python/mido/test_syx.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/backends/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/backends/backend.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/backends/portmidi.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/backends/portmidi_init.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/backends/pygame.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/backends/rtmidi.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/backends/test_backend.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/messages.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/midifiles.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/midifiles_meta.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/parser.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/ports.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/sockets.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/syx.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_messages.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_midifiles.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_parser.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_ports.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_sockets.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_string_format.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_syx.py
 
 
 %doc

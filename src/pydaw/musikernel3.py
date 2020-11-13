@@ -35,8 +35,9 @@ if len(sys.argv) > 1:
 else:
     f_prefix_dir = os.path.dirname(__file__)
     f_path = os.path.join(
-        f_prefix_dir, "..", "lib", pydaw_version, "pydaw", "python")
+        f_prefix_dir, "..", "lib", pydaw_version, "pydaw")
     f_path = os.path.abspath(f_path)
     print(f_path)
     sys.path.insert(0, f_path)
-    import musikernel
+    from mkpy.musikernel import main
+    main()
