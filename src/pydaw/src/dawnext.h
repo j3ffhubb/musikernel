@@ -950,9 +950,15 @@ void v_dn_process_track(t_dawnext * self, int a_global_track_num,
                         (a_ts->ml_current_beat - f_item_ref[0]->start));
                 }
 
-                v_dn_audio_items_run(self, f_item_ref[f_i], a_sample_count,
-                    f_track->buffers, f_track->sc_buffers,
-                    &f_track->sc_buffers_dirty, a_ts);
+                v_dn_audio_items_run(
+                    self,
+                    f_item_ref[f_i],
+                    a_sample_count,
+                    f_track->buffers,
+                    f_track->sc_buffers,
+                    &f_track->sc_buffers_dirty,
+                    a_ts
+                );
             }
         }
     }
@@ -1616,10 +1622,15 @@ inline void v_dn_run_engine(int a_sample_count,
 }
 
 
-void v_dn_audio_items_run(t_dawnext * self, t_dn_item_ref * a_item_ref,
-    int a_sample_count, MKFLT** a_buff, MKFLT ** a_sc_buff, int * a_sc_dirty,
-    t_dn_thread_storage * a_ts)
-{
+void v_dn_audio_items_run(
+    t_dawnext * self,
+    t_dn_item_ref * a_item_ref,
+    int a_sample_count,
+    MKFLT** a_buff,
+    MKFLT ** a_sc_buff,
+    int * a_sc_dirty,
+    t_dn_thread_storage * a_ts
+){
     t_dn_item * f_item = self->item_pool[a_item_ref->item_uid];
 
     if(!f_item->audio_items->index_counts[0])
@@ -2610,9 +2621,12 @@ t_dawnext * g_dawnext_get()
  * int a_region, //The region index to start playback on
  * int a_bar) //The bar index (with a_region) to start playback on
  */
-void v_dn_set_playback_mode(t_dawnext * self, int a_mode,
-        double a_beat, int a_lock)
-{
+void v_dn_set_playback_mode(
+    t_dawnext * self,
+    int a_mode,
+    double a_beat,
+    int a_lock
+){
     switch(a_mode)
     {
         case 0: //stop
@@ -2788,10 +2802,14 @@ void v_dn_offline_render_prep(t_dawnext * self)
     printf("Finished warming up plugins\n");
 }
 
-void v_dn_offline_render(t_dawnext * self, double a_start_beat,
-        double a_end_beat, char * a_file_out, int a_create_file,
-        int a_stem)
-{
+void v_dn_offline_render(
+    t_dawnext * self,
+    double a_start_beat,
+    double a_end_beat,
+    char * a_file_out,
+    int a_create_file,
+    int a_stem
+){
     SNDFILE * f_sndfile = NULL;
     int f_stem_count = self->routing_graph->track_pool_sorted_count;
     SNDFILE * f_stems[f_stem_count];
