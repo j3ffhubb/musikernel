@@ -27,10 +27,7 @@ from mkpy.libpydaw.pydaw_util import *
 from mkpy.libpydaw.pydaw_widgets import pydaw_modulex_settings
 from mkpy.libpydaw.translate import _
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5 import QtCore
-
+from mkpy.mkqt import *
 
 
 TRACK_COUNT_ALL = 32

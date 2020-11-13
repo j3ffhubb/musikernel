@@ -12,9 +12,7 @@ GNU General Public License for more details.
 
 """
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 from mkpy import libmk
 from mkpy.libpydaw import *

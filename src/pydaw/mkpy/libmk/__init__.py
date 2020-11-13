@@ -23,8 +23,7 @@ from mkpy.libpydaw.translate import _
 if pydaw_util.IS_LINUX and not pydaw_util.IS_ENGINE_LIB:
     from mkpy.libpydaw import liblo
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 #Circular dependency, so it assigns a pointer to itself here when loaded
 #import mkplugins

@@ -13,9 +13,7 @@ GNU General Public License for more details.
 
 """
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 from .libpydaw import pydaw_util, pydaw_widgets, pydaw_device_dialog
 
@@ -263,8 +261,8 @@ def engine_lib_callback(a_path, a_msg):
 
 
 class MkMainWindow(QMainWindow):
-    dawnext_callback = QtCore.pyqtSignal(str, list)
-    wavenext_callback = QtCore.pyqtSignal(str, list)
+    dawnext_callback = Signal(str, list)
+    wavenext_callback = Signal(str, list)
 
     def __init__(self):
         QMainWindow.__init__(self)
@@ -1290,9 +1288,11 @@ def kill_pydaw_engine():
     if len(f_result) > 0:
         print(f_result)
         f_answer = QMessageBox.warning(
-            MAIN_WINDOW, _("Warning"),
+            MAIN_WINDOW,
+            _("Warning"),
             mk_strings.multiple_instances_warning,
-            buttons=QMessageBox.Ok | QMessageBox.Cancel)
+            buttons=QMessageBox.Ok | QMessageBox.Cancel,
+        )
         if f_answer == QMessageBox.Cancel:
             exit(1)
         else:

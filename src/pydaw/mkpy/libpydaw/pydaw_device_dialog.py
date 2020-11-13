@@ -13,14 +13,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
+import ctypes
 import os
 import sys
 import time
-import ctypes
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 from mkpy.libpydaw import pydaw_util, portaudio, portmidi
 from mkpy.libpydaw.translate import _, global_encoding

@@ -30,9 +30,7 @@ try: #this will fail if imported by device dialog, but that's OK
 except ImportError:
     pass
 
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import *
-
+from mkpy.mkqt import *
 
 assert "cygwin" not in sys.platform, "Cygwin is unsupported"
 IS_WINDOWS = "win32" in sys.platform or "msys" in sys.platform

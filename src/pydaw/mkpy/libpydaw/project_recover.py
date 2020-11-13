@@ -16,9 +16,7 @@ GNU General Public License for more details.
 import mkpy.libpydaw.pydaw_util as pydaw_util
 from mkpy.libpydaw.translate import _
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 import json
 import os

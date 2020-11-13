@@ -200,7 +200,9 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/share/applications/{0}.desktop
 %{{_usr}}/share/doc/{0}/copyright
 %{{_usr}}/share/pixmaps/{0}.png
+
 %{{_usr}}/lib/{0}/pydaw/mkpy/splash.png
+%{{_usr}}/lib/{0}/pydaw/mkpy/mkqt.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/wavefile/__init__.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/wavefile/libsndfile.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/wavefile/wavefile.py
@@ -262,7 +264,6 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_sockets.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_string_format.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/mido/test_syx.py
-
 
 %doc
 

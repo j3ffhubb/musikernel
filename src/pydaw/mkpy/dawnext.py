@@ -21,9 +21,7 @@ import shutil
 import subprocess
 import traceback
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 from .libdawnext import *
 from .libmk import mk_project

@@ -15,9 +15,7 @@ GNU General Public License for more details.
 
 import os
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 from .libpydaw import *
 from .libpydaw.pydaw_util import *

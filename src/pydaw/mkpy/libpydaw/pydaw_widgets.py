@@ -27,9 +27,7 @@ from mkpy.libmk.mk_project import (
 )
 from mkpy.libpydaw.translate import _
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 import numpy
 

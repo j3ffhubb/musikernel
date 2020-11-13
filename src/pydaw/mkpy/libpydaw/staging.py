@@ -13,9 +13,7 @@ GNU General Public License for more details.
 """
 
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 class wire_input_port(QGraphicsRectItem):
     def __init__(self):

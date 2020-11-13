@@ -39,8 +39,7 @@ from mkpy.mkplugins import mk_compressor
 from mkpy.mkplugins import mk_vocoder
 from mkpy.mkplugins import mk_limiter
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mkpy.mkqt import *
 
 from mkpy.libpydaw.pydaw_util import pydaw_clip_value
 
