@@ -13,16 +13,21 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
+import datetime
+import json
+import os
+import shutil
+import sys
+import tarfile
+
+f_parent_dir = os.path.dirname(os.path.abspath(__file__))
+f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "../.."))
+sys.path.insert(0, f_parent_dir)
+
 import mkpy.libpydaw.pydaw_util as pydaw_util
 from mkpy.libpydaw.translate import _
 
 from mkpy.mkqt import *
-
-import json
-import os
-import shutil
-import tarfile
-import datetime
 
 class project_history_widget(QTreeWidget):
     def __init__(self, a_backup_dir, a_backup_file, a_project_dir):

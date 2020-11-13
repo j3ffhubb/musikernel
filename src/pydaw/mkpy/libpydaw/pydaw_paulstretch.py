@@ -17,21 +17,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
-import sys
+from argparse import ArgumentParser
+import numpy
 import os
 import subprocess
-import numpy
-
-from optparse import OptionParser
-
-from mkpy.libpydaw.pydaw_util import *
+import sys
 
 f_parent_dir = os.path.dirname(os.path.abspath(__file__))
-f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, ".."))
-
+f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "..", ".."))
 sys.path.insert(0, f_parent_dir)
 
-import wavefile
+from mkpy.libpydaw.pydaw_util import *
+from mkpy import wavefile
 
 
 def optimize_windowsize(n):
@@ -239,38 +236,80 @@ def paulstretch(file_path, stretch, windowsize_seconds, onset_level,
 print("Paul's Extreme Sound Stretch (Paulstretch) - Python version 20110223")
 print("new method: using onsets information")
 print("by Nasca Octavian PAUL, Targu Mures, Romania\n")
-parser = OptionParser(usage="usage: %prog [options] input_wav output_wav")
-parser.add_option("-s", "--stretch",
-                  dest="stretch", help="stretch amount (1.0 = no stretch)",
-                  type="float",default=8.0)
-parser.add_option("-w", "--window_size",
-                  dest="window_size", help="window size (seconds)",
-                  type="float", default=0.25)
-parser.add_option("-t", "--onset", dest="onset",
-                  help="onset sensitivity (0.0=max, 1.0=min)",
-                  type="float", default=10.0)
-parser.add_option("-p", "--start-pitch", dest="start_pitch",
-                  help="start pitch (36.0=max, -36.0=min)",
-                  type="float", default=None)
-parser.add_option("-e", "--end-pitch", dest="end_pitch",
-                  help="end pitch (36.0=max, -36.0=min)",
-                  type="float", default=None)
+parser = ArgumentParser(
+    description="CLI for Paulstretch"
+)
+parser.add_argument(
+  'input',
+  help='Path to the input file',
+)
+parser.add_argument(
+  'output',
+  help='Path to the output file',
+)
+parser.add_argument(
+    "--stretch",
+    "-s",
+    default=8.0,
+    dest="stretch",
+    help="stretch amount (1.0 = no stretch)",
+    type=float,
+)
+parser.add_argument(
+    "--window_size",
+    "-w",
+    default=0.25,
+    dest="window_size",
+    help="window size (seconds)",
+    type=float,
+)
+parser.add_argument(
+    "--onset",
+    "-t",
+    default=10.0,
+    dest="onset",
+    help="onset sensitivity (0.0=max, 1.0=min)",
+    type=float,
+)
+parser.add_argument(
+    "--start-pitch",
+    "-p",
+    default=None,
+    dest="start_pitch",
+    help="start pitch (36.0=max, -36.0=min)",
+    type=float,
+)
+parser.add_argument(
+    "--end-pitch",
+    "-e",
+    default=None,
+    dest="end_pitch",
+    help="end pitch (36.0=max, -36.0=min)",
+    type=float,
+)
 
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
-if (len(args) < 2) or \
-(options.stretch <= 0.0) or \
-(options.window_size <= 0.001):
+if (
+    args.stretch <= 0.0
+    or
+    args.window_size <= 0.001
+):
     print("Error in command line parameters. Run this program with "
         "--help for help.")
     sys.exit(1)
 
-print("stretch amount = {}".format(options.stretch))
-print("window size = {} seconds".format(options.window_size))
-print("onset sensitivity = {}".format(options.onset))
+print("stretch amount = {}".format(args.stretch))
+print("window size = {} seconds".format(args.window_size))
+print("onset sensitivity = {}".format(args.onset))
 
-paulstretch(args[0], numpy.double(options.stretch),
-            numpy.double(options.window_size),
-            numpy.double(options.onset),
-            args[1], options.start_pitch,
-            options.end_pitch, args[0])
+paulstretch(
+    args.input,
+    numpy.double(args.stretch),
+    numpy.double(args.window_size),
+    numpy.double(args.onset),
+    args.output,
+    args.start_pitch,
+    args.end_pitch,
+    args.input,
+)

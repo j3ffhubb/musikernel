@@ -18,6 +18,9 @@ import os
 import sys
 import time
 
+f_parent_dir = os.path.dirname(os.path.abspath(__file__))
+f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "../.."))
+sys.path.insert(0, f_parent_dir)
 from mkpy.mkqt import *
 
 from mkpy.libpydaw import pydaw_util, portaudio, portmidi
