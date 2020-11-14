@@ -1295,3 +1295,6 @@ if libmk.TOOLTIPS_ENABLED:
 CLOSE_ENGINE_ON_RENDER = False
 
 PLUGIN_RACK = None
+
+def init():
+    pass

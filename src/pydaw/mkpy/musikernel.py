@@ -31,6 +31,7 @@ import gc
 import subprocess
 import sys
 import time
+import traceback
 
 HOST_INDEX_DAW_NEXT = 0
 HOST_INDEX_WAVE_NEXT = 1
@@ -313,8 +314,10 @@ class MkMainWindow(QMainWindow):
 
         SPLASH_SCREEN.status_update(_("Loading DAW-Next"))
         from mkpy import dawnext
+        dawnext.init()
         SPLASH_SCREEN.status_update(_("Loading Wave-Next"))
         from mkpy import wavenext
+        wavenext.init()
 
         self.wave_editor_module = wavenext
 
@@ -1496,6 +1499,7 @@ def main():
         try:
             global_open_project(default_project_file)
         except Exception as ex:
+            traceback.print_exc()
             QMessageBox.warning(
                 MAIN_WINDOW, _("Error"),
                 _("Error opening project: {}\n{}\n"
