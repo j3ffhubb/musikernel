@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 """
 
+import argparse
 import os
 import sys
 
@@ -56,38 +57,38 @@ TOOLS = {
         "--no-file && gdb {BIN}-dbg ",
 }
 
-if len(sys.argv) < 2 or \
-sys.argv[1] not in ('e', 'd') or \
-sys.argv[2] not in TOOLS:
-    print("Usage: {} e|d  {} [CORES=1] "
-        "[SAMPLE_RATE=44100]".format(
-        os.path.basename(__file__), "|".join(TOOLS)))
-    exit(1)
+parser = argparse.ArgumentParser(
+    description="Diagnostic tool for Musikernel",
+)
+parser.add_argument(
+    'tool',
+    choices=sorted(TOOLS),
+    help="The tool to use",
+)
+parser.add_argument(
+    '--cores',
+    default=1,
+    help="The number of cores to use",
+    type=int,
+)
+parser.add_argument(
+    '--sample-rate',
+    default=44100,
+    dest='sr',
+    help="The sample rate to use",
+    type=int,
+)
+args = parser.parse_args()
+TIME = "0 96"
 
-HOST = {
-    "d":"dawnext"
-}[sys.argv[1]]
-
-TIME = {
-    "d":"0 96"
-}[sys.argv[1]]
-
-TOOL = sys.argv[2]
-
-if len(sys.argv) > 3:
-    CORES = int(sys.argv[3])
-    assert(CORES >= 0 and CORES < 32)
-else:
-    CORES = 1
-
-if len(sys.argv) > 4:
-    SR = int(sys.argv[4])
-    assert(SR >= 11025 and SR <= 384000)
-else:
-    SR = 44100
-
-CMD = TOOLS[TOOL].format(BIN=BIN, HOST=HOST, PROJECT=PROJECT,
-    CORES=CORES, SR=SR, TIME=TIME)
+CMD = TOOLS[args.tool].format(
+    BIN=BIN,
+    CORES=args.cores,
+    HOST="dawnext",
+    PROJECT=PROJECT,
+    SR=args.sr,
+    TIME=TIME,
+)
 print("Command:")
 print(CMD)
 print()
