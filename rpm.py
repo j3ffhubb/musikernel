@@ -167,6 +167,17 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/major-version.txt
 %{{_usr}}/lib/{0}/minor-version.txt
 
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/filedragdrop.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/hardware.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/__init__.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/abstract.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/audio.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/automation.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/editor.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/shared.py
+
 %{{_usr}}/lib/{0}/themes/default/play_checked.svg
 %{{_usr}}/lib/{0}/themes/default/rec_checked.svg
 %{{_usr}}/lib/{0}/themes/default/stop_checked.svg
