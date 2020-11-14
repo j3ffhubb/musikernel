@@ -1,10 +1,10 @@
 #!/bin/sh
-wc -l pydaw/src/*.c pydaw/src/*.h pydaw/libmodsynth/* \
-pydaw/libmodsynth/lib/* pydaw/libmodsynth/*/*/* pydaw/plugins/*/*
+
+find pydaw/src -type f -name '*.c' -or -name '*.h' -exec cat {} \; | wc -l
 
 echo "^^^ Lines of C code"
 
-wc -l pydaw/python/*.py pydaw/python/lib*/*.py pydaw/python/mkplugins/*.py
+find pydaw/mkpy -type f -name '*.py' -exec cat {} \; | wc -l
 
 echo "^^^ Lines of Python code"
 
