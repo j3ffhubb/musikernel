@@ -15,7 +15,7 @@ GNU General Public License for more details.
 #define	MIDI_DEVICE_H
 
 #include <assert.h>
-#include "../include/pydaw_plugin.h"
+#include "include/pydaw_plugin.h"
 #include <sys/time.h>
 #include <time.h>
 #include <portmidi.h>

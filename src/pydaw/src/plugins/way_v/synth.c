@@ -12,13 +12,12 @@ GNU General Public License for more details.
 */
 
 #include "../../include/pydaw_plugin.h"
-
-#include "libmodsynth.h"
 #include "../../libmodsynth/lib/amp.h"
-#include "../../libmodsynth/modules/filter/svf.h"
 #include "../../libmodsynth/lib/lms_math.h"
+#include "../../libmodsynth/modules/filter/svf.h"
+#include "../../pydaw_files.h"
+#include "libmodsynth.h"
 #include "synth.h"
-#include "../../src/pydaw_files.h"
 
 static void v_run_wayv_voice(
         t_wayv *, t_voc_single_voice*, t_wayv_poly_voice *,

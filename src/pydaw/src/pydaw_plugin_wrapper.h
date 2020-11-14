@@ -18,26 +18,26 @@ GNU General Public License for more details.
 extern "C" {
 #endif
 
-#include "../include/pydaw_plugin.h"
+#include "include/pydaw_plugin.h"
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../plugins/modulex/synth.c"
-#include "../plugins/euphoria/synth.c"
-#include "../plugins/way_v/synth.c"
-#include "../plugins/ray_v2/synth.c"
+#include "plugins/modulex/synth.c"
+#include "plugins/euphoria/synth.c"
+#include "plugins/way_v/synth.c"
+#include "plugins/ray_v2/synth.c"
 
-#include "../plugins/mk_delay/synth.c"
-#include "../plugins/mk_eq/synth.c"
-#include "../plugins/simple_fader/synth.c"
-#include "../plugins/simple_reverb/synth.c"
-#include "../plugins/trigger_fx/synth.c"
-#include "../plugins/sidechain_comp/synth.c"
-#include "../plugins/mk_channel/synth.c"
-#include "../plugins/xfade/synth.c"
-#include "../plugins/mk_compressor/synth.c"
-#include "../plugins/mk_vocoder/synth.c"
-#include "../plugins/mk_limiter/synth.c"
+#include "plugins/mk_delay/synth.c"
+#include "plugins/mk_eq/synth.c"
+#include "plugins/simple_fader/synth.c"
+#include "plugins/simple_reverb/synth.c"
+#include "plugins/trigger_fx/synth.c"
+#include "plugins/sidechain_comp/synth.c"
+#include "plugins/mk_channel/synth.c"
+#include "plugins/xfade/synth.c"
+#include "plugins/mk_compressor/synth.c"
+#include "plugins/mk_vocoder/synth.c"
+#include "plugins/mk_limiter/synth.c"
 
 
 typedef struct

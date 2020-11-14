@@ -46,8 +46,8 @@ GNU General Public License for more details.
 
 #include "compiler.h"
 #include "pydaw_files.h"
-#include "../include/pydaw_plugin.h"
-#include "../libmodsynth/lib/lmalloc.h"
+#include "include/pydaw_plugin.h"
+#include "libmodsynth/lib/lmalloc.h"
 #include "mk_threads.h"
 
 #ifndef NO_MIDI

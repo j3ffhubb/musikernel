@@ -16,7 +16,7 @@ GNU General Public License for more details.
 
 #include <pthread.h>
 #include <assert.h>
-#include "../src/pydaw_files.h"
+#include "../pydaw_files.h"
 #include "../libmodsynth/lib/lmalloc.h"
 
 #define PYDAW_EVENT_NOTEON     0

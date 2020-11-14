@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-CC  ?= gcc
+CC ?= gcc
 
 PREFIX ?= /usr
 PYDAW_VERSION = $(shell cat ../major-version.txt)

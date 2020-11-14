@@ -53,11 +53,11 @@ GNU General Public License for more details.
 #include <sched.h>
 #include <unistd.h>
 #include <time.h>
-#include "../libmodsynth/lib/amp.h"
-#include "../libmodsynth/lib/lmalloc.h"
-#include "../libmodsynth/lib/peak_meter.h"
-#include "../libmodsynth/modules/multifx/multifx3knob.h"
-#include "../libmodsynth/modules/modulation/ramp_env.h"
+#include "libmodsynth/lib/amp.h"
+#include "libmodsynth/lib/lmalloc.h"
+#include "libmodsynth/lib/peak_meter.h"
+#include "libmodsynth/modules/multifx/multifx3knob.h"
+#include "libmodsynth/modules/modulation/ramp_env.h"
 #include "pydaw_audio_tracks.h"
 #include "pydaw_audio_inputs.h"
 #include "pydaw_audio_util.h"

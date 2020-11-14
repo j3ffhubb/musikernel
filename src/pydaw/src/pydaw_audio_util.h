@@ -19,8 +19,8 @@ GNU General Public License for more details.
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
-#include "../libmodsynth/lib/interpolate-cubic.h"
-#include "../libmodsynth/lib/pitch_core.h"
+#include "libmodsynth/lib/interpolate-cubic.h"
+#include "libmodsynth/lib/pitch_core.h"
 #include "pydaw_files.h"
 
 #ifdef	__cplusplus

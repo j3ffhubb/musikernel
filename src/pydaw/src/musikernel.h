@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 #include "libshds.h"
 #include "pydaw_files.h"
-#include "../libmodsynth/lib/lmalloc.h"
+#include "libmodsynth/lib/lmalloc.h"
 #include "pydaw_plugin_wrapper.h"
 #include "pydaw_audio_inputs.h"
 
