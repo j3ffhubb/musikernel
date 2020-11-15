@@ -57,6 +57,15 @@ TRACK_COLOR_CLIPBOARD = None
 REGION_EDITOR_MIN_NOTE_LENGTH = REGION_EDITOR_GRID_WIDTH / 128.0
 REGION_EDITOR_DELETE_MODE = False
 
+class TempoMarkerEvent:
+    """ Used to override tempo marker events """
+    def __init__(self, beat):
+        self.beat = beat
+
+    def mouse_press(self, event):
+        shared.SEQUENCER.header_event_pos = self.beat
+        shared.SEQUENCER.header_time_modify()
+
 def pydaw_set_seq_snap(a_val=None):
     global SEQUENCER_QUANTIZE_PX, SEQ_QUANTIZE, SEQ_QUANTIZE_AMT, \
         SEQ_LINES_ENABLED, SEQ_SNAP_RANGE, SEQUENCER_SNAP_VAL, \
@@ -2081,8 +2090,9 @@ class ItemSequencer(QGraphicsView):
         self.header.mousePressEvent = self.header_click_event
         self.header.contextMenuEvent = self.headerContextMenuEvent
         self.scene.addItem(self.header)
+
         for f_marker in shared.CURRENT_REGION.get_markers():
-            if f_marker.type == 1:
+            if f_marker.type == 1:  # Loop
                 self.loop_start = f_marker.start_beat
                 self.loop_end = f_marker.beat
                 f_x = f_marker.start_beat * SEQUENCER_PX_PER_BEAT
@@ -2094,16 +2104,27 @@ class ItemSequencer(QGraphicsView):
                 f_end = QGraphicsLineItem(
                     f_x, 0, f_x, REGION_EDITOR_HEADER_HEIGHT, self.header)
                 f_end.setPen(shared.END_PEN)
-            elif f_marker.type == 2:
+            elif f_marker.type == 2:  # Tempo
                 f_text = "{} : {}/{}".format(
-                    f_marker.tempo, f_marker.tsig_num, f_marker.tsig_den)
-                f_item = QGraphicsSimpleTextItem(f_text, self.header)
-                f_item.setBrush(QtCore.Qt.white)
-                f_item.setPos(
+                    f_marker.tempo,
+                    f_marker.tsig_num,
+                    f_marker.tsig_den,
+                )
+                item = QGraphicsEllipseItem(
+                    0., 0., 12., 12.,
+                    self.header,
+                )
+                item.setBrush(QtCore.Qt.white)
+                item.setPos(
                     f_marker.beat * SEQUENCER_PX_PER_BEAT,
-                    REGION_EDITOR_HEADER_ROW_HEIGHT)
+                    REGION_EDITOR_HEADER_ROW_HEIGHT,
+                )
+                item.setToolTip(f_text)
+                item.mousePressEvent = TempoMarkerEvent(
+                    f_marker.beat,
+                ).mouse_press
                 self.draw_region(f_marker)
-            elif f_marker.type == 3:
+            elif f_marker.type == 3:  # Text
                 f_item = QGraphicsSimpleTextItem(
                     f_marker.text, self.header)
                 f_item.setBrush(QtCore.Qt.white)

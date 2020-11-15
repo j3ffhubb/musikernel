@@ -4,7 +4,7 @@
 from .abstract import AbstractItemEditor
 from ..filedragdrop import FileDragDropper
 from mkpy import libmk
-from mkpy.libdawnext import shared
+from mkpy.libdawnext import project, shared
 from mkpy.libdawnext.project import *
 from mkpy.libdawnext.shared import *
 from mkpy.libmk import mk_project
@@ -1020,7 +1020,10 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
 
     def lane_number_to_y_pos(self, a_lane_num):
         a_lane_num = pydaw_util.pydaw_clip_value(
-            a_lane_num, 0, project.TRACK_COUNT_ALL)
+            a_lane_num,
+            0,
+            project.TRACK_COUNT_ALL,
+        )
         return (a_lane_num * shared.AUDIO_ITEM_HEIGHT) + shared.AUDIO_RULER_HEIGHT
 
     def quantize_all(self, a_x):
