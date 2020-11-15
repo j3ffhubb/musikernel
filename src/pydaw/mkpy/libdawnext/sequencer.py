@@ -183,15 +183,24 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             a_audio_item.length_beats > CACHED_SEQ_LEN * 0.02
 
         if self.should_draw:
-            f_pixmaps, f_transform, self.x_scale, self.y_scale = \
-                shared.PROJECT.get_item_path(
-                    a_audio_item.item_uid, SEQUENCER_PX_PER_BEAT,
-                    shared.REGION_EDITOR_TRACK_HEIGHT - 20,
-                    shared.CURRENT_REGION.get_tempo_at_pos(a_audio_item.start_beat))
+            (
+                f_pixmaps,
+                f_transform,
+                self.x_scale,
+                self.y_scale,
+            ) = shared.PROJECT.get_item_path(
+                a_audio_item.item_uid,
+                SEQUENCER_PX_PER_BEAT,
+                shared.REGION_EDITOR_TRACK_HEIGHT - 20,
+                shared.CURRENT_REGION.get_tempo_at_pos(
+                    a_audio_item.start_beat,
+                ),
+            )
             for f_pixmap in f_pixmaps:
                 f_pixmap_item = QGraphicsPixmapItem(self)
                 f_pixmap_item.setCacheMode(
-                    QGraphicsItem.DeviceCoordinateCache)
+                    QGraphicsItem.DeviceCoordinateCache,
+                )
                 f_pixmap_item.setPixmap(f_pixmap)
                 f_pixmap_item.setTransform(f_transform)
                 f_pixmap_item.setZValue(1900.0)
@@ -247,10 +256,14 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
                           shared.AUDIO_ITEM_HANDLE_HEIGHT))
         self.length_handle.mousePressEvent = self.length_handle_mouseClickEvent
         self.length_handle_line = QGraphicsLineItem(
-            shared.AUDIO_ITEM_HANDLE_SIZE, shared.AUDIO_ITEM_HANDLE_HEIGHT,
             shared.AUDIO_ITEM_HANDLE_SIZE,
-            (shared.REGION_EDITOR_TRACK_HEIGHT * -1.0) + shared.AUDIO_ITEM_HANDLE_HEIGHT,
-            self.length_handle)
+            shared.AUDIO_ITEM_HANDLE_HEIGHT,
+            shared.AUDIO_ITEM_HANDLE_SIZE,
+            (
+                shared.REGION_EDITOR_TRACK_HEIGHT * -1.0
+            ) + shared.AUDIO_ITEM_HANDLE_HEIGHT,
+            self.length_handle,
+        )
 
         self.stretch_handle = QGraphicsRectItem(parent=self)
         self.stretch_handle.setAcceptHoverEvents(True)
@@ -268,16 +281,24 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.stretch_handle_mouseClickEvent
         self.stretch_handle_line = QGraphicsLineItem(
             shared.AUDIO_ITEM_HANDLE_SIZE,
-            (shared.AUDIO_ITEM_HANDLE_HEIGHT * 0.5) -
-                (shared.REGION_EDITOR_TRACK_HEIGHT * 0.5),
+            (
+                shared.AUDIO_ITEM_HANDLE_HEIGHT * 0.5
+            ) - (shared.REGION_EDITOR_TRACK_HEIGHT * 0.5),
             shared.AUDIO_ITEM_HANDLE_SIZE,
-            (shared.REGION_EDITOR_TRACK_HEIGHT * 0.5) +
-                (shared.AUDIO_ITEM_HANDLE_HEIGHT * 0.5),
-            self.stretch_handle)
+            (
+                shared.REGION_EDITOR_TRACK_HEIGHT * 0.5
+            ) + (shared.AUDIO_ITEM_HANDLE_HEIGHT * 0.5),
+            self.stretch_handle,
+        )
         self.stretch_handle.hide()
 
         self.split_line = QGraphicsLineItem(
-            0.0, 0.0, 0.0, shared.REGION_EDITOR_TRACK_HEIGHT, self)
+            0.0,
+            0.0,
+            0.0,
+            shared.REGION_EDITOR_TRACK_HEIGHT,
+            self,
+        )
         self.split_line.mapFromParent(0.0, 0.0)
         self.split_line.hide()
         self.split_line_is_shown = False
@@ -345,19 +366,25 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         f_length = (self.audio_item.length_beats * SEQUENCER_PX_PER_BEAT)
 
         self.length_orig = f_length
-        self.length_px_start = (self.audio_item.start_offset *
-            SEQUENCER_PX_PER_BEAT)
+        self.length_px_start = (
+            self.audio_item.start_offset * SEQUENCER_PX_PER_BEAT
+        )
         self.length_px_minus_start = f_length - self.length_px_start
 
         self.rect_orig = QtCore.QRectF(
-            0.0, 0.0, f_length, shared.REGION_EDITOR_TRACK_HEIGHT)
+            0.0,
+            0.0,
+            f_length,
+            shared.REGION_EDITOR_TRACK_HEIGHT,
+        )
         self.setRect(self.rect_orig)
 
         label_rect = QtCore.QRectF(0.0, 0.0, f_length, 20)
         self.label_bg.setRect(label_rect)
 
         f_track_num = REGION_EDITOR_HEADER_HEIGHT + (
-            shared.REGION_EDITOR_TRACK_HEIGHT * self.audio_item.track_num)
+            shared.REGION_EDITOR_TRACK_HEIGHT * self.audio_item.track_num
+        )
 
         self.setPos(f_start, f_track_num)
         self.is_moving = False
@@ -383,9 +410,20 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
 
         self.length_handle.setPos(
             f_length - shared.AUDIO_ITEM_HANDLE_SIZE,
-            shared.REGION_EDITOR_TRACK_HEIGHT - shared.AUDIO_ITEM_HANDLE_HEIGHT)
+            (
+                shared.REGION_EDITOR_TRACK_HEIGHT
+                -
+                shared.AUDIO_ITEM_HANDLE_HEIGHT
+            ),
+        )
         self.start_handle.setPos(
-            0.0, shared.REGION_EDITOR_TRACK_HEIGHT - shared.AUDIO_ITEM_HANDLE_HEIGHT)
+            0.0,
+            (
+                shared.REGION_EDITOR_TRACK_HEIGHT
+                -
+                shared.AUDIO_ITEM_HANDLE_HEIGHT
+            )
+        )
 #        if self.audio_item.time_stretch_mode >= 2 and \
 #        (((self.audio_item.time_stretch_mode != 5) and \
 #        (self.audio_item.time_stretch_mode != 2)) \

@@ -763,27 +763,46 @@ class DawNextProject(libmk.AbstractProject):
         self.pixmap_cache_unscaled = {}
         self.painter_path_cache = {}
 
-    def get_item_path(self, a_uid, a_px_per_beat, a_height, a_tempo):
+    def get_item_path(
+        self,
+        a_uid,
+        a_px_per_beat,
+        a_height,
+        a_tempo,
+    ):
         a_uid = int(a_uid)
         f_key = (a_px_per_beat, a_height, round(a_tempo, 1))
-        if a_uid in self.painter_path_cache and \
-        f_key in self.painter_path_cache[a_uid]:
+        if (
+            a_uid in self.painter_path_cache
+            and
+            f_key in self.painter_path_cache[a_uid]
+        ):
             return self.painter_path_cache[a_uid][f_key]
         else:
             if a_uid not in self.pixmap_cache_unscaled:
                 f_item_obj = self.get_item_by_uid(a_uid)
                 f_path = f_item_obj.painter_path(
-                    PIXMAP_BEAT_WIDTH, PIXMAP_TILE_HEIGHT, a_tempo)
+                    PIXMAP_BEAT_WIDTH,
+                    PIXMAP_TILE_HEIGHT,
+                    a_tempo,
+                )
                 self.pixmap_cache_unscaled[a_uid] = f_path
             if a_uid not in self.painter_path_cache:
                 self.painter_path_cache[a_uid] = {}
             f_x, f_y = pydaw_util.scale_sizes(
-                PIXMAP_BEAT_WIDTH, PIXMAP_TILE_HEIGHT,
-                a_px_per_beat, a_height)
+                PIXMAP_BEAT_WIDTH,
+                PIXMAP_TILE_HEIGHT,
+                a_px_per_beat,
+                a_height,
+            )
             f_transform = QTransform()
             f_transform.scale(f_x, f_y)
             self.painter_path_cache[a_uid][f_key] = (
-                self.pixmap_cache_unscaled[a_uid], f_transform, f_x, f_y)
+                self.pixmap_cache_unscaled[a_uid],
+                f_transform,
+                f_x,
+                f_y,
+            )
             return self.painter_path_cache[a_uid][f_key]
 
     def save_item_by_uid(self, a_uid, a_item, a_new_item=False):
@@ -794,7 +813,11 @@ class DawNextProject(libmk.AbstractProject):
             self.pixmap_cache_unscaled.pop(a_uid)
         if not self.suppress_updates:
             self.save_file(
-                pydaw_folder_items, str(a_uid), str(a_item), a_new_item)
+                pydaw_folder_items,
+                str(a_uid),
+                str(a_item),
+                a_new_item,
+            )
             self.IPC.pydaw_save_item(a_uid)
 
     def save_region(self, a_region, a_notify=True):
@@ -1501,7 +1524,7 @@ class pydaw_item:
         f_count = int(f_width // PIXMAP_TILE_WIDTH) + 1
         f_result = []
 
-        f_note_brush = QColor.fromRgb(210, 210, 210, 220)
+        f_note_brush = QColor.fromRgb(165, 165, 165, 240)
         f_audio_brush = QColor.fromRgb(150, 150, 150, 210)
         f_note_pen = QPen(f_note_brush)
         f_pen = QPen(f_audio_brush)
