@@ -13,7 +13,10 @@ from mkpy.libpydaw.pydaw_util import *
 from mkpy.libpydaw.translate import _
 from mkpy.mkplugins import *
 from mkpy.mkqt import *
+import .atm_context_menu
+import .context_menu
 import .header_context_menu
+import ._shared
 
 DRAW_SEQUENCER_GRAPHS = True
 REGION_EDITOR_SNAP = True
@@ -29,11 +32,6 @@ REGION_EDITOR_HEADER_HEIGHT = REGION_EDITOR_HEADER_ROW_HEIGHT * 3
 REGION_EDITOR_TOTAL_HEIGHT = (REGION_EDITOR_TRACK_COUNT *
     shared.REGION_EDITOR_TRACK_HEIGHT)
 REGION_EDITOR_QUANTIZE_INDEX = 4
-
-REGION_EDITOR_MODE = 0
-
-ATM_CLIPBOARD = []
-REGION_CLIPBOARD = []
 
 CACHED_SEQ_LEN = 32
 
@@ -154,7 +152,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         self.name = str(a_name)
         self.is_deleted = False
 
-        if REGION_EDITOR_MODE == 0:
+        if _shared.REGION_EDITOR_MODE == 0:
             self.setFlag(QGraphicsItem.ItemIsMovable)
             self.setFlag(QGraphicsItem.ItemIsSelectable)
             self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
@@ -464,7 +462,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
 
     def set_brush(self, a_index=None):
         if self.isSelected():
-            if REGION_EDITOR_MODE == 0:
+            if _shared.REGION_EDITOR_MODE == 0:
                 self.setOpacity(1.0)
             self.setBrush(shared.SELECTED_ITEM_COLOR)
             self.label_bg.setBrush(shared.SELECTED_ITEM_COLOR)
@@ -482,7 +480,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.length_handle.setBrush(shared.AUDIO_ITEM_HANDLE_SELECTED_BRUSH)
             self.stretch_handle.setBrush(shared.AUDIO_ITEM_HANDLE_SELECTED_BRUSH)
         else:
-            if REGION_EDITOR_MODE == 0:
+            if _shared.REGION_EDITOR_MODE == 0:
                 self.setOpacity(0.3)
             self.start_handle.setPen(shared.AUDIO_ITEM_HANDLE_PEN)
             self.length_handle.setPen(shared.AUDIO_ITEM_HANDLE_PEN)
@@ -1018,241 +1016,19 @@ class ItemSequencer(QGraphicsView):
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
-        self.menu = QMenu(self)
-        self.atm_menu = QMenu(self)
+        self.addAction(_shared.copy_action)
+        self.addAction(context_menu.cut_action)
+        self.addAction(atm_context_menu.break_atm_action)
+        self.addAction(atm_context_menu.unbreak_atm_action)
+        self.addAction(_shared.delete_action)
+        self.addAction(context_menu.unlink_selected_action)
+        self.addAction(context_menu.unlink_unique_action)
+        self.addAction(context_menu.unlink_action)
+        self.addAction(context_menu.rename_action)
+        self.addAction(context_menu.transpose_action)
+        self.addAction(context_menu.glue_action)
 
-        self.copy_action = self.menu.addAction(_("Copy"))
-        self.copy_action.triggered.connect(self.copy_selected)
-        self.copy_action.setShortcut(QKeySequence.Copy)
-        self.addAction(self.copy_action)
-        self.atm_menu.addAction(self.copy_action)
-
-        self.cut_action = self.menu.addAction(_("Cut"))
-        self.cut_action.triggered.connect(self.cut_selected)
-        self.cut_action.setShortcut(QKeySequence.Cut)
-        self.addAction(self.cut_action)
-
-        self.paste_action = self.atm_menu.addAction(_("Paste"))
-        self.paste_action.triggered.connect(self.paste_clipboard)
-
-        self.paste_orig_action = self.menu.addAction(
-            _("Paste to Original Track"))
-        self.paste_orig_action.triggered.connect(self.paste_clipboard)
-
-        self.paste_ctrl_action = self.atm_menu.addAction(
-            _("Paste Plugin Control"))
-        self.paste_ctrl_action.triggered.connect(self.paste_atm_point)
-
-        self.track_atm_menu = self.atm_menu.addMenu(
-            _("All Plugins for Track"))
-        self.track_atm_clipboard = []
-
-        self.copy_track_region_action = self.track_atm_menu.addAction(
-            _("Copy Region"))
-        self.copy_track_region_action.triggered.connect(
-            self.copy_track_region)
-        self.paste_track_region_action = self.track_atm_menu.addAction(
-            _("Paste Region"))
-        self.paste_track_region_action.triggered.connect(
-            self.paste_track_region)
-        self.track_atm_menu.addSeparator()
-        self.clear_track_region_action = self.track_atm_menu.addAction(
-            _("Clear Region"))
-        self.clear_track_region_action.triggered.connect(
-            self.clear_track_region)
-
-        self.atm_clear_menu = self.atm_menu.addMenu(_("Clear All"))
-
-        #self.clear_port_action = self.atm_clear_menu.addAction(
-        #    _("Current Control"))
-        #self.clear_port_action.triggered.connect(self.clear_port)
-
-        self.atm_clear_menu.addSeparator()
-        self.clear_plugin_action = self.atm_clear_menu.addAction(
-            _("Current Plugin"))
-        self.clear_plugin_action.triggered.connect(self.clear_plugin)
-
-        self.atm_clear_menu.addSeparator()
-        self.clear_track_action = self.atm_clear_menu.addAction(
-            _("Track"))
-        self.clear_track_action.triggered.connect(self.clear_track)
-
-        self.transform_atm_action = self.atm_menu.addAction(_("Transform..."))
-        self.transform_atm_action.triggered.connect(self.transform_atm)
-
-        self.lfo_atm_action = self.atm_menu.addAction(_("LFO Tool..."))
-        self.lfo_atm_action.triggered.connect(self.lfo_atm)
-
-        self.atm_menu.addSeparator()
-
-        self.break_atm_action = self.atm_menu.addAction(
-            _("Break after selected automation point(s)"))
-        self.break_atm_action.triggered.connect(self.break_atm)
-        self.break_atm_action.setShortcut(QKeySequence.fromString("CTRL+B"))
-        self.addAction(self.break_atm_action)
-
-        self.unbreak_atm_action = self.atm_menu.addAction(
-            _("Un-break after selected automation point(s)"))
-        self.unbreak_atm_action.triggered.connect(self.unbreak_atm)
-        self.unbreak_atm_action.setShortcut(
-            QKeySequence.fromString("CTRL+SHIFT+B"))
-        self.addAction(self.unbreak_atm_action)
-
-        self.atm_menu.addSeparator()
-
-        self.delete_action = self.menu.addAction(_("Delete"))
-        self.delete_action.triggered.connect(self.delete_selected)
-        self.delete_action.setShortcut(QKeySequence.Delete)
-        self.addAction(self.delete_action)
-        self.atm_menu.addAction(self.delete_action)
-
-        self.menu.addSeparator()
-
-        self.takes_menu = self.menu.addMenu(_("Takes"))
-        self.takes_menu.triggered.connect(self.takes_menu_triggered)
-
-        self.unlink_selected_action = self.menu.addAction(
-            _("Create New Take for Item(s)"))
-        self.unlink_selected_action.setShortcut(
-            QKeySequence.fromString("CTRL+U"))
-        self.unlink_selected_action.triggered.connect(
-            self.on_auto_unlink_selected)
-        self.addAction(self.unlink_selected_action)
-
-        self.unlink_unique_action = self.menu.addAction(
-            _("Create New Take for Unique Item(s)"))
-        self.unlink_unique_action.setShortcut(
-            QKeySequence.fromString("ALT+U"))
-        self.unlink_unique_action.triggered.connect(self.on_auto_unlink_unique)
-        self.addAction(self.unlink_unique_action)
-
-        self.unlink_action = self.menu.addAction(
-            _("Create Named Take for Single Item..."))
-        self.unlink_action.triggered.connect(self.on_unlink_item)
-        self.addAction(self.unlink_action)
-
-        self.menu.addSeparator()
-
-        self.rename_action = self.menu.addAction(
-            _("Rename Selected Item(s)..."))
-        self.rename_action.triggered.connect(self.on_rename_items)
-        self.addAction(self.rename_action)
-
-        self.transpose_action = self.menu.addAction(_("Transpose..."))
-        self.transpose_action.triggered.connect(self.transpose_dialog)
-        self.addAction(self.transpose_action)
-
-        self.glue_action = self.menu.addAction(_("Glue Selected"))
-        self.glue_action.triggered.connect(self.glue_selected)
-        self.glue_action.setShortcut(
-            QKeySequence.fromString("CTRL+G"))
-        self.addAction(self.glue_action)
         self.context_menu_enabled = True
-
-    def break_atm(self, checked=False, new_val=1):
-        if REGION_EDITOR_MODE != 1:
-            return
-        assert new_val in (0, 1), "Unexpected value '{}'".format(new_val)
-        points = [x.item for x in self.get_selected_points()]
-        if points:
-            for point in points:
-                point.break_after = new_val
-            self.automation_save_callback()
-
-    def unbreak_atm(self):
-        self.break_atm(new_val=0)
-
-    def clear_port(self):
-        if not self.current_coord:
-            return
-        f_track = self.current_coord[0]
-        f_track_port_num, f_track_index = shared.TRACK_PANEL.has_automation(f_track)
-        if f_track_port_num is None:
-            QMessageBox.warning(
-                self, _("Error"),
-                _("No automation selected for this track"))
-            return
-        f_index, f_plugin = shared.TRACK_PANEL.get_atm_params(f_track)
-        shared.ATM_REGION.clear_port(f_index, f_track_port_num)
-        self.automation_save_callback()
-
-    def clear_plugin(self):
-        if not self.current_coord:
-            return
-        f_track = self.current_coord[0]
-        f_track_port_num, f_track_index = shared.TRACK_PANEL.has_automation(f_track)
-        if f_track_port_num is None:
-            QMessageBox.warning(
-                self, _("Error"),
-                _("No automation selected for this track"))
-            return
-        f_index, f_plugin = shared.TRACK_PANEL.get_atm_params(f_track)
-        shared.ATM_REGION.clear_plugins([f_index])
-        self.automation_save_callback()
-
-    def clear_track(self):
-        if not self.current_coord:
-            return
-        f_track = self.current_coord[0]
-        f_plugins = shared.PROJECT.get_track_plugin_uids(f_track)
-        if not f_plugins:
-            return
-        shared.ATM_REGION.clear_plugins(f_plugins)
-        self.automation_save_callback()
-
-    def copy_track_region(self):
-        if not self.current_coord:
-            return
-        f_range = self.get_loop_pos()
-        if not f_range:
-            return
-        f_start, f_end = f_range
-        f_track = self.current_coord[0]
-        f_plugins = shared.PROJECT.get_track_plugin_uids(f_track)
-        if not f_plugins:
-            return
-        self.track_atm_clipboard = shared.ATM_REGION.copy_range_by_plugins(
-            f_start, f_end, f_plugins)
-        self.automation_save_callback()
-
-    def paste_track_region(self):
-        if not self.current_coord or not self.track_atm_clipboard:
-            return
-        f_beat = self.quantize(self.current_coord[1])
-        for f_point in (x.clone() for x in self.track_atm_clipboard):
-            f_point.beat += f_beat
-            shared.ATM_REGION.add_point(f_point)
-        self.automation_save_callback()
-
-    def clear_track_region(self):
-        if not self.current_coord:
-            return
-        f_range = self.get_loop_pos()
-        if not f_range:
-            return
-        f_start, f_end = f_range
-        f_track, f_beat = self.current_coord[:2]
-        f_plugins = shared.PROJECT.get_track_plugin_uids(f_track)
-        if not f_plugins:
-            return
-        shared.ATM_REGION.clear_range_by_plugins(f_start, f_end, f_plugins)
-        self.automation_save_callback()
-
-    def takes_menu_triggered(self, a_action):
-        f_uid = self.current_item.audio_item.item_uid
-        f_new_uid = a_action.item_uid
-        for f_item in self.get_selected_items():
-            if f_item.audio_item.item_uid == f_uid:
-                f_item_obj = f_item.audio_item
-                shared.CURRENT_REGION.remove_item_ref(f_item_obj)
-                f_item_obj.uid = f_new_uid
-                self.selected_item_strings.add(str(f_item_obj))
-                f_item_ref = f_item_obj.clone()
-                f_item_ref.item_uid = f_new_uid
-                shared.CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
-        shared.PROJECT.save_region(shared.CURRENT_REGION)
-        shared.PROJECT.commit(_("Change active take"))
-        shared.REGION_SETTINGS.open_region()
 
     def populate_takes_menu(self):
         self.takes_menu.clear()
@@ -1273,11 +1049,11 @@ class ItemSequencer(QGraphicsView):
         if not self.context_menu_enabled:
             self.context_menu_enabled = True
             return
-        if REGION_EDITOR_MODE == 0:
+        if _shared.REGION_EDITOR_MODE == 0:
             self.populate_takes_menu()
-            self.menu.exec_(QCursor.pos())
-        elif REGION_EDITOR_MODE == 1:
-            self.atm_menu.exec_(QCursor.pos())
+            context_menu.exec_(QCursor.pos())
+        elif _shared.REGION_EDITOR_MODE == 1:
+            atm_context_menu.exec_(QCursor.pos())
         self.context_menu_enabled = False
 
     def get_item(self, a_pos):
@@ -1309,7 +1085,7 @@ class ItemSequencer(QGraphicsView):
 
         if a_event.button() == QtCore.Qt.RightButton:
             if self.current_coord:
-                if REGION_EDITOR_MODE == 0:
+                if _shared.REGION_EDITOR_MODE == 0:
                     self.current_item = self.get_item(f_pos)
                     if self.current_item and \
                     not self.current_item.isSelected():
@@ -1318,7 +1094,7 @@ class ItemSequencer(QGraphicsView):
                         self.selected_item_strings = {
                             self.current_item.get_selected_string()}
                 self.show_context_menu()
-        elif REGION_EDITOR_MODE == 0:
+        elif _shared.REGION_EDITOR_MODE == 0:
             self.current_item = self.get_item(f_pos)
             self.setDragMode(QGraphicsView.RubberBandDrag)
             if shared.EDITOR_MODE == shared.EDITOR_MODE_SELECT:
@@ -1365,7 +1141,7 @@ class ItemSequencer(QGraphicsView):
                 else:
                     self.clear_selected_item_strings()
 
-        elif REGION_EDITOR_MODE == 1:
+        elif _shared.REGION_EDITOR_MODE == 1:
             self.setDragMode(QGraphicsView.NoDrag)
             self.atm_select_pos_x = None
             self.atm_select_track = None
@@ -1401,13 +1177,13 @@ class ItemSequencer(QGraphicsView):
 
     def sceneMouseMoveEvent(self, a_event):
         QGraphicsScene.mouseMoveEvent(self.scene, a_event)
-        if REGION_EDITOR_MODE == 0:
+        if _shared.REGION_EDITOR_MODE == 0:
             if REGION_EDITOR_DELETE_MODE:
                 f_item = self.get_item(a_event.scenePos())
                 if f_item and not f_item.audio_item in self.deleted_items:
                     f_item.hide()
                     self.deleted_items.append(f_item.audio_item)
-        elif REGION_EDITOR_MODE == 1:
+        elif _shared.REGION_EDITOR_MODE == 1:
             if self.atm_select_pos_x is not None:
                 f_pos_x = a_event.scenePos().x()
                 f_vals = sorted((f_pos_x, self.atm_select_pos_x))
@@ -1420,7 +1196,7 @@ class ItemSequencer(QGraphicsView):
                         f_item.setSelected(False)
 
     def sceneMouseReleaseEvent(self, a_event):
-        if REGION_EDITOR_MODE == 0:
+        if _shared.REGION_EDITOR_MODE == 0:
             if REGION_EDITOR_DELETE_MODE:
                 region_editor_set_delete_mode(False)
                 self.scene.clearSelection()
@@ -1433,7 +1209,7 @@ class ItemSequencer(QGraphicsView):
                 libmk.clean_wav_pool()
             else:
                 QGraphicsScene.mouseReleaseEvent(self.scene, a_event)
-        elif REGION_EDITOR_MODE == 1:
+        elif _shared.REGION_EDITOR_MODE == 1:
             if self.atm_delete:
                 self.delete_selected_atm(self.atm_select_track)
             elif shared.EDITOR_MODE == shared.EDITOR_MODE_DRAW:
@@ -1518,9 +1294,9 @@ class ItemSequencer(QGraphicsView):
                     yield f_point
 
     def open_region(self):
-        if REGION_EDITOR_MODE == 0:
+        if _shared.REGION_EDITOR_MODE == 0:
             shared.SEQUENCER.setDragMode(QGraphicsView.NoDrag)
-        elif REGION_EDITOR_MODE == 1:
+        elif _shared.REGION_EDITOR_MODE == 1:
             shared.SEQUENCER.setDragMode(QGraphicsView.RubberBandDrag)
         self.enabled = False
         global CACHED_SEQ_LEN
@@ -1541,7 +1317,7 @@ class ItemSequencer(QGraphicsView):
                 self.selected_item_strings:
                     f_new_item.setSelected(True)
         self.ignore_selection_change = False
-        if REGION_EDITOR_MODE == 1:
+        if _shared.REGION_EDITOR_MODE == 1:
             self.open_atm_region()
             shared.TRACK_PANEL.update_ccs_in_use()
         f_scrollbar.setValue(f_scrollbar_value)
@@ -1617,24 +1393,6 @@ class ItemSequencer(QGraphicsView):
     def get_selected(self):
         return [x for x in self.audio_items if x.isSelected()]
 
-    def delete_selected(self):
-        if self.check_running():
-            return
-        if REGION_EDITOR_MODE == 0:
-            f_item_list = self.get_selected()
-            self.clear_selected_item_strings()
-            if f_item_list:
-                for f_item in f_item_list:
-                    shared.CURRENT_REGION.remove_item_ref(f_item.audio_item)
-                shared.PROJECT.save_region(shared.CURRENT_REGION)
-                shared.PROJECT.commit(_("Delete item(s)"))
-                shared.REGION_SETTINGS.open_region()
-                libmk.clean_wav_pool()
-        elif REGION_EDITOR_MODE == 1:
-            for f_point in self.get_selected_points():
-                shared.ATM_REGION.remove_point(f_point.item)
-            self.automation_save_callback()
-
     def set_tooltips(self, a_on):
         if a_on:
             self.setToolTip(dn_strings.sequencer)
@@ -1655,11 +1413,11 @@ class ItemSequencer(QGraphicsView):
     def highlight_selected(self):
         self.setUpdatesEnabled(False)
         self.has_selected = False
-        if REGION_EDITOR_MODE == 0:
+        if _shared.REGION_EDITOR_MODE == 0:
             for f_item in self.audio_items:
                 f_item.set_brush()
                 self.has_selected = True
-        elif REGION_EDITOR_MODE == 1:
+        elif _shared.REGION_EDITOR_MODE == 1:
             for f_item in self.get_all_points():
                 f_item.set_brush()
                 self.has_selected = True
@@ -1820,9 +1578,9 @@ class ItemSequencer(QGraphicsView):
 
     def start_playback(self):
         self.playback_pos_orig = self.playback_pos
-        if REGION_EDITOR_MODE == 0:
+        if _shared.REGION_EDITOR_MODE == 0:
             self.set_selected_strings()
-        elif REGION_EDITOR_MODE == 1:
+        elif _shared.REGION_EDITOR_MODE == 1:
             self.set_selected_point_strings()
 
     def set_playback_clipboard(self):
@@ -2084,509 +1842,6 @@ class ItemSequencer(QGraphicsView):
         shared.PROJECT.save_atm_region(shared.ATM_REGION)
         if a_open:
             self.open_region()
-
-    def transform_atm_callback(self, a_add, a_mul):
-        self.setUpdatesEnabled(False)
-        for f_point, f_val in zip(self.atm_selected, self.atm_selected_vals):
-            f_val = (f_val * a_mul) + a_add
-            f_val = pydaw_util.pydaw_clip_value(f_val, 0.0, 127.0, True)
-            f_point.item.cc_val = f_val
-            f_point.setPos(self.get_pos_from_point(f_point.item))
-        self.setUpdatesEnabled(True)
-        self.update()
-
-    def transform_atm(self):
-        self.atm_selected = sorted(self.get_selected_points())
-        if not self.atm_selected:
-            QMessageBox.warning(
-                self, _("Error"), _("No automation points selected"))
-            return
-        f_start_beat = self.atm_selected[0].item.beat
-        self.set_playback_pos(f_start_beat)
-        f_scrollbar = self.horizontalScrollBar()
-        f_scrollbar.setValue(SEQUENCER_PX_PER_BEAT * f_start_beat)
-
-        self.atm_selected_vals = [x.item.cc_val for x in self.atm_selected]
-
-        f_result = pydaw_widgets.add_mul_dialog(
-            self.transform_atm_callback,
-            lambda : self.automation_save_callback(a_open=False))
-
-        if not f_result:
-            for f_point, f_val in zip(
-            self.atm_selected, self.atm_selected_vals):
-                f_point.item.cc_val = f_val
-            self.automation_save_callback()
-        else:
-            self.open_region()
-
-    def lfo_atm_callback(
-            self, a_phase, a_start_freq, a_start_amp, a_start_center,
-            a_start_fade, a_end_fade, a_end_freq, a_end_amp, a_end_center):
-        a_phase, a_start_freq, a_start_fade, a_end_freq, a_end_fade = (
-            x * 0.01 for x in
-            (a_phase, a_start_freq, a_start_fade, a_end_freq, a_end_fade))
-        a_phase *= math.pi
-        f_start_beat, f_end_beat = self.get_loop_pos()
-
-        f_length_beats = f_end_beat - f_start_beat
-        two_pi = 2.0 * math.pi
-        f_start_radians_p64, f_end_radians_p64 = (
-            (x * two_pi) / 8.0 for x in (a_start_freq, a_end_freq))
-        f_length_beats_recip = 1.0 / f_length_beats
-
-        self.setUpdatesEnabled(False)
-
-        for f_point in self.atm_selected:
-            f_pos_beats = f_point.item.beat - f_start_beat
-            f_pos = f_pos_beats * f_length_beats_recip
-            f_center = pydaw_util.linear_interpolate(
-                a_start_center, a_end_center, f_pos)
-            f_amp = pydaw_util.linear_interpolate(
-                a_start_amp, a_end_amp, f_pos)
-
-            if f_pos < a_start_fade:
-                f_amp *= f_pos / a_start_fade
-            elif f_pos > a_end_fade:
-                f_amp *= 1.0 - (
-                    (f_pos - a_end_fade) / (1.0 - a_end_fade))
-
-            f_val = (math.sin(a_phase) * f_amp) + f_center
-            f_val = pydaw_util.pydaw_clip_value(f_val, 0.0, 127.0, True)
-            f_point.item.cc_val = f_val
-            f_point.setPos(self.get_pos_from_point(f_point.item))
-
-            a_phase += pydaw_util.linear_interpolate(
-                f_start_radians_p64, f_end_radians_p64, f_pos)
-            if a_phase >= two_pi:
-                a_phase -= two_pi
-
-        self.setUpdatesEnabled(True)
-        self.update()
-
-    def lfo_atm(self):
-        if not self.current_coord:
-            return
-        f_range = self.get_loop_pos()
-        if not f_range:
-            return
-        f_start_beat, f_end_beat = f_range
-        if f_end_beat - f_start_beat > 64:
-            QMessageBox.warning(
-                self, _("Error"),
-                _("LFO patterns are limited to 64 beats in length"))
-            return
-        f_scrollbar = self.horizontalScrollBar()
-        f_scrollbar.setValue(SEQUENCER_PX_PER_BEAT * f_start_beat)
-        self.set_playback_pos(f_start_beat)
-        f_step = 1.0 / 16.0
-        f_track, f_beat, f_val = self.current_coord
-        f_index, f_plugin = shared.TRACK_PANEL.get_atm_params(f_track)
-        if f_index is None:
-            QMessageBox.warning(
-                self, _("Error"), _("Track has no automation selected"))
-            return
-
-        f_port, f_atm_uid = shared.TRACK_PANEL.has_automation(f_track)
-        f_old = shared.ATM_REGION.clear_range(
-            f_index, f_port, f_start_beat, f_end_beat)
-        if f_old:
-            self.automation_save_callback()
-        f_pos = f_start_beat
-        self.scene.clearSelection()
-        self.atm_selected = []
-
-        for f_i in range(int((f_end_beat - f_start_beat) / f_step)):
-            f_point = project.pydaw_atm_point(
-                f_pos, f_port, 64.0, f_index, f_plugin)
-            shared.ATM_REGION.add_point(f_point)
-            f_item = self.draw_point(f_point)
-            self.atm_selected.append(f_item)
-            f_pos += f_step
-
-        f_result = pydaw_widgets.lfo_dialog(
-            self.lfo_atm_callback,
-            lambda : self.automation_save_callback(a_open=False))
-
-        if not f_result:
-            for f_point in self.atm_selected:
-                shared.ATM_REGION.remove_point(f_point.item)
-            if f_old:
-                for f_point in f_old:
-                    shared.ATM_REGION.add_point(f_point)
-            self.automation_save_callback()
-        else:
-            self.open_region()
-
-    def transpose_dialog(self):
-        if REGION_EDITOR_MODE != 0:
-            return
-        f_item_set = {x.name for x in self.get_selected_items()}
-        if len(f_item_set) == 0:
-            QMessageBox.warning(
-                shared.MAIN_WINDOW, _("Error"), _("No items selected"))
-            return
-
-        def transpose_ok_handler():
-            for f_item_name in f_item_set:
-                f_item = shared.PROJECT.get_item_by_name(f_item_name)
-                f_item.transpose(
-                    f_semitone.value(), f_octave.value(),
-                    a_selected_only=False,
-                    a_duplicate=f_duplicate_notes.isChecked())
-                shared.PROJECT.save_item(f_item_name, f_item)
-            shared.PROJECT.commit(_("Transpose item(s)"))
-            if shared.CURRENT_ITEM:
-                global_open_items(shared.CURRENT_ITEM_NAME)
-            if f_duplicate_notes.isChecked():
-                shared.REGION_SETTINGS.open_region()
-            f_window.close()
-
-        def transpose_cancel_handler():
-            f_window.close()
-
-        f_window = QDialog(shared.MAIN_WINDOW)
-        f_window.setWindowTitle(_("Transpose"))
-        f_layout = QGridLayout()
-        f_window.setLayout(f_layout)
-
-        f_semitone = QSpinBox()
-        f_semitone.setRange(-12, 12)
-        f_layout.addWidget(QLabel(_("Semitones")), 0, 0)
-        f_layout.addWidget(f_semitone, 0, 1)
-        f_octave = QSpinBox()
-        f_octave.setRange(-5, 5)
-        f_layout.addWidget(QLabel(_("Octaves")), 1, 0)
-        f_layout.addWidget(f_octave, 1, 1)
-        f_duplicate_notes = QCheckBox(_("Duplicate notes?"))
-        f_duplicate_notes.setToolTip(
-            _("Checking this box causes the transposed "
-            "notes to be added rather than moving the existing notes."))
-        f_layout.addWidget(f_duplicate_notes, 2, 1)
-        f_ok = QPushButton(_("OK"))
-        f_ok.pressed.connect(transpose_ok_handler)
-        f_layout.addWidget(f_ok, 6, 0)
-        f_cancel = QPushButton(_("Cancel"))
-        f_cancel.pressed.connect(transpose_cancel_handler)
-        f_layout.addWidget(f_cancel, 6, 1)
-        f_window.exec_()
-
-    def glue_selected(self):
-        if libmk.IS_PLAYING:
-            return
-        f_did_something = False
-        f_selected = [x.audio_item for x in self.get_selected()]
-        for f_i in range(project.TRACK_COUNT_ALL):
-            f_track_items = [x for x in f_selected if x.track_num == f_i]
-            if len(f_track_items) > 1:
-                f_did_something = True
-                f_track_items.sort()
-                f_new_ref = f_track_items[0].clone()
-                f_items_dict = shared.PROJECT.get_items_dict()
-                f_old_name = f_items_dict.get_name_by_uid(f_new_ref.item_uid)
-                f_new_name = shared.PROJECT.get_next_default_item_name(
-                    f_old_name, f_items_dict)
-                f_new_uid = shared.PROJECT.create_empty_item(f_new_name)
-                f_new_item = shared.PROJECT.get_item_by_uid(f_new_uid)
-                f_tempo = shared.CURRENT_REGION.get_tempo_at_pos(f_new_ref.start_beat)
-                f_last_ref = f_track_items[-1]
-                f_new_ref.item_uid = f_new_uid
-                f_new_ref.length_beats = (f_last_ref.start_beat -
-                    f_new_ref.start_beat) + f_last_ref.length_beats
-                shared.CURRENT_REGION.add_item_ref_by_uid(f_new_ref)
-                f_first = True
-                for f_ref in f_track_items:
-                    f_tempo = shared.CURRENT_REGION.get_tempo_at_pos(f_ref.start_beat)
-                    f_item = shared.PROJECT.get_item_by_uid(f_ref.item_uid)
-                    f_new_item.extend(f_new_ref, f_ref, f_item, f_tempo)
-                    if not f_first:
-                        shared.CURRENT_REGION.remove_item_ref(f_ref)
-                    else:
-                        f_first = False
-                pydaw_util.print_sorted_dict(locals())
-                shared.PROJECT.save_item(f_new_name, f_new_item)
-        if f_did_something:
-            shared.PROJECT.save_region(shared.CURRENT_REGION)
-            shared.PROJECT.commit(_("Glue sequencer items"))
-            shared.REGION_SETTINGS.open_region()
-        else:
-            QMessageBox.warning(
-                shared.MAIN_WINDOW, _("Error"),
-                _("You must select at least 2 items on one or more tracks"))
-
-
-    def cut_selected(self):
-        self.copy_selected()
-        self.delete_selected()
-
-    def on_rename_items(self):
-        if REGION_EDITOR_MODE != 0:
-            return
-        f_result = []
-        for f_item_name in (x.name for x in self.get_selected_items()):
-            if not f_item_name in f_result:
-                f_result.append(f_item_name)
-        if not f_result:
-            return
-
-        def ok_handler():
-            f_new_name = str(f_new_lineedit.text())
-            if f_new_name == "":
-                QMessageBox.warning(
-                    self.group_box, _("Error"), _("Name cannot be blank"))
-                return
-            global REGION_CLIPBOARD
-            #Clear the clipboard, otherwise the names could be invalid
-            REGION_CLIPBOARD = []
-            shared.PROJECT.rename_items(f_result, f_new_name)
-            shared.PROJECT.commit(_("Rename items"))
-            shared.REGION_SETTINGS.open_region()
-            if shared.DRAW_LAST_ITEMS:
-                global_open_items()
-            f_window.close()
-
-        def cancel_handler():
-            f_window.close()
-
-        def on_name_changed():
-            f_new_lineedit.setText(
-                pydaw_remove_bad_chars(f_new_lineedit.text()))
-
-        f_window = QDialog(shared.MAIN_WINDOW)
-        f_window.setWindowTitle(_("Rename selected items..."))
-        f_layout = QGridLayout()
-        f_window.setLayout(f_layout)
-        f_new_lineedit = QLineEdit()
-        f_new_lineedit.editingFinished.connect(on_name_changed)
-        f_new_lineedit.setMaxLength(24)
-        f_layout.addWidget(QLabel(_("New name:")), 0, 0)
-        f_layout.addWidget(f_new_lineedit, 0, 1)
-        f_ok_button = QPushButton(_("OK"))
-        f_layout.addWidget(f_ok_button, 5, 0)
-        f_ok_button.clicked.connect(ok_handler)
-        f_cancel_button = QPushButton(_("Cancel"))
-        f_layout.addWidget(f_cancel_button, 5, 1)
-        f_cancel_button.clicked.connect(cancel_handler)
-        f_window.exec_()
-
-    def on_unlink_item(self):
-        """ Rename a single instance of an item and
-            make it into a new item
-        """
-        if REGION_EDITOR_MODE != 0:
-            return
-
-        if not self.current_coord or not self.current_item:
-            return
-
-        f_uid_dict = shared.PROJECT.get_items_dict()
-        f_current_item = self.current_item.audio_item
-
-        f_current_item_text = f_uid_dict.get_name_by_uid(
-            f_current_item.item_uid)
-
-        def note_ok_handler():
-            f_cell_text = str(f_new_lineedit.text())
-            if f_cell_text == f_current_item_text:
-                QMessageBox.warning(
-                    self.group_box, _("Error"),
-                    _("You must choose a different name than the "
-                    "original item"))
-                return
-            if shared.PROJECT.item_exists(f_cell_text):
-                QMessageBox.warning(
-                    self.group_box, _("Error"),
-                    _("An item with this name already exists."))
-                return
-            f_uid = shared.PROJECT.copy_item(
-                f_current_item_text, str(f_new_lineedit.text()))
-            self.last_item_copied = f_cell_text
-
-            f_item_ref = f_current_item.clone()
-            f_takes = shared.PROJECT.get_takes()
-            f_takes.add_item(f_current_item.item_uid, f_uid)
-            f_item_ref.item_uid = f_uid
-            shared.CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
-            shared.PROJECT.save_takes(f_takes)
-            shared.PROJECT.save_region(shared.CURRENT_REGION)
-            shared.PROJECT.commit(
-                _("Unlink item '{}' as '{}'").format(
-                f_current_item_text, f_cell_text))
-            self.open_region()
-            f_window.close()
-
-        def note_cancel_handler():
-            f_window.close()
-
-        def on_name_changed():
-            f_new_lineedit.setText(
-                pydaw_remove_bad_chars(f_new_lineedit.text()))
-
-        f_window = QDialog(shared.MAIN_WINDOW)
-        f_window.setWindowTitle(_("Copy and unlink item..."))
-        f_layout = QGridLayout()
-        f_window.setLayout(f_layout)
-        f_new_lineedit = QLineEdit(f_current_item_text)
-        f_new_lineedit.editingFinished.connect(on_name_changed)
-        f_new_lineedit.setMaxLength(24)
-        f_layout.addWidget(QLabel(_("New name:")), 0, 0)
-        f_layout.addWidget(f_new_lineedit, 0, 1)
-        f_ok_button = QPushButton(_("OK"))
-        f_layout.addWidget(f_ok_button, 5, 0)
-        f_ok_button.clicked.connect(note_ok_handler)
-        f_cancel_button = QPushButton(_("Cancel"))
-        f_layout.addWidget(f_cancel_button, 5, 1)
-        f_cancel_button.clicked.connect(note_cancel_handler)
-        f_window.exec_()
-
-    def on_auto_unlink_selected(self):
-        """ Adds an automatic -N suffix """
-        if REGION_EDITOR_MODE != 0:
-            return
-        f_selected = list(self.get_selected_items())
-        if not f_selected:
-            return
-
-        f_takes = shared.PROJECT.get_takes()
-
-        self.selected_item_strings = set()
-        for f_item in sorted(
-        f_selected, key=lambda x:
-        (x.audio_item.track_num, x.audio_item.start_beat)):
-            f_name_suffix = 1
-            while shared.PROJECT.item_exists(
-            "{}-{}".format(f_item.name, f_name_suffix)):
-                f_name_suffix += 1
-            f_cell_text = "{}-{}".format(f_item.name, f_name_suffix)
-            f_uid = shared.PROJECT.copy_item(f_item.name, f_cell_text)
-            f_item_obj = f_item.audio_item
-            f_takes.add_item(f_item_obj.item_uid, f_uid)
-            shared.CURRENT_REGION.remove_item_ref(f_item_obj)
-            f_item_obj.uid = f_uid
-            f_item_ref = f_item_obj.clone()
-            f_item_ref.item_uid = f_uid
-            self.selected_item_strings.add(str(f_item_ref))
-            shared.CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
-        shared.PROJECT.save_region(shared.CURRENT_REGION)
-        shared.PROJECT.save_takes(f_takes)
-        shared.PROJECT.commit(_("Auto-Unlink items"))
-        shared.REGION_SETTINGS.open_region()
-
-    def on_auto_unlink_unique(self):
-        if REGION_EDITOR_MODE != 0:
-            return
-        f_result = [(x.name, x.audio_item) for x in self.get_selected_items()]
-
-        if not f_result:
-            return
-
-        old_new_map = {}
-
-        f_takes = shared.PROJECT.get_takes()
-
-        for f_item_name in set(x[0] for x in f_result):
-            f_name_suffix = 1
-            while shared.PROJECT.item_exists(
-            "{}-{}".format(f_item_name, f_name_suffix)):
-                f_name_suffix += 1
-            f_cell_text = "{}-{}".format(f_item_name, f_name_suffix)
-            f_uid = shared.PROJECT.copy_item(f_item_name, f_cell_text)
-            old_new_map[f_item_name] = f_uid
-
-        self.selected_item_strings = set()
-
-        for k, v in f_result:
-            shared.CURRENT_REGION.remove_item_ref(v)
-            f_new_uid = old_new_map[k]
-            f_takes.add_item(v.item_uid, f_new_uid)
-            v.uid = f_new_uid
-            f_item_ref = project.pydaw_sequencer_item(
-                v.track_num, v.start_beat, v.length_beats, f_new_uid)
-            self.selected_item_strings.add(str(f_item_ref))
-            shared.CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
-        shared.PROJECT.save_region(shared.CURRENT_REGION)
-        shared.PROJECT.save_takes(f_takes)
-        shared.PROJECT.commit(_("Auto-Unlink unique items"))
-        shared.REGION_SETTINGS.open_region()
-
-    def copy_selected(self):
-        if not self.enabled:
-            self.warn_no_region_selected()
-            return
-        if REGION_EDITOR_MODE == 0:
-            global REGION_CLIPBOARD
-            REGION_CLIPBOARD = [x.audio_item.clone() for x in
-                self.get_selected_items()]
-            if REGION_CLIPBOARD:
-                REGION_CLIPBOARD.sort()
-                f_start = int(REGION_CLIPBOARD[0].start_beat)
-                for f_item in REGION_CLIPBOARD:
-                    f_item.start_beat -= f_start
-        elif REGION_EDITOR_MODE == 1:
-            global ATM_CLIPBOARD
-            ATM_CLIPBOARD = [x.item.clone() for x in
-                self.get_selected_points(self.current_coord[0])]
-            if ATM_CLIPBOARD:
-                ATM_CLIPBOARD.sort()
-                f_start = int(ATM_CLIPBOARD[0].beat)
-                for f_item in ATM_CLIPBOARD:
-                    f_item.beat -= f_start
-
-    def paste_clipboard(self):
-        if libmk.IS_PLAYING or not self.current_coord:
-            return
-        self.scene.clearSelection()
-        f_track, f_beat, f_val = self.current_coord
-        f_beat = int(f_beat)
-        if REGION_EDITOR_MODE == 0:
-            self.selected_item_strings = set()
-            for f_item in REGION_CLIPBOARD:
-                f_new_item = f_item.clone()
-                f_new_item.start_beat += f_beat
-                shared.CURRENT_REGION.add_item_ref_by_uid(f_new_item)
-                self.selected_item_strings.add(str(f_new_item))
-            shared.PROJECT.save_region(shared.CURRENT_REGION)
-            shared.REGION_SETTINGS.open_region()
-        elif REGION_EDITOR_MODE == 1:
-            f_track_port_num, f_track_index = shared.TRACK_PANEL.has_automation(
-                self.current_coord[0])
-            if f_track_port_num is None:
-                QMessageBox.warning(
-                    self, _("Error"),
-                    _("No automation selected for this track"))
-                return
-            f_track_params = shared.TRACK_PANEL.get_atm_params(f_track)
-            f_end = ATM_CLIPBOARD[-1].beat + f_beat
-            f_point = ATM_CLIPBOARD[0]
-            shared.ATM_REGION.clear_range(
-                f_point.index, f_point.port_num, f_beat, f_end)
-            for f_point in ATM_CLIPBOARD:
-                shared.ATM_REGION.add_point(
-                    pydaw_atm_point(
-                        f_point.beat + f_beat, f_track_port_num,
-                        f_point.cc_val, *f_track_params))
-            self.automation_save_callback()
-
-    def paste_atm_point(self):
-        if libmk.IS_PLAYING:
-            return
-        self.context_menu_enabled = False
-        if pydaw_widgets.CC_CLIPBOARD is None:
-            QMessageBox.warning(
-                self, _("Error"),
-                _("Nothing copied to the clipboard.\n"
-                "Right-click->'Copy' on any knob on any plugin."))
-            return
-        f_track, f_beat, f_val = self.current_coord
-        f_beat = self.quantize(f_beat)
-        f_val = pydaw_widgets.CC_CLIPBOARD
-        f_port, f_index = shared.TRACK_PANEL.has_automation(self.current_coord[0])
-        if f_port is not None:
-            f_point = pydaw_atm_point(
-                f_beat, f_port, f_val, *shared.TRACK_PANEL.get_atm_params(f_track))
-            shared.ATM_REGION.add_point(f_point)
-            self.draw_point(f_point)
-            self.automation_save_callback()
 
 class SeqTrack:
     """ The widget that contains the controls for an individual track
@@ -3628,8 +2883,7 @@ class RegionSettings:
         shared.MAIN_WINDOW.tab_changed()
 
     def edit_mode_changed(self, a_value=None):
-        global REGION_EDITOR_MODE
-        REGION_EDITOR_MODE = a_value
+        _shared.REGION_EDITOR_MODE = a_value
         shared.SEQUENCER.open_region()
 
     def toggle_hide_inactive(self):
