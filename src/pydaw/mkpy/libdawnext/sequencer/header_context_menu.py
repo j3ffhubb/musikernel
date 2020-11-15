@@ -1,3 +1,4 @@
+from . import _shared
 from mkpy.libdawnext import project, shared
 from mkpy.libdawnext.project import *
 from mkpy.libdawnext.shared import *
@@ -19,7 +20,7 @@ class TempoMarkerEvent:
 def show(event):
     shared.SEQUENCER.context_menu_enabled = False
     shared.SEQUENCER.header_event_pos = int(
-        event.pos().x() / SEQUENCER_PX_PER_BEAT
+        event.pos().x() / _shared.SEQUENCER_PX_PER_BEAT
     )
     menu = QMenu(shared.MAIN_WINDOW)
     marker_action = menu.addAction(_("Text Marker..."))
@@ -40,10 +41,10 @@ def show(event):
         loop_end_action = menu.addAction(_("Set Region End"))
         loop_end_action.triggered.connect(header_loop_end)
         select_region = menu.addAction(_("Select Items in Region"))
-        select_region.triggered.connect(select_region_items)
+        select_region.triggered.connect(shared.SEQUENCER.select_region_items)
         copy_region_action = menu.addAction(_("Copy Region"))
         copy_region_action.triggered.connect(copy_region)
-        if shared.CURRENT_REGION.region_clipboard:
+        if shared.SEQUENCER.region_clipboard:
             insert_region_action = menu.addAction(_("Insert Region"))
             insert_region_action.triggered.connect(insert_region)
     menu.exec_(QCursor.pos())
@@ -51,7 +52,7 @@ def show(event):
 def header_time_modify():
     def ok_handler():
         marker = project.pydaw_tempo_marker(
-            shared.CURRENT_REGION.header_event_pos, tempo.value(),
+            shared.SEQUENCER.header_event_pos, tempo.value(),
             tsig_num.value(), int(str(tsig_den.currentText())))
         shared.CURRENT_REGION.set_marker(marker)
         shared.PROJECT.save_region(shared.CURRENT_REGION)
@@ -61,10 +62,10 @@ def header_time_modify():
 
     def delete_handler():
         marker = shared.CURRENT_REGION.has_marker(
-            shared.CURRENT_REGION.header_event_pos,
+            shared.SEQUENCER.header_event_pos,
             2,
         )
-        if marker and shared.CURRENT_REGION.header_event_pos:
+        if marker and shared.SEQUENCER.header_event_pos:
             shared.CURRENT_REGION.delete_marker(marker)
             shared.PROJECT.save_region(shared.CURRENT_REGION)
             shared.PROJECT.commit(_("Delete tempo marker"))
@@ -77,7 +78,7 @@ def header_time_modify():
     window.setLayout(layout)
 
     marker = shared.CURRENT_REGION.has_marker(
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
         2,
     )
 
@@ -111,7 +112,7 @@ def header_time_modify():
     ok = QPushButton(_("Save"))
     ok.pressed.connect(ok_handler)
     layout.addWidget(ok, 6, 0)
-    if shared.CURRENT_REGION.header_event_pos:
+    if shared.SEQUENCER.header_event_pos:
         cancel = QPushButton(_("Delete"))
         cancel.pressed.connect(delete_handler)
     else:
@@ -188,7 +189,7 @@ def header_time_range():
     window.setLayout(layout)
 
     marker = shared.CURRENT_REGION.has_marker(
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
         2,
     )
 
@@ -236,7 +237,7 @@ def header_time_range():
 def header_marker_modify():
     def ok_handler():
         marker = project.pydaw_sequencer_marker(
-            shared.CURRENT_REGION.header_event_pos, text.text())
+            shared.SEQUENCER.header_event_pos, text.text())
         shared.CURRENT_REGION.set_marker(marker)
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Add text marker"))
@@ -245,7 +246,7 @@ def header_marker_modify():
 
     def cancel_handler():
         marker = shared.CURRENT_REGION.has_marker(
-            shared.CURRENT_REGION.header_event_pos,
+            shared.SEQUENCER.header_event_pos,
             3,
         )
         if marker:
@@ -261,7 +262,7 @@ def header_marker_modify():
     window.setLayout(layout)
 
     marker = shared.CURRENT_REGION.has_marker(
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
         3,
     )
 
@@ -279,7 +280,7 @@ def header_marker_modify():
     ok.pressed.connect(ok_handler)
     ok_cancel_layout.addWidget(ok)
     if shared.CURRENT_REGION.has_marker(
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
         3,
     ):
         cancel = QPushButton(_("Delete"))
@@ -291,19 +292,19 @@ def header_marker_modify():
 
 def header_loop_start():
     tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
     )
     if shared.CURRENT_REGION.loop_marker:
         end = pydaw_util.pydaw_clip_min(
             shared.CURRENT_REGION.loop_marker.beat,
-            shared.CURRENT_REGION.header_event_pos + tsig_beats,
+            shared.SEQUENCER.header_event_pos + tsig_beats,
         )
     else:
-        end = shared.CURRENT_REGION.header_event_pos + tsig_beats
+        end = shared.SEQUENCER.header_event_pos + tsig_beats
 
     marker = project.pydaw_loop_marker(
         end,
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
     )
     shared.CURRENT_REGION.set_loop_marker(marker)
     shared.PROJECT.save_region(shared.CURRENT_REGION)
@@ -312,10 +313,10 @@ def header_loop_start():
 
 def header_loop_end():
     tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
     )
     shared.CURRENT_REGION.loop_marker.beat = pydaw_util.pydaw_clip_min(
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
         tsig_beats,
     )
     shared.CURRENT_REGION.loop_marker.start_beat = \
@@ -333,7 +334,7 @@ def copy_region():
     region_length = region_end - region_start
     item_list = [
         x.audio_item.clone()
-        for x in shared.CURRENT_REGION.get_region_items()
+        for x in shared.SEQUENCER.get_region_items()
     ]
     atm_list = shared.ATM_REGION.copy_range_all(
         region_start,
@@ -343,7 +344,7 @@ def copy_region():
         item.start_beat -= region_start
     for point in atm_list:
         point.beat -= region_start
-    shared.CURRENT_REGION.region_clipboard = (
+    shared.SEQUENCER.region_clipboard = (
         region_length,
         item_list,
         atm_list,
@@ -354,18 +355,18 @@ def insert_region():
         region_length,
         item_list,
         atm_list,
-    ) = shared.CURRENT_REGION.region_clipboard
+    ) = shared.SEQUENCER.region_clipboard
     item_list = [x.clone() for x in item_list]
     atm_list = [x.clone() for x in atm_list]
     shared.CURRENT_REGION.insert_space(
-        shared.CURRENT_REGION.header_event_pos,
+        shared.SEQUENCER.header_event_pos,
         region_length,
     )
     for item in item_list:
-        item.start_beat += shared.CURRENT_REGION.header_event_pos
+        item.start_beat += shared.SEQUENCER.header_event_pos
         shared.CURRENT_REGION.add_item_reby_uid(item)
     for point in atm_list:
-        point.beat += shared.CURRENT_REGION.header_event_pos
+        point.beat += shared.SEQUENCER.header_event_pos
         shared.ATM_REGION.add_point(point)
     shared.CURRENT_REGION.automation_save_callback()
     shared.PROJECT.save_region(shared.CURRENT_REGION)

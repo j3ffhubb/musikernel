@@ -1,3 +1,4 @@
+from .audio_input import AudioInputWidget
 from mkpy import libmk
 from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *

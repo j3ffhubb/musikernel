@@ -1,3 +1,4 @@
+from . import _shared
 from mkpy import libmk
 from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
@@ -7,6 +8,9 @@ from mkpy.libpydaw.pydaw_util import *
 from mkpy.libpydaw.translate import _
 from mkpy.mkplugins import *
 from mkpy.mkqt import *
+
+TRACK_COLOR_CLIPBOARD = None
+
 
 class SeqTrack:
     """ The widget that contains the controls for an individual track
@@ -299,15 +303,21 @@ class TrackPanel:
         self.tracks_widget.setContentsMargins(0, 0, 0, 0)
         self.tracks_layout = QVBoxLayout(self.tracks_widget)
         self.tracks_layout.addItem(
-            QSpacerItem(0, REGION_EDITOR_HEADER_HEIGHT + 2.0,
-            vPolicy=QSizePolicy.MinimumExpanding))
+            QSpacerItem(
+                0,
+                _shared.REGION_EDITOR_HEADER_HEIGHT + 2.0,
+                vPolicy=QSizePolicy.MinimumExpanding
+            ),
+        )
         self.tracks_layout.setContentsMargins(0, 0, 0, 0)
-        for i in range(REGION_EDITOR_TRACK_COUNT):
+        for i in range(_shared.REGION_EDITOR_TRACK_COUNT):
             f_track = SeqTrack(i, shared.TRACK_NAMES[i])
             self.tracks[i] = f_track
             self.tracks_layout.addWidget(f_track.group_box)
         self.automation_dict = {
-            x:(None, None) for x in range(REGION_EDITOR_TRACK_COUNT)}
+            x:(None, None) for x in range(
+                _shared.REGION_EDITOR_TRACK_COUNT)
+            }
         self.set_track_height()
 
     def set_tooltips(self, a_on):
@@ -319,9 +329,15 @@ class TrackPanel:
     def set_track_height(self):
         self.tracks_widget.setUpdatesEnabled(False)
         self.tracks_widget.setFixedSize(
-            QtCore.QSize(REGION_TRACK_WIDTH,
-            (shared.REGION_EDITOR_TRACK_HEIGHT * REGION_EDITOR_TRACK_COUNT) +
-            REGION_EDITOR_HEADER_HEIGHT))
+            QtCore.QSize(
+                _shared.REGION_TRACK_WIDTH,
+                (
+                    shared.REGION_EDITOR_TRACK_HEIGHT
+                    *
+                    _shared.REGION_EDITOR_TRACK_COUNT
+                ) + _shared.REGION_EDITOR_HEADER_HEIGHT
+            ),
+        )
         for f_track in self.tracks.values():
             f_track.group_box.setFixedHeight(shared.REGION_EDITOR_TRACK_HEIGHT)
         self.tracks_widget.setUpdatesEnabled(True)

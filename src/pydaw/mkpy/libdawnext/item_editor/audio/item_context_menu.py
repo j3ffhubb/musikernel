@@ -12,7 +12,9 @@ from mkpy.mkqt import *
 import shutil
 
 
-def show_context_menu():
+LAST_AUDIO_ITEM_DIR = global_home
+
+def show():
     f_CURRENT_AUDIO_ITEM_INDEX = _shared.CURRENT_AUDIO_ITEM_INDEX
     _shared.CURRENT_AUDIO_ITEM_INDEX = _shared.CURRENT_ITEM.track_num
     f_menu = QMenu(shared.MAIN_WINDOW)
@@ -154,7 +156,7 @@ def open_in_wave_editor():
     f_path = _shared.CURRENT_ITEM.get_file_path()
     libmk.MAIN_WINDOW.open_in_wave_editor(f_path)
 
-def copy_file_path_to_clipboard(
+def copy_file_path_to_clipboard():
     f_path = _shared.CURRENT_ITEM.get_file_path()
     f_clipboard = QApplication.clipboard()
     f_clipboard.setText(f_path)
@@ -167,7 +169,7 @@ def select_file_instance():
             f_item.setSelected(True)
 
 def replace_with_path_in_clipboard():
-    f_path = global_get_audio_file_from_clipboard()
+    f_path = _shared.global_get_audio_file_from_clipboard()
     if f_path is not None:
         _shared.CURRENT_ITEM.audio_item.uid = \
             libmk.PROJECT.get_wav_uid_by_name(f_path)
@@ -183,7 +185,7 @@ def ts_mode_menu_triggered(a_action):
     f_list = [x.audio_item for x in shared.AUDIO_SEQ.get_selected()]
     for f_item in f_list:
         f_item.time_stretch_mode = f_index
-    _shared.CURRENT_ITEM.timestretch_items(f_list)
+    timestretch_items(f_list)
 
 def output_mode_triggered(a_action):
     f_list = shared.AUDIO_SEQ.get_selected()
@@ -311,13 +313,20 @@ def move_to_region_end():
     f_list = shared.AUDIO_SEQ.get_selected()
     if f_list:
         f_current_region_length = pydaw_get_current_region_length()
-        f_global_tempo = CURRENT_REGION.get_tempo_at_pos(
-            shared.CURRENT_ITEM_REF.start_beat)
+        f_global_tempo = shared.CURRENT_REGION.get_tempo_at_pos(
+            shared.CURRENT_ITEM_REF.start_beat,
+        )
         for f_item in f_list:
             f_item.audio_item.clip_at_region_end(
-                f_current_region_length, f_global_tempo,
-                f_item.graph_object.length_in_seconds, False)
-        shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
+                f_current_region_length,
+                f_global_tempo,
+                f_item.graph_object.length_in_seconds,
+                False,
+            )
+        shared.PROJECT.save_item(
+            shared.CURRENT_ITEM_NAME,
+            shared.CURRENT_ITEM,
+        )
         shared.PROJECT.commit(_("Move audio item(s) to region end"))
         global_open_audio_items(True)
 
@@ -353,4 +362,50 @@ def edit_paif():
     shared.AUDIO_SEQ.scene.clearSelection()
     _shared.CURRENT_ITEM.setSelected(True)
     shared.AUDIO_SEQ_WIDGET.folders_tab_widget.setCurrentIndex(2)
+
+def crisp_menu_triggered(a_action):
+    f_index = CRISPNESS_SETTINGS.index(a_action.crisp_mode)
+    f_list = [
+        x.audio_item
+        for x in shared.AUDIO_SEQ.get_selected()
+        if x.audio_item.time_stretch_mode in (3, 4)
+    ]
+    for f_item in f_list:
+        f_item.crispness = f_index
+    timestretch_items(f_list)
+
+def timestretch_items(a_list):
+    f_stretched_items = []
+    for f_item in a_list:
+        if f_item.time_stretch_mode >= 3:
+            f_ts_result = libmk.PROJECT.timestretch_audio_item(f_item)
+            if f_ts_result is not None:
+                f_stretched_items.append(f_ts_result)
+
+    libmk.PROJECT.save_stretch_dicts()
+
+    for f_stretch_item in f_stretched_items:
+        f_stretch_item[2].wait()
+        libmk.PROJECT.get_wav_uid_by_name(
+            etch_item[0],
+            a_uid=f_stretch_item[1],
+        )
+    for f_audio_item in shared.AUDIO_SEQ.get_selected():
+        f_new_graph = libmk.PROJECT.get_sample_graph_by_uid(
+            f_audio_item.audio_item.uid,
+        )
+        f_audio_item.audio_item.clip_at_region_end(
+            pydaw_get_current_region_length(),
+            shared.CURRENT_REGION.get_tempo_at_pos(
+                shared.CURRENT_ITEM_REF.start_beat,
+            ),
+            f_new_graph.length_in_seconds,
+        )
+
+    shared.PROJECT.save_item(
+        shared.CURRENT_ITEM_NAME,
+        shared.CURRENT_ITEM,
+    )
+    shared.PROJECT.commit(_("Change timestretch mode for audio item(s)"))
+    global_open_audio_items()
 

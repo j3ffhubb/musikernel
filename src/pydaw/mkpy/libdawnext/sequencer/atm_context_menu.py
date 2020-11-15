@@ -6,9 +6,10 @@ from mkpy.libpydaw import (
     pydaw_util,
     pydaw_widgets,
 )
+from mkpy.libpydaw.translate import _
 from mkpy.mkqt import *
 
-MENU = QMenu(shared.SEQUENCER)
+MENU = None
 track_atm_clipboard = []
 
 def clear_plugin():
@@ -338,55 +339,59 @@ def break_atm(checked=False, new_val=1):
 def unbreak_atm():
     break_atm(new_val=0)
 
+def init():
+    global \
+        MENU, \
+        break_atm_action, \
+        unbreak_atm_action
+    MENU = QMenu(shared.SEQUENCER)
+    MENU.addAction(_shared.copy_action)
 
+    paste_action = MENU.addAction(_("Paste"))
+    paste_action.triggered.connect(_shared.paste_clipboard)
 
-MENU.addAction(_shared.copy_action)
+    paste_ctrl_action = MENU.addAction(_("Paste Plugin Control"))
+    paste_ctrl_action.triggered.connect(paste_atm_point)
 
-paste_action = MENU.addAction(_("Paste"))
-paste_action.triggered.connect(_shared.paste_clipboard)
+    track_atm_menu = MENU.addMenu(_("All Plugins for Track"))
 
-paste_ctrl_action = MENU.addAction(_("Paste Plugin Control"))
-paste_ctrl_action.triggered.connect(paste_atm_point)
+    copy_track_region_action = track_atm_menu.addAction(_("Copy Region"))
+    copy_track_region_action.triggered.connect(copy_track_region)
+    paste_track_region_action = track_atm_menu.addAction(_("Paste Region"))
+    paste_track_region_action.triggered.connect(paste_track_region)
+    track_atm_menu.addSeparator()
+    clear_track_region_action = track_atm_menu.addAction(_("Clear Region"))
+    clear_track_region_action.triggered.connect(clear_track_region)
 
-track_atm_menu = MENU.addMenu(_("All Plugins for Track"))
+    atm_clear_menu = MENU.addMenu(_("Clear All"))
 
-copy_track_region_action = track_atm_menu.addAction(_("Copy Region"))
-copy_track_region_action.triggered.connect(copy_track_region)
-paste_track_region_action = track_atm_menu.addAction(_("Paste Region"))
-paste_track_region_action.triggered.connect(paste_track_region)
-track_atm_menu.addSeparator()
-clear_track_region_action = track_atm_menu.addAction(_("Clear Region"))
-clear_track_region_action.triggered.connect(clear_track_region)
+    atm_clear_menu.addSeparator()
+    clear_plugin_action = atm_clear_menu.addAction(_("Current Plugin"))
+    clear_plugin_action.triggered.connect(clear_plugin)
 
-atm_clear_menu = MENU.addMenu(_("Clear All"))
+    atm_clear_menu.addSeparator()
+    clear_track_action = atm_clear_menu.addAction(_("Track"))
+    clear_track_action.triggered.connect(clear_track)
 
-atm_clear_menu.addSeparator()
-clear_plugin_action = atm_clear_menu.addAction(_("Current Plugin"))
-clear_plugin_action.triggered.connect(clear_plugin)
+    transform_atm_action = MENU.addAction(_("Transform..."))
+    transform_atm_action.triggered.connect(transform_atm)
 
-atm_clear_menu.addSeparator()
-clear_track_action = atm_clear_menu.addAction(_("Track"))
-clear_track_action.triggered.connect(clear_track)
+    lfo_atm_action = MENU.addAction(_("LFO Tool..."))
+    lfo_atm_action.triggered.connect(lfo_atm)
 
-transform_atm_action = MENU.addAction(_("Transform..."))
-transform_atm_action.triggered.connect(transform_atm)
+    MENU.addSeparator()
 
-lfo_atm_action = MENU.addAction(_("LFO Tool..."))
-lfo_atm_action.triggered.connect(lfo_atm)
+    break_atm_action = MENU.addAction(
+        _("Break after selected automation point(s)"),
+    )
+    break_atm_action.triggered.connect(break_atm)
+    break_atm_action.setShortcut(QKeySequence.fromString("CTRL+B"))
 
-MENU.addSeparator()
-
-break_atm_action = MENU.addAction(
-    _("Break after selected automation point(s)"),
-)
-break_atm_action.triggered.connect(break_atm)
-break_atm_action.setShortcut(QKeySequence.fromString("CTRL+B"))
-
-unbreak_atm_action = MENU.addAction(
-    _("Un-break after selected automation point(s)"))
-unbreak_atm_action.triggered.connect(unbreak_atm)
-unbreak_atm_action.setShortcut(
-    QKeySequence.fromString("CTRL+SHIFT+B"),
-)
-MENU.addSeparator()
-MENU.addAction(_shared.delete_action)
+    unbreak_atm_action = MENU.addAction(
+        _("Un-break after selected automation point(s)"))
+    unbreak_atm_action.triggered.connect(unbreak_atm)
+    unbreak_atm_action.setShortcut(
+        QKeySequence.fromString("CTRL+SHIFT+B"),
+    )
+    MENU.addSeparator()
+    MENU.addAction(_shared.delete_action)

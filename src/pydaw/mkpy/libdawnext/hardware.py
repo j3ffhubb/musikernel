@@ -31,7 +31,11 @@ class MidiDevice:
         self.suppress_updates = False
 
     def device_changed(self, a_val=None):
-        if SUPPRESS_TRACK_COMBOBOX_CHANGES or self.suppress_updates:
+        if (
+            shared.SUPPRESS_TRACK_COMBOBOX_CHANGES
+            or
+            self.suppress_updates
+        ):
             return
         track_index = self.track_combobox.currentIndex()
         shared.PROJECT.IPC.pydaw_midi_device(

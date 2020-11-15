@@ -1,7 +1,10 @@
 """
 
 """
-from . import _shared
+from . import (
+    item_context_menu,
+    _shared,
+)
 from ..abstract import AbstractItemEditor
 from mkpy import libmk
 from mkpy.libdawnext import project, shared
@@ -19,9 +22,6 @@ from mkpy.mkqt import *
 
 
 PAINTER_PATH_CACHE = {}
-
-
-LAST_AUDIO_ITEM_DIR = global_home
 
 def global_paif_val_callback(a_port, a_val):
     if (
@@ -479,42 +479,6 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
     def copy_as_notes(self):
         shared.PIANO_ROLL_EDITOR.clipboard = en_project.envelope_to_notes(
             self.graph_object, TRANSPORT.tempo_spinbox.value())
-
-    def crisp_menu_triggered(self, a_action):
-        f_index = CRISPNESS_SETTINGS.index(a_action.crisp_mode)
-        f_list = [x.audio_item for x in shared.AUDIO_SEQ.get_selected() if
-            x.audio_item.time_stretch_mode in (3, 4)]
-        for f_item in f_list:
-            f_item.crispness = f_index
-        self.timestretch_items(f_list)
-
-    def timestretch_items(self, a_list):
-        f_stretched_items = []
-        for f_item in a_list:
-            if f_item.time_stretch_mode >= 3:
-                f_ts_result = libmk.PROJECT.timestretch_audio_item(f_item)
-                if f_ts_result is not None:
-                    f_stretched_items.append(f_ts_result)
-
-        libmk.PROJECT.save_stretch_dicts()
-
-        for f_stretch_item in f_stretched_items:
-            f_stretch_item[2].wait()
-            libmk.PROJECT.get_wav_uid_by_name(
-                f_stretch_item[0], a_uid=f_stretch_item[1])
-        for f_audio_item in shared.AUDIO_SEQ.get_selected():
-            f_new_graph = libmk.PROJECT.get_sample_graph_by_uid(
-                f_audio_item.audio_item.uid)
-            f_audio_item.audio_item.clip_at_region_end(
-                pydaw_get_current_region_length(),
-                shared.CURRENT_REGION.get_tempo_at_pos(
-                    shared.CURRENT_ITEM_REF.start_beat,
-                ),
-                f_new_graph.length_in_seconds)
-
-        shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-        shared.PROJECT.commit(_("Change timestretch mode for audio item(s)"))
-        global_open_audio_items()
 
     def set_paif_for_all_instance(self):
         f_paif = shared.PROJECT.get_audio_per_item_fx_region(
@@ -1206,7 +1170,7 @@ class AudioItemSeq(AbstractItemEditor):
         f_menu.exec_(a_event.screenPos())
 
     def on_scene_paste_paths(self):
-        f_path = global_get_audio_file_from_clipboard()
+        f_path = _shared.global_get_audio_file_from_clipboard()
         if f_path:
             self.add_items(
                 self.context_menu_pos.x(), self.context_menu_pos.y(),
@@ -1627,24 +1591,6 @@ class AudioItemSeqWidget(FileDragDropper):
         shared.AUDIO_SEQ.set_v_zoom(float(a_val) * 0.1)
         global_open_audio_items(a_reload=False)
 
-def global_get_audio_file_from_clipboard():
-    f_clipboard = QApplication.clipboard()
-    f_path = f_clipboard.text()
-    if not f_path:
-        QMessageBox.warning(
-            shared.MAIN_WINDOW, _("Error"), _("No text in the system clipboard"))
-    else:
-        f_path = str(f_path).strip()
-        if os.path.isfile(f_path):
-            print(f_path)
-            return f_path
-        else:
-            f_path = f_path[:100]
-            QMessageBox.warning(
-                shared.MAIN_WINDOW, _("Error"),
-                _("{} is not a valid file").format(f_path))
-    return None
-
 def pydaw_set_audio_seq_zoom(a_horizontal, a_vertical):
     f_width = float(shared.AUDIO_SEQ.rect().width()) - \
         float(shared.AUDIO_SEQ.verticalScrollBar().width()) - 6.0
@@ -1656,5 +1602,3 @@ def pydaw_set_audio_seq_zoom(a_horizontal, a_vertical):
     shared.AUDIO_SEQ.px_per_beat = shared.AUDIO_PX_PER_BEAT
     pydaw_set_audio_snap(shared.AUDIO_SNAP_VAL)
     shared.AUDIO_ITEM_HEIGHT = 75.0 * a_vertical
-
-

@@ -1,13 +1,14 @@
 from .  import _shared
-from mkpy.libdawnext import shared
+from mkpy.libdawnext import project, shared
 from mkpy.libdawnext.project import *
 from mkpy.libpydaw import (
     pydaw_util,
     pydaw_widgets,
 )
+from mkpy.libpydaw.translate import _
 from mkpy.mkqt import *
 
-MENU = QMenu(shared.SEQUENCER)
+MENU = None
 
 def cut_selected():
     _shared.copy_selected()
@@ -355,47 +356,73 @@ def glue_selected():
             _("You must select at least 2 items on one or more tracks"),
         )
 
-MENU.addAction(_shared.copy_action)
+def populate_takes_menu():
+    takes_menu.clear()
+    if shared.SEQUENCER.current_item:
+        f_takes = shared.PROJECT.get_takes()
+        f_take_list = f_takes.get_take(
+            shared.SEQUENCER.current_item.audio_item.item_uid,
+        )
+        if f_take_list:
+            f_items_dict = shared.PROJECT.get_items_dict()
+            for f_uid in f_take_list[1]:
+                f_name = f_items_dict.get_name_by_uid(f_uid)
+                f_action = takes_menu.addAction(f_name)
+                f_action.item_uid = f_uid
 
-cut_action = MENU.addAction(_("Cut"))
-cut_action.triggered.connect(cut_selected)
-cut_action.setShortcut(QKeySequence.Cut)
+def init():
+    global \
+        MENU, \
+        cut_action, \
+        glue_action, \
+        rename_action, \
+        takes_menu, \
+        transpose_action, \
+        unlink_action, \
+        unlink_selected_action, \
+        unlink_unique_action
+    MENU = QMenu(shared.SEQUENCER)
+    MENU.addAction(_shared.copy_action)
 
-paste_orig_action = MENU.addAction(_("Paste to Original Track"))
-paste_orig_action.triggered.connect(_shared.paste_clipboard)
+    cut_action = MENU.addAction(_("Cut"))
+    cut_action.triggered.connect(cut_selected)
+    cut_action.setShortcut(QKeySequence.Cut)
 
-MENU.addSeparator()
-MENU.addAction(_shared.delete_action)
-MENU.addSeparator()
+    paste_orig_action = MENU.addAction(_("Paste to Original Track"))
+    paste_orig_action.triggered.connect(_shared.paste_clipboard)
 
-takes_menu = MENU.addMenu(_("Takes"))
-takes_menu.triggered.connect(takes_menu_triggered)
+    MENU.addSeparator()
+    MENU.addAction(_shared.delete_action)
+    MENU.addSeparator()
 
-unlink_selected_action = MENU.addAction(
-    _("Create New Take for Item(s)"),
-)
-unlink_selected_action.setShortcut(
-    QKeySequence.fromString("CTRL+U"),
-)
-unlink_selected_action.triggered.connect(on_auto_unlink_selected)
-unlink_unique_action = MENU.addAction(
-    _("Create New Take for Unique Item(s)"),
-)
-unlink_unique_action.setShortcut(
-    QKeySequence.fromString("ALT+U"),
-)
-unlink_unique_action.triggered.connect(on_auto_unlink_unique)
-unlink_action = MENU.addAction(
-    _("Create Named Take for Single Item..."),
-)
-unlink_action.triggered.connect(on_unlink_item)
-MENU.addSeparator()
-rename_action = MENU.addAction(_("Rename Selected Item(s)..."))
-rename_action.triggered.connect(on_rename_items)
-transpose_action = MENU.addAction(_("Transpose..."))
-transpose_action.triggered.connect(transpose_dialog)
-glue_action = MENU.addAction(_("Glue Selected"))
-glue_action.triggered.connect(glue_selected)
-glue_action.setShortcut(
-    QKeySequence.fromString("CTRL+G"),
-)
+    takes_menu = MENU.addMenu(_("Takes"))
+    takes_menu.triggered.connect(takes_menu_triggered)
+
+    unlink_selected_action = MENU.addAction(
+        _("Create New Take for Item(s)"),
+    )
+    unlink_selected_action.setShortcut(
+        QKeySequence.fromString("CTRL+U"),
+    )
+    unlink_selected_action.triggered.connect(on_auto_unlink_selected)
+    unlink_unique_action = MENU.addAction(
+        _("Create New Take for Unique Item(s)"),
+    )
+    unlink_unique_action.setShortcut(
+        QKeySequence.fromString("ALT+U"),
+    )
+    unlink_unique_action.triggered.connect(on_auto_unlink_unique)
+    unlink_action = MENU.addAction(
+        _("Create Named Take for Single Item..."),
+    )
+    unlink_action.triggered.connect(on_unlink_item)
+    MENU.addSeparator()
+    rename_action = MENU.addAction(_("Rename Selected Item(s)..."))
+    rename_action.triggered.connect(on_rename_items)
+    transpose_action = MENU.addAction(_("Transpose..."))
+    transpose_action.triggered.connect(transpose_dialog)
+    glue_action = MENU.addAction(_("Glue Selected"))
+    glue_action.triggered.connect(glue_selected)
+    glue_action.setShortcut(
+        QKeySequence.fromString("CTRL+G"),
+    )

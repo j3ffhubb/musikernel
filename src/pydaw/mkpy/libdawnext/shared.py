@@ -513,6 +513,31 @@ def pydaw_set_audio_snap(a_val):
     elif a_val == 1:
         AUDIO_LINES_ENABLED = False
 
+def global_update_track_comboboxes(a_index=None, a_value=None):
+    if (
+        a_index is not None
+        and
+        a_value is not None
+    ):
+        TRACK_NAMES[int(a_index)] = str(a_value)
+    global SUPPRESS_TRACK_COMBOBOX_CHANGES
+    SUPPRESS_TRACK_COMBOBOX_CHANGES = True
+    for f_cbox in TRACK_NAME_COMBOBOXES:
+        f_current_index = f_cbox.currentIndex()
+        f_cbox.clear()
+        f_cbox.clearEditText()
+        f_cbox.addItems(TRACK_NAMES)
+        f_cbox.setCurrentIndex(f_current_index)
+
+    PLUGIN_RACK.set_track_names(TRACK_NAMES)
+
+    SUPPRESS_TRACK_COMBOBOX_CHANGES = False
+    ROUTING_GRAPH_WIDGET.draw_graph(
+        PROJECT.get_routing_graph(),
+        TRACK_PANEL.get_track_names(),
+    )
+    global_open_mixer()
+
 
 # Only functions, globals must accessed through the module
 __all__ = [
@@ -530,6 +555,7 @@ __all__ = [
     'global_ui_refresh_callback',
     'global_update_hidden_rows',
     'global_update_peak_meters',
+    'global_update_track_comboboxes',
     'on_ready',
     'open_last',
     'pydaw_get_current_region_length',

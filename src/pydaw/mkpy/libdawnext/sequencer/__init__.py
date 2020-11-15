@@ -7,8 +7,8 @@ from . import (
     context_menu,
     header_context_menu,
 )
-from .audio_input import AudioInput, AudioInputWidget
 from .track import SeqTrack, TrackPanel
+from .transport import TransportWidget
 from mkpy import libmk
 from mkpy.libdawnext import project, shared
 from mkpy.libdawnext.project import *
@@ -24,18 +24,16 @@ from mkpy.mkqt import *
 
 
 DRAW_SEQUENCER_GRAPHS = True
-REGION_EDITOR_SNAP = True
+#REGION_EDITOR_SNAP = True
 REGION_EDITOR_GRID_WIDTH = 1000.0
-REGION_TRACK_WIDTH = 180  #Width of the tracks in px
 MREC_EVENTS = []
 
-REGION_EDITOR_TRACK_COUNT = 32
-
-REGION_EDITOR_HEADER_ROW_HEIGHT = 18
-REGION_EDITOR_HEADER_HEIGHT = REGION_EDITOR_HEADER_ROW_HEIGHT * 3
 #gets updated by the region editor to it's real value:
-REGION_EDITOR_TOTAL_HEIGHT = (REGION_EDITOR_TRACK_COUNT *
-    shared.REGION_EDITOR_TRACK_HEIGHT)
+REGION_EDITOR_TOTAL_HEIGHT = (
+    _shared.REGION_EDITOR_TRACK_COUNT
+    *
+    shared.REGION_EDITOR_TRACK_HEIGHT
+)
 REGION_EDITOR_QUANTIZE_INDEX = 4
 
 CACHED_SEQ_LEN = 32
@@ -46,16 +44,13 @@ ATM_POINT_RADIUS = ATM_POINT_DIAMETER * 0.5
 ATM_GRADIENT = QtCore.Qt.white
 
 LAST_ITEM_LENGTH = 4
-SEQUENCER_PX_PER_BEAT = 24
 SEQUENCER_SNAP_VAL = 3
-SEQUENCER_QUANTIZE_PX = SEQUENCER_PX_PER_BEAT
-SEQUENCER_QUANTIZE_64TH = SEQUENCER_PX_PER_BEAT / 16.0
+SEQUENCER_QUANTIZE_PX = _shared.SEQUENCER_PX_PER_BEAT
+SEQUENCER_QUANTIZE_64TH = _shared.SEQUENCER_PX_PER_BEAT / 16.0
 SEQ_QUANTIZE = True
 SEQ_QUANTIZE_AMT = 1.0
 SEQ_LINES_ENABLED = False
 SEQ_SNAP_RANGE = 8
-
-TRACK_COLOR_CLIPBOARD = None
 
 REGION_EDITOR_MIN_NOTE_LENGTH = REGION_EDITOR_GRID_WIDTH / 128.0
 REGION_EDITOR_DELETE_MODE = False
@@ -76,8 +71,8 @@ def pydaw_set_seq_snap(a_val=None):
     else:
         SEQ_QUANTIZE = False
         SEQ_LINES_ENABLED = False
-    SEQUENCER_QUANTIZE_PX = SEQUENCER_PX_PER_BEAT / f_divisor
-    SEQUENCER_QUANTIZE_64TH = SEQUENCER_PX_PER_BEAT / 16.0
+    SEQUENCER_QUANTIZE_PX = _shared.SEQUENCER_PX_PER_BEAT / f_divisor
+    SEQUENCER_QUANTIZE_64TH = _shared.SEQUENCER_PX_PER_BEAT / 16.0
     SEQ_QUANTIZE_AMT = f_divisor
 
 class SeqAtmItem(QGraphicsEllipseItem):
@@ -184,7 +179,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
                 self.y_scale,
             ) = shared.PROJECT.get_item_path(
                 a_audio_item.item_uid,
-                SEQUENCER_PX_PER_BEAT,
+                _shared.SEQUENCER_PX_PER_BEAT,
                 shared.REGION_EDITOR_TRACK_HEIGHT - 20,
                 shared.CURRENT_REGION.get_tempo_at_pos(
                     a_audio_item.start_beat,
@@ -356,12 +351,12 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         QApplication.restoreOverrideCursor()
 
     def draw(self):
-        f_start = self.audio_item.start_beat * SEQUENCER_PX_PER_BEAT
-        f_length = (self.audio_item.length_beats * SEQUENCER_PX_PER_BEAT)
+        f_start = self.audio_item.start_beat * _shared.SEQUENCER_PX_PER_BEAT
+        f_length = (self.audio_item.length_beats * _shared.SEQUENCER_PX_PER_BEAT)
 
         self.length_orig = f_length
         self.length_px_start = (
-            self.audio_item.start_offset * SEQUENCER_PX_PER_BEAT
+            self.audio_item.start_offset * _shared.SEQUENCER_PX_PER_BEAT
         )
         self.length_px_minus_start = f_length - self.length_px_start
 
@@ -376,7 +371,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         label_rect = QtCore.QRectF(0.0, 0.0, f_length, 20)
         self.label_bg.setRect(label_rect)
 
-        f_track_num = REGION_EDITOR_HEADER_HEIGHT + (
+        f_track_num = _shared.REGION_EDITOR_HEADER_HEIGHT + (
             shared.REGION_EDITOR_TRACK_HEIGHT * self.audio_item.track_num
         )
 
@@ -449,12 +444,17 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
 
     def clip_at_region_end(self):
         f_current_region_length = pydaw_get_current_region_length()
-        f_max_x = f_current_region_length * SEQUENCER_PX_PER_BEAT
+        f_max_x = f_current_region_length * _shared.SEQUENCER_PX_PER_BEAT
         f_pos_x = self.pos().x()
         f_end = f_pos_x + self.rect().width()
         if f_end > f_max_x:
             f_end_px = f_max_x - f_pos_x
-            self.setRect(0.0, 0.0, f_end_px, shared.REGION_EDITOR_TRACK_HEIGHT)
+            self.setRect(
+                0.0,
+                0.0,
+                f_end_px,
+                shared.REGION_EDITOR_TRACK_HEIGHT,
+            )
             self.audio_item.sample_end = \
                 ((self.rect().width() + self.length_px_start) /
                 self.length_orig) * 1000.0
@@ -505,7 +505,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.setBrush(brush)
 
     def pos_to_musical_time(self, a_pos):
-        return a_pos / SEQUENCER_PX_PER_BEAT
+        return a_pos / _shared.SEQUENCER_PX_PER_BEAT
 
     def start_handle_mouseClickEvent(self, a_event):
         if libmk.IS_PLAYING:
@@ -538,7 +538,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         self.check_selected_status()
         a_event.setAccepted(True)
         QGraphicsRectItem.mousePressEvent(self.stretch_handle, a_event)
-        f_max_region_pos = (SEQUENCER_PX_PER_BEAT *
+        f_max_region_pos = (_shared.SEQUENCER_PX_PER_BEAT *
             pydaw_get_current_region_length())
         for f_item in shared.SEQUENCER.audio_items:
             if f_item.isSelected() and \
@@ -617,7 +617,9 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
                 f_tracks_combobox.addItems(shared.TRACK_NAMES)
                 f_tracks_combobox.setCurrentIndex(f_out)
             else:
-                f_tracks_combobox.addItems(["None"] + shared.TRACK_NAMES)
+                f_tracks_combobox.addItems(
+                    ["None"] + shared.TRACK_NAMES,
+                )
                 f_tracks_combobox.setCurrentIndex(f_out + 1)
             f_tracks_combobox.setMinimumWidth(105)
             f_layout.addWidget(f_tracks_combobox, 0, f_i)
@@ -729,19 +731,26 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.split_line.hide()
 
     def y_pos_to_lane_number(self, a_y_pos):
-        f_lane_num = int((a_y_pos - REGION_EDITOR_HEADER_HEIGHT) /
-            shared.REGION_EDITOR_TRACK_HEIGHT)
+        f_lane_num = int(
+            (a_y_pos - _shared.REGION_EDITOR_HEADER_HEIGHT)
+            /
+            shared.REGION_EDITOR_TRACK_HEIGHT
+        )
         f_lane_num = pydaw_clip_value(
-            f_lane_num, 0, project.TRACK_COUNT_ALL)
-        f_y_pos = (f_lane_num *
-            shared.REGION_EDITOR_TRACK_HEIGHT) + REGION_EDITOR_HEADER_HEIGHT
+            f_lane_num,
+            0,
+            project.TRACK_COUNT_ALL,
+        )
+        f_y_pos = (
+            f_lane_num * shared.REGION_EDITOR_TRACK_HEIGHT
+        ) + _shared.REGION_EDITOR_HEADER_HEIGHT
         return f_lane_num, f_y_pos
 
     def lane_number_to_y_pos(self, a_lane_num):
         a_lane_num = pydaw_util.pydaw_clip_value(
             a_lane_num, 0, project.TRACK_COUNT_ALL)
         return (a_lane_num *
-            shared.REGION_EDITOR_TRACK_HEIGHT) + REGION_EDITOR_HEADER_HEIGHT
+            shared.REGION_EDITOR_TRACK_HEIGHT) + _shared.REGION_EDITOR_HEADER_HEIGHT
 
     def quantize_all(self, a_x):
         f_x = a_x
@@ -819,10 +828,10 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
             QGraphicsRectItem.mouseMoveEvent(self, a_event)
             if SEQ_QUANTIZE:
                 f_max_x = (pydaw_get_current_region_length() *
-                    SEQUENCER_PX_PER_BEAT) - SEQUENCER_QUANTIZE_PX
+                    _shared.SEQUENCER_PX_PER_BEAT) - SEQUENCER_QUANTIZE_PX
             else:
                 f_max_x = (pydaw_get_current_region_length() *
-                    SEQUENCER_PX_PER_BEAT) - shared.AUDIO_ITEM_HANDLE_SIZE
+                    _shared.SEQUENCER_PX_PER_BEAT) - shared.AUDIO_ITEM_HANDLE_SIZE
             f_new_lane, f_ignored = self.y_pos_to_lane_number(
                 a_event.scenePos().y())
             f_lane_offset = f_new_lane - self.audio_item.track_num
@@ -866,7 +875,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
                 f_x -= f_audio_item.quantize_offset
                 f_audio_item.setRect(
                     0.0, 0.0, f_x, shared.REGION_EDITOR_TRACK_HEIGHT)
-                f_item.length_beats = f_x /SEQUENCER_PX_PER_BEAT
+                f_item.length_beats = f_x /_shared.SEQUENCER_PX_PER_BEAT
                 print(f_item.length_beats)
                 f_did_change = True
             elif f_audio_item.is_start_resizing:
@@ -1021,32 +1030,23 @@ class ItemSequencer(QGraphicsView):
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
+        _shared.init()
+        atm_context_menu.init()
+        context_menu.init()
+
         self.addAction(_shared.copy_action)
-        self.addAction(context_menu.cut_action)
+        self.addAction(_shared.delete_action)
         self.addAction(atm_context_menu.break_atm_action)
         self.addAction(atm_context_menu.unbreak_atm_action)
-        self.addAction(_shared.delete_action)
-        self.addAction(context_menu.unlink_selected_action)
-        self.addAction(context_menu.unlink_unique_action)
-        self.addAction(context_menu.unlink_action)
+        self.addAction(context_menu.cut_action)
+        self.addAction(context_menu.glue_action)
         self.addAction(context_menu.rename_action)
         self.addAction(context_menu.transpose_action)
-        self.addAction(context_menu.glue_action)
+        self.addAction(context_menu.unlink_action)
+        self.addAction(context_menu.unlink_selected_action)
+        self.addAction(context_menu.unlink_unique_action)
 
         self.context_menu_enabled = True
-
-    def populate_takes_menu(self):
-        self.takes_menu.clear()
-        if self.current_item:
-            f_takes = shared.PROJECT.get_takes()
-            f_take_list = f_takes.get_take(
-                self.current_item.audio_item.item_uid)
-            if f_take_list:
-                f_items_dict = shared.PROJECT.get_items_dict()
-                for f_uid in f_take_list[1]:
-                    f_name = f_items_dict.get_name_by_uid(f_uid)
-                    f_action = self.takes_menu.addAction(f_name)
-                    f_action.item_uid = f_uid
 
     def show_context_menu(self):
         if libmk.IS_PLAYING:
@@ -1055,10 +1055,10 @@ class ItemSequencer(QGraphicsView):
             self.context_menu_enabled = True
             return
         if _shared.REGION_EDITOR_MODE == 0:
-            self.populate_takes_menu()
-            context_menu.exec_(QCursor.pos())
+            context_menu.populate_takes_menu()
+            context_menu.MENU.exec_(QCursor.pos())
         elif _shared.REGION_EDITOR_MODE == 1:
-            atm_context_menu.exec_(QCursor.pos())
+            atm_context_menu.MENU.exec_(QCursor.pos())
         self.context_menu_enabled = False
 
     def get_item(self, a_pos):
@@ -1084,7 +1084,7 @@ class ItemSequencer(QGraphicsView):
 
         if self.check_header(f_pos):
             if a_event.button() == QtCore.Qt.LeftButton:
-                f_beat = int(f_pos.x() / SEQUENCER_PX_PER_BEAT)
+                f_beat = int(f_pos.x() / _shared.SEQUENCER_PX_PER_BEAT)
                 global_set_playback_pos(f_beat)
             return
 
@@ -1122,8 +1122,8 @@ class ItemSequencer(QGraphicsView):
                     return
                 self.scene.clearSelection()
                 f_pos_x = f_pos.x()
-                f_pos_y = f_pos.y() - REGION_EDITOR_HEADER_HEIGHT
-                f_beat = float(f_pos_x // SEQUENCER_PX_PER_BEAT)
+                f_pos_y = f_pos.y() - _shared.REGION_EDITOR_HEADER_HEIGHT
+                f_beat = float(f_pos_x // _shared.SEQUENCER_PX_PER_BEAT)
                 f_track = int(f_pos_y // shared.REGION_EDITOR_TRACK_HEIGHT)
                 f_item_name = "{}-1".format(shared.TRACK_NAMES[f_track])
                 f_uid = shared.PROJECT.create_empty_item(f_item_name)
@@ -1231,7 +1231,7 @@ class ItemSequencer(QGraphicsView):
 
     def get_item_coord(self, a_pos, a_clip=False):
         f_pos_x = a_pos.x()
-        f_pos_y = a_pos.y() - REGION_EDITOR_HEADER_HEIGHT
+        f_pos_y = a_pos.y() - _shared.REGION_EDITOR_HEADER_HEIGHT
         if a_clip or (
         f_pos_x > 0 and
         f_pos_y > 0 and
@@ -1243,7 +1243,7 @@ class ItemSequencer(QGraphicsView):
             f_track = int(f_pos_y / shared.REGION_EDITOR_TRACK_HEIGHT)
             f_val = (1.0 - ((f_pos_y - (f_track * shared.REGION_EDITOR_TRACK_HEIGHT))
                 / f_track_height)) * 127.0
-            f_beat = f_pos_x / SEQUENCER_PX_PER_BEAT
+            f_beat = f_pos_x / _shared.SEQUENCER_PX_PER_BEAT
             return f_track, round(f_beat, 6), round(f_val, 6)
         else:
             return None
@@ -1459,11 +1459,11 @@ class ItemSequencer(QGraphicsView):
             return a_beat
 
     def pos_to_beat_and_track(self, a_pos):
-        f_beat_frac = (a_pos.x() / SEQUENCER_PX_PER_BEAT)
+        f_beat_frac = (a_pos.x() / _shared.SEQUENCER_PX_PER_BEAT)
         f_beat_frac = pydaw_clip_min(f_beat_frac, 0.0)
         f_beat_frac = self.quantize(f_beat_frac)
 
-        f_lane_num = int((a_pos.y() - REGION_EDITOR_HEADER_HEIGHT) /
+        f_lane_num = int((a_pos.y() - _shared.REGION_EDITOR_HEADER_HEIGHT) /
             shared.REGION_EDITOR_TRACK_HEIGHT)
         f_lane_num = pydaw_clip_value(
             f_lane_num, 0, project.TRACK_COUNT_ALL - 1)
@@ -1572,13 +1572,13 @@ class ItemSequencer(QGraphicsView):
         self.playback_pos = float(a_beat)
         if self.playback_pos > f_right:
             return
-        f_pos = (self.playback_pos * SEQUENCER_PX_PER_BEAT)
+        f_pos = (self.playback_pos * _shared.SEQUENCER_PX_PER_BEAT)
         self.playback_cursor.setPos(f_pos, 0.0)
         if libmk.IS_PLAYING and shared.REGION_SETTINGS.follow_checkbox.isChecked():
             f_port_rect = self.viewport().rect()
             f_rect = self.mapToScene(f_port_rect).boundingRect()
             if not (f_pos > f_rect.left() and f_pos < f_rect.right()):
-                f_pos = int(self.playback_pos) * SEQUENCER_PX_PER_BEAT
+                f_pos = int(self.playback_pos) * _shared.SEQUENCER_PX_PER_BEAT
                 shared.REGION_SETTINGS.scrollbar.setValue(int(f_pos))
 
     def start_playback(self):
@@ -1621,7 +1621,7 @@ class ItemSequencer(QGraphicsView):
             and
             a_event.button() != QtCore.Qt.RightButton
         ):
-            f_beat = int(a_event.scenePos().x() / SEQUENCER_PX_PER_BEAT)
+            f_beat = int(a_event.scenePos().x() / _shared.SEQUENCER_PX_PER_BEAT)
             global_set_playback_pos(f_beat)
 
     def check_line_count(self):
@@ -1685,12 +1685,12 @@ class ItemSequencer(QGraphicsView):
     def draw_header(self, a_cursor_pos=None):
         self.loop_start = self.loop_end = None
         f_region_length = pydaw_get_current_region_length()
-        f_size = SEQUENCER_PX_PER_BEAT * f_region_length
+        f_size = _shared.SEQUENCER_PX_PER_BEAT * f_region_length
         self.max_x = f_size
         self.setSceneRect(
             -3.0, 0.0, f_size + self.width() + 3.0, REGION_EDITOR_TOTAL_HEIGHT)
         self.header = QGraphicsRectItem(
-            0, 0, f_size, REGION_EDITOR_HEADER_HEIGHT)
+            0, 0, f_size, _shared.REGION_EDITOR_HEADER_HEIGHT)
         self.header.setZValue(1500.0)
         self.header.setBrush(shared.SEQUENCER_HEADER_BRUSH)
         self.header.mousePressEvent = self.header_click_event
@@ -1701,14 +1701,14 @@ class ItemSequencer(QGraphicsView):
             if f_marker.type == 1:  # Loop
                 self.loop_start = f_marker.start_beat
                 self.loop_end = f_marker.beat
-                f_x = f_marker.start_beat * SEQUENCER_PX_PER_BEAT
+                f_x = f_marker.start_beat * _shared.SEQUENCER_PX_PER_BEAT
                 f_start = QGraphicsLineItem(
-                    f_x, 0, f_x, REGION_EDITOR_HEADER_HEIGHT, self.header)
+                    f_x, 0, f_x, _shared.REGION_EDITOR_HEADER_HEIGHT, self.header)
                 f_start.setPen(shared.START_PEN)
 
-                f_x = f_marker.beat * SEQUENCER_PX_PER_BEAT
+                f_x = f_marker.beat * _shared.SEQUENCER_PX_PER_BEAT
                 f_end = QGraphicsLineItem(
-                    f_x, 0, f_x, REGION_EDITOR_HEADER_HEIGHT, self.header)
+                    f_x, 0, f_x, _shared.REGION_EDITOR_HEADER_HEIGHT, self.header)
                 f_end.setPen(shared.END_PEN)
             elif f_marker.type == 2:  # Tempo
                 f_text = "{} : {}/{}".format(
@@ -1722,11 +1722,11 @@ class ItemSequencer(QGraphicsView):
                 )
                 item.setBrush(QtCore.Qt.white)
                 item.setPos(
-                    f_marker.beat * SEQUENCER_PX_PER_BEAT,
-                    REGION_EDITOR_HEADER_ROW_HEIGHT,
+                    f_marker.beat * _shared.SEQUENCER_PX_PER_BEAT,
+                    _shared.REGION_EDITOR_HEADER_ROW_HEIGHT,
                 )
                 item.setToolTip(f_text)
-                item.mousePressEvent = TempoMarkerEvent(
+                item.mousePressEvent = header_context_menu.TempoMarkerEvent(
                     f_marker.beat,
                 ).mouse_press
                 self.draw_region(f_marker)
@@ -1735,13 +1735,17 @@ class ItemSequencer(QGraphicsView):
                     f_marker.text, self.header)
                 f_item.setBrush(QtCore.Qt.white)
                 f_item.setPos(
-                    f_marker.beat * SEQUENCER_PX_PER_BEAT,
-                    REGION_EDITOR_HEADER_ROW_HEIGHT * 2)
+                    f_marker.beat * _shared.SEQUENCER_PX_PER_BEAT,
+                    _shared.REGION_EDITOR_HEADER_ROW_HEIGHT * 2,
+                )
             else:
                 assert False, "Invalid marker type"
 
-        f_total_height = (REGION_EDITOR_TRACK_COUNT *
-            (shared.REGION_EDITOR_TRACK_HEIGHT)) + REGION_EDITOR_HEADER_HEIGHT
+        f_total_height = (
+            _shared.REGION_EDITOR_TRACK_COUNT
+            *
+            shared.REGION_EDITOR_TRACK_HEIGHT
+        ) + _shared.REGION_EDITOR_HEADER_HEIGHT
         self.playback_cursor = self.scene.addLine(
             0.0, 0.0, 0.0, f_total_height, QPen(QtCore.Qt.red, 2.0))
         self.playback_cursor.setZValue(1000.0)
@@ -1752,15 +1756,18 @@ class ItemSequencer(QGraphicsView):
 
     def draw_region(self, a_marker):
         f_region_length = pydaw_get_current_region_length()
-        f_size = SEQUENCER_PX_PER_BEAT * f_region_length
+        f_size = _shared.SEQUENCER_PX_PER_BEAT * f_region_length
         f_v_pen = QPen(QtCore.Qt.black)
         f_beat_pen = QPen(QColor(210, 210, 210))
         f_16th_pen = QPen(QColor(120, 120, 120))
         f_reg_pen = QPen(QtCore.Qt.white)
-        f_total_height = (REGION_EDITOR_TRACK_COUNT *
-            (shared.REGION_EDITOR_TRACK_HEIGHT)) + REGION_EDITOR_HEADER_HEIGHT
+        f_total_height = (
+            _shared.REGION_EDITOR_TRACK_COUNT
+            *
+            shared.REGION_EDITOR_TRACK_HEIGHT
+        ) + _shared.REGION_EDITOR_HEADER_HEIGHT
 
-        f_x_offset = a_marker.beat * SEQUENCER_PX_PER_BEAT
+        f_x_offset = a_marker.beat * _shared.SEQUENCER_PX_PER_BEAT
         i3 = f_x_offset
 
         for i in range(int(a_marker.length)):
@@ -1778,7 +1785,7 @@ class ItemSequencer(QGraphicsView):
                     for f_i4 in range(1, SEQ_SNAP_RANGE):
                         f_sub_x = i3 + (SEQUENCER_QUANTIZE_PX * f_i4)
                         f_line = self.scene.addLine(
-                            f_sub_x, REGION_EDITOR_HEADER_HEIGHT,
+                            f_sub_x, _shared.REGION_EDITOR_HEADER_HEIGHT,
                             f_sub_x, f_total_height, f_16th_pen)
                         self.beat_line_list.append(f_line)
             elif DRAW_SEQUENCER_GRAPHS:
@@ -1790,15 +1797,15 @@ class ItemSequencer(QGraphicsView):
                     for f_i4 in range(1, SEQ_SNAP_RANGE):
                         f_sub_x = f_beat_x + (SEQUENCER_QUANTIZE_PX * f_i4)
                         f_line = self.scene.addLine(
-                            f_sub_x, REGION_EDITOR_HEADER_HEIGHT,
+                            f_sub_x, _shared.REGION_EDITOR_HEADER_HEIGHT,
                             f_sub_x, f_total_height, f_16th_pen)
                         self.beat_line_list.append(f_line)
-            i3 += SEQUENCER_PX_PER_BEAT
+            i3 += _shared.SEQUENCER_PX_PER_BEAT
         self.scene.addLine(
-            i3, REGION_EDITOR_HEADER_HEIGHT, i3, f_total_height, f_reg_pen)
-        for i2 in range(REGION_EDITOR_TRACK_COUNT):
+            i3, _shared.REGION_EDITOR_HEADER_HEIGHT, i3, f_total_height, f_reg_pen)
+        for i2 in range(_shared.REGION_EDITOR_TRACK_COUNT):
             f_y = (shared.REGION_EDITOR_TRACK_HEIGHT *
-                (i2 + 1)) + REGION_EDITOR_HEADER_HEIGHT
+                (i2 + 1)) + _shared.REGION_EDITOR_HEADER_HEIGHT
             self.scene.addLine(f_x_offset, f_y, f_size, f_y)
 
     def clear_drawn_items(self):
@@ -1823,7 +1830,7 @@ class ItemSequencer(QGraphicsView):
             return
         f_track = shared.TRACK_PANEL.plugin_uid_map[a_point.index]
         f_min = (f_track *
-            shared.REGION_EDITOR_TRACK_HEIGHT) + REGION_EDITOR_HEADER_HEIGHT
+            shared.REGION_EDITOR_TRACK_HEIGHT) + _shared.REGION_EDITOR_HEADER_HEIGHT
         f_max = f_min + shared.REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
         f_item = SeqAtmItem(
             a_point, self.automation_save_callback, f_min, f_max)
@@ -1838,34 +1845,15 @@ class ItemSequencer(QGraphicsView):
         f_track_height = shared.REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
         f_track = shared.TRACK_PANEL.plugin_uid_map[a_point.index]
         return QtCore.QPointF(
-            (a_point.beat * SEQUENCER_PX_PER_BEAT),
+            (a_point.beat * _shared.SEQUENCER_PX_PER_BEAT),
             (f_track_height * (1.0 - (a_point.cc_val / 127.0))) +
             (shared.REGION_EDITOR_TRACK_HEIGHT * f_track) +
-            REGION_EDITOR_HEADER_HEIGHT)
+            _shared.REGION_EDITOR_HEADER_HEIGHT)
 
     def automation_save_callback(self, a_open=True):
         shared.PROJECT.save_atm_region(shared.ATM_REGION)
         if a_open:
             self.open_region()
-
-def global_update_track_comboboxes(a_index=None, a_value=None):
-    if not a_index is None and not a_value is None:
-        shared.TRACK_NAMES[int(a_index)] = str(a_value)
-    global SUPPRESS_TRACK_COMBOBOX_CHANGES
-    SUPPRESS_TRACK_COMBOBOX_CHANGES = True
-    for f_cbox in shared.TRACK_NAME_COMBOBOXES:
-        f_current_index = f_cbox.currentIndex()
-        f_cbox.clear()
-        f_cbox.clearEditText()
-        f_cbox.addItems(shared.TRACK_NAMES)
-        f_cbox.setCurrentIndex(f_current_index)
-
-    shared.PLUGIN_RACK.set_track_names(shared.TRACK_NAMES)
-
-    SUPPRESS_TRACK_COMBOBOX_CHANGES = False
-    shared.ROUTING_GRAPH_WIDGET.draw_graph(
-        shared.PROJECT.get_routing_graph(), shared.TRACK_PANEL.get_track_names())
-    global_open_mixer()
 
 class RegionSettings:
     """ The widget that holds the sequencer """
@@ -1977,7 +1965,7 @@ class RegionSettings:
         self.scrollbar.sliderPressed.connect(self.scrollbar_pressed)
         self.scrollbar.sliderReleased.connect(self.scrollbar_released)
         self.hlayout0.addWidget(self.scrollbar)
-        self.scrollbar.setSingleStep(SEQUENCER_PX_PER_BEAT)
+        self.scrollbar.setSingleStep(_shared.SEQUENCER_PX_PER_BEAT)
 
         self.widgets_to_disable = (
             self.hzoom_slider, self.vzoom_slider, self.menu_button)
@@ -1994,17 +1982,17 @@ class RegionSettings:
 
     def scrollbar_released(self, a_val=None):
         f_val = round(self.scrollbar.value() /
-            SEQUENCER_PX_PER_BEAT) * SEQUENCER_PX_PER_BEAT
+            _shared.SEQUENCER_PX_PER_BEAT) * _shared.SEQUENCER_PX_PER_BEAT
         self.scrollbar.setValue(int(f_val))
 
     def vzoom_pressed(self, a_val=None):
         self.is_vzooming = True
-        self.old_px_per_beat = SEQUENCER_PX_PER_BEAT
+        self.old_px_per_beat = _shared.SEQUENCER_PX_PER_BEAT
         #self.size_label.move(QCursor.pos())
         self.size_label.setText("Track Height")
         self.set_vzoom_size()
         f_widget = shared.MAIN_WINDOW.midi_scroll_area
-        f_point = QtCore.QPoint(0, REGION_EDITOR_HEADER_HEIGHT + 2)
+        f_point = QtCore.QPoint(0, _shared.REGION_EDITOR_HEADER_HEIGHT + 2)
         self.size_label.setParent(f_widget)
         self.size_label.setStyleSheet(
             "QLabel { background-color: black; color: white }")
@@ -2027,7 +2015,9 @@ class RegionSettings:
 
     def set_vzoom_size(self):
         self.size_label.setFixedSize(
-            REGION_TRACK_WIDTH, shared.REGION_EDITOR_TRACK_HEIGHT + 2)
+            _shared.REGION_TRACK_WIDTH,
+            shared.REGION_EDITOR_TRACK_HEIGHT + 2,
+        )
 
     def set_vzoom(self, a_val=None):
         if not self.is_vzooming:
@@ -2036,17 +2026,23 @@ class RegionSettings:
         global REGION_EDITOR_TOTAL_HEIGHT
         self.last_vzoom = self.vzoom_slider.value()
         shared.REGION_EDITOR_TRACK_HEIGHT = (self.last_vzoom * 8) + 64
-        REGION_EDITOR_TOTAL_HEIGHT = (REGION_EDITOR_TRACK_COUNT *
-            shared.REGION_EDITOR_TRACK_HEIGHT)
+        REGION_EDITOR_TOTAL_HEIGHT = (
+            _shared.REGION_EDITOR_TRACK_COUNT
+            *
+            shared.REGION_EDITOR_TRACK_HEIGHT
+        )
         self.set_vzoom_size()
 
     def hzoom_pressed(self, a_val=None):
         self.is_hzooming = True
-        self.old_px_per_beat = SEQUENCER_PX_PER_BEAT
+        self.old_px_per_beat = _shared.SEQUENCER_PX_PER_BEAT
         #self.size_label.move(QCursor.pos())
         self.size_label.setText("Beat")
         self.set_hzoom_size()
-        f_point = QtCore.QPoint(REGION_TRACK_WIDTH + 10, 2)
+        f_point = QtCore.QPoint(
+            _shared.REGION_TRACK_WIDTH + 10,
+            2,
+        )
         f_widget = shared.MAIN_WINDOW.midi_scroll_area
         self.size_label.setParent(f_widget)
         self.size_label.setStyleSheet(
@@ -2059,35 +2055,35 @@ class RegionSettings:
         pydaw_set_seq_snap()
         self.open_region()
         self.scrollbar.setValue(
-            (SEQUENCER_PX_PER_BEAT / self.old_px_per_beat) *
+            (_shared.SEQUENCER_PX_PER_BEAT / self.old_px_per_beat) *
             self.scrollbar.value())
-        self.scrollbar.setSingleStep(SEQUENCER_PX_PER_BEAT)
+        self.scrollbar.setSingleStep(_shared.SEQUENCER_PX_PER_BEAT)
         self.size_label.hide()
 
     def set_hzoom_size(self):
         self.size_label.setFixedSize(
-            SEQUENCER_PX_PER_BEAT, REGION_EDITOR_HEADER_HEIGHT)
+            _shared.SEQUENCER_PX_PER_BEAT, _shared.REGION_EDITOR_HEADER_HEIGHT)
 
     def set_hzoom(self, a_val=None):
         if not self.is_hzooming:
             self.hzoom_slider.setValue(self.last_hzoom)
             return
-        global SEQUENCER_PX_PER_BEAT, DRAW_SEQUENCER_GRAPHS
+        global DRAW_SEQUENCER_GRAPHS
         self.last_hzoom = self.hzoom_slider.value()
         if self.last_hzoom < 3:
             DRAW_SEQUENCER_GRAPHS = False
             f_length = pydaw_get_current_region_length()
             f_width = shared.SEQUENCER.width()
             f_factor = {0:1, 1:2, 2:4}[self.last_hzoom]
-            SEQUENCER_PX_PER_BEAT = (f_width / f_length) * f_factor
+            _shared.SEQUENCER_PX_PER_BEAT = (f_width / f_length) * f_factor
             self.size_label.setText("Project * {}".format(f_factor))
             self.size_label.setFixedSize(
-                150, REGION_EDITOR_HEADER_HEIGHT)
+                150, _shared.REGION_EDITOR_HEADER_HEIGHT)
         else:
             if self.last_hzoom < 6:
                 self.last_hzoom = 6
             DRAW_SEQUENCER_GRAPHS = True
-            SEQUENCER_PX_PER_BEAT = ((self.last_hzoom - 6) * 4) + 24
+            _shared.SEQUENCER_PX_PER_BEAT = ((self.last_hzoom - 6) * 4) + 24
             self.size_label.setText("Beat")
             self.set_hzoom_size()
 

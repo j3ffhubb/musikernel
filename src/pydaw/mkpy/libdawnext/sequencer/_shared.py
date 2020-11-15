@@ -15,6 +15,15 @@ REGION_EDITOR_MODE = 0
 ATM_CLIPBOARD = []
 REGION_CLIPBOARD = []
 
+REGION_EDITOR_HEADER_ROW_HEIGHT = 18
+REGION_EDITOR_HEADER_HEIGHT = REGION_EDITOR_HEADER_ROW_HEIGHT * 3
+
+REGION_TRACK_WIDTH = 180  #Width of the tracks in px
+REGION_EDITOR_TRACK_COUNT = 32
+
+SEQUENCER_PX_PER_BEAT = 24
+
+
 def copy_selected():
     if not shared.SEQUENCER.enabled:
         shared.SEQUENCER.warn_no_region_selected()
@@ -95,10 +104,19 @@ def delete_selected():
             shared.ATM_REGION.remove_point(f_point.item)
         shared.SEQUENCER.automation_save_callback()
 
-copy_action = QAction(text=_("Copy"))
-copy_action.triggered.connect(copy_selected)
-copy_action.setShortcut(QKeySequence.Copy)
+def init():
+    global copy_action, delete_action
+    print('Creating copy_action')
+    copy_action = QAction(
+        parent=shared.SEQUENCER,
+        text=_("Copy"),
+    )
+    copy_action.triggered.connect(copy_selected)
+    print('Setting shortcut for copy_action')
+    copy_action.setShortcut(QKeySequence.Copy)
 
-delete_action = QAction(text=_("Delete"))
-delete_action.triggered.connect(delete_selected)
-delete_action.setShortcut(QKeySequence.Delete)
+    print('Creating delete_action')
+    delete_action = QAction(text=_("Delete"))
+    delete_action.triggered.connect(delete_selected)
+    print('Setting shortcut for delete_action')
+    delete_action.setShortcut(QKeySequence.Delete)
