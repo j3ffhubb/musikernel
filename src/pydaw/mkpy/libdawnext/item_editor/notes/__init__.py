@@ -4,6 +4,7 @@
 
 from . import _shared
 from ..abstract import AbstractItemEditor, ItemEditorHeader
+from .key import PianoKeyItem
 from .note import PianoRollNoteItem
 from mkpy import libmk
 from mkpy.libdawnext import shared
@@ -19,58 +20,6 @@ from mkpy.libpydaw.pydaw_util import *
 from mkpy.libpydaw.translate import _
 from mkpy.mkqt import *
 
-PIANO_ROLL_HEADER_HEIGHT = 45
-SELECTED_NOTE_GRADIENT = QLinearGradient(
-    QtCore.QPointF(0, 0),
-    QtCore.QPointF(0, 12),
-)
-SELECTED_NOTE_GRADIENT.setColorAt(0, QColor(180, 172, 100))
-SELECTED_NOTE_GRADIENT.setColorAt(1, QColor(240, 240, 240))
-
-SELECTED_PIANO_NOTE = None   #Used for mouse click hackery
-
-PIANO_ROLL_NOTE_LABELS = [
-    "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-
-PIANO_NOTE_GRADIENT_TUPLE = \
-    ((255, 0, 0), (255, 123, 0), (255, 255, 0), (123, 255, 0), (0, 255, 0),
-     (0, 255, 123), (0, 255, 255), (0, 123, 255), (0, 0, 255), (0, 0, 255))
-
-
-def piano_roll_set_delete_mode(a_enabled):
-    if a_enabled:
-        shared.PIANO_ROLL_EDITOR.setDragMode(QGraphicsView.NoDrag)
-        _shared.PIANO_ROLL_DELETED_NOTES = []
-        _shared.PIANO_ROLL_DELETE_MODE = True
-        QApplication.setOverrideCursor(
-            QCursor(QtCore.Qt.ForbiddenCursor))
-    else:
-        shared.PIANO_ROLL_EDITOR.setDragMode(QGraphicsView.RubberBandDrag)
-        _shared.PIANO_ROLL_DELETE_MODE = False
-        for f_item in _shared.PIANO_ROLL_DELETED_NOTES:
-            f_item.delete()
-        shared.PIANO_ROLL_EDITOR.selected_note_strings = []
-        global_save_and_reload_items()
-        QApplication.restoreOverrideCursor()
-
-class PianoKeyItem(QGraphicsRectItem):
-    """ This is a piano key on the PianoRollEditor
-    """
-    def __init__(self, a_piano_width, a_note_height, a_parent):
-        QGraphicsRectItem.__init__(
-            self, 0, 0, a_piano_width, a_note_height, a_parent)
-        self.setAcceptHoverEvents(True)
-        self.hover_brush = QColor(200, 200, 200)
-
-    def hoverEnterEvent(self, a_event):
-        QGraphicsRectItem.hoverEnterEvent(self, a_event)
-        self.o_brush = self.brush()
-        self.setBrush(self.hover_brush)
-        QApplication.restoreOverrideCursor()
-
-    def hoverLeaveEvent(self, a_event):
-        QGraphicsRectItem.hoverLeaveEvent(self, a_event)
-        self.setBrush(self.o_brush)
 
 class PianoRollEditor(AbstractItemEditor):
     """ This is the QGraphicsView and QGraphicsScene where notes are drawn
@@ -121,7 +70,7 @@ class PianoRollEditor(AbstractItemEditor):
         self.piano_height = self.note_height * shared.PIANO_ROLL_NOTE_COUNT
 
         self.piano_height = self.note_height * shared.PIANO_ROLL_NOTE_COUNT
-        shared.PIANO_ROLL_TOTAL_HEIGHT = self.piano_height + PIANO_ROLL_HEADER_HEIGHT
+        shared.PIANO_ROLL_TOTAL_HEIGHT = self.piano_height + _shared.PIANO_ROLL_HEADER_HEIGHT
 
     def get_selected_items(self):
         return (x for x in self.note_items if x.isSelected())
@@ -160,7 +109,7 @@ class PianoRollEditor(AbstractItemEditor):
 
     def set_header_and_keys(self):
         f_point = self.get_scene_pos()
-        self.piano.setPos(f_point.x(), PIANO_ROLL_HEADER_HEIGHT)
+        self.piano.setPos(f_point.x(), _shared.PIANO_ROLL_HEADER_HEIGHT)
         self.header.setPos(self.piano_width + self.padding, f_point.y())
 
     def get_scene_pos(self):
@@ -172,7 +121,7 @@ class PianoRollEditor(AbstractItemEditor):
         self.has_selected = False
         for f_item in self.note_items:
             if f_item.isSelected():
-                f_item.setBrush(SELECTED_NOTE_GRADIENT)
+                f_item.setBrush(_shared.SELECTED_NOTE_GRADIENT)
                 f_item.note_item.is_selected = True
                 self.has_selected = True
             else:
@@ -327,7 +276,7 @@ class PianoRollEditor(AbstractItemEditor):
 
     def sceneMouseReleaseEvent(self, a_event):
         if _shared.PIANO_ROLL_DELETE_MODE:
-            piano_roll_set_delete_mode(False)
+            _shared.piano_roll_set_delete_mode(False)
         else:
             QGraphicsScene.mouseReleaseEvent(self.scene, a_event)
         self.click_enabled = True
@@ -342,7 +291,7 @@ class PianoRollEditor(AbstractItemEditor):
                 self.scene.clearSelection()
             self.hover_restore_cursor_event()
         elif shared.EDITOR_MODE == shared.EDITOR_MODE_ERASE:
-            piano_roll_set_delete_mode(True)
+            _shared.piano_roll_set_delete_mode(True)
             return
         elif (
             a_event.modifiers() == (
@@ -374,7 +323,7 @@ class PianoRollEditor(AbstractItemEditor):
                 and
                 f_pos_x < shared.PIANO_ROLL_GRID_MAX_START_TIME
                 and
-                f_pos_y > PIANO_ROLL_HEADER_HEIGHT
+                f_pos_y > _shared.PIANO_ROLL_HEADER_HEIGHT
                 and
                 f_pos_y < shared.PIANO_ROLL_TOTAL_HEIGHT
             ):
@@ -385,7 +334,7 @@ class PianoRollEditor(AbstractItemEditor):
                     pass
                 f_note = int(
                     shared.PIANO_ROLL_NOTE_COUNT - ((f_pos_y -
-                    PIANO_ROLL_HEADER_HEIGHT) / self.note_height)) + 1
+                    _shared.PIANO_ROLL_HEADER_HEIGHT) / self.note_height)) + 1
                 if shared.PIANO_ROLL_SNAP:
                     f_beat = (
                         int(
@@ -406,8 +355,7 @@ class PianoRollEditor(AbstractItemEditor):
                     f_note_item = mk_project.pydaw_note(
                         f_beat, 0.25, f_note, self.get_vel(f_beat))
                 shared.ITEM_EDITOR.add_note(f_note_item)
-                global SELECTED_PIANO_NOTE
-                SELECTED_PIANO_NOTE = f_note_item
+                _shared.SELECTED_PIANO_NOTE = f_note_item
                 f_drawn_note = self.draw_note(f_note_item)
                 f_drawn_note.setSelected(True)
                 f_drawn_note.resize_start_pos = f_drawn_note.note_item.start
@@ -435,7 +383,10 @@ class PianoRollEditor(AbstractItemEditor):
 
     def draw_header(self):
         AbstractItemEditor.draw_header(
-            self, self.viewer_width, PIANO_ROLL_HEADER_HEIGHT)
+            self,
+            self.viewer_width,
+            _shared.PIANO_ROLL_HEADER_HEIGHT,
+        )
         self.header.hoverEnterEvent = self.hover_restore_cursor_event
         self.scene.addItem(self.header)
         #self.header.mapToScene(self.piano_width + self.padding, 0.0)
@@ -447,11 +398,20 @@ class PianoRollEditor(AbstractItemEditor):
             f_start_x = f_start * self.px_per_beat
             f_end_x = f_end * self.px_per_beat
             f_start_line = QGraphicsLineItem(
-                f_start_x, 0.0, f_start_x,
-                PIANO_ROLL_HEADER_HEIGHT, self.header)
+                f_start_x,
+                0.0,
+                f_start_x,
+                _shared.PIANO_ROLL_HEADER_HEIGHT,
+                self.header,
+            )
             f_start_line.setPen(shared.START_PEN)
             f_end_line = QGraphicsLineItem(
-                f_end_x, 0.0, f_end_x, PIANO_ROLL_HEADER_HEIGHT, self.header)
+                f_end_x,
+                0.0,
+                f_end_x,
+                _shared.PIANO_ROLL_HEADER_HEIGHT,
+                self.header,
+            )
             f_end_line.setPen(shared.END_PEN)
 
     def draw_piano(self):
@@ -460,9 +420,16 @@ class PianoRollEditor(AbstractItemEditor):
         f_piano_label = QFont()
         f_piano_label.setPointSize(8)
         self.piano = QGraphicsRectItem(
-            0, 0, self.piano_width, self.piano_height)
+            0,
+            0,
+            self.piano_width,
+            self.piano_height,
+        )
         self.scene.addItem(self.piano)
-        self.piano.mapToScene(0.0, PIANO_ROLL_HEADER_HEIGHT)
+        self.piano.mapToScene(
+            0.0,
+            _shared.PIANO_ROLL_HEADER_HEIGHT,
+        )
         f_key = PianoKeyItem(self.piano_width, self.note_height, self.piano)
         f_label = QGraphicsSimpleTextItem("C8", f_key)
         f_label.setPen(QtCore.Qt.black)
@@ -525,12 +492,18 @@ class PianoRollEditor(AbstractItemEditor):
                 f_octave_brushes[f_index:] + f_octave_brushes[:f_index]
         self.first_open = False
         f_note_bar = QGraphicsRectItem(
-            0, 0, self.viewer_width, self.note_height)
+            0,
+            0,
+            self.viewer_width,
+            self.note_height,
+        )
         f_note_bar.hoverMoveEvent = self.hover_restore_cursor_event
         f_note_bar.setBrush(f_base_brush)
         self.scene.addItem(f_note_bar)
         f_note_bar.setPos(
-            self.piano_width + self.padding, PIANO_ROLL_HEADER_HEIGHT)
+            self.piano_width + self.padding,
+            _shared.PIANO_ROLL_HEADER_HEIGHT,
+        )
         for i in range(self.end_octave - self.start_octave,
                        self.start_octave - self.start_octave, -1):
             for j in range(self.notes_in_octave, 0, -1):
@@ -542,15 +515,26 @@ class PianoRollEditor(AbstractItemEditor):
                 f_current_key += 1
                 if f_current_key >= len(f_octave_brushes):
                     f_current_key = 0
-                f_note_bar_y = (self.note_height * j) + (self.octave_height *
-                    (i - 1)) + PIANO_ROLL_HEADER_HEIGHT
+                f_note_bar_y = (
+                    (self.note_height * j)
+                    +
+                    (self.octave_height * (i - 1))
+                    +
+                    _shared.PIANO_ROLL_HEADER_HEIGHT
+                )
                 f_note_bar.setPos(
-                    self.piano_width + self.padding, f_note_bar_y)
+                    self.piano_width + self.padding, f_note_bar_y,
+                )
         f_beat_pen = QPen()
         f_beat_pen.setWidth(2)
         f_line_pen = QPen(QColor(0, 0, 0))
-        self.total_height = \
-            self.piano_height + PIANO_ROLL_HEADER_HEIGHT + self.note_height
+        self.total_height = (
+            self.piano_height
+            +
+            _shared.PIANO_ROLL_HEADER_HEIGHT
+            +
+            self.note_height
+        )
         for i in range(0, int(shared.CURRENT_ITEM_LEN) + 1):
             f_beat_x = (self.px_per_beat * i) + self.piano_width
             f_beat = self.scene.addLine(
@@ -568,7 +552,11 @@ class PianoRollEditor(AbstractItemEditor):
                     f_x = (self.px_per_beat * i) + (self.value_width *
                         j) + self.piano_width
                     f_line = self.scene.addLine(
-                        f_x, PIANO_ROLL_HEADER_HEIGHT, f_x, self.total_height)
+                        f_x,
+                        _shared.PIANO_ROLL_HEADER_HEIGHT,
+                        f_x,
+                        self.total_height,
+                    )
                     if float(j) != self.grid_div * 0.5:
                         f_line.setPen(f_line_pen)
 
@@ -594,8 +582,11 @@ class PianoRollEditor(AbstractItemEditor):
         self.has_selected = False #Reset the selected-ness state...
         self.viewer_width = shared.PIANO_ROLL_GRID_WIDTH
         self.setSceneRect(
-            0.0, 0.0, self.viewer_width + 200.0,
-            self.piano_height + PIANO_ROLL_HEADER_HEIGHT + 24.0)
+            0.0,
+            0.0,
+            self.viewer_width + 200.0,
+            self.piano_height + _shared.PIANO_ROLL_HEADER_HEIGHT + 24.0,
+        )
         shared.PIANO_ROLL_GRID_MAX_START_TIME = (shared.PIANO_ROLL_GRID_WIDTH -
             1.0) + shared.PIANO_KEYS_WIDTH
         self.setUpdatesEnabled(False)
@@ -631,11 +622,19 @@ class PianoRollEditor(AbstractItemEditor):
         f_start = (self.piano_width + self.padding +
             self.px_per_beat * (a_note.start - a_offset))
         f_length = self.px_per_beat * a_note.length
-        f_note = PIANO_ROLL_HEADER_HEIGHT + self.note_height * \
+        f_note = (
+            _shared.PIANO_ROLL_HEADER_HEIGHT
+            +
+            self.note_height
+            *
             (shared.PIANO_ROLL_NOTE_COUNT - a_note.note_num)
+        )
         f_note_item = PianoRollNoteItem(
-            f_length, self.note_height, a_note.note_num,
-            a_note, a_enabled)
+            f_length,
+            self.note_height,
+            a_note.note_num,
+            a_note, a_enabled,
+        )
         f_note_item.setPos(f_start, f_note)
         self.scene.addItem(f_note_item)
         if a_enabled:
@@ -680,7 +679,7 @@ class PianoRollEditorWidget:
         self.controls_grid_layout = QGridLayout()
         self.scale_key_combobox = QComboBox()
         self.scale_key_combobox.setMinimumWidth(60)
-        self.scale_key_combobox.addItems(PIANO_ROLL_NOTE_LABELS)
+        self.scale_key_combobox.addItems(_shared.PIANO_ROLL_NOTE_LABELS)
         self.scale_key_combobox.currentIndexChanged.connect(
             self.reload_handler)
         self.controls_grid_layout.addWidget(QLabel("Key:"), 0, 3)

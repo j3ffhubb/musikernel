@@ -11,6 +11,19 @@ from mkpy.libpydaw.pydaw_util import *
 from mkpy.libpydaw.translate import _
 from mkpy.mkqt import *
 
+PIANO_NOTE_GRADIENT_TUPLE = (
+    (255, 0, 0),
+    (255, 123, 0),
+    (255, 255, 0),
+    (123, 255, 0),
+    (0, 255, 0),
+    (0, 255, 123),
+    (0, 255, 255),
+    (0, 123, 255),
+    (0, 0, 255),
+    (0, 0, 255),
+)
+
 
 class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
     """ An individual note in the PianoRollEditor """
@@ -40,8 +53,11 @@ class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
         self.is_copying = False
         self.is_velocity_dragging = False
         self.is_velocity_curving = False
-        if SELECTED_PIANO_NOTE is not None and \
-        a_note_item == SELECTED_PIANO_NOTE:
+        if (
+            _shared.SELECTED_PIANO_NOTE is not None
+            and
+            a_note_item == _shared.SELECTED_PIANO_NOTE
+        ):
             self.is_resizing = True
             shared.PIANO_ROLL_EDITOR.click_enabled = True
         else:
@@ -87,7 +103,7 @@ class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
         f_note_num = a_note_num if a_note_num is not None \
             else self.note_item.note_num
         f_octave = (f_note_num // 12) - 2
-        f_note = PIANO_ROLL_NOTE_LABELS[f_note_num % 12]
+        f_note = _shared.PIANO_ROLL_NOTE_LABELS[f_note_num % 12]
         f_text = "{}{}".format(f_note, f_octave)
         if f_text != self.current_note_text:
             self.current_note_text = f_text
@@ -146,7 +162,7 @@ class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
             shared.PIANO_ROLL_EDITOR.scene.clearSelection()
             self.setSelected(True)
         if shared.EDITOR_MODE == shared.EDITOR_MODE_ERASE:
-            piano_roll_set_delete_mode(True)
+            _shared.piano_roll_set_delete_mode(True)
             self.delete_later()
         elif a_event.modifiers() == \
         QtCore.Qt.ControlModifier | QtCore.Qt.AltModifier:
@@ -166,7 +182,7 @@ class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
         else:
             a_event.setAccepted(True)
             QGraphicsRectItem.mousePressEvent(self, a_event)
-            self.setBrush(SELECTED_NOTE_GRADIENT)
+            self.setBrush(_shared.SELECTED_NOTE_GRADIENT)
             self.o_pos = self.pos()
             if self.mouse_is_at_end(a_event.pos()):
                 self.is_resizing = True
@@ -258,14 +274,14 @@ class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
                     f_pos_x = shared.PIANO_KEYS_WIDTH
                 elif f_pos_x > shared.PIANO_ROLL_GRID_MAX_START_TIME:
                     f_pos_x = shared.PIANO_ROLL_GRID_MAX_START_TIME
-                if f_pos_y < PIANO_ROLL_HEADER_HEIGHT:
-                    f_pos_y = PIANO_ROLL_HEADER_HEIGHT
+                if f_pos_y < _shared.PIANO_ROLL_HEADER_HEIGHT:
+                    f_pos_y = _shared.PIANO_ROLL_HEADER_HEIGHT
                 elif f_pos_y > shared.PIANO_ROLL_TOTAL_HEIGHT:
                     f_pos_y = shared.PIANO_ROLL_TOTAL_HEIGHT
                 f_pos_y = \
-                    (int((f_pos_y - PIANO_ROLL_HEADER_HEIGHT) /
+                    (int((f_pos_y - _shared.PIANO_ROLL_HEADER_HEIGHT) /
                     self.note_height) * self.note_height) + \
-                    PIANO_ROLL_HEADER_HEIGHT
+                    _shared.PIANO_ROLL_HEADER_HEIGHT
                 if shared.PIANO_ROLL_SNAP:
                     f_pos_x = (int((f_pos_x - shared.PIANO_KEYS_WIDTH) /
                     shared.PIANO_ROLL_SNAP_VALUE) *
@@ -276,17 +292,16 @@ class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
 
     def y_pos_to_note(self, a_y):
         return int(shared.PIANO_ROLL_NOTE_COUNT -
-            ((a_y - PIANO_ROLL_HEADER_HEIGHT) /
+            ((a_y - _shared.PIANO_ROLL_HEADER_HEIGHT) /
             shared.PIANO_ROLL_NOTE_HEIGHT))
 
     def mouseReleaseEvent(self, a_event):
         if _shared.PIANO_ROLL_DELETE_MODE:
-            piano_roll_set_delete_mode(False)
+            _shared.piano_roll_set_delete_mode(False)
             return
         a_event.setAccepted(True)
         f_recip = 1.0 / shared.PIANO_ROLL_GRID_WIDTH
         QGraphicsRectItem.mouseReleaseEvent(self, a_event)
-        global SELECTED_PIANO_NOTE
         if self.is_copying:
             f_new_selection = []
         for f_item in shared.PIANO_ROLL_EDITOR.get_selected_items():
@@ -326,7 +341,7 @@ class PianoRollNoteItem(pydaw_widgets.QGraphicsRectItemNDL):
         if self.is_resizing:
             shared.LAST_NOTE_RESIZE = self.note_item.length
         shared.CURRENT_ITEM.fix_overlaps()
-        SELECTED_PIANO_NOTE = None
+        _shared.SELECTED_PIANO_NOTE = None
         shared.PIANO_ROLL_EDITOR.selected_note_strings = []
         if self.is_copying:
             for f_new_item in f_new_selection:
