@@ -431,9 +431,9 @@ class MkMainWindow(QMainWindow):
 
         self.menu_help = self.menu_bar.addMenu(_("Help"))
 
-        self.youtube_action = self.menu_help.addAction(
-            _("Watch Tutorial Videos on Youtube..."))
-        self.youtube_action.triggered.connect(self.on_youtube)
+        #self.youtube_action = self.menu_help.addAction(
+        #    _("Watch Tutorial Videos on Youtube..."))
+        #self.youtube_action.triggered.connect(self.on_youtube)
 
         self.troubleshoot_action = self.menu_help.addAction(
             _("Troubleshooting..."))
@@ -504,7 +504,8 @@ class MkMainWindow(QMainWindow):
 
     def on_youtube(self):
         f_url = QtCore.QUrl(
-            "https://www.youtube.com/channel/UCf_PgsosvLpxkN6bff9NESA/videos")
+            "TODO",
+        )
         QDesktopServices.openUrl(f_url)
 
     def engine_lib_callback(self, a_path, a_msg):
