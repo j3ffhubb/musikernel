@@ -171,7 +171,11 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/hardware.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/__init__.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/abstract.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/audio.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/audio/__init__.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/audio/_shared.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/audio/fade_vol_dialog.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/audio/item_context_menu.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/audio/time_pitch_dialog.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/automation.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/editor.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes.py

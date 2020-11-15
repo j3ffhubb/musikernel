@@ -1,10 +1,11 @@
 """
 
 """
-from .abstract import AbstractItemEditor
-from ..filedragdrop import FileDragDropper
+from . import _shared
+from ..abstract import AbstractItemEditor
 from mkpy import libmk
 from mkpy.libdawnext import project, shared
+from mkpy.libdawnext.filedragdrop import FileDragDropper
 from mkpy.libdawnext.project import *
 from mkpy.libdawnext.shared import *
 from mkpy.libmk import mk_project
@@ -19,22 +20,37 @@ from mkpy.mkqt import *
 
 PAINTER_PATH_CACHE = {}
 
-CURRENT_AUDIO_ITEM_INDEX = None
 
 LAST_AUDIO_ITEM_DIR = global_home
 
 def global_paif_val_callback(a_port, a_val):
-    if shared.CURRENT_ITEM is not None and \
-    CURRENT_AUDIO_ITEM_INDEX is not None:
+    if (
+        shared.CURRENT_ITEM is not None
+        and
+        _shared.CURRENT_AUDIO_ITEM_INDEX is not None
+    ):
         shared.PROJECT.IPC.pydaw_audio_per_item_fx(
-            shared.CURRENT_ITEM.uid, CURRENT_AUDIO_ITEM_INDEX, a_port, a_val)
+            shared.CURRENT_ITEM.uid,
+            _shared.CURRENT_AUDIO_ITEM_INDEX,
+            a_port,
+            a_val,
+        )
 
 def global_paif_rel_callback(a_port, a_val):
-    if shared.CURRENT_ITEM is not None and \
-    CURRENT_AUDIO_ITEM_INDEX is not None:
+    if (
+        shared.CURRENT_ITEM is not None
+        and
+        _shared.CURRENT_AUDIO_ITEM_INDEX is not None
+    ):
         f_index_list = shared.AUDIO_SEQ_WIDGET.modulex.get_list()
-        shared.CURRENT_ITEM.set_row(CURRENT_AUDIO_ITEM_INDEX, f_index_list)
-        shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
+        shared.CURRENT_ITEM.set_row(
+            _shared.CURRENT_AUDIO_ITEM_INDEX,
+            f_index_list,
+        )
+        shared.PROJECT.save_item(
+            shared.CURRENT_ITEM_NAME,
+            shared.CURRENT_ITEM,
+        )
 
 class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
     """ This is an individual audio item within the AudioItemSeq """
@@ -452,149 +468,6 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
             shared.AUDIO_SEQ.scene.clearSelection()
             self.setSelected(True)
 
-    def show_context_menu(self):
-        global CURRENT_AUDIO_ITEM_INDEX
-        f_CURRENT_AUDIO_ITEM_INDEX = CURRENT_AUDIO_ITEM_INDEX
-        CURRENT_AUDIO_ITEM_INDEX = self.track_num
-        f_menu = QMenu(shared.MAIN_WINDOW)
-
-        shared.AUDIO_SEQ.context_menu_enabled = False
-
-        f_file_menu = f_menu.addMenu(_("File"))
-        f_save_a_copy_action = f_file_menu.addAction(_("Save a Copy..."))
-        f_save_a_copy_action.triggered.connect(self.save_a_copy)
-        f_open_folder_action = f_file_menu.addAction(_("Open File in Browser"))
-        f_open_folder_action.triggered.connect(self.open_item_folder)
-        f_wave_editor_action = f_file_menu.addAction(_("Open in Wave Editor"))
-        f_wave_editor_action.triggered.connect(self.open_in_wave_editor)
-        f_copy_file_path_action = f_file_menu.addAction(
-            _("Copy File Path to Clipboard"))
-        f_copy_file_path_action.triggered.connect(
-            self.copy_file_path_to_clipboard)
-        f_select_instance_action = f_file_menu.addAction(
-            _("Select All Instances of This File"))
-        f_select_instance_action.triggered.connect(self.select_file_instance)
-        f_file_menu.addSeparator()
-        f_replace_action = f_file_menu.addAction(
-            _("Replace with Path in Clipboard"))
-        f_replace_action.triggered.connect(self.replace_with_path_in_clipboard)
-
-        f_properties_menu = f_menu.addMenu(_("Properties"))
-
-        f_ts_mode_menu = f_properties_menu.addMenu("Timestretch Mode")
-        f_ts_mode_menu.triggered.connect(self.ts_mode_menu_triggered)
-
-        f_ts_modes = {x.audio_item.time_stretch_mode
-            for x in shared.AUDIO_SEQ.get_selected()}
-
-        for f_ts_mode in TIMESTRETCH_MODES:
-            f_index = pydaw_util.TIMESTRETCH_INDEXES[f_ts_mode]
-            f_action = f_ts_mode_menu.addAction(f_ts_mode)
-            f_action.algo_name = f_ts_mode
-            if len(f_ts_modes) == 1 and f_index in f_ts_modes:
-                f_action.setCheckable(True)
-                f_action.setChecked(True)
-
-        if len(f_ts_modes) == 1 and [x for x in (3, 4) if x in f_ts_modes]:
-            f_crisp_menu = f_properties_menu.addMenu("Crispness")
-            f_crisp_menu.triggered.connect(self.crisp_menu_triggered)
-            f_crisp_settings = {x.audio_item.crispness
-                for x in shared.AUDIO_SEQ.get_selected()}
-            for f_crisp_mode, f_index in zip(
-            CRISPNESS_SETTINGS, range(len(CRISPNESS_SETTINGS))):
-                f_action = f_crisp_menu.addAction(f_crisp_mode)
-                f_action.crisp_mode = f_crisp_mode
-                if len(f_crisp_settings) == 1 and \
-                f_index in f_crisp_settings:
-                    f_action.setCheckable(True)
-                    f_action.setChecked(True)
-
-        f_output_modes = {x.audio_item.output_track
-            for x in shared.AUDIO_SEQ.get_selected()}
-
-        f_output_menu = f_properties_menu.addMenu(_("Output"))
-        f_output_menu.triggered.connect(self.output_mode_triggered)
-        for f_i, f_name in zip(
-        range(3), [_("Normal"), _("Sidechain"), _("Both")]):
-            f_action = f_output_menu.addAction(f_name)
-            f_action.output_val = f_i
-            if len(f_output_modes) == 1 and f_i in f_output_modes:
-                f_action.setCheckable(True)
-                f_action.setChecked(True)
-
-        f_volume_action = f_properties_menu.addAction(_("Volume..."))
-        f_volume_action.triggered.connect(self.volume_dialog)
-        f_normalize_action = f_properties_menu.addAction(_("Normalize..."))
-        f_normalize_action.triggered.connect(self.normalize_dialog)
-        f_reset_fades_action = f_properties_menu.addAction(_("Reset Fades"))
-        f_reset_fades_action.triggered.connect(self.reset_fades)
-        f_reset_end_action = f_properties_menu.addAction(_("Reset Ends"))
-        f_reset_end_action.triggered.connect(self.reset_end)
-        f_move_to_end_action = f_properties_menu.addAction(
-            _("Move to Region End"))
-        f_move_to_end_action.triggered.connect(self.move_to_region_end)
-        f_reverse_action = f_properties_menu.addAction(_("Reverse/Unreverse"))
-        f_reverse_action.triggered.connect(self.reverse)
-        f_time_pitch_action = f_properties_menu.addAction(_("Time/Pitch..."))
-        f_time_pitch_action.triggered.connect(self.time_pitch_dialog)
-        f_fade_vol_action = f_properties_menu.addAction(_("Fade Volume..."))
-        f_fade_vol_action.triggered.connect(self.fade_vol_dialog)
-
-        f_paif_menu = f_menu.addMenu(_("Per-Item FX"))
-        f_edit_paif_action = f_paif_menu.addAction(_("Edit Per-Item Effects"))
-        f_edit_paif_action.triggered.connect(self.edit_paif)
-        f_paif_menu.addSeparator()
-        f_paif_copy = f_paif_menu.addAction(_("Copy"))
-        f_paif_copy.triggered.connect(
-            shared.AUDIO_SEQ_WIDGET.on_modulex_copy)
-        f_paif_paste = f_paif_menu.addAction(_("Paste"))
-        f_paif_paste.triggered.connect(
-            shared.AUDIO_SEQ_WIDGET.on_modulex_paste)
-        f_paif_clear = f_paif_menu.addAction(_("Clear"))
-        f_paif_clear.triggered.connect(
-            shared.AUDIO_SEQ_WIDGET.on_modulex_clear)
-
-#        f_per_file_menu = f_menu.addMenu("For All Instances of This File Set")
-#        f_all_volumes_action = f_per_file_menu.addAction(_("Volume..."))
-#        f_all_volumes_action.triggered.connect(self.set_vol_for_all_instances)
-#        f_all_fades_action = f_per_file_menu.addAction(_("Fades"))
-#        f_all_fades_action.triggered.connect(self.set_fades_for_all_instances)
-#        f_all_paif_action = f_per_file_menu.addAction(_("Per-Item FX"))
-#        f_all_paif_action.triggered.connect(self.set_paif_for_all_instance)
-#
-#        f_groove_menu = f_menu.addMenu(_("Groove"))
-#        f_copy_as_cc_action = f_groove_menu.addAction(
-#            _("Copy Volume Envelope as CC Automation"))
-#        f_copy_as_cc_action.triggered.connect(
-#            self.copy_as_cc_automation)
-#        f_copy_as_pb_action = f_groove_menu.addAction(
-#            _("Copy Volume Envelope as Pitchbend Automation"))
-#        f_copy_as_pb_action.triggered.connect(
-#            self.copy_as_pb_automation)
-#        f_copy_as_notes_action = f_groove_menu.addAction(
-#            _("Copy Volume Envelope as MIDI Notes"))
-#        f_copy_as_notes_action.triggered.connect(self.copy_as_notes)
-
-        f_menu.exec_(QCursor.pos())
-        CURRENT_AUDIO_ITEM_INDEX = f_CURRENT_AUDIO_ITEM_INDEX
-
-    def output_mode_triggered(self, a_action):
-        f_list = shared.AUDIO_SEQ.get_selected()
-        for f_item in f_list:
-            f_item.audio_item.output_track = a_action.output_val
-        shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-        shared.PROJECT.commit(_("Set audio items output mode"))
-        global_open_audio_items(True)
-
-
-    def time_pitch_dialog(self):
-        f_dialog = time_pitch_dialog_widget(self.audio_item)
-        f_dialog.widget.exec_()
-
-    def fade_vol_dialog(self):
-        f_dialog = fade_vol_dialog_widget(self.audio_item)
-        f_dialog.widget.exec_()
-
     def copy_as_cc_automation(self):
         shared.CC_EDITOR.clipboard = en_project.envelope_to_automation(
             self.graph_object, True, TRANSPORT.tempo_spinbox.value())
@@ -613,13 +486,6 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
             x.audio_item.time_stretch_mode in (3, 4)]
         for f_item in f_list:
             f_item.crispness = f_index
-        self.timestretch_items(f_list)
-
-    def ts_mode_menu_triggered(self, a_action):
-        f_index = TIMESTRETCH_INDEXES[a_action.algo_name]
-        f_list = [x.audio_item for x in shared.AUDIO_SEQ.get_selected()]
-        for f_item in f_list:
-            f_item.time_stretch_mode = f_index
         self.timestretch_items(f_list)
 
     def timestretch_items(self, a_list):
@@ -641,23 +507,19 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
                 f_audio_item.audio_item.uid)
             f_audio_item.audio_item.clip_at_region_end(
                 pydaw_get_current_region_length(),
-                CURRENT_REGION.get_tempo_at_pos(shared.CURRENT_ITEM_REF.start_beat),
+                shared.CURRENT_REGION.get_tempo_at_pos(
+                    shared.CURRENT_ITEM_REF.start_beat,
+                ),
                 f_new_graph.length_in_seconds)
 
         shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
         shared.PROJECT.commit(_("Change timestretch mode for audio item(s)"))
         global_open_audio_items()
 
-    def select_file_instance(self):
-        shared.AUDIO_SEQ.scene.clearSelection()
-        f_uid = self.audio_item.uid
-        for f_item in shared.AUDIO_SEQ.audio_items:
-            if f_item.audio_item.uid == f_uid:
-                f_item.setSelected(True)
-
     def set_paif_for_all_instance(self):
         f_paif = shared.PROJECT.get_audio_per_item_fx_region(
-            CURRENT_REGION.uid)
+            shared.CURRENT_REGION.uid,
+        )
         f_paif_row = f_paif.get_row(self.track_num)
         shared.PROJECT.set_paif_for_all_audio_items(
             self.audio_item.uid, f_paif_row)
@@ -720,166 +582,12 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
         f_ok_cancel_layout.addWidget(f_cancel_button)
         f_dialog.exec_()
 
-    def reverse(self):
-        f_list = shared.AUDIO_SEQ.get_selected()
-        for f_item in f_list:
-            f_item.audio_item.reversed = not f_item.audio_item.reversed
-            # Invert the start/end and fades so that the same section stays in
-            # the sequencer exactly as it is, just reversed
-            start = f_item.audio_item.sample_start
-            end = f_item.audio_item.sample_end
-            f_item.audio_item.sample_start = 1000. - end
-            f_item.audio_item.sample_end = 1000. - start
-
-            fade_in = f_item.audio_item.fade_in
-            fade_out = f_item.audio_item.fade_out
-            f_item.audio_item.fade_in = 999. - fade_out
-            f_item.audio_item.fade_out = 1000. - fade_in - 1.
-
-        shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-        shared.PROJECT.commit(_("Toggle audio items reversed"))
-        global_open_audio_items(True)
-
-    def move_to_region_end(self):
-        f_list = shared.AUDIO_SEQ.get_selected()
-        if f_list:
-            f_current_region_length = pydaw_get_current_region_length()
-            f_global_tempo = CURRENT_REGION.get_tempo_at_pos(
-                shared.CURRENT_ITEM_REF.start_beat)
-            for f_item in f_list:
-                f_item.audio_item.clip_at_region_end(
-                    f_current_region_length, f_global_tempo,
-                    f_item.graph_object.length_in_seconds, False)
-            shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-            shared.PROJECT.commit(_("Move audio item(s) to region end"))
-            global_open_audio_items(True)
-
-    def reset_fades(self):
-        f_list = shared.AUDIO_SEQ.get_selected()
-        if f_list:
-            for f_item in f_list:
-                f_item.audio_item.fade_in = 0.0
-                f_item.audio_item.fade_out = 999.0
-            shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-            shared.PROJECT.commit(_("Reset audio item fades"))
-            global_open_audio_items(True)
-
-    def reset_end(self):
-        f_list = shared.AUDIO_SEQ.get_selected()
-        for f_item in f_list:
-            f_item.audio_item.sample_start = 0.0
-            f_item.audio_item.sample_end = 1000.0
-            self.draw()
-            self.clip_at_region_end()
-        shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-        shared.PROJECT.commit(_("Reset sample ends for audio item(s)"))
-        global_open_audio_items()
-
-    def replace_with_path_in_clipboard(self):
-        f_path = global_get_audio_file_from_clipboard()
-        if f_path is not None:
-            self.audio_item.uid = libmk.PROJECT.get_wav_uid_by_name(f_path)
-            shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-            shared.PROJECT.commit(_("Replace audio item"))
-            global_open_audio_items(True)
-
-    def open_in_wave_editor(self):
-        f_path = self.get_file_path()
-        libmk.MAIN_WINDOW.open_in_wave_editor(f_path)
-
-    def edit_paif(self):
-        shared.AUDIO_SEQ.scene.clearSelection()
-        self.setSelected(True)
-        shared.AUDIO_SEQ_WIDGET.folders_tab_widget.setCurrentIndex(2)
-
     def normalize(self, a_value):
         f_val = self.graph_object.normalize(a_value)
         self.audio_item.vol = f_val
 
-    def volume_dialog(self):
-        def on_ok():
-            f_val = round(f_db_spinbox.value(), 1)
-            for f_item in shared.AUDIO_SEQ.get_selected():
-                f_item.audio_item.vol = f_val
-            shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-            shared.PROJECT.commit(_("Normalize audio items"))
-            global_open_audio_items(True)
-            f_window.close()
-
-        def on_cancel():
-            f_window.close()
-
-        f_window = QDialog(shared.MAIN_WINDOW)
-        f_window.f_result = None
-        f_window.setWindowTitle(_("Volume"))
-        f_window.setFixedSize(150, 90)
-        f_layout = QVBoxLayout()
-        f_window.setLayout(f_layout)
-        f_hlayout = QHBoxLayout()
-        f_layout.addLayout(f_hlayout)
-        f_hlayout.addWidget(QLabel("dB"))
-        f_db_spinbox = QDoubleSpinBox()
-        f_hlayout.addWidget(f_db_spinbox)
-        f_db_spinbox.setDecimals(1)
-        f_db_spinbox.setRange(-24, 24)
-        f_vols = {x.audio_item.vol for x in shared.AUDIO_SEQ.get_selected()}
-        if len(f_vols) == 1:
-            f_db_spinbox.setValue(f_vols.pop())
-        else:
-            f_db_spinbox.setValue(0)
-        f_ok_button = QPushButton(_("OK"))
-        f_ok_cancel_layout = QHBoxLayout()
-        f_layout.addLayout(f_ok_cancel_layout)
-        f_ok_cancel_layout.addWidget(f_ok_button)
-        f_ok_button.pressed.connect(on_ok)
-        f_cancel_button = QPushButton(_("Cancel"))
-        f_ok_cancel_layout.addWidget(f_cancel_button)
-        f_cancel_button.pressed.connect(on_cancel)
-        f_window.exec_()
-        return f_window.f_result
-
-
-    def normalize_dialog(self):
-        f_val = normalize_dialog()
-        if f_val is None:
-            return
-        f_save = False
-        for f_item in shared.AUDIO_SEQ.get_selected():
-            f_save = True
-            f_item.normalize(f_val)
-        if f_save:
-            shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-            shared.PROJECT.commit(_("Normalize audio items"))
-            global_open_audio_items(True)
-
     def get_file_path(self):
         return libmk.PROJECT.get_wav_path_by_uid(self.audio_item.uid)
-
-    def copy_file_path_to_clipboard(self):
-        f_path = self.get_file_path()
-        f_clipboard = QApplication.clipboard()
-        f_clipboard.setText(f_path)
-
-    def save_a_copy(self):
-        global LAST_AUDIO_ITEM_DIR
-        f_file, f_filter = QFileDialog.getSaveFileName(
-            parent=shared.MAIN_WINDOW,
-            caption=_('Save audio item as .wav'),
-            directory=LAST_AUDIO_ITEM_DIR,
-            options=QFileDialog.DontUseNativeDialog,
-        )
-        if not f_file is None and not str(f_file) == "":
-            f_file = str(f_file)
-            if not f_file.endswith(".wav"):
-                f_file += ".wav"
-            LAST_AUDIO_ITEM_DIR = os.path.dirname(f_file)
-            f_orig_path = libmk.PROJECT.get_wav_name_by_uid(
-                self.audio_item.uid)
-            shutil.copy(f_orig_path, f_file)
-
-    def open_item_folder(self):
-        f_path = libmk.PROJECT.get_wav_name_by_uid(self.audio_item.uid)
-        shared.AUDIO_SEQ_WIDGET.open_file_in_browser(f_path)
 
     def mousePressEvent(self, a_event):
         if libmk.IS_PLAYING:
@@ -895,7 +603,8 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.setSelected(True)
 
         if a_event.button() == QtCore.Qt.RightButton:
-            self.show_context_menu()
+            _shared.CURRENT_ITEM = self
+            item_context_menu.show()
             return
 
         if shared.EDITOR_MODE == shared.EDITOR_MODE_SPLIT:
@@ -1421,7 +1130,9 @@ class AudioItemSeq(AbstractItemEditor):
                 _("You must have at least 2 items selected to crossfade"))
             return
 
-        f_tempo = CURRENT_REGION.get_tempo_at_pos(shared.CURRENT_ITEM_REF.start_beat)
+        f_tempo = shared.CURRENT_REGION.get_tempo_at_pos(
+            shared.CURRENT_ITEM_REF.start_beat,
+        )
         f_changed = False
 
         for f_item in f_list:
@@ -1503,18 +1214,17 @@ class AudioItemSeq(AbstractItemEditor):
 
     def scene_selection_changed(self):
         f_selected_items = []
-        global CURRENT_AUDIO_ITEM_INDEX
         for f_item in self.audio_items:
             f_item.set_brush()
             if f_item.isSelected():
                 f_selected_items.append(f_item)
         if len(f_selected_items) == 1:
-            CURRENT_AUDIO_ITEM_INDEX = f_selected_items[0].track_num
+            _shared.CURRENT_AUDIO_ITEM_INDEX = f_selected_items[0].track_num
             shared.AUDIO_SEQ_WIDGET.modulex.widget.setEnabled(True)
             shared.AUDIO_SEQ_WIDGET.modulex.set_from_list(
-                shared.CURRENT_ITEM.get_row(CURRENT_AUDIO_ITEM_INDEX))
+                shared.CURRENT_ITEM.get_row(_shared.CURRENT_AUDIO_ITEM_INDEX))
         elif len(f_selected_items) == 0:
-            CURRENT_AUDIO_ITEM_INDEX = None
+            _shared.CURRENT_AUDIO_ITEM_INDEX = None
             shared.AUDIO_SEQ_WIDGET.modulex.widget.setDisabled(True)
         else:
             shared.AUDIO_SEQ_WIDGET.modulex.widget.setDisabled(True)
@@ -1707,358 +1417,6 @@ class AudioItemSeq(AbstractItemEditor):
         self.scene.addItem(f_audio_item)
         return f_audio_item
 
-
-class time_pitch_dialog_widget:
-    def __init__(self, a_audio_item):
-        self.widget = QDialog()
-        self.widget.setWindowTitle(_("Time/Pitch..."))
-        self.widget.setMaximumWidth(480)
-        self.main_vlayout = QVBoxLayout(self.widget)
-
-        self.layout = QGridLayout()
-        self.main_vlayout.addLayout(self.layout)
-
-        self.vlayout2 = QVBoxLayout()
-        self.layout.addLayout(self.vlayout2, 1, 1)
-        self.start_hlayout = QHBoxLayout()
-        self.vlayout2.addLayout(self.start_hlayout)
-
-        self.timestretch_hlayout = QHBoxLayout()
-        self.time_pitch_gridlayout = QGridLayout()
-        self.vlayout2.addLayout(self.timestretch_hlayout)
-        self.vlayout2.addLayout(self.time_pitch_gridlayout)
-        self.timestretch_hlayout.addWidget(QLabel(_("Mode:")))
-        self.timestretch_mode = QComboBox()
-
-        self.timestretch_mode.setMinimumWidth(240)
-        self.timestretch_hlayout.addWidget(self.timestretch_mode)
-        self.timestretch_mode.addItems(TIMESTRETCH_MODES)
-        self.timestretch_mode.setCurrentIndex(a_audio_item.time_stretch_mode)
-        self.timestretch_mode.currentIndexChanged.connect(
-            self.timestretch_mode_changed)
-        self.time_pitch_gridlayout.addWidget(QLabel(_("Pitch:")), 0, 0)
-        self.pitch_shift = QDoubleSpinBox()
-        self.pitch_shift.setRange(-36, 36)
-        self.pitch_shift.setValue(a_audio_item.pitch_shift)
-        self.pitch_shift.setDecimals(6)
-        self.time_pitch_gridlayout.addWidget(self.pitch_shift, 0, 1)
-
-        self.pitch_shift_end_checkbox = QCheckBox(_("End:"))
-        self.pitch_shift_end_checkbox.setChecked(
-            a_audio_item.pitch_shift != a_audio_item.pitch_shift_end)
-        self.pitch_shift_end_checkbox.toggled.connect(
-            self.pitch_end_mode_changed)
-        self.time_pitch_gridlayout.addWidget(
-            self.pitch_shift_end_checkbox, 0, 2)
-        self.pitch_shift_end = QDoubleSpinBox()
-        self.pitch_shift_end.setRange(-36, 36)
-        self.pitch_shift_end.setValue(a_audio_item.pitch_shift_end)
-        self.pitch_shift_end.setDecimals(6)
-        self.time_pitch_gridlayout.addWidget(self.pitch_shift_end, 0, 3)
-
-        self.time_pitch_gridlayout.addWidget(QLabel(_("Time:")), 1, 0)
-        self.timestretch_amt = QDoubleSpinBox()
-        self.timestretch_amt.setRange(0.1, 200.0)
-        self.timestretch_amt.setDecimals(6)
-        self.timestretch_amt.setSingleStep(0.1)
-        self.timestretch_amt.setValue(a_audio_item.timestretch_amt)
-        self.time_pitch_gridlayout.addWidget(self.timestretch_amt, 1, 1)
-
-        self.crispness_layout = QHBoxLayout()
-        self.vlayout2.addLayout(self.crispness_layout)
-        self.crispness_layout.addWidget(QLabel(_("Crispness")))
-        self.crispness_combobox = QComboBox()
-        self.crispness_combobox.addItems(CRISPNESS_SETTINGS)
-        self.crispness_combobox.setCurrentIndex(a_audio_item.crispness)
-        self.crispness_layout.addWidget(self.crispness_combobox)
-
-        self.timestretch_amt_end_checkbox = QCheckBox(_("End:"))
-        self.timestretch_amt_end_checkbox.toggled.connect(
-            self.timestretch_end_mode_changed)
-        self.time_pitch_gridlayout.addWidget(
-            self.timestretch_amt_end_checkbox, 1, 2)
-        self.timestretch_amt_end = QDoubleSpinBox()
-        self.timestretch_amt_end.setRange(0.2, 4.0)
-        self.timestretch_amt_end.setDecimals(6)
-        self.timestretch_amt_end.setSingleStep(0.1)
-        self.timestretch_amt_end.setValue(a_audio_item.timestretch_amt_end)
-        self.time_pitch_gridlayout.addWidget(self.timestretch_amt_end, 1, 3)
-
-        self.timestretch_mode_changed(0)
-
-        self.timestretch_mode.currentIndexChanged.connect(
-            self.timestretch_changed)
-        self.pitch_shift.valueChanged.connect(self.timestretch_changed)
-        self.pitch_shift_end.valueChanged.connect(self.timestretch_changed)
-        self.timestretch_amt.valueChanged.connect(self.timestretch_changed)
-        self.timestretch_amt_end.valueChanged.connect(self.timestretch_changed)
-        self.crispness_combobox.currentIndexChanged.connect(
-            self.timestretch_changed)
-
-        self.ok_layout = QHBoxLayout()
-        self.ok = QPushButton(_("OK"))
-        self.ok.pressed.connect(self.ok_handler)
-        self.ok_layout.addWidget(self.ok)
-        self.cancel = QPushButton(_("Cancel"))
-        self.cancel.pressed.connect(self.widget.close)
-        self.ok_layout.addWidget(self.cancel)
-        self.vlayout2.addLayout(self.ok_layout)
-
-        self.last_open_dir = global_home
-
-    def timestretch_end_mode_changed(self, a_val=None):
-        if not self.timestretch_amt_end_checkbox.isChecked():
-            self.timestretch_amt_end.setValue(self.timestretch_amt.value())
-
-    def pitch_end_mode_changed(self, a_val=None):
-        if not self.pitch_shift_end_checkbox.isChecked():
-            self.pitch_shift_end.setValue(self.pitch_shift.value())
-
-    def end_mode_changed(self, a_val=None):
-        self.end_mode_checkbox.setChecked(True)
-
-    def timestretch_changed(self, a_val=None):
-        if not self.pitch_shift_end_checkbox.isChecked():
-            self.pitch_shift_end.setValue(self.pitch_shift.value())
-        if not self.timestretch_amt_end_checkbox.isChecked():
-            self.timestretch_amt_end.setValue(self.timestretch_amt.value())
-
-    def timestretch_mode_changed(self, a_val=None):
-        a_val = pydaw_util.TIMESTRETCH_INDEXES[
-            str(self.timestretch_mode.currentText())]
-        if a_val == 0:
-            self.pitch_shift.setEnabled(False)
-            self.timestretch_amt.setEnabled(False)
-            self.pitch_shift.setValue(0.0)
-            self.pitch_shift_end.setValue(0.0)
-            self.timestretch_amt.setValue(1.0)
-            self.timestretch_amt_end.setValue(1.0)
-            self.timestretch_amt_end_checkbox.setEnabled(False)
-            self.timestretch_amt_end_checkbox.setChecked(False)
-            self.pitch_shift_end_checkbox.setEnabled(False)
-            self.pitch_shift_end_checkbox.setChecked(False)
-            self.crispness_combobox.setCurrentIndex(5)
-            self.crispness_combobox.setEnabled(False)
-        elif a_val == 1:
-            self.pitch_shift.setEnabled(True)
-            self.timestretch_amt.setEnabled(False)
-            self.timestretch_amt.setValue(1.0)
-            self.timestretch_amt_end.setValue(1.0)
-            self.timestretch_amt_end.setEnabled(False)
-            self.timestretch_amt_end_checkbox.setEnabled(False)
-            self.timestretch_amt_end_checkbox.setChecked(False)
-            self.pitch_shift_end_checkbox.setEnabled(True)
-            self.pitch_shift_end.setEnabled(True)
-            self.crispness_combobox.setCurrentIndex(5)
-            self.crispness_combobox.setEnabled(False)
-        elif a_val == 2:
-            self.pitch_shift.setEnabled(False)
-            self.timestretch_amt.setEnabled(True)
-            self.pitch_shift.setValue(0.0)
-            self.pitch_shift_end.setValue(0.0)
-            self.pitch_shift_end.setEnabled(False)
-            self.timestretch_amt_end.setEnabled(True)
-            self.timestretch_amt_end_checkbox.setEnabled(True)
-            self.pitch_shift_end_checkbox.setEnabled(False)
-            self.pitch_shift_end_checkbox.setChecked(False)
-            self.crispness_combobox.setCurrentIndex(5)
-            self.crispness_combobox.setEnabled(False)
-        elif a_val == 3 or a_val == 4:
-            self.pitch_shift.setEnabled(True)
-            self.pitch_shift_end.setEnabled(False)
-            self.timestretch_amt.setEnabled(True)
-            self.timestretch_amt_end_checkbox.setEnabled(False)
-            self.timestretch_amt_end_checkbox.setChecked(False)
-            self.pitch_shift_end_checkbox.setEnabled(False)
-            self.pitch_shift_end_checkbox.setChecked(False)
-            self.crispness_combobox.setEnabled(True)
-        elif a_val == 5:
-            self.pitch_shift.setEnabled(True)
-            self.pitch_shift_end.setEnabled(True)
-            self.timestretch_amt.setEnabled(True)
-            self.timestretch_amt_end.setEnabled(True)
-            self.timestretch_amt_end_checkbox.setEnabled(True)
-            self.pitch_shift_end_checkbox.setEnabled(True)
-            self.crispness_combobox.setCurrentIndex(5)
-            self.crispness_combobox.setEnabled(False)
-        elif a_val == 6:
-            self.pitch_shift.setEnabled(True)
-            self.timestretch_amt.setEnabled(True)
-            self.timestretch_amt_end.setEnabled(False)
-            self.pitch_shift_end.setEnabled(False)
-            self.timestretch_amt_end_checkbox.setEnabled(False)
-            self.timestretch_amt_end_checkbox.setChecked(False)
-            self.pitch_shift_end_checkbox.setEnabled(False)
-            self.pitch_shift_end_checkbox.setChecked(False)
-            self.crispness_combobox.setCurrentIndex(5)
-            self.crispness_combobox.setEnabled(False)
-
-
-    def ok_handler(self):
-        if libmk.IS_PLAYING:
-            QMessageBox.warning(
-                self.widget, _("Error"),
-                _("Cannot edit audio items during playback"))
-            return
-
-        self.end_mode = 0
-
-        f_selected_count = 0
-
-        f_was_stretching = False
-        f_stretched_items = []
-
-        for f_item in shared.AUDIO_SEQ.audio_items:
-            if f_item.isSelected():
-                f_new_ts_mode = self.timestretch_mode.currentIndex()
-                f_new_ts = round(self.timestretch_amt.value(), 6)
-                f_new_ps = round(self.pitch_shift.value(), 6)
-                if self.timestretch_amt_end_checkbox.isChecked():
-                    f_new_ts_end = round(
-                        self.timestretch_amt_end.value(), 6)
-                else:
-                    f_new_ts_end = f_new_ts
-                if self.pitch_shift_end_checkbox.isChecked():
-                    f_new_ps_end = round(self.pitch_shift_end.value(), 6)
-                else:
-                    f_new_ps_end = f_new_ps
-                f_item.audio_item.crispness = \
-                    self.crispness_combobox.currentIndex()
-
-                if ((f_item.audio_item.time_stretch_mode >= 3) or
-                (f_item.audio_item.time_stretch_mode == 1 and \
-                (f_item.audio_item.pitch_shift_end !=
-                    f_item.audio_item.pitch_shift)) or \
-                (f_item.audio_item.time_stretch_mode == 2 and \
-                (f_item.audio_item.timestretch_amt_end !=
-                    f_item.audio_item.timestretch_amt))) and \
-                ((f_new_ts_mode == 0) or \
-                (f_new_ts_mode == 1 and f_new_ps == f_new_ps_end) or \
-                (f_new_ts_mode == 2 and f_new_ts == f_new_ts_end)):
-                    f_item.audio_item.uid = \
-                        libmk.PROJECT.timestretch_get_orig_file_uid(
-                            f_item.audio_item.uid)
-
-                f_item.audio_item.time_stretch_mode = f_new_ts_mode
-                f_item.audio_item.pitch_shift = f_new_ps
-                f_item.audio_item.timestretch_amt = f_new_ts
-                f_item.audio_item.pitch_shift_end = f_new_ps_end
-                f_item.audio_item.timestretch_amt_end = f_new_ts_end
-                f_item.draw()
-                f_item.clip_at_region_end()
-                if (f_new_ts_mode >= 3) or \
-                (f_new_ts_mode == 1 and f_new_ps != f_new_ps_end) or \
-                (f_new_ts_mode == 2 and f_new_ts != f_new_ts_end) and \
-                (f_item.orig_string != str(f_item.audio_item)):
-                    f_was_stretching = True
-                    f_ts_result = libmk.PROJECT.timestretch_audio_item(
-                        f_item.audio_item)
-                    if f_ts_result is not None:
-                        f_stretched_items.append(
-                            (f_ts_result, f_item.audio_item))
-                f_item.draw()
-                f_selected_count += 1
-        if f_selected_count == 0:
-            QMessageBox.warning(
-                self.widget, _("Error"), _("No items selected"))
-        else:
-            if f_was_stretching:
-#                f_current_region_length = pydaw_get_current_region_length()
-#                f_global_tempo = float(TRANSPORT.tempo_spinbox.value())
-                libmk.PROJECT.save_stretch_dicts()
-                for f_stretch_item, f_audio_item in f_stretched_items:
-                    f_stretch_item[2].wait()
-                    libmk.PROJECT.get_wav_uid_by_name(
-                        f_stretch_item[0], a_uid=f_stretch_item[1])
-#                    f_new_uid = libmk.PROJECT.get_wav_uid_by_name(
-#                        f_stretch_item[0], a_uid=f_stretch_item[1])
-#                    f_graph = libmk.PROJECT.get_sample_graph_by_uid(f_new_uid)
-#                    f_audio_item.clip_at_region_end(
-#                        f_current_region_length, f_global_tempo,
-#                        f_graph.length_in_seconds)
-            shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-            global_open_audio_items(True)
-            shared.PROJECT.commit(_("Update audio items"))
-        self.widget.close()
-
-
-class fade_vol_dialog_widget:
-    def __init__(self, a_audio_item):
-        self.widget = QDialog()
-        self.widget.setWindowTitle(_("Fade Volume..."))
-        self.widget.setMaximumWidth(480)
-        self.main_vlayout = QVBoxLayout(self.widget)
-
-        self.layout = QGridLayout()
-        self.main_vlayout.addLayout(self.layout)
-
-        self.fadein_vol_layout = QHBoxLayout()
-        self.fadein_vol_checkbox = QCheckBox(_("Fade-In:"))
-        self.fadein_vol_layout.addWidget(self.fadein_vol_checkbox)
-        self.fadein_vol_spinbox = QSpinBox()
-        self.fadein_vol_spinbox.setRange(-50, -6)
-        self.fadein_vol_spinbox.setValue(a_audio_item.fadein_vol)
-        self.fadein_vol_spinbox.valueChanged.connect(self.fadein_vol_changed)
-        self.fadein_vol_layout.addWidget(self.fadein_vol_spinbox)
-        self.fadein_vol_layout.addItem(
-            QSpacerItem(5, 5, QSizePolicy.Expanding))
-        self.main_vlayout.addLayout(self.fadein_vol_layout)
-
-        self.fadeout_vol_checkbox = QCheckBox(_("Fade-Out:"))
-        self.fadein_vol_layout.addWidget(self.fadeout_vol_checkbox)
-        self.fadeout_vol_spinbox = QSpinBox()
-        self.fadeout_vol_spinbox.setRange(-50, -6)
-        self.fadeout_vol_spinbox.setValue(a_audio_item.fadeout_vol)
-        self.fadeout_vol_spinbox.valueChanged.connect(self.fadeout_vol_changed)
-        self.fadein_vol_layout.addWidget(self.fadeout_vol_spinbox)
-
-        self.ok_layout = QHBoxLayout()
-        self.ok = QPushButton(_("OK"))
-        self.ok.pressed.connect(self.ok_handler)
-        self.ok_layout.addWidget(self.ok)
-        self.cancel = QPushButton(_("Cancel"))
-        self.cancel.pressed.connect(self.widget.close)
-        self.ok_layout.addWidget(self.cancel)
-        self.main_vlayout.addLayout(self.ok_layout)
-
-        self.last_open_dir = global_home
-
-    def fadein_vol_changed(self, a_val=None):
-        self.fadein_vol_checkbox.setChecked(True)
-
-    def fadeout_vol_changed(self, a_val=None):
-        self.fadeout_vol_checkbox.setChecked(True)
-
-    def ok_handler(self):
-        if libmk.IS_PLAYING:
-            QMessageBox.warning(
-                self.widget, _("Error"),
-                _("Cannot edit audio items during playback"))
-            return
-
-        self.end_mode = 0
-
-        f_selected_count = 0
-
-        for f_item in shared.AUDIO_SEQ.audio_items:
-            if f_item.isSelected():
-                if self.fadein_vol_checkbox.isChecked():
-                    f_item.audio_item.fadein_vol = \
-                        self.fadein_vol_spinbox.value()
-                if self.fadeout_vol_checkbox.isChecked():
-                    f_item.audio_item.fadeout_vol = \
-                        self.fadeout_vol_spinbox.value()
-                f_item.draw()
-                f_selected_count += 1
-        if f_selected_count == 0:
-            QMessageBox.warning(
-                self.widget, _("Error"), _("No items selected"))
-        else:
-            shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)
-            global_open_audio_items(True)
-            shared.PROJECT.commit(_("Update audio items"))
-        self.widget.close()
-
 class AudioItemSeqWidget(FileDragDropper):
     """ The parent widget (including the file browser dialog) for the
         AudioItemSeq
@@ -2157,25 +1515,43 @@ class AudioItemSeqWidget(FileDragDropper):
             self.modulex.widget.setToolTip("")
 
     def on_select_all(self):
-        if CURRENT_REGION is None or libmk.IS_PLAYING:
+        if (
+            shared.CURRENT_REGION is None
+            or
+            libmk.IS_PLAYING
+        ):
             return
         for f_item in shared.AUDIO_SEQ.audio_items:
             f_item.setSelected(True)
 
     def on_glue_selected(self):
-        if CURRENT_REGION is None or libmk.IS_PLAYING:
+        if (
+            shared.CURRENT_REGION is None
+            or
+            libmk.IS_PLAYING
+        ):
             return
         shared.AUDIO_SEQ.glue_selected()
 
     def on_delete_selected(self):
-        if CURRENT_REGION is None or libmk.IS_PLAYING:
+        if (
+            shared.CURRENT_REGION is None
+            or
+            libmk.IS_PLAYING
+        ):
             return
         shared.AUDIO_SEQ.delete_selected()
 
     def on_modulex_copy(self):
-        if CURRENT_AUDIO_ITEM_INDEX is not None and shared.CURRENT_ITEM:
+        if (
+            _shared.CURRENT_AUDIO_ITEM_INDEX is not None
+            and
+            shared.CURRENT_ITEM
+        ):
             f_paif = shared.CURRENT_ITEM
-            self.modulex_clipboard = f_paif.get_row(CURRENT_AUDIO_ITEM_INDEX)
+            self.modulex_clipboard = f_paif.get_row(
+                _shared.CURRENT_AUDIO_ITEM_INDEX,
+            )
 
     def on_modulex_paste(self):
         if self.modulex_clipboard is not None and shared.CURRENT_ITEM:
@@ -2282,34 +1658,3 @@ def pydaw_set_audio_seq_zoom(a_horizontal, a_vertical):
     shared.AUDIO_ITEM_HEIGHT = 75.0 * a_vertical
 
 
-def normalize_dialog():
-    def on_ok():
-        f_window.f_result = f_db_spinbox.value()
-        f_window.close()
-
-    def on_cancel():
-        f_window.close()
-
-    f_window = QDialog(shared.MAIN_WINDOW)
-    f_window.f_result = None
-    f_window.setWindowTitle(_("Normalize"))
-    f_window.setFixedSize(150, 90)
-    f_layout = QVBoxLayout()
-    f_window.setLayout(f_layout)
-    f_hlayout = QHBoxLayout()
-    f_layout.addLayout(f_hlayout)
-    f_hlayout.addWidget(QLabel("dB"))
-    f_db_spinbox = QDoubleSpinBox()
-    f_db_spinbox.setDecimals(1)
-    f_hlayout.addWidget(f_db_spinbox)
-    f_db_spinbox.setRange(-18, 0)
-    f_ok_button = QPushButton(_("OK"))
-    f_ok_cancel_layout = QHBoxLayout()
-    f_layout.addLayout(f_ok_cancel_layout)
-    f_ok_cancel_layout.addWidget(f_ok_button)
-    f_ok_button.pressed.connect(on_ok)
-    f_cancel_button = QPushButton(_("Cancel"))
-    f_ok_cancel_layout.addWidget(f_cancel_button)
-    f_cancel_button.pressed.connect(on_cancel)
-    f_window.exec_()
-    return f_window.f_result
