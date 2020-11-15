@@ -1,3 +1,4 @@
+from .  import _shared
 from mkpy import libmk
 from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
@@ -7,7 +8,6 @@ from mkpy.libpydaw import (
     pydaw_widgets,
 )
 from mkpy.mkqt import *
-import ._shared
 
 
 REGION_EDITOR_MODE = 0

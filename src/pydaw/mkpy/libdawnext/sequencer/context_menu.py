@@ -1,4 +1,4 @@
-import ._shared
+from .  import _shared
 from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
 from mkpy.libpydaw import (
