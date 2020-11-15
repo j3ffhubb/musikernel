@@ -922,8 +922,14 @@ class DawNextProject(libmk.AbstractProject):
 
 class pydaw_sequencer_item:
     def __init__(
-            self, a_track_num, a_start_beat, a_length_beats,
-            a_item_uid=-1, a_start_pos=0.0, modified=True):
+        self,
+        a_track_num,
+        a_start_beat,
+        a_length_beats,
+        a_item_uid=-1,
+        a_start_pos=0.0,
+        modified=True,
+    ):
         self.track_num = int(a_track_num)
         self.start_beat = float(a_start_beat)
         self.length_beats = float(a_length_beats)
@@ -1976,8 +1982,15 @@ class pydaw_item:
             self.remove_cc(cc)
 
     #TODO:  A maximum number of events per line?
-    def draw_cc_line(self, a_cc, a_start, a_start_val,
-                     a_end, a_end_val, a_curve=0):
+    def draw_cc_line(
+        self,
+        a_cc,
+        a_start,
+        a_start_val,
+        a_end,
+        a_end_val,
+        a_curve=0,
+    ):
         f_cc = int(a_cc)
         f_start = float(a_start)
         f_start_val = int(a_start_val)

@@ -1961,6 +1961,91 @@ class ItemSequencer(QGraphicsView):
         f_layout.addWidget(f_cancel, 6, 1)
         f_window.exec_()
 
+    def header_time_range(self):
+        if not shared.CURRENT_REGION.loop_marker:
+            QMessageBox.warning(
+                "Error",
+                "No region set, please set a region first",
+            )
+            return
+        def ok_handler():
+            tempo = f_start_tempo.value()
+            beat = shared.CURRENT_REGION.loop_marker.start_beat
+            beats = (
+                shared.CURRENT_REGION.loop_marker.beat
+                -
+                shared.CURRENT_REGION.loop_marker.start_beat
+            )
+            inc = (float(f_end_tempo.value()) - float(tempo)) / beats
+            for i in range(
+                shared.CURRENT_REGION.loop_marker.start_beat,
+                shared.CURRENT_REGION.loop_marker.beat + 1,
+            ):
+                f_marker = project.pydaw_tempo_marker(
+                    i,
+                    int(round(tempo)),
+                    f_tsig_num.value(),
+                    int(str(f_tsig_den.currentText())),
+                )
+                tempo += inc
+                beat += 1
+                shared.CURRENT_REGION.set_marker(f_marker)
+            shared.PROJECT.save_region(shared.CURRENT_REGION)
+            shared.PROJECT.commit(_("Set tempo range"))
+            shared.REGION_SETTINGS.open_region()
+            f_window.close()
+
+        def cancel_handler():
+            f_window.close()
+
+        f_window = QDialog(shared.MAIN_WINDOW)
+        f_window.setWindowTitle(_("Tempo Range"))
+        f_layout = QGridLayout()
+        f_window.setLayout(f_layout)
+
+        f_marker = shared.CURRENT_REGION.has_marker(self.header_event_pos, 2)
+
+        f_start_tempo = QSpinBox()
+        f_start_tempo.setRange(30, 240)
+        f_layout.addWidget(QLabel(_("Start Tempo")), 0, 0)
+        f_layout.addWidget(f_start_tempo, 0, 1)
+        f_end_tempo = QSpinBox()
+        f_end_tempo.setRange(30, 240)
+        f_layout.addWidget(QLabel(_("End Tempo")), 1, 0)
+        f_layout.addWidget(f_end_tempo, 1, 1)
+        f_tsig_layout = QHBoxLayout()
+        f_layout.addLayout(f_tsig_layout, 2, 1)
+        f_tsig_num = QSpinBox()
+        f_tsig_num.setRange(1, 16)
+        f_layout.addWidget(QLabel(_("Time Signature")), 2, 0)
+        f_tsig_layout.addWidget(f_tsig_num)
+        f_tsig_layout.addWidget(QLabel("/"))
+
+        f_tsig_den = QComboBox()
+        f_tsig_den.setMinimumWidth(60)
+        f_tsig_layout.addWidget(f_tsig_den)
+        f_tsig_den.addItems(["2", "4", "8", "16"])
+
+        if f_marker:
+            f_start_tempo.setValue(f_marker.tempo)
+            f_end_tempo.setValue(f_marker.tempo)
+            f_tsig_num.setValue(f_marker.tsig_num)
+            f_tsig_den.setCurrentIndex(
+                f_tsig_den.findText(str(f_marker.tsig_den)))
+        else:
+            f_start_tempo.setValue(128)
+            f_end_tempo.setValue(128)
+            f_tsig_num.setValue(4)
+            f_tsig_den.setCurrentIndex(1)
+
+        f_ok = QPushButton(_("Create"))
+        f_ok.pressed.connect(ok_handler)
+        f_layout.addWidget(f_ok, 6, 0)
+        f_cancel = QPushButton(_("Cancel"))
+        f_cancel.pressed.connect(cancel_handler)
+        f_layout.addWidget(f_cancel, 6, 1)
+        f_window.exec_()
+
     def header_marker_modify(self):
         def ok_handler():
             f_marker = project.pydaw_sequencer_marker(
@@ -2009,27 +2094,36 @@ class ItemSequencer(QGraphicsView):
         f_window.exec_()
 
     def header_loop_start(self):
-        f_tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(self.header_event_pos)
+        tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
+            self.header_event_pos,
+        )
         if shared.CURRENT_REGION.loop_marker:
-            f_end = pydaw_util.pydaw_clip_min(
+            end = pydaw_util.pydaw_clip_min(
                 shared.CURRENT_REGION.loop_marker.beat,
-                self.header_event_pos + f_tsig_beats)
+                self.header_event_pos + tsig_beats,
+            )
         else:
-            f_end = self.header_event_pos + f_tsig_beats
+            end = self.header_event_pos + tsig_beats
 
-        f_marker = project.pydaw_loop_marker(f_end, self.header_event_pos)
-        shared.CURRENT_REGION.set_loop_marker(f_marker)
+        marker = project.pydaw_loop_marker(end, self.header_event_pos)
+        shared.CURRENT_REGION.set_loop_marker(marker)
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Set region start"))
         shared.REGION_SETTINGS.open_region()
 
     def header_loop_end(self):
-        f_tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(self.header_event_pos)
+        f_tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
+            self.header_event_pos,
+        )
         shared.CURRENT_REGION.loop_marker.beat = pydaw_util.pydaw_clip_min(
-            self.header_event_pos, f_tsig_beats)
-        shared.CURRENT_REGION.loop_marker.start_beat = pydaw_util.pydaw_clip_max(
-            shared.CURRENT_REGION.loop_marker.start_beat,
-            shared.CURRENT_REGION.loop_marker.beat - f_tsig_beats)
+            self.header_event_pos,
+            f_tsig_beats,
+        )
+        shared.CURRENT_REGION.loop_marker.start_beat = \
+            pydaw_util.pydaw_clip_max(
+                shared.CURRENT_REGION.loop_marker.start_beat,
+                shared.CURRENT_REGION.loop_marker.beat - f_tsig_beats,
+            )
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Set region end"))
         shared.REGION_SETTINGS.open_region()
@@ -2042,6 +2136,8 @@ class ItemSequencer(QGraphicsView):
         f_marker_action.triggered.connect(self.header_marker_modify)
         f_time_modify_action = f_menu.addAction(_("Time/Tempo Marker..."))
         f_time_modify_action.triggered.connect(self.header_time_modify)
+        f_time_range_action = f_menu.addAction(_("Tempo Range..."))
+        f_time_range_action.triggered.connect(self.header_time_range)
         f_menu.addSeparator()
         f_loop_start_action = f_menu.addAction(_("Set Region Start"))
         f_loop_start_action.triggered.connect(self.header_loop_start)
