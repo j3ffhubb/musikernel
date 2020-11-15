@@ -1182,7 +1182,7 @@ class ItemSequencer(QGraphicsView):
                 _("No automation selected for this track"))
             return
         f_index, f_plugin = shared.TRACK_PANEL.get_atm_params(f_track)
-        ATM_REGION.clear_port(f_index, f_track_port_num)
+        shared.ATM_REGION.clear_port(f_index, f_track_port_num)
         self.automation_save_callback()
 
     def clear_plugin(self):
@@ -1196,7 +1196,7 @@ class ItemSequencer(QGraphicsView):
                 _("No automation selected for this track"))
             return
         f_index, f_plugin = shared.TRACK_PANEL.get_atm_params(f_track)
-        ATM_REGION.clear_plugins([f_index])
+        shared.ATM_REGION.clear_plugins([f_index])
         self.automation_save_callback()
 
     def clear_track(self):
@@ -1206,7 +1206,7 @@ class ItemSequencer(QGraphicsView):
         f_plugins = shared.PROJECT.get_track_plugin_uids(f_track)
         if not f_plugins:
             return
-        ATM_REGION.clear_plugins(f_plugins)
+        shared.ATM_REGION.clear_plugins(f_plugins)
         self.automation_save_callback()
 
     def copy_track_region(self):
@@ -1220,7 +1220,7 @@ class ItemSequencer(QGraphicsView):
         f_plugins = shared.PROJECT.get_track_plugin_uids(f_track)
         if not f_plugins:
             return
-        self.track_atm_clipboard = ATM_REGION.copy_range_by_plugins(
+        self.track_atm_clipboard = shared.ATM_REGION.copy_range_by_plugins(
             f_start, f_end, f_plugins)
         self.automation_save_callback()
 
@@ -1230,7 +1230,7 @@ class ItemSequencer(QGraphicsView):
         f_beat = self.quantize(self.current_coord[1])
         for f_point in (x.clone() for x in self.track_atm_clipboard):
             f_point.beat += f_beat
-            ATM_REGION.add_point(f_point)
+            shared.ATM_REGION.add_point(f_point)
         self.automation_save_callback()
 
     def clear_track_region(self):
@@ -1244,7 +1244,7 @@ class ItemSequencer(QGraphicsView):
         f_plugins = shared.PROJECT.get_track_plugin_uids(f_track)
         if not f_plugins:
             return
-        ATM_REGION.clear_range_by_plugins(f_start, f_end, f_plugins)
+        shared.ATM_REGION.clear_range_by_plugins(f_start, f_end, f_plugins)
         self.automation_save_callback()
 
     def takes_menu_triggered(self, a_action):
@@ -1399,7 +1399,7 @@ class ItemSequencer(QGraphicsView):
                     f_point = pydaw_atm_point(
                         f_beat, f_port, f_val,
                         *shared.TRACK_PANEL.get_atm_params(f_track))
-                    ATM_REGION.add_point(f_point)
+                    shared.ATM_REGION.add_point(f_point)
                     point_item = self.draw_point(f_point)
                     point_item.setSelected(True)
                     self.current_atm_point = point_item
@@ -1483,7 +1483,7 @@ class ItemSequencer(QGraphicsView):
         self.selected_point_strings = set()
         for f_point in f_selected:
             self.automation_points.remove(f_point)
-            ATM_REGION.remove_point(f_point.item)
+            shared.ATM_REGION.remove_point(f_point.item)
         self.automation_save_callback()
 
     def get_selected_items(self):
@@ -1532,8 +1532,8 @@ class ItemSequencer(QGraphicsView):
         elif REGION_EDITOR_MODE == 1:
             shared.SEQUENCER.setDragMode(QGraphicsView.RubberBandDrag)
         self.enabled = False
-        global ATM_REGION, CACHED_SEQ_LEN
-        ATM_REGION = shared.PROJECT.get_atm_region()
+        global CACHED_SEQ_LEN
+        shared.ATM_REGION = shared.PROJECT.get_atm_region()
         f_items_dict = shared.PROJECT.get_items_dict()
         f_scrollbar = self.horizontalScrollBar()
         f_scrollbar_value = f_scrollbar.value()
@@ -1563,7 +1563,7 @@ class ItemSequencer(QGraphicsView):
         for f_track in shared.TRACK_PANEL.tracks:
             f_port, f_index = shared.TRACK_PANEL.has_automation(f_track)
             if f_port is not None:
-                points = ATM_REGION.get_points(f_index, f_port)
+                points = shared.ATM_REGION.get_points(f_index, f_port)
                 if points:
                     point_items = [self.draw_point(x) for x in points]
                     self.draw_atm_lines(f_track, point_items)
@@ -1641,7 +1641,7 @@ class ItemSequencer(QGraphicsView):
                 libmk.clean_wav_pool()
         elif REGION_EDITOR_MODE == 1:
             for f_point in self.get_selected_points():
-                ATM_REGION.remove_point(f_point.item)
+                shared.ATM_REGION.remove_point(f_point.item)
             self.automation_save_callback()
 
     def set_tooltips(self, a_on):
@@ -1907,8 +1907,11 @@ class ItemSequencer(QGraphicsView):
             shared.REGION_SETTINGS.open_region()
             f_window.close()
 
-        def cancel_handler():
-            f_marker = shared.CURRENT_REGION.has_marker(self.header_event_pos, 2)
+        def delete_handler():
+            f_marker = shared.CURRENT_REGION.has_marker(
+                self.header_event_pos,
+                2,
+            )
             if f_marker and self.header_event_pos:
                 shared.CURRENT_REGION.delete_marker(f_marker)
                 shared.PROJECT.save_region(shared.CURRENT_REGION)
@@ -1955,11 +1958,37 @@ class ItemSequencer(QGraphicsView):
         f_layout.addWidget(f_ok, 6, 0)
         if self.header_event_pos:
             f_cancel = QPushButton(_("Delete"))
+            f_cancel.pressed.connect(delete_handler)
         else:
             f_cancel = QPushButton(_("Cancel"))
-        f_cancel.pressed.connect(cancel_handler)
+            f_cancel.pressed.connect(f_window.close)
         f_layout.addWidget(f_cancel, 6, 1)
         f_window.exec_()
+
+    def header_tempo_clear(self):
+        if not shared.CURRENT_REGION.loop_marker:
+            QMessageBox.warning(
+                "Error",
+                "No region set, please set a region first",
+            )
+            return
+        deleted = False
+        for i in range(
+            shared.CURRENT_REGION.loop_marker.start_beat,
+            shared.CURRENT_REGION.loop_marker.beat + 1,
+        ):
+            if i == 0:
+                continue
+            marker = shared.CURRENT_REGION.has_marker(i, 2)
+            if marker:
+                print("Deleting {}".format(marker.__dict__))
+                shared.CURRENT_REGION.delete_marker(marker)
+                deleted += 1
+        if deleted:
+            print("Deleted {} tempo markers".format(deleted))
+            shared.PROJECT.save_region(shared.CURRENT_REGION)
+            shared.PROJECT.commit(_("Delete tempo ranger"))
+            shared.REGION_SETTINGS.open_region()
 
     def header_time_range(self):
         if not shared.CURRENT_REGION.loop_marker:
@@ -2057,7 +2086,10 @@ class ItemSequencer(QGraphicsView):
             f_window.close()
 
         def cancel_handler():
-            f_marker = shared.CURRENT_REGION.has_marker(self.header_event_pos, 3)
+            f_marker = shared.CURRENT_REGION.has_marker(
+                self.header_event_pos,
+                3,
+            )
             if f_marker:
                 shared.CURRENT_REGION.delete_marker(f_marker)
                 shared.PROJECT.save_region(shared.CURRENT_REGION)
@@ -2139,6 +2171,11 @@ class ItemSequencer(QGraphicsView):
         f_time_range_action = f_menu.addAction(_("Tempo Range..."))
         f_time_range_action.triggered.connect(self.header_time_range)
         f_menu.addSeparator()
+        clear_tempo_range_action = f_menu.addAction(
+            _("Clear Time/Tempo Markers in Region")
+        )
+        clear_tempo_range_action.triggered.connect(self.header_tempo_clear)
+        f_menu.addSeparator()
         f_loop_start_action = f_menu.addAction(_("Set Region Start"))
         f_loop_start_action.triggered.connect(self.header_loop_start)
         if shared.CURRENT_REGION.loop_marker:
@@ -2158,7 +2195,7 @@ class ItemSequencer(QGraphicsView):
         f_region_end = shared.CURRENT_REGION.loop_marker.beat
         f_region_length = f_region_end - f_region_start
         f_list = [x.audio_item.clone() for x in self.get_region_items()]
-        f_atm_list = ATM_REGION.copy_range_all(f_region_start, f_region_end)
+        f_atm_list = shared.ATM_REGION.copy_range_all(f_region_start, f_region_end)
         for f_item in f_list:
             f_item.start_beat -= f_region_start
         for f_point in f_atm_list:
@@ -2175,7 +2212,7 @@ class ItemSequencer(QGraphicsView):
             shared.CURRENT_REGION.add_item_ref_by_uid(f_item)
         for f_point in f_atm_list:
             f_point.beat += self.header_event_pos
-            ATM_REGION.add_point(f_point)
+            shared.ATM_REGION.add_point(f_point)
         self.automation_save_callback()
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Insert region"))
@@ -2372,7 +2409,7 @@ class ItemSequencer(QGraphicsView):
             REGION_EDITOR_HEADER_HEIGHT)
 
     def automation_save_callback(self, a_open=True):
-        shared.PROJECT.save_atm_region(ATM_REGION)
+        shared.PROJECT.save_atm_region(shared.ATM_REGION)
         if a_open:
             self.open_region()
 
@@ -2479,7 +2516,7 @@ class ItemSequencer(QGraphicsView):
             return
 
         f_port, f_atm_uid = shared.TRACK_PANEL.has_automation(f_track)
-        f_old = ATM_REGION.clear_range(
+        f_old = shared.ATM_REGION.clear_range(
             f_index, f_port, f_start_beat, f_end_beat)
         if f_old:
             self.automation_save_callback()
@@ -2490,7 +2527,7 @@ class ItemSequencer(QGraphicsView):
         for f_i in range(int((f_end_beat - f_start_beat) / f_step)):
             f_point = project.pydaw_atm_point(
                 f_pos, f_port, 64.0, f_index, f_plugin)
-            ATM_REGION.add_point(f_point)
+            shared.ATM_REGION.add_point(f_point)
             f_item = self.draw_point(f_point)
             self.atm_selected.append(f_item)
             f_pos += f_step
@@ -2501,10 +2538,10 @@ class ItemSequencer(QGraphicsView):
 
         if not f_result:
             for f_point in self.atm_selected:
-                ATM_REGION.remove_point(f_point.item)
+                shared.ATM_REGION.remove_point(f_point.item)
             if f_old:
                 for f_point in f_old:
-                    ATM_REGION.add_point(f_point)
+                    shared.ATM_REGION.add_point(f_point)
             self.automation_save_callback()
         else:
             self.open_region()
@@ -2849,10 +2886,10 @@ class ItemSequencer(QGraphicsView):
             f_track_params = shared.TRACK_PANEL.get_atm_params(f_track)
             f_end = ATM_CLIPBOARD[-1].beat + f_beat
             f_point = ATM_CLIPBOARD[0]
-            ATM_REGION.clear_range(
+            shared.ATM_REGION.clear_range(
                 f_point.index, f_point.port_num, f_beat, f_end)
             for f_point in ATM_CLIPBOARD:
-                ATM_REGION.add_point(
+                shared.ATM_REGION.add_point(
                     pydaw_atm_point(
                         f_point.beat + f_beat, f_track_port_num,
                         f_point.cc_val, *f_track_params))
@@ -2875,7 +2912,7 @@ class ItemSequencer(QGraphicsView):
         if f_port is not None:
             f_point = pydaw_atm_point(
                 f_beat, f_port, f_val, *shared.TRACK_PANEL.get_atm_params(f_track))
-            ATM_REGION.add_point(f_point)
+            shared.ATM_REGION.add_point(f_point)
             self.draw_point(f_point)
             self.automation_save_callback()
 
@@ -3084,7 +3121,7 @@ class SeqTrack:
         if self.ccs_in_use_combobox is not None:
             self.ccs_in_use_combobox.clear()
             if self.automation_uid is not None:
-                f_list = ATM_REGION.get_ports(self.automation_uid)
+                f_list = shared.ATM_REGION.get_ports(self.automation_uid)
                 self.ccs_in_use_combobox.addItems(
                     [""] +
                     [CONTROLLER_PORT_NUM_DICT[

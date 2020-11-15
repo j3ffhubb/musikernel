@@ -24,6 +24,7 @@ from .libmk import mk_project
 from .libpydaw.pydaw_util import *
 from .libpydaw.translate import _
 from .mkplugins import MkPluginUiDict
+from mkpy import dawnext
 from mkpy import libmk
 from mkpy.libpydaw import strings as mk_strings
 
@@ -313,7 +314,6 @@ class MkMainWindow(QMainWindow):
         self.transport_splitter.addWidget(self.main_stack)
 
         SPLASH_SCREEN.status_update(_("Loading DAW-Next"))
-        from mkpy import dawnext
         dawnext.init()
         SPLASH_SCREEN.status_update(_("Loading Wave-Next"))
         from mkpy import wavenext
