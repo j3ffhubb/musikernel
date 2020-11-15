@@ -13,7 +13,7 @@ from mkpy.libpydaw.pydaw_util import *
 from mkpy.libpydaw.translate import _
 from mkpy.mkplugins import *
 from mkpy.mkqt import *
-
+import .header_context_menu
 
 DRAW_SEQUENCER_GRAPHS = True
 REGION_EDITOR_SNAP = True
@@ -56,15 +56,6 @@ TRACK_COLOR_CLIPBOARD = None
 
 REGION_EDITOR_MIN_NOTE_LENGTH = REGION_EDITOR_GRID_WIDTH / 128.0
 REGION_EDITOR_DELETE_MODE = False
-
-class TempoMarkerEvent:
-    """ Used to override tempo marker events """
-    def __init__(self, beat):
-        self.beat = beat
-
-    def mouse_press(self, event):
-        shared.SEQUENCER.header_event_pos = self.beat
-        shared.SEQUENCER.header_time_modify()
 
 def pydaw_set_seq_snap(a_val=None):
     global SEQUENCER_QUANTIZE_PX, SEQ_QUANTIZE, SEQ_QUANTIZE_AMT, \
@@ -1862,8 +1853,11 @@ class ItemSequencer(QGraphicsView):
         #pydaw_set_SEQUENCER_zoom(self.h_zoom, self.v_zoom)
 
     def header_click_event(self, a_event):
-        if not libmk.IS_PLAYING and \
-        a_event.button() != QtCore.Qt.RightButton:
+        if (
+            not libmk.IS_PLAYING
+            and
+            a_event.button() != QtCore.Qt.RightButton
+        ):
             f_beat = int(a_event.scenePos().x() / SEQUENCER_PX_PER_BEAT)
             global_set_playback_pos(f_beat)
 
@@ -1895,328 +1889,6 @@ class ItemSequencer(QGraphicsView):
                 f_line.setVisible(True)
             for f_num in self.text_list:
                 f_num.setVisible(True)
-
-    def header_time_modify(self):
-        def ok_handler():
-            f_marker = project.pydaw_tempo_marker(
-                self.header_event_pos, f_tempo.value(),
-                f_tsig_num.value(), int(str(f_tsig_den.currentText())))
-            shared.CURRENT_REGION.set_marker(f_marker)
-            shared.PROJECT.save_region(shared.CURRENT_REGION)
-            shared.PROJECT.commit(_("Set tempo marker"))
-            shared.REGION_SETTINGS.open_region()
-            f_window.close()
-
-        def delete_handler():
-            f_marker = shared.CURRENT_REGION.has_marker(
-                self.header_event_pos,
-                2,
-            )
-            if f_marker and self.header_event_pos:
-                shared.CURRENT_REGION.delete_marker(f_marker)
-                shared.PROJECT.save_region(shared.CURRENT_REGION)
-                shared.PROJECT.commit(_("Delete tempo marker"))
-                shared.REGION_SETTINGS.open_region()
-            f_window.close()
-
-        f_window = QDialog(shared.MAIN_WINDOW)
-        f_window.setWindowTitle(_("Tempo / Time Signature"))
-        f_layout = QGridLayout()
-        f_window.setLayout(f_layout)
-
-        f_marker = shared.CURRENT_REGION.has_marker(self.header_event_pos, 2)
-
-        f_tempo = QSpinBox()
-        f_tempo.setRange(30, 240)
-        f_layout.addWidget(QLabel(_("Tempo")), 0, 0)
-        f_layout.addWidget(f_tempo, 0, 1)
-        f_tsig_layout = QHBoxLayout()
-        f_layout.addLayout(f_tsig_layout, 1, 1)
-        f_tsig_num = QSpinBox()
-        f_tsig_num.setRange(1, 16)
-        f_layout.addWidget(QLabel(_("Time Signature")), 1, 0)
-        f_tsig_layout.addWidget(f_tsig_num)
-        f_tsig_layout.addWidget(QLabel("/"))
-
-        f_tsig_den = QComboBox()
-        f_tsig_den.setMinimumWidth(60)
-        f_tsig_layout.addWidget(f_tsig_den)
-        f_tsig_den.addItems(["2", "4", "8", "16"])
-
-        if f_marker:
-            f_tempo.setValue(f_marker.tempo)
-            f_tsig_num.setValue(f_marker.tsig_num)
-            f_tsig_den.setCurrentIndex(
-                f_tsig_den.findText(str(f_marker.tsig_den)))
-        else:
-            f_tempo.setValue(128)
-            f_tsig_num.setValue(4)
-            f_tsig_den.setCurrentIndex(1)
-
-        f_ok = QPushButton(_("Save"))
-        f_ok.pressed.connect(ok_handler)
-        f_layout.addWidget(f_ok, 6, 0)
-        if self.header_event_pos:
-            f_cancel = QPushButton(_("Delete"))
-            f_cancel.pressed.connect(delete_handler)
-        else:
-            f_cancel = QPushButton(_("Cancel"))
-            f_cancel.pressed.connect(f_window.close)
-        f_layout.addWidget(f_cancel, 6, 1)
-        f_window.exec_()
-
-    def header_tempo_clear(self):
-        if not shared.CURRENT_REGION.loop_marker:
-            QMessageBox.warning(
-                "Error",
-                "No region set, please set a region first",
-            )
-            return
-        deleted = False
-        for i in range(
-            shared.CURRENT_REGION.loop_marker.start_beat,
-            shared.CURRENT_REGION.loop_marker.beat + 1,
-        ):
-            if i == 0:
-                continue
-            marker = shared.CURRENT_REGION.has_marker(i, 2)
-            if marker:
-                print("Deleting {}".format(marker.__dict__))
-                shared.CURRENT_REGION.delete_marker(marker)
-                deleted += 1
-        if deleted:
-            print("Deleted {} tempo markers".format(deleted))
-            shared.PROJECT.save_region(shared.CURRENT_REGION)
-            shared.PROJECT.commit(_("Delete tempo ranger"))
-            shared.REGION_SETTINGS.open_region()
-
-    def header_time_range(self):
-        if not shared.CURRENT_REGION.loop_marker:
-            QMessageBox.warning(
-                "Error",
-                "No region set, please set a region first",
-            )
-            return
-        def ok_handler():
-            tempo = f_start_tempo.value()
-            beat = shared.CURRENT_REGION.loop_marker.start_beat
-            beats = (
-                shared.CURRENT_REGION.loop_marker.beat
-                -
-                shared.CURRENT_REGION.loop_marker.start_beat
-            )
-            inc = (float(f_end_tempo.value()) - float(tempo)) / beats
-            for i in range(
-                shared.CURRENT_REGION.loop_marker.start_beat,
-                shared.CURRENT_REGION.loop_marker.beat + 1,
-            ):
-                f_marker = project.pydaw_tempo_marker(
-                    i,
-                    int(round(tempo)),
-                    f_tsig_num.value(),
-                    int(str(f_tsig_den.currentText())),
-                )
-                tempo += inc
-                beat += 1
-                shared.CURRENT_REGION.set_marker(f_marker)
-            shared.PROJECT.save_region(shared.CURRENT_REGION)
-            shared.PROJECT.commit(_("Set tempo range"))
-            shared.REGION_SETTINGS.open_region()
-            f_window.close()
-
-        def cancel_handler():
-            f_window.close()
-
-        f_window = QDialog(shared.MAIN_WINDOW)
-        f_window.setWindowTitle(_("Tempo Range"))
-        f_layout = QGridLayout()
-        f_window.setLayout(f_layout)
-
-        f_marker = shared.CURRENT_REGION.has_marker(self.header_event_pos, 2)
-
-        f_start_tempo = QSpinBox()
-        f_start_tempo.setRange(30, 240)
-        f_layout.addWidget(QLabel(_("Start Tempo")), 0, 0)
-        f_layout.addWidget(f_start_tempo, 0, 1)
-        f_end_tempo = QSpinBox()
-        f_end_tempo.setRange(30, 240)
-        f_layout.addWidget(QLabel(_("End Tempo")), 1, 0)
-        f_layout.addWidget(f_end_tempo, 1, 1)
-        f_tsig_layout = QHBoxLayout()
-        f_layout.addLayout(f_tsig_layout, 2, 1)
-        f_tsig_num = QSpinBox()
-        f_tsig_num.setRange(1, 16)
-        f_layout.addWidget(QLabel(_("Time Signature")), 2, 0)
-        f_tsig_layout.addWidget(f_tsig_num)
-        f_tsig_layout.addWidget(QLabel("/"))
-
-        f_tsig_den = QComboBox()
-        f_tsig_den.setMinimumWidth(60)
-        f_tsig_layout.addWidget(f_tsig_den)
-        f_tsig_den.addItems(["2", "4", "8", "16"])
-
-        if f_marker:
-            f_start_tempo.setValue(f_marker.tempo)
-            f_end_tempo.setValue(f_marker.tempo)
-            f_tsig_num.setValue(f_marker.tsig_num)
-            f_tsig_den.setCurrentIndex(
-                f_tsig_den.findText(str(f_marker.tsig_den)))
-        else:
-            f_start_tempo.setValue(128)
-            f_end_tempo.setValue(128)
-            f_tsig_num.setValue(4)
-            f_tsig_den.setCurrentIndex(1)
-
-        f_ok = QPushButton(_("Create"))
-        f_ok.pressed.connect(ok_handler)
-        f_layout.addWidget(f_ok, 6, 0)
-        f_cancel = QPushButton(_("Cancel"))
-        f_cancel.pressed.connect(cancel_handler)
-        f_layout.addWidget(f_cancel, 6, 1)
-        f_window.exec_()
-
-    def header_marker_modify(self):
-        def ok_handler():
-            f_marker = project.pydaw_sequencer_marker(
-                self.header_event_pos, f_text.text())
-            shared.CURRENT_REGION.set_marker(f_marker)
-            shared.PROJECT.save_region(shared.CURRENT_REGION)
-            shared.PROJECT.commit(_("Add text marker"))
-            shared.REGION_SETTINGS.open_region()
-            f_window.close()
-
-        def cancel_handler():
-            f_marker = shared.CURRENT_REGION.has_marker(
-                self.header_event_pos,
-                3,
-            )
-            if f_marker:
-                shared.CURRENT_REGION.delete_marker(f_marker)
-                shared.PROJECT.save_region(shared.CURRENT_REGION)
-                shared.PROJECT.commit(_("Delete text marker"))
-                shared.REGION_SETTINGS.open_region()
-            f_window.close()
-
-        f_window = QDialog(shared.MAIN_WINDOW)
-        f_window.setWindowTitle(_("Marker"))
-        f_layout = QGridLayout()
-        f_window.setLayout(f_layout)
-
-        f_marker = shared.CURRENT_REGION.has_marker(self.header_event_pos, 3)
-
-        f_text = QLineEdit()
-        f_text.setMaxLength(21)
-
-        if f_marker:
-            f_text.setText(f_marker.text)
-
-        f_layout.addWidget(QLabel(_("Text")), 0, 0)
-        f_layout.addWidget(f_text, 0, 1)
-        f_ok_cancel_layout = QHBoxLayout()
-        f_layout.addLayout(f_ok_cancel_layout, 6, 1)
-        f_ok = QPushButton(_("Save"))
-        f_ok.pressed.connect(ok_handler)
-        f_ok_cancel_layout.addWidget(f_ok)
-        if shared.CURRENT_REGION.has_marker(self.header_event_pos, 3):
-            f_cancel = QPushButton(_("Delete"))
-        else:
-            f_cancel = QPushButton(_("Cancel"))
-        f_cancel.pressed.connect(cancel_handler)
-        f_ok_cancel_layout.addWidget(f_cancel)
-        f_window.exec_()
-
-    def header_loop_start(self):
-        tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
-            self.header_event_pos,
-        )
-        if shared.CURRENT_REGION.loop_marker:
-            end = pydaw_util.pydaw_clip_min(
-                shared.CURRENT_REGION.loop_marker.beat,
-                self.header_event_pos + tsig_beats,
-            )
-        else:
-            end = self.header_event_pos + tsig_beats
-
-        marker = project.pydaw_loop_marker(end, self.header_event_pos)
-        shared.CURRENT_REGION.set_loop_marker(marker)
-        shared.PROJECT.save_region(shared.CURRENT_REGION)
-        shared.PROJECT.commit(_("Set region start"))
-        shared.REGION_SETTINGS.open_region()
-
-    def header_loop_end(self):
-        f_tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
-            self.header_event_pos,
-        )
-        shared.CURRENT_REGION.loop_marker.beat = pydaw_util.pydaw_clip_min(
-            self.header_event_pos,
-            f_tsig_beats,
-        )
-        shared.CURRENT_REGION.loop_marker.start_beat = \
-            pydaw_util.pydaw_clip_max(
-                shared.CURRENT_REGION.loop_marker.start_beat,
-                shared.CURRENT_REGION.loop_marker.beat - f_tsig_beats,
-            )
-        shared.PROJECT.save_region(shared.CURRENT_REGION)
-        shared.PROJECT.commit(_("Set region end"))
-        shared.REGION_SETTINGS.open_region()
-
-    def headerContextMenuEvent(self, a_event):
-        self.context_menu_enabled = False
-        self.header_event_pos = int(a_event.pos().x() / SEQUENCER_PX_PER_BEAT)
-        f_menu = QMenu(self)
-        f_marker_action = f_menu.addAction(_("Text Marker..."))
-        f_marker_action.triggered.connect(self.header_marker_modify)
-        f_time_modify_action = f_menu.addAction(_("Time/Tempo Marker..."))
-        f_time_modify_action.triggered.connect(self.header_time_modify)
-        f_time_range_action = f_menu.addAction(_("Tempo Range..."))
-        f_time_range_action.triggered.connect(self.header_time_range)
-        f_menu.addSeparator()
-        clear_tempo_range_action = f_menu.addAction(
-            _("Clear Time/Tempo Markers in Region")
-        )
-        clear_tempo_range_action.triggered.connect(self.header_tempo_clear)
-        f_menu.addSeparator()
-        f_loop_start_action = f_menu.addAction(_("Set Region Start"))
-        f_loop_start_action.triggered.connect(self.header_loop_start)
-        if shared.CURRENT_REGION.loop_marker:
-            f_loop_end_action = f_menu.addAction(_("Set Region End"))
-            f_loop_end_action.triggered.connect(self.header_loop_end)
-            f_select_region = f_menu.addAction(_("Select Items in Region"))
-            f_select_region.triggered.connect(self.select_region_items)
-            f_copy_region_action = f_menu.addAction(_("Copy Region"))
-            f_copy_region_action.triggered.connect(self.copy_region)
-            if self.region_clipboard:
-                f_insert_region_action = f_menu.addAction(_("Insert Region"))
-                f_insert_region_action.triggered.connect(self.insert_region)
-        f_menu.exec_(QCursor.pos())
-
-    def copy_region(self):
-        f_region_start = shared.CURRENT_REGION.loop_marker.start_beat
-        f_region_end = shared.CURRENT_REGION.loop_marker.beat
-        f_region_length = f_region_end - f_region_start
-        f_list = [x.audio_item.clone() for x in self.get_region_items()]
-        f_atm_list = shared.ATM_REGION.copy_range_all(f_region_start, f_region_end)
-        for f_item in f_list:
-            f_item.start_beat -= f_region_start
-        for f_point in f_atm_list:
-            f_point.beat -= f_region_start
-        self.region_clipboard = (f_region_length, f_list, f_atm_list)
-
-    def insert_region(self):
-        f_region_length, f_list, f_atm_list = self.region_clipboard
-        f_list = [x.clone() for x in f_list]
-        f_atm_list = [x.clone() for x in f_atm_list]
-        shared.CURRENT_REGION.insert_space(self.header_event_pos, f_region_length)
-        for f_item in f_list:
-            f_item.start_beat += self.header_event_pos
-            shared.CURRENT_REGION.add_item_ref_by_uid(f_item)
-        for f_point in f_atm_list:
-            f_point.beat += self.header_event_pos
-            shared.ATM_REGION.add_point(f_point)
-        self.automation_save_callback()
-        shared.PROJECT.save_region(shared.CURRENT_REGION)
-        shared.PROJECT.commit(_("Insert region"))
-        shared.REGION_SETTINGS.open_region()
 
     def get_region_items(self):
         f_region_start = shared.CURRENT_REGION.loop_marker.start_beat
@@ -2259,7 +1931,7 @@ class ItemSequencer(QGraphicsView):
         self.header.setZValue(1500.0)
         self.header.setBrush(shared.SEQUENCER_HEADER_BRUSH)
         self.header.mousePressEvent = self.header_click_event
-        self.header.contextMenuEvent = self.headerContextMenuEvent
+        self.header.contextMenuEvent = header_context_menu.show
         self.scene.addItem(self.header)
 
         for f_marker in shared.CURRENT_REGION.get_markers():
@@ -4013,7 +3685,6 @@ class RegionSettings:
             shared.MIDI_DEVICES_DIALOG.set_routings()
             shared.TRANSPORT.open_project()
 
-
 def region_editor_set_delete_mode(a_enabled):
     global REGION_EDITOR_DELETE_MODE
     if a_enabled:
@@ -4026,6 +3697,4 @@ def region_editor_set_delete_mode(a_enabled):
         REGION_EDITOR_DELETE_MODE = False
         shared.SEQUENCER.selected_item_strings = set()
         QApplication.restoreOverrideCursor()
-
-
 
