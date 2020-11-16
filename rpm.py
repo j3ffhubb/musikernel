@@ -194,6 +194,7 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/context_menu.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/header_context_menu.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/item.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/seq.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/track.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/transport.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/shared.py

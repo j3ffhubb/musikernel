@@ -41,7 +41,7 @@ from .libdawnext.item_editor.notes import (
 )
 from .libdawnext.sequencer import (
     ItemSequencer,
-    RegionSettings,
+    SequencerWidget,
     TrackPanel,
     TransportWidget,
 )
@@ -529,7 +529,7 @@ def init():
     shared.CC_EDITOR = AutomationEditor()
     shared.CC_EDITOR_WIDGET = AutomationEditorWidget(shared.CC_EDITOR)
 
-    shared.REGION_SETTINGS = RegionSettings()
+    shared.REGION_SETTINGS = SequencerWidget()
     shared.TRACK_PANEL = TrackPanel()
 
     shared.PIANO_ROLL_EDITOR = PianoRollEditor()

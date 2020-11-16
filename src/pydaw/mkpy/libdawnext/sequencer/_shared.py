@@ -32,6 +32,41 @@ SEQ_QUANTIZE = True
 ATM_POINT_DIAMETER = 10.0
 ATM_POINT_RADIUS = ATM_POINT_DIAMETER * 0.5
 
+#gets updated by the region editor to it's real value:
+REGION_EDITOR_TOTAL_HEIGHT = (
+    REGION_EDITOR_TRACK_COUNT
+    *
+    shared.REGION_EDITOR_TRACK_HEIGHT
+)
+
+SEQUENCER_SNAP_VAL = 3
+SEQ_QUANTIZE_AMT = 1.0
+SEQ_LINES_ENABLED = False
+SEQ_SNAP_RANGE = 8
+
+REGION_EDITOR_DELETE_MODE = False
+
+def pydaw_set_seq_snap(a_val=None):
+    global \
+        SEQUENCER_SNAP_VAL, \
+        SEQ_LINES_ENABLED, \
+        SEQ_QUANTIZE_AMT, \
+        SEQ_SNAP_RANGE
+    if a_val is None:
+        a_val = SEQUENCER_SNAP_VAL
+    else:
+        SEQUENCER_SNAP_VAL = a_val
+    SEQ_SNAP_RANGE = 8
+    f_divisor = shared.ITEM_SNAP_DIVISORS[a_val]
+    if a_val > 0:
+        SEQ_QUANTIZE = True
+        SEQ_LINES_ENABLED = False
+    else:
+        SEQ_QUANTIZE = False
+        SEQ_LINES_ENABLED = False
+    SEQUENCER_QUANTIZE_PX = SEQUENCER_PX_PER_BEAT / f_divisor
+    SEQUENCER_QUANTIZE_64TH = SEQUENCER_PX_PER_BEAT / 16.0
+    SEQ_QUANTIZE_AMT = f_divisor
 
 def copy_selected():
     if not shared.SEQUENCER.enabled:

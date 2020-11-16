@@ -12,7 +12,7 @@ ATM_GRADIENT = QtCore.Qt.white
 
 class SeqAtmItem(QGraphicsEllipseItem):
     """ This is an automation point within the ItemSequencer, these are only
-        drawn when "Automation" mode is selected in RegionSettings
+        drawn when "Automation" mode is selected in SequencerWidget
     """
     def __init__(self, a_item, a_save_callback, a_min_y, a_max_y):
         QGraphicsEllipseItem.__init__(
