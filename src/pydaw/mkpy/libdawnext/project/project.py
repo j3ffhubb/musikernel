@@ -1,5 +1,5 @@
-from .atm_region import pydaw_atm_region
-from .audio_item import pydaw_audio_item
+from .atm_region import DawNextAtmRegion
+from .audio_item import DawNextAudioItem
 from .item import pydaw_item
 from .seq_item import pydaw_sequencer_item
 from .sequencer import pydaw_sequencer
@@ -314,9 +314,9 @@ class DawNextProject(libmk.AbstractProject):
     def get_atm_region(self):
         if os.path.isfile(self.automation_file):
             with open(self.automation_file) as f_file:
-                return pydaw_atm_region.from_str(f_file.read())
+                return DawNextAtmRegion.from_str(f_file.read())
         else:
-            return pydaw_atm_region()
+            return DawNextAtmRegion()
 
     def save_atm_region(self, a_region):
         self.save_file(pydaw_folder_dawnext, "automation.txt", str(a_region))
@@ -373,7 +373,7 @@ class DawNextProject(libmk.AbstractProject):
 
     def set_fades_for_all_audio_items(self, a_item):
         """ a_uid:  wav_pool uid
-            a_item:  pydaw_audio_item
+            a_item:  DawNextAudioItem
         """
         f_changed_any = False
         assert False, "this needs to be reworked"
@@ -536,7 +536,7 @@ class DawNextProject(libmk.AbstractProject):
                 #(f_audio_frame / (f_frames + a_sample_count)) * 1000.0
                 f_start = pydaw_util.pydaw_clip_value(f_start, 0.0, f_end)
                 f_end = pydaw_util.pydaw_clip_value(f_end, f_start, 1000.0)
-                f_audio_item = pydaw_audio_item(
+                f_audio_item = DawNextAudioItem(
                     f_uid, a_sample_start=f_start, a_sample_end=f_end,
                     a_output_track=f_mode, a_lane_num=f_lane)
                 f_index = f_item.get_next_index()

@@ -1,11 +1,11 @@
-from .atm_point import pydaw_atm_point
+from .atm_point import DawNextAtmPoint
 from mkpy.libmk.mk_project import *
 from mkpy.libpydaw.pydaw_util import *
 from mkpy.libpydaw.translate import _
 from mkpy.mkqt import *
 
 
-class pydaw_atm_region:
+class DawNextAtmRegion:
     def __init__(self):
         self.plugins = {}
         self.points = []
@@ -140,7 +140,7 @@ class pydaw_atm_region:
                     f_int_val = pydaw_util.cosine_interpolate(
                         f_val, f_val_next, (f_i / f_inc_count))
                 f_int_val = f_smoother.process(f_int_val)
-                f_point2 = pydaw_atm_point(
+                f_point2 = DawNextAtmPoint(
                     f_beat, a_port_num, f_int_val, a_index, a_plugin_index)
                 f_result.append(f_point2)
                 a_points.append(f_point2)
@@ -151,7 +151,7 @@ class pydaw_atm_region:
         # New file format:
         # lines starting with 'p':  p|plugin_uid|port_count
         # lines starting with 'q':  n|port_num|point_count
-        # other lines:  pydaw_atm_point
+        # other lines:  DawNextAtmPoint
         f_result = []
         for f_index in sorted(self.plugins):
             port_dict = {k:v for k, v in self.plugins[f_index].items() if v}
@@ -174,13 +174,13 @@ class pydaw_atm_region:
 
     @staticmethod
     def from_str(a_str):
-        f_result = pydaw_atm_region()
+        f_result = DawNextAtmRegion()
         for f_line in str(a_str).split("\n"):
             if f_line == pydaw_terminating_char:
                 break
             if f_line[0] in ("p", "q"):
                 continue
-            f_point = pydaw_atm_point.from_str(f_line)
+            f_point = DawNextAtmPoint.from_str(f_line)
             f_result.add_point(f_point)
         return f_result
 

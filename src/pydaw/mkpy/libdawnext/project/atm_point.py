@@ -4,7 +4,7 @@ from mkpy.libpydaw.translate import _
 from mkpy.mkqt import *
 
 
-class pydaw_atm_point:
+class DawNextAtmPoint:
     def __init__(
             self, a_beat, a_port_num, a_cc_val, a_index, a_plugin_index,
             a_break_after=0, a_curve=0.0):
@@ -41,15 +41,15 @@ class pydaw_atm_point:
 
     @staticmethod
     def from_arr(a_arr):
-        f_result = pydaw_atm_point(*a_arr)
+        f_result = DawNextAtmPoint(*a_arr)
         return f_result
 
     @staticmethod
     def from_str(a_str):
         f_arr = a_str.split("|")
-        return pydaw_atm_point.from_arr(f_arr)
+        return DawNextAtmPoint.from_arr(f_arr)
 
     def clone(self):
-        return pydaw_atm_point.from_str(str(self))
+        return DawNextAtmPoint.from_str(str(self))
 
 

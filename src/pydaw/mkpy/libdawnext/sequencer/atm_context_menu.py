@@ -49,7 +49,7 @@ def paste_atm_point():
         shared.SEQUENCER.current_coord[0],
     )
     if f_port is not None:
-        f_point = pydaw_atm_point(
+        f_point = DawNextAtmPoint(
             f_beat,
             f_port,
             f_val,
@@ -296,7 +296,7 @@ def lfo_atm():
     shared.SEQUENCER.atm_selected = []
 
     for f_i in range(int((f_end_beat - f_start_beat) / f_step)):
-        f_point = project.pydaw_atm_point(
+        f_point = project.DawNextAtmPoint(
             f_pos,
             f_port,
             64.0,

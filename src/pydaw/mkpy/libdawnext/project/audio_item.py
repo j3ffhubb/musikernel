@@ -5,7 +5,7 @@ from mkpy.mkqt import *
 import numpy
 
 
-class pydaw_audio_item(MkAudioItem):
+class DawNextAudioItem(MkAudioItem):
     def clip_at_region_end(self, a_region_length, a_tempo,
             a_sample_length_seconds, a_truncate=True):
         f_region_length_beats = a_region_length
@@ -38,15 +38,15 @@ class pydaw_audio_item(MkAudioItem):
             return False
 
     def clone(self):
-        return pydaw_audio_item.from_arr(str(self).strip("\n").split("|"))
+        return DawNextAudioItem.from_arr(str(self).strip("\n").split("|"))
 
     @staticmethod
     def from_str(f_str):
-        return pydaw_audio_item.from_arr(f_str.split("|"))
+        return DawNextAudioItem.from_arr(f_str.split("|"))
 
     @staticmethod
     def from_arr(a_arr):
-        f_result = pydaw_audio_item(*a_arr)
+        f_result = DawNextAudioItem(*a_arr)
         return f_result
 
 

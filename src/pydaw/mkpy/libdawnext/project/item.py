@@ -1,4 +1,4 @@
-from .audio_item import pydaw_audio_item
+from .audio_item import DawNextAudioItem
 from mkpy import libmk
 from mkpy.libmk.mk_project import *
 from mkpy.libpydaw.pydaw_util import *
@@ -234,7 +234,7 @@ class pydaw_item:
             return self.fx_list[int(a_row_index)]
         else:
             # print("Index {} not found in "
-            #     "pydaw_audio_item_fx_region".format(a_row_index))
+            #     "DawNextAudioItem_fx_region".format(a_row_index))
             if a_return_none:
                 return None
             else:
@@ -624,7 +624,7 @@ class pydaw_item:
                 elif f_event_arr[0] == "a":
                     f_result.add_item(
                         int(f_event_arr[1]),
-                        pydaw_audio_item.from_arr(f_event_arr[2:]))
+                        DawNextAudioItem.from_arr(f_event_arr[2:]))
                 elif f_event_arr[0] == "f":
                     f_items_arr = []
                     f_item_index = f_event_arr[1]

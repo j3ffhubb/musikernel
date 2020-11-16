@@ -12,9 +12,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
-from .atm_point import pydaw_atm_point
-from .atm_region import pydaw_atm_region
-from .audio_item import pydaw_audio_item
+from .atm_point import DawNextAtmPoint
+from .atm_region import DawNextAtmRegion
+from .audio_item import DawNextAudioItem
 from .item import pydaw_item
 from .midi_file import DawNextMidiFile
 from .project import DawNextProject

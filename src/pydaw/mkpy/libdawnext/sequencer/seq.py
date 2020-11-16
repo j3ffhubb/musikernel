@@ -228,7 +228,7 @@ class ItemSequencer(QGraphicsView):
                 if f_port is not None:
                     f_track, f_beat, f_val = self.current_coord
                     f_beat = self.quantize(f_beat)
-                    f_point = pydaw_atm_point(
+                    f_point = DawNextAtmPoint(
                         f_beat, f_port, f_val,
                         *shared.TRACK_PANEL.get_atm_params(f_track))
                     shared.ATM_REGION.add_point(f_point)
@@ -606,7 +606,7 @@ class ItemSequencer(QGraphicsView):
                     f_restart = True
                 f_length = f_graph.length_in_seconds / f_seconds_per_beat
                 if a_single_item:
-                    f_item = pydaw_audio_item(
+                    f_item = DawNextAudioItem(
                         f_uid, a_start_bar=0, a_start_beat=0.0,
                         a_lane_num=lane_num)
                     lane_num += 1
@@ -617,7 +617,7 @@ class ItemSequencer(QGraphicsView):
                     f_item_ref = project.pydaw_sequencer_item(
                         f_track_num, f_beat_frac, f_length, f_item_uid)
                     shared.CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
-                    f_item = pydaw_audio_item(
+                    f_item = DawNextAudioItem(
                         f_uid, a_start_bar=0, a_start_beat=0.0, a_lane_num=0)
                     f_items.add_item(f_index, f_item)
                     shared.PROJECT.save_item_by_uid(f_item_uid, f_items)

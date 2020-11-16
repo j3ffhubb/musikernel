@@ -125,7 +125,7 @@ def paste_clipboard():
             f_point.index, f_point.port_num, f_beat, f_end)
         for f_point in ATM_CLIPBOARD:
             shared.ATM_REGION.add_point(
-                pydaw_atm_point(
+                DawNextAtmPoint(
                     f_point.beat + f_beat, f_track_port_num,
                     f_point.cc_val, *f_track_params))
         shared.SEQUENCER.automation_save_callback()

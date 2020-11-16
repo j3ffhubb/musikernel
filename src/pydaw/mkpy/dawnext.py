@@ -523,7 +523,7 @@ class MainWindow(QScrollArea):
 
 def init():
     global MAIN_WINDOW, TRANSPORT
-    shared.ATM_REGION = pydaw_atm_region()
+    shared.ATM_REGION = DawNextAtmRegion()
     shared.SEQUENCER = ItemSequencer()
     shared.PB_EDITOR = AutomationEditor(a_is_cc=False)
     shared.CC_EDITOR = AutomationEditor()

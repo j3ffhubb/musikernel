@@ -277,7 +277,7 @@ class AudioItemSeq(AbstractItemEditor):
                     break
                 else:
                     f_uid = libmk.PROJECT.get_wav_uid_by_name(f_file_name_str)
-                    f_item = pydaw_audio_item(
+                    f_item = DawNextAudioItem(
                         f_uid, a_start_bar=0, a_start_beat=f_beat_frac,
                         a_lane_num=f_lane_num)
                     f_items.add_item(f_index, f_item)
@@ -612,7 +612,7 @@ class AudioItemSeqWidget(FileDragDropper):
             f_index = shared.CURRENT_ITEM.get_next_index()
             if f_index == -1:
                 break
-            f_item = pydaw_audio_item.from_str(f_str)
+            f_item = DawNextAudioItem.from_str(f_str)
             f_start = f_item.start_beat
             if f_start < shared.CURRENT_ITEM_LEN:
 #                f_graph = libmk.PROJECT.get_sample_graph_by_uid(f_item.uid)
