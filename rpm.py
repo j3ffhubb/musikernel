@@ -189,6 +189,7 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/__init__.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/_shared.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/atm_context_menu.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/atm_item.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/audio_input.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/context_menu.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/header_context_menu.py

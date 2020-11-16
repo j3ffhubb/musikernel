@@ -7,8 +7,12 @@ from . import (
     context_menu,
     header_context_menu,
 )
+from .atm_item import SeqAtmItem
 from .track import SeqTrack, TrackPanel
-from .transport import TransportWidget
+from .transport import (
+    MREC_EVENTS,
+    TransportWidget,
+)
 from mkpy import libmk
 from mkpy.libdawnext import project, shared
 from mkpy.libdawnext.project import *
@@ -26,7 +30,6 @@ from mkpy.mkqt import *
 DRAW_SEQUENCER_GRAPHS = True
 #REGION_EDITOR_SNAP = True
 REGION_EDITOR_GRID_WIDTH = 1000.0
-MREC_EVENTS = []
 
 #gets updated by the region editor to it's real value:
 REGION_EDITOR_TOTAL_HEIGHT = (
@@ -38,27 +41,20 @@ REGION_EDITOR_QUANTIZE_INDEX = 4
 
 CACHED_SEQ_LEN = 32
 
-ATM_POINT_DIAMETER = 10.0
-ATM_POINT_RADIUS = ATM_POINT_DIAMETER * 0.5
-
-ATM_GRADIENT = QtCore.Qt.white
-
 LAST_ITEM_LENGTH = 4
 SEQUENCER_SNAP_VAL = 3
-SEQUENCER_QUANTIZE_PX = _shared.SEQUENCER_PX_PER_BEAT
-SEQUENCER_QUANTIZE_64TH = _shared.SEQUENCER_PX_PER_BEAT / 16.0
-SEQ_QUANTIZE = True
 SEQ_QUANTIZE_AMT = 1.0
 SEQ_LINES_ENABLED = False
 SEQ_SNAP_RANGE = 8
 
-REGION_EDITOR_MIN_NOTE_LENGTH = REGION_EDITOR_GRID_WIDTH / 128.0
 REGION_EDITOR_DELETE_MODE = False
 
 def pydaw_set_seq_snap(a_val=None):
-    global SEQUENCER_QUANTIZE_PX, SEQ_QUANTIZE, SEQ_QUANTIZE_AMT, \
-        SEQ_LINES_ENABLED, SEQ_SNAP_RANGE, SEQUENCER_SNAP_VAL, \
-        SEQUENCER_QUANTIZE_64TH
+    global \
+        SEQUENCER_SNAP_VAL, \
+        SEQ_LINES_ENABLED, \
+        SEQ_QUANTIZE_AMT, \
+        SEQ_SNAP_RANGE
     if a_val is None:
         a_val = SEQUENCER_SNAP_VAL
     else:
@@ -66,83 +62,14 @@ def pydaw_set_seq_snap(a_val=None):
     SEQ_SNAP_RANGE = 8
     f_divisor = shared.ITEM_SNAP_DIVISORS[a_val]
     if a_val > 0:
-        SEQ_QUANTIZE = True
+        _shared.SEQ_QUANTIZE = True
         SEQ_LINES_ENABLED = False
     else:
-        SEQ_QUANTIZE = False
+        _shared.SEQ_QUANTIZE = False
         SEQ_LINES_ENABLED = False
-    SEQUENCER_QUANTIZE_PX = _shared.SEQUENCER_PX_PER_BEAT / f_divisor
-    SEQUENCER_QUANTIZE_64TH = _shared.SEQUENCER_PX_PER_BEAT / 16.0
+    _shared.SEQUENCER_QUANTIZE_PX = _shared.SEQUENCER_PX_PER_BEAT / f_divisor
+    _shared.SEQUENCER_QUANTIZE_64TH = _shared.SEQUENCER_PX_PER_BEAT / 16.0
     SEQ_QUANTIZE_AMT = f_divisor
-
-class SeqAtmItem(QGraphicsEllipseItem):
-    """ This is an automation point within the ItemSequencer, these are only
-        drawn when "Automation" mode is selected in RegionSettings
-    """
-    def __init__(self, a_item, a_save_callback, a_min_y, a_max_y):
-        QGraphicsEllipseItem.__init__(
-            self, 0, 0, ATM_POINT_DIAMETER, ATM_POINT_DIAMETER)
-        self.setPen(shared.NO_PEN)
-        self.save_callback = a_save_callback
-        self.item = a_item
-        self.setFlag(QGraphicsItem.ItemIsMovable)
-        self.setFlag(QGraphicsItem.ItemIsSelectable)
-        self.setZValue(1100.0)
-        self.set_brush()
-        self.min_y = a_min_y
-        self.max_y = a_max_y
-        self.is_deleted = False
-
-    def itemChange(self, a_change, a_value):
-        if a_change == QGraphicsItem.ItemSelectedHasChanged:
-            self.set_brush()
-        return QGraphicsItem.itemChange(self, a_change, a_value)
-
-    def set_brush(self):
-        if self.isSelected():
-            self.setBrush(QtCore.Qt.black)
-        else:
-            self.setBrush(ATM_GRADIENT)
-
-    def mousePressEvent(self, a_event):
-        shared.SEQUENCER.remove_atm_path(self.item.index)
-        a_event.setAccepted(True)
-        QGraphicsEllipseItem.mousePressEvent(self, a_event)
-        self.quantize(a_event.scenePos())
-
-    def mouseMoveEvent(self, a_event):
-        QGraphicsEllipseItem.mouseMoveEvent(self, a_event)
-        self.quantize(a_event.scenePos())
-
-    def quantize(self, a_pos):
-        f_pos = a_pos
-        f_x = f_pos.x()
-        if SEQ_QUANTIZE:
-            f_x = round(f_x / SEQUENCER_QUANTIZE_PX) * SEQUENCER_QUANTIZE_PX
-        else:
-            f_x = round(
-                f_x / SEQUENCER_QUANTIZE_64TH) * SEQUENCER_QUANTIZE_64TH
-        f_x = pydaw_util.pydaw_clip_min(f_x, 0.0)
-        f_y = pydaw_util.pydaw_clip_value(f_pos.y(), self.min_y, self.max_y)
-        self.setPos(f_x, f_y)
-
-    def mouseReleaseEvent(self, a_event):
-        a_event.setAccepted(True)
-        QGraphicsEllipseItem.mouseReleaseEvent(self, a_event)
-        self.quantize(a_event.scenePos())
-        self.set_point_value()
-        self.save_callback()
-
-    def set_point_value(self):
-        f_pos = self.pos()
-        f_point = self.item
-        (track, beat, cc_val) = shared.SEQUENCER.get_item_coord(f_pos, a_clip=True)
-        beat = pydaw_util.pydaw_clip_min(beat, 0.0)
-        cc_val = pydaw_util.pydaw_clip_value(cc_val, 0.0, 127.0, True)
-        f_point.beat, f_point.cc_val = (beat, cc_val)
-
-    def __lt__(self, other):
-        return self.pos().x() < other.pos().x()
 
 class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
     """ This is an individual sequencer item within the ItemSequencer
@@ -754,22 +681,28 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
 
     def quantize_all(self, a_x):
         f_x = a_x
-        if SEQ_QUANTIZE:
-            f_x = round(f_x / SEQUENCER_QUANTIZE_PX) * SEQUENCER_QUANTIZE_PX
+        if _shared.SEQ_QUANTIZE:
+            f_x = round(
+                f_x / _shared.SEQUENCER_QUANTIZE_PX
+            ) * _shared.SEQUENCER_QUANTIZE_PX
         return f_x
 
     def quantize(self, a_x):
         f_x = a_x
         f_x = self.quantize_all(f_x)
-        if SEQ_QUANTIZE and f_x < SEQUENCER_QUANTIZE_PX:
-            f_x = SEQUENCER_QUANTIZE_PX
+        if (
+            _shared.SEQ_QUANTIZE
+            and
+            f_x < _shared.SEQUENCER_QUANTIZE_PX
+        ):
+            f_x = _shared.SEQUENCER_QUANTIZE_PX
         return f_x
 
     def quantize_start(self, a_x):
         f_x = a_x
         f_x = self.quantize_all(f_x)
         if f_x >= self.length_handle.pos().x():
-            f_x -= SEQUENCER_QUANTIZE_PX
+            f_x -= _shared.SEQUENCER_QUANTIZE_PX
         return f_x
 
     def quantize_scene(self, a_x):
@@ -826,9 +759,12 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
                         (shared.AUDIO_ITEM_HANDLE_HEIGHT * 0.5))
         else:
             QGraphicsRectItem.mouseMoveEvent(self, a_event)
-            if SEQ_QUANTIZE:
-                f_max_x = (pydaw_get_current_region_length() *
-                    _shared.SEQUENCER_PX_PER_BEAT) - SEQUENCER_QUANTIZE_PX
+            if _shared.SEQ_QUANTIZE:
+                f_max_x = (
+                    pydaw_get_current_region_length()
+                    *
+                    _shared.SEQUENCER_PX_PER_BEAT
+                ) - _shared.SEQUENCER_QUANTIZE_PX
             else:
                 f_max_x = (pydaw_get_current_region_length() *
                     _shared.SEQUENCER_PX_PER_BEAT) - shared.AUDIO_ITEM_HANDLE_SIZE
@@ -1238,18 +1174,32 @@ class ItemSequencer(QGraphicsView):
         f_pos_y < REGION_EDITOR_TOTAL_HEIGHT):
             f_pos_x = pydaw_util.pydaw_clip_min(f_pos_x, 0.0)
             f_pos_y = pydaw_util.pydaw_clip_value(
-                f_pos_y, 0.0, REGION_EDITOR_TOTAL_HEIGHT)
-            f_track_height = shared.REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
+                f_pos_y,
+                0.0,
+                REGION_EDITOR_TOTAL_HEIGHT,
+            )
+            f_track_height = (
+                shared.REGION_EDITOR_TRACK_HEIGHT
+                -
+                _shared.ATM_POINT_DIAMETER
+            )
             f_track = int(f_pos_y / shared.REGION_EDITOR_TRACK_HEIGHT)
-            f_val = (1.0 - ((f_pos_y - (f_track * shared.REGION_EDITOR_TRACK_HEIGHT))
-                / f_track_height)) * 127.0
+            f_val = (
+                1.0 - (
+                    (
+                        f_pos_y - (
+                            f_track * shared.REGION_EDITOR_TRACK_HEIGHT
+                        )
+                    ) / f_track_height
+                )
+            ) * 127.0
             f_beat = f_pos_x / _shared.SEQUENCER_PX_PER_BEAT
             return f_track, round(f_beat, 6), round(f_val, 6)
         else:
             return None
 
     def delete_selected_atm(self, a_track):
-        self.copy_selected()
+        _shared.copy_selected()
         f_selected = list(self.get_selected_points(a_track))
         self.scene.clearSelection()
         self.selected_point_strings = set()
@@ -1345,16 +1295,16 @@ class ItemSequencer(QGraphicsView):
         path = QPainterPath()
         point = a_points[0]
         pos = point.scenePos()
-        x = pos.x() + ATM_POINT_RADIUS
-        y = pos.y() + ATM_POINT_RADIUS
+        x = pos.x() + _shared.ATM_POINT_RADIUS
+        y = pos.y() + _shared.ATM_POINT_RADIUS
         path.moveTo(0.0, y)
         path.lineTo(x, y)
         break_after = point.item.break_after
 
         for point in a_points[1:]:
             pos = point.scenePos()
-            x = pos.x() + ATM_POINT_RADIUS
-            y = pos.y() + ATM_POINT_RADIUS
+            x = pos.x() + _shared.ATM_POINT_RADIUS
+            y = pos.y() + _shared.ATM_POINT_RADIUS
             if break_after:
                 path.moveTo(x, y)
             else:
@@ -1453,7 +1403,7 @@ class ItemSequencer(QGraphicsView):
             shared.REGION_SETTINGS.open_region()
 
     def quantize(self, a_beat):
-        if SEQ_QUANTIZE:
+        if _shared.SEQ_QUANTIZE:
             return int(a_beat * SEQ_QUANTIZE_AMT) / SEQ_QUANTIZE_AMT
         else:
             return a_beat
@@ -1783,7 +1733,7 @@ class ItemSequencer(QGraphicsView):
                 f_number.setPos(i3 + 3.0, 2)
                 if SEQ_LINES_ENABLED and DRAW_SEQUENCER_GRAPHS:
                     for f_i4 in range(1, SEQ_SNAP_RANGE):
-                        f_sub_x = i3 + (SEQUENCER_QUANTIZE_PX * f_i4)
+                        f_sub_x = i3 + (_shared.SEQUENCER_QUANTIZE_PX * f_i4)
                         f_line = self.scene.addLine(
                             f_sub_x, _shared.REGION_EDITOR_HEADER_HEIGHT,
                             f_sub_x, f_total_height, f_16th_pen)
@@ -1795,7 +1745,9 @@ class ItemSequencer(QGraphicsView):
                 self.beat_line_list.append(f_line)
                 if SEQ_LINES_ENABLED:
                     for f_i4 in range(1, SEQ_SNAP_RANGE):
-                        f_sub_x = f_beat_x + (SEQUENCER_QUANTIZE_PX * f_i4)
+                        f_sub_x = f_beat_x + (
+                            _shared.SEQUENCER_QUANTIZE_PX * f_i4
+                        )
                         f_line = self.scene.addLine(
                             f_sub_x, _shared.REGION_EDITOR_HEADER_HEIGHT,
                             f_sub_x, f_total_height, f_16th_pen)
@@ -1831,7 +1783,13 @@ class ItemSequencer(QGraphicsView):
         f_track = shared.TRACK_PANEL.plugin_uid_map[a_point.index]
         f_min = (f_track *
             shared.REGION_EDITOR_TRACK_HEIGHT) + _shared.REGION_EDITOR_HEADER_HEIGHT
-        f_max = f_min + shared.REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
+        f_max = (
+            f_min
+            +
+            shared.REGION_EDITOR_TRACK_HEIGHT
+            -
+            _shared.ATM_POINT_DIAMETER
+        )
         f_item = SeqAtmItem(
             a_point, self.automation_save_callback, f_min, f_max)
         self.scene.addItem(f_item)
@@ -1842,7 +1800,11 @@ class ItemSequencer(QGraphicsView):
         return f_item
 
     def get_pos_from_point(self, a_point):
-        f_track_height = shared.REGION_EDITOR_TRACK_HEIGHT - ATM_POINT_DIAMETER
+        f_track_height = (
+            shared.REGION_EDITOR_TRACK_HEIGHT
+            -
+            _shared.ATM_POINT_DIAMETER
+        )
         f_track = shared.TRACK_PANEL.plugin_uid_map[a_point.index]
         return QtCore.QPointF(
             (a_point.beat * _shared.SEQUENCER_PX_PER_BEAT),
