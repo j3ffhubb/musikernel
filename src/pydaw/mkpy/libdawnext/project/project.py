@@ -1,3 +1,4 @@
+from . import _shared
 from .atm_region import DawNextAtmRegion
 from .audio_item import DawNextAudioItem
 from .item import pydaw_item
@@ -297,8 +298,11 @@ class DawNextProject(libmk.AbstractProject):
             self, a_midi_file, a_beat_offset, a_track_offset):
         """ @a_midi_file:  An instance of DawNextMidiFile """
         f_sequencer = self.get_region()
-        f_active_tracks = [x + a_track_offset for x in
-            a_midi_file.result_dict if x + a_track_offset < _shared.TRACK_COUNT_ALL]
+        f_active_tracks = [
+            x + a_track_offset
+            for x in a_midi_file.result_dict
+            if x + a_track_offset < _shared.TRACK_COUNT_ALL
+        ]
         f_end_beat = max(x.get_length() for x in
             a_midi_file.result_dict.values())
         f_sequencer.clear_range(f_active_tracks, a_beat_offset, f_end_beat)

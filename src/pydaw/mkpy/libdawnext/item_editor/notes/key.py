@@ -1,8 +1,19 @@
+from mkpy.libdawnext.project import *
+from mkpy.libdawnext.shared import *
+from mkpy.libpydaw.pydaw_util import *
+from mkpy.libpydaw.translate import _
+from mkpy.mkqt import *
+
 
 class PianoKeyItem(QGraphicsRectItem):
     """ This is a piano key on the PianoRollEditor
     """
-    def __init__(self, a_piano_width, a_note_height, a_parent):
+    def __init__(
+        self,
+        a_piano_width,
+        a_note_height,
+        a_parent,
+    ):
         QGraphicsRectItem.__init__(
             self,
             0,
@@ -23,4 +34,3 @@ class PianoKeyItem(QGraphicsRectItem):
     def hoverLeaveEvent(self, a_event):
         QGraphicsRectItem.hoverLeaveEvent(self, a_event)
         self.setBrush(self.o_brush)
-

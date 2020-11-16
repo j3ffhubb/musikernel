@@ -1,3 +1,4 @@
+from . import _shared
 from .audio_item import DawNextAudioItem
 from mkpy import libmk
 from mkpy.libmk.mk_project import *

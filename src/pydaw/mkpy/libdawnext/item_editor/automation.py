@@ -3,6 +3,7 @@ from mkpy import libmk
 from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
 from mkpy.libdawnext.shared import *
+from mkpy.libmk import mk_project
 from mkpy.libpydaw import (
     pydaw_util,
     pydaw_widgets,
@@ -185,7 +186,13 @@ class AutomationEditor(AbstractItemEditor):
                 f_cc_val = int(127.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
                     self.viewer_height) * 127.0))
                 f_cc_val = pydaw_clip_value(f_cc_val, 0, 127)
-                shared.ITEM_EDITOR.add_cc(pydaw_cc(f_cc_start, self.cc_num, f_cc_val))
+                shared.ITEM_EDITOR.add_cc(
+                    mk_project.pydaw_cc(
+                        f_cc_start,
+                        self.cc_num,
+                        f_cc_val,
+                    )
+                )
             else:
                 f_cc_val = 1.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
                     self.viewer_height) * 2.0)
@@ -333,7 +340,7 @@ class AutomationEditor(AbstractItemEditor):
         self.update()
 
     def draw_point(self, a_cc, a_select=True):
-        """ a_cc is an instance of the pydaw_cc class"""
+        """ a_cc is an instance of the mk_project.pydaw_cc class"""
         f_time = self.axis_size + (a_cc.start * self.px_per_beat)
         if self.is_cc:
             f_value = self.axis_size +  self.viewer_height / 127.0 * (127.0 -
@@ -480,9 +487,11 @@ class AutomationEditorWidget:
             return
 
         def ok_handler():
-            f_cc = pydaw_cc(
-                f_pos_spinbox.value() - 1.0, self.automation_viewer.cc_num,
-                f_value_spinbox.value())
+            f_cc = mk_project.pydaw_cc(
+                f_pos_spinbox.value() - 1.0,
+                self.automation_viewer.cc_num,
+                f_value_spinbox.value(),
+            )
             shared.CURRENT_ITEM.add_cc(f_cc)
 
             shared.PROJECT.save_item(shared.CURRENT_ITEM_NAME, shared.CURRENT_ITEM)

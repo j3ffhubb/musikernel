@@ -54,6 +54,13 @@ PACKAGE_NAME = "{}-{}".format(
     MAJOR_VERSION, global_version_fedora)
 
 global_home = os.path.expanduser("~")
+rpm_build_path = os.path.join(
+    global_home,
+    'rpmbuild',
+    "BUILD",
+    MAJOR_VERSION,
+)
+os.system('rm -rf {}*')
 
 if not os.path.isdir("{}/rpmbuild".format(global_home)):
     os.system("rpmdev-setuptree")

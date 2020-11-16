@@ -1,3 +1,16 @@
+from .  import _shared
+from mkpy import libmk
+from mkpy.libdawnext import shared
+from mkpy.libdawnext.project import *
+from mkpy.libdawnext.shared import *
+from mkpy.libpydaw import (
+    pydaw_util,
+    pydaw_widgets,
+)
+from mkpy.libpydaw.pydaw_util import *
+from mkpy.libpydaw.translate import _
+from mkpy.mkqt import *
+
 
 class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
     """ This is an individual sequencer item within the ItemSequencer
@@ -246,7 +259,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
 
         if self.should_draw:
             f_offset = 0
-            f_offset_inc = project.PIXMAP_TILE_WIDTH * self.x_scale
+            f_offset_inc = PIXMAP_TILE_WIDTH * self.x_scale
             for f_pixmap_item in self.pixmap_items:
                 f_pixmap_item.setPos(
                     f_offset + self.sample_start_offset_px, 20.0)
@@ -597,7 +610,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         f_lane_num = pydaw_clip_value(
             f_lane_num,
             0,
-            project.TRACK_COUNT_ALL,
+            TRACK_COUNT_ALL,
         )
         f_y_pos = (
             f_lane_num * shared.REGION_EDITOR_TRACK_HEIGHT
@@ -606,7 +619,7 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
 
     def lane_number_to_y_pos(self, a_lane_num):
         a_lane_num = pydaw_util.pydaw_clip_value(
-            a_lane_num, 0, project.TRACK_COUNT_ALL)
+            a_lane_num, 0, TRACK_COUNT_ALL)
         return (a_lane_num *
             shared.REGION_EDITOR_TRACK_HEIGHT) + _shared.REGION_EDITOR_HEADER_HEIGHT
 

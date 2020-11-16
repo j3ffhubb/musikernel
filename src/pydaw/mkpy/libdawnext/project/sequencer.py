@@ -173,7 +173,7 @@ class pydaw_sequencer:
     def fix_overlaps(self):
         # Delete items with length < 1/16th note
         f_to_delete = {x for x in self.items if x.length_beats < 0.25}
-        for f_i in range(TRACK_COUNT_ALL):
+        for f_i in range(_shared.TRACK_COUNT_ALL):
             f_items = [
                 x for x in self.items if x.track_num == f_i and
                 x not in f_to_delete]
@@ -198,7 +198,7 @@ class pydaw_sequencer:
             len([x for x in self.markers.values() if x.type in (1, 2)])))
         for v in sorted(self.markers.values()):
             f_result.append(str(v))
-        for f_i in range(TRACK_COUNT_ALL):
+        for f_i in range(_shared.TRACK_COUNT_ALL):
             f_items = [x for x in self.items if x.track_num == f_i]
             if f_items:
                 f_items.sort()

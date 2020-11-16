@@ -1,10 +1,12 @@
 """
 
 """
-from mkpy.mkqt import *
+from mkpy import libmk
 from mkpy.libdawnext.project import *
 from mkpy.libpydaw import pydaw_util
 from mkpy.libpydaw.translate import _
+from mkpy.mkqt import *
+
 
 AUDIO_ITEMS_TO_DROP = []
 MIDI_FILES_TO_DROP = []
@@ -111,7 +113,7 @@ TAB_MIXER = 4
 TAB_NOTES = 5
 
 REGION_EDITOR_TRACK_HEIGHT = 64
-PROJECT = DawNextProject(global_pydaw_with_audio)
+PROJECT = DawNextProject(pydaw_util.global_pydaw_with_audio)
 TRACK_NAMES = [
     "Master" if x == 0 else "track{}".format(x)
     for x in range(TRACK_COUNT_ALL)
@@ -275,7 +277,7 @@ def open_last():
 #Opens or creates a new project
 def global_open_project(a_project_file):
     global PROJECT, TRACK_NAMES, TRACK_COLORS
-    PROJECT = DawNextProject(global_pydaw_with_audio)
+    PROJECT = DawNextProject(pydaw_util.global_pydaw_with_audio)
     PROJECT.suppress_updates = True
     PROJECT.open_project(a_project_file, False)
     TRACK_COLORS = PROJECT.get_track_colors()
@@ -300,7 +302,7 @@ def global_open_project(a_project_file):
 
 def global_new_project(a_project_file):
     global PROJECT, TRACK_COLORS
-    PROJECT = DawNextProject(global_pydaw_with_audio)
+    PROJECT = DawNextProject(pydaw_util.global_pydaw_with_audio)
     PROJECT.new_project(a_project_file)
     TRACK_COLORS = PROJECT.get_track_colors()
     global_update_track_comboboxes()
@@ -445,14 +447,30 @@ def pydaw_set_piano_roll_quantize(a_index=None):
     PIANO_ROLL_SNAP_DIVISOR = ITEM_SNAP_DIVISORS[PIANO_ROLL_QUANTIZE_INDEX]
 
     PIANO_ROLL_SNAP_BEATS = 1.0 / PIANO_ROLL_SNAP_DIVISOR
-    LAST_NOTE_RESIZE = pydaw_clip_min(LAST_NOTE_RESIZE, PIANO_ROLL_SNAP_BEATS)
+    LAST_NOTE_RESIZE = pydaw_util.pydaw_clip_min(
+        LAST_NOTE_RESIZE,
+        PIANO_ROLL_SNAP_BEATS,
+    )
     PIANO_ROLL_EDITOR.set_grid_div(PIANO_ROLL_SNAP_DIVISOR)
-    PIANO_ROLL_SNAP_VALUE = (PIANO_ROLL_GRID_WIDTH / CURRENT_ITEM_LEN /
-        PIANO_ROLL_SNAP_DIVISOR)
-    PIANO_ROLL_MIN_NOTE_LENGTH = (PIANO_ROLL_GRID_WIDTH /
-        CURRENT_ITEM_LEN / 32.0)
+    PIANO_ROLL_SNAP_VALUE = (
+        PIANO_ROLL_GRID_WIDTH
+        /
+        CURRENT_ITEM_LEN
+        /
+        PIANO_ROLL_SNAP_DIVISOR
+    )
+    PIANO_ROLL_MIN_NOTE_LENGTH = (
+        PIANO_ROLL_GRID_WIDTH
+        /
+        CURRENT_ITEM_LEN
+        /
+        32.0
+    )
 
-def global_open_audio_items(a_update_viewer=True, a_reload=True):
+def global_open_audio_items(
+    a_update_viewer=True,
+    a_reload=True,
+):
     if a_update_viewer:
         f_selected_list = []
         for f_item in AUDIO_SEQ.audio_items:
@@ -466,8 +484,12 @@ def global_open_audio_items(a_update_viewer=True, a_reload=True):
 #                try:
                     f_graph = libmk.PROJECT.get_sample_graph_by_uid(v.uid)
                     if f_graph is None:
-                        print(_("Error drawing item for {}, could not get "
-                        "sample graph object").format(v.uid))
+                        print(
+                            _(
+                                "Error drawing item for {}, could not get "
+                                "sample graph object"
+                            ).format(v.uid)
+                        )
                         continue
                     AUDIO_SEQ.draw_item(k, v, f_graph)
 #                except:

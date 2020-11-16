@@ -1,3 +1,4 @@
+from . import _shared
 from mkpy.libmk.mk_project import *
 from mkpy.libpydaw.pydaw_util import *
 from mkpy.libpydaw.translate import _

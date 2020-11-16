@@ -9,6 +9,9 @@ from mkpy.libpydaw.translate import _
 from mkpy.mkplugins import *
 from mkpy.mkqt import *
 
+
+MREC_EVENTS = []
+
 class TransportWidget(libmk.AbstractTransport):
     def __init__(self):
         self.recording_timestamp = None

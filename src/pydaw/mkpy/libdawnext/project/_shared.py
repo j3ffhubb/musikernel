@@ -12,7 +12,6 @@ import os
 import re
 import traceback
 
-
 TRACK_COUNT_ALL = 32
 #Anything smaller gets deleted when doing a transform
 pydaw_min_note_length = 4.0 / 129.0
