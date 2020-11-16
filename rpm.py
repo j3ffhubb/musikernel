@@ -183,9 +183,10 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/__init__.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/editor.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/key.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/notes.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/note.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/_shared.py
 
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/__init__.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/_shared.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/atm_point.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/atm_region.py
