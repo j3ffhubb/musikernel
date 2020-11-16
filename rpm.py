@@ -180,6 +180,8 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/editor.py
 
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/__init__.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/editor.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/key.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/notes.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/_shared.py
 
