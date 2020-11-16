@@ -10,6 +10,9 @@ from mkpy.libpydaw import (
 from mkpy.mkqt import *
 
 
+DRAW_SEQUENCER_GRAPHS = True
+CACHED_SEQ_LEN = 32
+LAST_ITEM_LENGTH = 4
 REGION_EDITOR_MODE = 0
 
 ATM_CLIPBOARD = []
