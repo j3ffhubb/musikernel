@@ -186,6 +186,19 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/notes.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/item_editor/notes/_shared.py
 
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/_shared.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/atm_point.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/atm_region.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/audio_item.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/item.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/midi_file.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/project.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/region_marker.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/seq_item.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/sequencer.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/tempo_marker.py
+%{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/project/text_marker.py
+
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/__init__.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/_shared.py
 %{{_usr}}/lib/musikernel3/pydaw/mkpy/libdawnext/sequencer/atm_context_menu.py
@@ -271,7 +284,6 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/mkpy/dawnext.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/__init__.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/osc.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/project.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/strings.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/mido/__init__.py
