@@ -334,7 +334,7 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/takes.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/tracks.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/wavenext.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/wave_edit/__init__.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/dawnext.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/libdawnext/__init__.py

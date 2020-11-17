@@ -22,7 +22,7 @@ GNU General Public License for more details.
 #endif
 
 #include "dawnext.h"
-#include "wavenext.h"
+#include "wave_edit.h"
 
 #ifdef MACOS
 #include <sys/param.h>
@@ -109,7 +109,7 @@ void v_pydaw_activate(
     musikernel->hosts[MK_HOST_WAVENEXT].mix = v_default_mix;
 
     g_dn_instantiate();
-    g_wavenext_get();
+    g_wave_edit_get();
 
     v_open_project(a_project_path, 1);
 

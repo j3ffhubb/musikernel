@@ -17,11 +17,11 @@ import os
 
 from mkpy.mkqt import *
 
-from .libpydaw import *
-from .libpydaw.pydaw_util import *
-from .libpydaw.pydaw_widgets import *
-from .libpydaw.translate import _
-from .mkplugins import *
+from mkpy.libpydaw import *
+from mkpy.libpydaw.pydaw_util import *
+from mkpy.libpydaw.pydaw_widgets import *
+from mkpy.libpydaw.translate import _
+from mkpy.mkplugins import *
 from mkpy import libmk
 from mkpy.libpydaw import strings as mk_strings
 
@@ -46,7 +46,7 @@ def set_tooltips_enabled(a_enabled):
 
 class WaveNextOsc(libmk.AbstractIPC):
     def __init__(self, a_with_audio=False,
-             a_configure_path="/musikernel/wavenext"):
+             a_configure_path="/musikernel/wave_edit"):
         libmk.AbstractIPC.__init__(self, a_with_audio, a_configure_path)
 
     def pydaw_wn_playback(self, a_mode):
@@ -77,12 +77,12 @@ class WaveNextOsc(libmk.AbstractIPC):
     def save_audio_inputs(self):
         self.send_configure("ai", "")
 
-wavenext_folder = os.path.join("projects", "wavenext")
-wavenext_folder_tracks = os.path.join(wavenext_folder, "tracks")
+wave_edit_folder = os.path.join("projects", "wave_edit")
+wave_edit_folder_tracks = os.path.join(wave_edit_folder, "tracks")
 pydaw_file_wave_editor_bookmarks = os.path.join(
-    wavenext_folder, "bookmarks.txt")
-pydaw_file_notes = os.path.join(wavenext_folder, "notes.txt")
-pydaw_file_pyinput = os.path.join(wavenext_folder, "input.txt")
+    wave_edit_folder, "bookmarks.txt")
+pydaw_file_notes = os.path.join(wave_edit_folder, "notes.txt")
+pydaw_file_pyinput = os.path.join(wave_edit_folder, "input.txt")
 
 
 class WaveNextProject(libmk.AbstractProject):
@@ -92,7 +92,7 @@ class WaveNextProject(libmk.AbstractProject):
         self.suppress_updates = False
 
     def save_track_plugins(self, a_uid, a_track):
-        f_folder = wavenext_folder_tracks
+        f_folder = wave_edit_folder_tracks
         if not self.suppress_updates:
             self.save_file(f_folder, str(a_uid), str(a_track))
 
@@ -102,7 +102,7 @@ class WaveNextProject(libmk.AbstractProject):
         self.project_file = os.path.splitext(
             os.path.basename(a_project_file))[0]
         self.track_pool_folder = os.path.join(
-            self.project_folder, wavenext_folder_tracks)
+            self.project_folder, wave_edit_folder_tracks)
         #files
         self.pynotes_file = os.path.join(
             self.project_folder, pydaw_file_notes)
@@ -526,8 +526,10 @@ class MainWindow(QScrollArea):
 
     def on_undo(self):
         QMessageBox.warning(
-            MAIN_WINDOW, "Error",
-            "Wave-Next does not support undo/redo")
+            MAIN_WINDOW,
+            "Error",
+            "Wave Editor does not support undo/redo",
+        )
 
     def on_redo(self):
         self.on_undo()
@@ -777,7 +779,7 @@ class pydaw_wave_editor_widget:
                 self.plugins[f_plugin.index].set_value(f_plugin)
 
     def name_callback(self):
-        return "Wave-Next"
+        return "Wave Editor"
 
     def copy_audio_item(self):
         pass

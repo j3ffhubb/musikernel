@@ -158,9 +158,10 @@ class TransportWidget:
         self.grid_layout1.addWidget(QLabel(_("Host")), 0, 55)
         self.host_combobox = QComboBox()
         self.host_combobox.setMinimumWidth(120)
-        self.host_combobox.addItems(["DAW-Next", "Wave-Next"])
+        self.host_combobox.addItems(["DAW", "Wave Editor"])
         self.host_combobox.currentIndexChanged.connect(
-            libmk.MAIN_WINDOW.set_host)
+            libmk.MAIN_WINDOW.set_host,
+        )
         self.grid_layout1.addWidget(self.host_combobox, 1, 55)
 
         self.master_vol_knob = pydaw_widgets.pydaw_pixmap_knob(60, -480, 0)
@@ -264,7 +265,7 @@ def engine_lib_callback(a_path, a_msg):
 
 class MkMainWindow(QMainWindow):
     dawnext_callback = Signal(str, list)
-    wavenext_callback = Signal(str, list)
+    wave_edit_callback = Signal(str, list)
 
     def __init__(self):
         QMainWindow.__init__(self)
@@ -316,12 +317,12 @@ class MkMainWindow(QMainWindow):
         SPLASH_SCREEN.status_update(_("Loading DAW-Next"))
         dawnext.init()
         SPLASH_SCREEN.status_update(_("Loading Wave-Next"))
-        from mkpy import wavenext
-        wavenext.init()
+        from mkpy import wave_edit
+        wave_edit.init()
 
-        self.wave_editor_module = wavenext
+        self.wave_editor_module = wave_edit
 
-        libmk.HOST_MODULES = (dawnext, wavenext)
+        libmk.HOST_MODULES = (dawnext, wave_edit)
         self.host_windows = tuple(x.MAIN_WINDOW for x in libmk.HOST_MODULES)
 
         self.current_module = dawnext
@@ -465,11 +466,11 @@ class MkMainWindow(QMainWindow):
         if pydaw_util.IS_ENGINE_LIB:
             self.dawnext_callback.connect(
                 dawnext.MAIN_WINDOW.configure_callback)
-            self.wavenext_callback.connect(
-                wavenext.MAIN_WINDOW.configure_callback)
+            self.wave_edit_callback.connect(
+                wave_edit.MAIN_WINDOW.configure_callback)
 
             self.engine_callback_dict = {
-                "musikernel/wavenext": self.wavenext_callback,
+                "musikernel/wave_edit": self.wave_edit_callback,
                 "musikernel/dawnext": self.dawnext_callback
                 }
             pydaw_util.load_engine_lib(engine_lib_callback)
@@ -482,8 +483,8 @@ class MkMainWindow(QMainWindow):
             if self.osc_server is not None:
                 print(self.osc_server.get_url())
                 self.osc_server.add_method(
-                    "musikernel/wavenext", 's',
-                    wavenext.MAIN_WINDOW.configure_callback)
+                    "musikernel/wave_edit", 's',
+                    wave_edit.MAIN_WINDOW.configure_callback)
                 self.osc_server.add_method(
                     "musikernel/dawnext", 's',
                     dawnext.MAIN_WINDOW.configure_callback)

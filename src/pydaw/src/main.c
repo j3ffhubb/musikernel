@@ -1041,7 +1041,7 @@ int v_configure(const char * path, const char * key, const char * value)
         }
     }
 
-    if(!strcmp(path, "/musikernel/wavenext"))
+    if(!strcmp(path, "/musikernel/wave_edit"))
     {
         v_wn_configure(key, value);
         return 0;
