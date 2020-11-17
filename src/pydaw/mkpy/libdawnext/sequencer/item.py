@@ -192,31 +192,42 @@ class SequencerItem(pydaw_widgets.QGraphicsRectItemNDL):
         a_event.setAccepted(True)
         QGraphicsRectItem.mouseDoubleClickEvent(self, a_event)
         global_open_items(
-            self.name, a_reset_scrollbar=True, a_new_ref=self.audio_item)
-        editors = (shared.CURRENT_ITEM.items, shared.CURRENT_ITEM.notes,
-             shared.CURRENT_ITEM.ccs, shared.CURRENT_ITEM.pitchbends)
+            self.name,
+            a_reset_scrollbar=True,
+            a_new_ref=self.audio_item,
+        )
+        editors = (
+            shared.CURRENT_ITEM.items,
+            shared.CURRENT_ITEM.notes,
+            shared.CURRENT_ITEM.ccs,
+            shared.CURRENT_ITEM.pitchbends,
+        )
         current_index = shared.ITEM_EDITOR.tab_widget.currentIndex()
         if current_index < len(editors) and not editors[current_index]:
             for i in range(len(editors)):
                 if editors[i]:
                     current_index = i
-                    shared.ITEM_EDITOR.tab_widget.setCurrentIndex(current_index)
+                    shared.ITEM_EDITOR.tab_widget.setCurrentIndex(
+                        current_index,
+                    )
                     break
         shared.MAIN_WINDOW.main_tabwidget.setCurrentIndex(
             shared.TAB_ITEM_EDITOR,
         )
         #Ensure that notes are visible
         if current_index == 1 and shared.CURRENT_ITEM.notes:
-            height = PIANO_ROLL_EDITOR.geometry().height()
+            height = shared.PIANO_ROLL_EDITOR.geometry().height()
             average = sum(
-                x.pos().y() for x in PIANO_ROLL_EDITOR.note_items
-                ) / len(PIANO_ROLL_EDITOR.note_items)
+                x.pos().y() for x in shared.PIANO_ROLL_EDITOR.note_items
+                ) / len(shared.PIANO_ROLL_EDITOR.note_items)
             val = int(average - (height * 0.5))
-            PIANO_ROLL_EDITOR.verticalScrollBar().setValue(val)
+            shared.PIANO_ROLL_EDITOR.verticalScrollBar().setValue(val)
 
     def generic_hoverEnterEvent(self, a_event):
         if not libmk.IS_PLAYING:
-            QApplication.setOverrideCursor(QCursor(QtCore.Qt.SizeHorCursor))
+            QApplication.setOverrideCursor(
+                QCursor(QtCore.Qt.SizeHorCursor),
+            )
 
     def generic_hoverLeaveEvent(self, a_event):
         QApplication.restoreOverrideCursor()

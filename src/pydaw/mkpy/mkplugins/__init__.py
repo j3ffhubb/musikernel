@@ -656,10 +656,17 @@ class PluginRack:
         return [x.plugin_uid for x in self.plugins if x.plugin_uid != -1]
 
     def set_plugin_order(self):
-        f_labels = ["{} : {}".format(f_i, x.plugin_combobox.currentText())
-            for f_i, x in zip(range(1, 11), self.plugins)]
+        f_labels = [
+            "{} : {}".format(f_i, x.plugin_combobox.currentText())
+            for f_i, x in zip(range(1, 11), self.plugins)
+        ]
         f_result = pydaw_widgets.ordered_table_dialog(
-            f_labels, self.plugins, 30, 200, libmk.MAIN_WINDOW)
+            f_labels,
+            self.plugins,
+            30,
+            200,
+            libmk.MAIN_WINDOW,
+        )
         if f_result:
             for f_i, f_plugin in zip(range(len(f_result)), f_result):
                 f_plugin.index = f_i

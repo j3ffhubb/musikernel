@@ -546,7 +546,7 @@ class ItemSequencer(QGraphicsView):
         f_lane_num = int((a_pos.y() - _shared.REGION_EDITOR_HEADER_HEIGHT) /
             shared.REGION_EDITOR_TRACK_HEIGHT)
         f_lane_num = pydaw_clip_value(
-            f_lane_num, 0, project.TRACK_COUNT_ALL - 1)
+            f_lane_num, 0, TRACK_COUNT_ALL - 1)
 
         return f_beat_frac, f_lane_num
 
@@ -627,7 +627,7 @@ class ItemSequencer(QGraphicsView):
                     f_items.add_item(f_index, f_item)
                     shared.PROJECT.save_item_by_uid(f_item_uid, f_items)
                     f_track_num += 1
-                    if f_track_num >= project.TRACK_COUNT_ALL:
+                    if f_track_num >= TRACK_COUNT_ALL:
                         break
 
         if a_single_item:

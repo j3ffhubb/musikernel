@@ -8,6 +8,8 @@ from mkpy.libpydaw import (
 )
 from mkpy.libpydaw.translate import _
 from mkpy.mkqt import *
+import math
+
 
 MENU = None
 track_atm_clipboard = []
@@ -170,7 +172,7 @@ def transform_atm():
     f_start_beat = shared.SEQUENCER.atm_selected[0].item.beat
     shared.SEQUENCER.set_playback_pos(f_start_beat)
     f_scrollbar = shared.SEQUENCER.horizontalScrollBar()
-    f_scrollbar.setValue(SEQUENCER_PX_PER_BEAT * f_start_beat)
+    f_scrollbar.setValue(_shared.SEQUENCER_PX_PER_BEAT * f_start_beat)
 
     shared.SEQUENCER.atm_selected_vals = [
         x.item.cc_val
@@ -269,7 +271,7 @@ def lfo_atm():
         )
         return
     f_scrollbar = shared.SEQUENCER.horizontalScrollBar()
-    f_scrollbar.setValue(SEQUENCER_PX_PER_BEAT * f_start_beat)
+    f_scrollbar.setValue(_shared.SEQUENCER_PX_PER_BEAT * f_start_beat)
     shared.SEQUENCER.set_playback_pos(f_start_beat)
     f_step = 1.0 / 16.0
     f_track, f_beat, f_val = shared.SEQUENCER.current_coord
@@ -296,7 +298,7 @@ def lfo_atm():
     shared.SEQUENCER.atm_selected = []
 
     for f_i in range(int((f_end_beat - f_start_beat) / f_step)):
-        f_point = project.DawNextAtmPoint(
+        f_point = DawNextAtmPoint(
             f_pos,
             f_port,
             64.0,
@@ -309,7 +311,7 @@ def lfo_atm():
         f_pos += f_step
 
     f_result = pydaw_widgets.lfo_dialog(
-        shared.SEQUENCER.lfo_atm_callback,
+        lfo_atm_callback,
         lambda : shared.SEQUENCER.automation_save_callback(a_open=False)
     )
 

@@ -671,7 +671,7 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
         a_lane_num = pydaw_util.pydaw_clip_value(
             a_lane_num,
             0,
-            project.TRACK_COUNT_ALL,
+            TRACK_COUNT_ALL,
         )
         return (a_lane_num * shared.AUDIO_ITEM_HEIGHT) + shared.AUDIO_RULER_HEIGHT
 
