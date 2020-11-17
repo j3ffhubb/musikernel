@@ -323,7 +323,9 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/mk_vocoder.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/mkplugins/mk_limiter.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/libmk/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project.py
+
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/__init__.py
+
 %{{_usr}}/lib/{0}/pydaw/mkpy/wavenext.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/dawnext.py
