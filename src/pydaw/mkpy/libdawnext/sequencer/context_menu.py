@@ -1,5 +1,5 @@
 from .  import _shared
-from mkpy.libdawnext import project, shared
+from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
 from mkpy.libpydaw import (
     pydaw_util,
@@ -96,7 +96,7 @@ def on_auto_unlink_unique():
         f_new_uid = old_new_map[k]
         f_takes.add_item(v.item_uid, f_new_uid)
         v.uid = f_new_uid
-        f_item_ref = project.pydaw_sequencer_item(
+        f_item_ref = pydaw_sequencer_item(
             v.track_num,
             v.start_beat,
             v.length_beats,
@@ -311,7 +311,7 @@ def glue_selected():
         return
     f_did_something = False
     f_selected = [x.audio_item for x in shared.SEQUENCER.get_selected()]
-    for f_i in range(project.TRACK_COUNT_ALL):
+    for f_i in range(TRACK_COUNT_ALL):
         f_track_items = [x for x in f_selected if x.track_num == f_i]
         if len(f_track_items) > 1:
             f_did_something = True
@@ -320,7 +320,9 @@ def glue_selected():
             f_items_dict = shared.PROJECT.get_items_dict()
             f_old_name = f_items_dict.get_name_by_uid(f_new_ref.item_uid)
             f_new_name = shared.PROJECT.get_next_default_item_name(
-                f_old_name, f_items_dict)
+                f_old_name,
+                f_items_dict,
+            )
             f_new_uid = shared.PROJECT.create_empty_item(f_new_name)
             f_new_item = shared.PROJECT.get_item_by_uid(f_new_uid)
             f_tempo = shared.CURRENT_REGION.get_tempo_at_pos(

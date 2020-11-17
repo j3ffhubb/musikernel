@@ -2,7 +2,7 @@ from . import _shared
 from .fade_vol_dialog import FadeVolDialogWidget
 from .time_pitch_dialog import TimePitchDialogWidget
 from mkpy import libmk
-from mkpy.libdawnext import project, shared
+from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
 from mkpy.libdawnext.shared import *
 from mkpy.libpydaw import pydaw_util

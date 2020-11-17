@@ -325,6 +325,14 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/mkpy/libmk/__init__.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/audio_inputs.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/audio_item.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/midi_events.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/project.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/routing.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/sample_graph.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/takes.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/libmk/mk_project/tracks.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/wavenext.py
 

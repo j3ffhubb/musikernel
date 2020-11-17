@@ -3,7 +3,7 @@ from . import (
     _shared,
 )
 from mkpy import libmk
-from mkpy.libdawnext import project, shared
+from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
 from mkpy.libdawnext.shared import *
 from mkpy.libmk import mk_project
@@ -445,16 +445,24 @@ class AudioSeqItem(pydaw_widgets.QGraphicsRectItemNDL):
             self.setSelected(True)
 
     def copy_as_cc_automation(self):
-        shared.CC_EDITOR.clipboard = en_project.envelope_to_automation(
-            self.graph_object, True, TRANSPORT.tempo_spinbox.value())
+        shared.CC_EDITOR.clipboard = envelope_to_automation(
+            self.graph_object,
+            True,
+            TRANSPORT.tempo_spinbox.value(),
+        )
 
     def copy_as_pb_automation(self):
-        shared.PB_EDITOR.clipboard = en_project.envelope_to_automation(
-            self.graph_object, False, TRANSPORT.tempo_spinbox.value())
+        shared.PB_EDITOR.clipboard = envelope_to_automation(
+            self.graph_object,
+            False,
+            TRANSPORT.tempo_spinbox.value(),
+        )
 
     def copy_as_notes(self):
-        shared.PIANO_ROLL_EDITOR.clipboard = en_project.envelope_to_notes(
-            self.graph_object, TRANSPORT.tempo_spinbox.value())
+        shared.PIANO_ROLL_EDITOR.clipboard = envelope_to_notes(
+            self.graph_object,
+            TRANSPORT.tempo_spinbox.value(),
+        )
 
     def set_paif_for_all_instance(self):
         f_paif = shared.PROJECT.get_audio_per_item_fx_region(

@@ -1,5 +1,5 @@
 from . import _shared
-from mkpy.libdawnext import project, shared
+from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
 from mkpy.libdawnext.shared import *
 from mkpy.libpydaw import pydaw_util
@@ -51,7 +51,7 @@ def show(event):
 
 def header_time_modify():
     def ok_handler():
-        marker = project.pydaw_tempo_marker(
+        marker = pydaw_tempo_marker(
             shared.SEQUENCER.header_event_pos, tempo.value(),
             tsig_num.value(), int(str(tsig_den.currentText())))
         shared.CURRENT_REGION.set_marker(marker)
@@ -166,7 +166,7 @@ def header_time_range():
             shared.CURRENT_REGION.loop_marker.start_beat,
             shared.CURRENT_REGION.loop_marker.beat + 1,
         ):
-            marker = project.pydaw_tempo_marker(
+            marker = pydaw_tempo_marker(
                 i,
                 int(round(tempo)),
                 tsig_num.value(),
@@ -236,7 +236,7 @@ def header_time_range():
 
 def header_marker_modify():
     def ok_handler():
-        marker = project.pydaw_sequencer_marker(
+        marker = pydaw_sequencer_marker(
             shared.SEQUENCER.header_event_pos, text.text())
         shared.CURRENT_REGION.set_marker(marker)
         shared.PROJECT.save_region(shared.CURRENT_REGION)
@@ -302,7 +302,7 @@ def header_loop_start():
     else:
         end = shared.SEQUENCER.header_event_pos + tsig_beats
 
-    marker = project.pydaw_loop_marker(
+    marker = pydaw_loop_marker(
         end,
         shared.SEQUENCER.header_event_pos,
     )

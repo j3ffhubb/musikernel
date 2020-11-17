@@ -7,7 +7,7 @@ from . import (
 from .atm_item import SeqAtmItem
 from .item import SequencerItem
 from mkpy import libmk
-from mkpy.libdawnext import project, shared
+from mkpy.libdawnext import shared
 from mkpy.libdawnext.project import *
 from mkpy.libdawnext.shared import *
 from mkpy.libpydaw import (
@@ -188,7 +188,7 @@ class ItemSequencer(QGraphicsView):
                 f_track = int(f_pos_y // shared.REGION_EDITOR_TRACK_HEIGHT)
                 f_item_name = "{}-1".format(shared.TRACK_NAMES[f_track])
                 f_uid = shared.PROJECT.create_empty_item(f_item_name)
-                f_item_ref = project.pydaw_sequencer_item(
+                f_item_ref = pydaw_sequencer_item(
                     f_track,
                     f_beat,
                     _shared.LAST_ITEM_LENGTH,
@@ -525,7 +525,7 @@ class ItemSequencer(QGraphicsView):
         elif MIDI_FILES_TO_DROP:
             f_midi_path = MIDI_FILES_TO_DROP[0]
             f_beat, f_lane_num = self.pos_to_beat_and_track(f_pos)
-            f_midi = project.DawNextMidiFile(f_midi_path, shared.PROJECT)
+            f_midi = DawNextMidiFile(f_midi_path, shared.PROJECT)
             shared.PROJECT.import_midi_file(f_midi, f_beat, f_lane_num)
             shared.PROJECT.commit("Import MIDI file")
             shared.REGION_SETTINGS.open_region()
@@ -584,8 +584,12 @@ class ItemSequencer(QGraphicsView):
             f_item_name = "{}-1".format(shared.TRACK_NAMES[f_track_num])
             f_item_uid = shared.PROJECT.create_empty_item(f_item_name)
             f_items = shared.PROJECT.get_item_by_uid(f_item_uid)
-            f_item_ref = project.pydaw_sequencer_item(
-                f_track_num, f_beat_frac, 1.0, f_item_uid)
+            f_item_ref = pydaw_sequencer_item(
+                f_track_num,
+                f_beat_frac,
+                1.0,
+                f_item_uid,
+            )
 
         for f_file_name in a_item_list:
             libmk.APP.processEvents()
@@ -619,11 +623,19 @@ class ItemSequencer(QGraphicsView):
                     if f_length > f_item_ref.length_beats:
                         f_item_ref.length_beats = f_length
                 else:
-                    f_item_ref = project.pydaw_sequencer_item(
-                        f_track_num, f_beat_frac, f_length, f_item_uid)
+                    f_item_ref = pydaw_sequencer_item(
+                        f_track_num,
+                        f_beat_frac,
+                        f_length,
+                        f_item_uid,
+                    )
                     shared.CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
                     f_item = DawNextAudioItem(
-                        f_uid, a_start_bar=0, a_start_beat=0.0, a_lane_num=0)
+                        f_uid,
+                        a_start_bar=0,
+                        a_start_beat=0.0,
+                        a_lane_num=0,
+                    )
                     f_items.add_item(f_index, f_item)
                     shared.PROJECT.save_item_by_uid(f_item_uid, f_items)
                     f_track_num += 1
