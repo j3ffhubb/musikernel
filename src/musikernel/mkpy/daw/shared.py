@@ -161,7 +161,7 @@ SEQUENCER = None
 PB_EDITOR = None
 CC_EDITOR = None
 CC_EDITOR_WIDGET = None
-REGION_SETTINGS = None
+SEQ_WIDGET = None
 TRACK_PANEL = None
 PIANO_ROLL_EDITOR = None
 PIANO_ROLL_EDITOR_WIDGET = None
@@ -184,7 +184,7 @@ def pydaw_get_current_region_length():
 def global_update_hidden_rows(a_val=None):
     return # TODO
 #    REGION_EDITOR.setUpdatesEnabled(False)
-#    if CURRENT_REGION and REGION_SETTINGS.hide_inactive:
+#    if CURRENT_REGION and SEQ_WIDGET.hide_inactive:
 #        f_active = {x.track_num for x in CURRENT_REGION.items}
 #        for k, v in TRACK_PANEL.tracks.items():
 #            v.group_box.setHidden(k not in f_active)
@@ -293,8 +293,8 @@ def global_open_project(a_project_file):
         PROJECT.get_routing_graph(), TRACK_PANEL.get_track_names())
     global_open_mixer()
     MIDI_DEVICES_DIALOG.set_routings()
-    REGION_SETTINGS.open_region()
-    REGION_SETTINGS.snap_combobox.setCurrentIndex(1)
+    SEQ_WIDGET.open_region()
+    SEQ_WIDGET.snap_combobox.setCurrentIndex(1)
     TRANSPORT.open_project()
     PLUGIN_RACK.initialize(PROJECT)
     MIXER_WIDGET.set_project(PROJECT)
@@ -310,8 +310,8 @@ def global_new_project(a_project_file):
     MAIN_WINDOW.notes_tab.setText("")
     ROUTING_GRAPH_WIDGET.scene.clear()
     global_open_mixer()
-    REGION_SETTINGS.open_region()
-    REGION_SETTINGS.snap_combobox.setCurrentIndex(1)
+    SEQ_WIDGET.open_region()
+    SEQ_WIDGET.snap_combobox.setCurrentIndex(1)
     PLUGIN_RACK.initialize(PROJECT)
     MIXER_WIDGET.set_project(PROJECT)
     PIANO_ROLL_EDITOR.default_vposition()
@@ -322,12 +322,18 @@ def pydaw_seconds_to_beats(a_seconds):
         CURRENT_ITEM_REF.start_beat) / 60.0)
 
 
-def global_set_playback_pos(a_beat):
-    global PLAYBACK_POS
-    PLAYBACK_POS = float(a_beat)
+def global_set_playback_pos(a_beat=None):
+    if a_beat is not None:
+        global PLAYBACK_POS
+        PLAYBACK_POS = float(a_beat)
     TRANSPORT.set_pos_from_cursor(PLAYBACK_POS)
     for f_editor in (
-    SEQUENCER, AUDIO_SEQ, PIANO_ROLL_EDITOR, PB_EDITOR, CC_EDITOR):
+        SEQUENCER,
+        AUDIO_SEQ,
+        PIANO_ROLL_EDITOR,
+        PB_EDITOR,
+        CC_EDITOR,
+    ):
         f_editor.set_playback_pos(PLAYBACK_POS)
     TRANSPORT.set_time(PLAYBACK_POS)
 
@@ -348,7 +354,7 @@ def global_close_all():
     global AUDIO_ITEMS_TO_DROP
     if glbl.PLUGIN_UI_DICT:
         glbl.PLUGIN_UI_DICT.close_all_plugin_windows()
-    REGION_SETTINGS.clear_new()
+    SEQ_WIDGET.clear_new()
     ITEM_EDITOR.clear_new()
     AUDIO_SEQ.clear_drawn_items()
     PB_EDITOR.clear_drawn_items()
@@ -361,7 +367,7 @@ def global_ui_refresh_callback(a_restore_all=False):
     """
     global_open_items(CURRENT_ITEM_NAME)
     TRACK_PANEL.open_tracks()
-    REGION_SETTINGS.open_region()
+    SEQ_WIDGET.open_region()
     MAIN_WINDOW.tab_changed()
     PROJECT.IPC.pydaw_open_song(PROJECT.project_folder, a_restore_all)
 

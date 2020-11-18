@@ -197,7 +197,7 @@ class ItemSequencer(QGraphicsView):
                 self.selected_item_strings = {str(f_item_ref)}
                 shared.PROJECT.save_region(shared.CURRENT_REGION)
                 shared.PROJECT.commit(_("Add new item"))
-                shared.REGION_SETTINGS.open_region()
+                shared.SEQ_WIDGET.open_region()
                 return
             elif shared.EDITOR_MODE == shared.EDITOR_MODE_ERASE:
                 self.deleted_items = []
@@ -527,7 +527,7 @@ class ItemSequencer(QGraphicsView):
             f_midi = DawMidiFile(f_midi_path, shared.PROJECT)
             shared.PROJECT.import_midi_file(f_midi, f_beat, f_lane_num)
             shared.PROJECT.commit("Import MIDI file")
-            shared.REGION_SETTINGS.open_region()
+            shared.SEQ_WIDGET.open_region()
 
     def quantize(self, a_beat):
         if _shared.SEQ_QUANTIZE:
@@ -647,7 +647,7 @@ class ItemSequencer(QGraphicsView):
 
         shared.PROJECT.save_region(shared.CURRENT_REGION, a_notify=not f_restart)
         shared.PROJECT.commit("Added audio items")
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
         self.last_open_dir = os.path.dirname(f_file_name_str)
 
         if f_restart:
@@ -665,12 +665,12 @@ class ItemSequencer(QGraphicsView):
             return
         f_pos = (self.playback_pos * _shared.SEQUENCER_PX_PER_BEAT)
         self.playback_cursor.setPos(f_pos, 0.0)
-        if glbl.IS_PLAYING and shared.REGION_SETTINGS.follow_checkbox.isChecked():
+        if glbl.IS_PLAYING and shared.SEQ_WIDGET.follow_checkbox.isChecked():
             f_port_rect = self.viewport().rect()
             f_rect = self.mapToScene(f_port_rect).boundingRect()
             if not (f_pos > f_rect.left() and f_pos < f_rect.right()):
                 f_pos = int(self.playback_pos) * _shared.SEQUENCER_PX_PER_BEAT
-                shared.REGION_SETTINGS.scrollbar.setValue(int(f_pos))
+                shared.SEQ_WIDGET.scrollbar.setValue(int(f_pos))
 
     def start_playback(self):
         self.playback_pos_orig = self.playback_pos

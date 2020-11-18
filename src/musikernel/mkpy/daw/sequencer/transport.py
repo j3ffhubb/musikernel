@@ -130,7 +130,7 @@ class TransportWidget(glbl.AbstractTransport):
 
     def set_controls_enabled(self, a_enabled):
         for f_widget in (
-        shared.REGION_SETTINGS.snap_combobox, self.overdub_checkbox):
+        shared.SEQ_WIDGET.snap_combobox, self.overdub_checkbox):
             f_widget.setEnabled(a_enabled)
 
     def on_play(self):
@@ -140,7 +140,7 @@ class TransportWidget(glbl.AbstractTransport):
             shared.TAB_ITEM_EDITOR
         ):
             shared.SEQUENCER.open_region()
-        shared.REGION_SETTINGS.on_play()
+        shared.SEQ_WIDGET.on_play()
         shared.AUDIO_SEQ_WIDGET.on_play()
         shared.SEQUENCER.start_playback()
         shared.PROJECT.IPC.pydaw_en_playback(
@@ -152,7 +152,7 @@ class TransportWidget(glbl.AbstractTransport):
 
     def on_stop(self):
         shared.PROJECT.IPC.pydaw_en_playback(0)
-        shared.REGION_SETTINGS.on_stop()
+        shared.SEQ_WIDGET.on_stop()
         shared.AUDIO_SEQ_WIDGET.on_stop()
         self.set_controls_enabled(True)
         self.loop_mode_combobox.setEnabled(True)
@@ -171,8 +171,9 @@ class TransportWidget(glbl.AbstractTransport):
             self.show_save_items_dialog(a_restart=f_restart_engine)
 
         shared.SEQUENCER.stop_playback()
-        #shared.REGION_SETTINGS.open_region()
+        #shared.SEQ_WIDGET.open_region()
         self.set_time(shared.SEQUENCER.get_beat_value())
+        #shared.global_set_playback_pos()
 
     def show_save_items_dialog(self, a_restart=False):
         f_inputs = self.audio_inputs.inputs
@@ -191,7 +192,7 @@ class TransportWidget(glbl.AbstractTransport):
                 f_file_name, MREC_EVENTS, self.overdub_checkbox.isChecked(),
                 util.SAMPLE_RATE, self.rec_start, self.rec_end,
                 f_inputs, f_sample_count, f_file_name)
-            shared.REGION_SETTINGS.open_region()
+            shared.SEQ_WIDGET.open_region()
             if util.IS_ENGINE_LIB:
                 glbl.clean_wav_pool()
             elif a_restart:
@@ -242,7 +243,7 @@ class TransportWidget(glbl.AbstractTransport):
 #                self.group_box, _("Error"),
 #                _("Cannot use overdub mode with loop mode to record"))
 #            return False
-        shared.REGION_SETTINGS.on_play()
+        shared.SEQ_WIDGET.on_play()
         shared.AUDIO_SEQ_WIDGET.on_play()
         shared.SEQUENCER.start_playback()
         self.set_controls_enabled(False)

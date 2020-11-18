@@ -25,7 +25,7 @@ def takes_menu_triggered(a_action):
             shared.CURRENT_REGION.add_item_ref_by_uid(f_item_ref)
     shared.PROJECT.save_region(shared.CURRENT_REGION)
     shared.PROJECT.commit(_("Change active take"))
-    shared.REGION_SETTINGS.open_region()
+    shared.SEQ_WIDGET.open_region()
 
 def on_auto_unlink_selected():
     """ Adds an automatic -N suffix """
@@ -59,7 +59,7 @@ def on_auto_unlink_selected():
     shared.PROJECT.save_region(shared.CURRENT_REGION)
     shared.PROJECT.save_takes(f_takes)
     shared.PROJECT.commit(_("Auto-Unlink items"))
-    shared.REGION_SETTINGS.open_region()
+    shared.SEQ_WIDGET.open_region()
 
 def on_auto_unlink_unique():
     if _shared.REGION_EDITOR_MODE != 0:
@@ -104,7 +104,7 @@ def on_auto_unlink_unique():
     shared.PROJECT.save_region(shared.CURRENT_REGION)
     shared.PROJECT.save_takes(f_takes)
     shared.PROJECT.commit(_("Auto-Unlink unique items"))
-    shared.REGION_SETTINGS.open_region()
+    shared.SEQ_WIDGET.open_region()
 
 def on_unlink_item():
     """ Rename a single instance of an item and
@@ -213,7 +213,7 @@ def on_rename_items():
         REGION_CLIPBOARD = []
         shared.PROJECT.rename_items(f_result, f_new_name)
         shared.PROJECT.commit(_("Rename items"))
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
         if shared.DRAW_LAST_ITEMS:
             shared.global_open_items()
         f_window.close()
@@ -270,7 +270,7 @@ def transpose_dialog():
                 shared.CURRENT_ITEM_NAME,
             )
         if f_duplicate_notes.isChecked():
-            shared.REGION_SETTINGS.open_region()
+            shared.SEQ_WIDGET.open_region()
         f_window.close()
 
     def transpose_cancel_handler():
@@ -349,7 +349,7 @@ def glue_selected():
     if f_did_something:
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Glue sequencer items"))
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
     else:
         QMessageBox.warning(
             shared.MAIN_WINDOW,

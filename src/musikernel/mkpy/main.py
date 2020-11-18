@@ -35,8 +35,38 @@ import traceback
 if util.IS_LINUX and not util.IS_ENGINE_LIB:
     from .vendor import liblo
 
-HOST_INDEX_DAW_NEXT = 0
-HOST_INDEX_WAVE_NEXT = 1
+HOST_INDEX_DAW = 0
+HOST_INDEX_WAVE_EDIT = 1
+
+def handle_engine_error(exitCode):
+    if exitCode == 0:
+        print("Engine exited with return code 0, no errors.")
+        return
+
+    if exitCode == 1000:
+        QMessageBox.warning(
+            glbl.MAIN_WINDOW, "Error", "Audio device not found")
+    elif exitCode == 1001:
+        QMessageBox.warning(
+            glbl.MAIN_WINDOW, "Error", "Device config not found")
+    elif exitCode == 1002:
+        QMessageBox.warning(
+            glbl.MAIN_WINDOW, "Error",
+            "Unknown error opening audio device")
+    if exitCode == 1003:
+        QMessageBox.warning(
+            glbl.MAIN_WINDOW, "Error",
+            "The audio device was busy, make sure that no other applications "
+            "are using the device and try restarting MusiKernel")
+    else:
+        QMessageBox.warning(
+            glbl.MAIN_WINDOW, "Error",
+            "The audio engine died with error code {}, "
+            "please try restarting MusiKernel".format(exitCode))
+        glbl.TRANSPORT.stop_button.setChecked(True)
+    if exitCode >= 1000 and exitCode <= 1002:
+        glbl.MAIN_WINDOW.on_change_audio_settings()
+
 
 class MkIpc(glbl.AbstractIPC):
     def __init__(self):
@@ -128,16 +158,16 @@ class TransportWidget:
         self.vlayout.addLayout(self.hlayout1)
         self.play_button = QRadioButton()
         self.play_button.setObjectName("play_button")
-        self.play_button.clicked.connect(self.on_play)
+        self.play_button.toggled.connect(self.on_play)
         self.hlayout1.addWidget(self.play_button)
         self.stop_button = QRadioButton()
         self.stop_button.setChecked(True)
         self.stop_button.setObjectName("stop_button")
-        self.stop_button.clicked.connect(self.on_stop)
+        self.stop_button.toggled.connect(self.on_stop)
         self.hlayout1.addWidget(self.stop_button)
         self.rec_button = QRadioButton()
         self.rec_button.setObjectName("rec_button")
-        self.rec_button.clicked.connect(self.on_rec)
+        self.rec_button.toggled.connect(self.on_rec)
         self.hlayout1.addWidget(self.rec_button)
         self.grid_layout1 = QGridLayout()
         self.hlayout1.addLayout(self.grid_layout1)
@@ -203,6 +233,8 @@ class TransportWidget:
             self.play_button.click()
 
     def on_play(self):
+        if not self.play_button.isChecked():
+            return
         if glbl.IS_RECORDING:
             self.rec_button.setChecked(True)
             return
@@ -213,6 +245,8 @@ class TransportWidget:
             self.stop_button.setChecked(True)
 
     def on_stop(self):
+        if not self.stop_button.isChecked():
+            return
         if not glbl.IS_PLAYING and not glbl.IS_RECORDING:
             return
         MAIN_WINDOW.current_module.TRANSPORT.on_stop()
@@ -222,6 +256,8 @@ class TransportWidget:
         time.sleep(0.1)
 
     def on_rec(self):
+        if not self.rec_button.isChecked():
+            return
         if glbl.IS_RECORDING:
             return
         if glbl.IS_PLAYING:
@@ -659,14 +695,21 @@ class MkMainWindow(QMainWindow):
 
     def subprocess_monitor(self):
         try:
-            if PYDAW_SUBPROCESS and PYDAW_SUBPROCESS.poll() is not None:
+            if (
+                ENGINE_SUBPROCESS
+                and
+                ENGINE_SUBPROCESS.poll() is not None
+            ):
                 self.subprocess_timer.stop()
-                exitCode = PYDAW_SUBPROCESS.returncode
-                util.handle_engine_error(exitCode)
-            elif util.IS_ENGINE_LIB and \
-            util.ENGINE_RETCODE is not None:
+                exitCode = ENGINE_SUBPROCESS.returncode
+                handle_engine_error(exitCode)
+            elif (
+                util.IS_ENGINE_LIB
+                and
+                util.ENGINE_RETCODE is not None
+            ):
                 self.subprocess_timer.stop()
-                util.handle_engine_error(util.ENGINE_RETCODE)
+                handle_engine_error(util.ENGINE_RETCODE)
         except Exception as ex:
             print("subprocess_monitor: {}".format(ex))
 
@@ -1243,11 +1286,11 @@ def close_pydaw_engine():
     """ Ask the engine to gracefully stop itself, then kill the process if it
     doesn't exit on it's own"""
     glbl.IPC.stop_server()
-    global PYDAW_SUBPROCESS
-    if PYDAW_SUBPROCESS is not None:
+    global ENGINE_SUBPROCESS
+    if ENGINE_SUBPROCESS is not None:
         f_exited = False
         for i in range(20):
-            if PYDAW_SUBPROCESS.poll() is not None:
+            if ENGINE_SUBPROCESS.poll() is not None:
                 f_exited = True
                 break
             else:
@@ -1255,17 +1298,17 @@ def close_pydaw_engine():
         if not f_exited:
             try:
                 if util.global_pydaw_is_sandboxed:
-                    print("PYDAW_SUBPROCESS did not exit on it's own, "
+                    print("ENGINE_SUBPROCESS did not exit on it's own, "
                           "sending SIGTERM to helper script...")
-                    PYDAW_SUBPROCESS.terminate()
+                    ENGINE_SUBPROCESS.terminate()
                 else:
-                    print("PYDAW_SUBPROCESS did not exit on it's "
+                    print("ENGINE_SUBPROCESS did not exit on it's "
                         "own, sending SIGKILL...")
-                    PYDAW_SUBPROCESS.kill()
+                    ENGINE_SUBPROCESS.kill()
             except Exception as ex:
                 print("Exception raised while trying to kill process: "
                     "{}".format(ex))
-        PYDAW_SUBPROCESS = None
+        ENGINE_SUBPROCESS = None
 
 def kill_pydaw_engine():
     """ Kill any zombie instances of the engine if they exist. Otherwise, the
@@ -1327,7 +1370,7 @@ def open_pydaw_engine(a_project_path):
 
     f_pid = os.getpid()
     print(_("Starting audio engine with {}").format(a_project_path))
-    global PYDAW_SUBPROCESS
+    global ENGINE_SUBPROCESS
     if util.pydaw_which("pasuspender") is not None:
         f_pa_suspend = True
     else:
@@ -1375,7 +1418,7 @@ def open_pydaw_engine(a_project_path):
                 util.INSTALL_PREFIX,
                 f_project_dir, f_pid, util.USE_HUGEPAGES)
     print(f_cmd)
-    PYDAW_SUBPROCESS = subprocess.Popen([f_cmd], shell=True)
+    ENGINE_SUBPROCESS = subprocess.Popen([f_cmd], shell=True)
 
 def reopen_pydaw_engine():
     open_pydaw_engine(PROJECT_FILE)
@@ -1455,11 +1498,11 @@ def splash_screen_opening(default_project_file):
 
 
 def main():
-    global MAIN_WINDOW, SPLASH_SCREEN, PYDAW_SUBPROCESS, RESPAWN
+    global MAIN_WINDOW, SPLASH_SCREEN, ENGINE_SUBPROCESS, RESPAWN
     glbl.APP = QApplication(sys.argv)
     MAIN_WINDOW = MkMainWindow()
     SPLASH_SCREEN = SplashScreen()
-    PYDAW_SUBPROCESS = None
+    ENGINE_SUBPROCESS = None
     default_project_file = util.get_file_setting("last-project", str, None)
     RESPAWN = False
 
@@ -1522,7 +1565,7 @@ def main():
     MAIN_WINDOW.show()
 
     if util.ENGINE_RETCODE is not None:
-        util.handle_engine_error(util.ENGINE_RETCODE)
+        handle_engine_error(util.ENGINE_RETCODE)
         if util.ENGINE_RETCODE == 1003:
             MAIN_WINDOW.ignore_close_event = False
             MAIN_WINDOW.prepare_to_quit()

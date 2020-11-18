@@ -25,11 +25,6 @@ import subprocess
 import sys
 import time
 
-try: #this will fail if imported by device dialog, but that's OK
-    from mkpy.vendor import mido
-except ImportError:
-    pass
-
 from mkpy.mkqt import *
 
 assert "cygwin" not in sys.platform, "Cygwin is unsupported"
@@ -166,37 +161,6 @@ class EngineLibThread(QtCore.QThread):
             str(USE_HUGEPAGES).encode("ascii"))
         ENGINE_RETCODE = ENGINE_LIB.main(5, ctypes.byref(argv))
         print("ENGINE_RETCODE: {}".format(ENGINE_RETCODE))
-
-def handle_engine_error(exitCode):
-    if exitCode == 0:
-        print("Engine exited with return code 0, no errors.")
-        return
-
-    import glbl
-
-    if exitCode == 1000:
-        QMessageBox.warning(
-            glbl.MAIN_WINDOW, "Error", "Audio device not found")
-    elif exitCode == 1001:
-        QMessageBox.warning(
-            glbl.MAIN_WINDOW, "Error", "Device config not found")
-    elif exitCode == 1002:
-        QMessageBox.warning(
-            glbl.MAIN_WINDOW, "Error",
-            "Unknown error opening audio device")
-    if exitCode == 1003:
-        QMessageBox.warning(
-            glbl.MAIN_WINDOW, "Error",
-            "The audio device was busy, make sure that no other applications "
-            "are using the device and try restarting MusiKernel")
-    else:
-        QMessageBox.warning(
-            glbl.MAIN_WINDOW, "Error",
-            "The audio engine died with error code {}, "
-            "please try restarting MusiKernel".format(exitCode))
-    if exitCode >= 1000 and exitCode <= 1002:
-        glbl.MAIN_WINDOW.on_change_audio_settings()
-
 
 PROJECT_DIR = None
 

@@ -130,7 +130,7 @@ class MainWindow(QScrollArea):
         self.sequencer_vlayout.addWidget(self.song_region_tab)
         self.main_tabwidget.addTab(self.sequencer_widget, _("Sequencer"))
 
-        self.song_region_vlayout.addWidget(shared.REGION_SETTINGS.widget)
+        self.song_region_vlayout.addWidget(shared.SEQ_WIDGET.widget)
 
         self.midi_scroll_area = QScrollArea()
         self.midi_scroll_area.setWidgetResizable(True)
@@ -529,7 +529,7 @@ def init():
     shared.CC_EDITOR = AutomationEditor()
     shared.CC_EDITOR_WIDGET = AutomationEditorWidget(shared.CC_EDITOR)
 
-    shared.REGION_SETTINGS = SequencerWidget()
+    shared.SEQ_WIDGET = SequencerWidget()
     shared.TRACK_PANEL = TrackPanel()
 
     shared.PIANO_ROLL_EDITOR = PianoRollEditor()

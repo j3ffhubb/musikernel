@@ -567,7 +567,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             f_item_old.length_beats = f_musical_pos
             shared.PROJECT.save_region(shared.CURRENT_REGION)
             shared.PROJECT.commit(_("Split sequencer item"))
-            shared.REGION_SETTINGS.open_region()
+            shared.SEQ_WIDGET.open_region()
         else:
             if a_event.modifiers() == QtCore.Qt.ControlModifier:
                 a_event.accept()
@@ -844,5 +844,5 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             shared.PROJECT.save_region(shared.CURRENT_REGION)
             shared.PROJECT.commit(_("Update sequencer items"))
         shared.SEQUENCER.set_selected_strings()
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
 

@@ -106,7 +106,7 @@ def paste_clipboard():
             shared.CURRENT_REGION.add_item_ref_by_uid(f_new_item)
             shared.SEQUENCER.selected_item_strings.add(str(f_new_item))
         shared.PROJECT.save_region(shared.CURRENT_REGION)
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
     elif REGION_EDITOR_MODE == 1:
         f_track_port_num, f_track_index = shared.TRACK_PANEL.has_automation(
             shared.SEQUENCER.current_coord[0])
@@ -138,7 +138,7 @@ def delete_selected():
                 shared.CURRENT_REGION.remove_item_ref(f_item.audio_item)
             shared.PROJECT.save_region(shared.CURRENT_REGION)
             shared.PROJECT.commit(_("Delete item(s)"))
-            shared.REGION_SETTINGS.open_region()
+            shared.SEQ_WIDGET.open_region()
             glbl.clean_wav_pool()
     elif REGION_EDITOR_MODE == 1:
         for f_point in shared.SEQUENCER.get_selected_points():

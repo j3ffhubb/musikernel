@@ -57,7 +57,7 @@ def header_time_modify():
         shared.CURRENT_REGION.set_marker(marker)
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Set tempo marker"))
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
         window.close()
 
     def delete_handler():
@@ -69,7 +69,7 @@ def header_time_modify():
             shared.CURRENT_REGION.delete_marker(marker)
             shared.PROJECT.save_region(shared.CURRENT_REGION)
             shared.PROJECT.commit(_("Delete tempo marker"))
-            shared.REGION_SETTINGS.open_region()
+            shared.SEQ_WIDGET.open_region()
         window.close()
 
     window = QDialog(shared.MAIN_WINDOW)
@@ -144,7 +144,7 @@ def header_tempo_clear():
         print("Deleted {} tempo markers".format(deleted))
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Delete tempo ranger"))
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
 
 def header_time_range():
     if not shared.CURRENT_REGION.loop_marker:
@@ -177,7 +177,7 @@ def header_time_range():
             shared.CURRENT_REGION.set_marker(marker)
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Set tempo range"))
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
         window.close()
 
     def cancel_handler():
@@ -241,7 +241,7 @@ def header_marker_modify():
         shared.CURRENT_REGION.set_marker(marker)
         shared.PROJECT.save_region(shared.CURRENT_REGION)
         shared.PROJECT.commit(_("Add text marker"))
-        shared.REGION_SETTINGS.open_region()
+        shared.SEQ_WIDGET.open_region()
         window.close()
 
     def cancel_handler():
@@ -253,7 +253,7 @@ def header_marker_modify():
             shared.CURRENT_REGION.delete_marker(marker)
             shared.PROJECT.save_region(shared.CURRENT_REGION)
             shared.PROJECT.commit(_("Delete text marker"))
-            shared.REGION_SETTINGS.open_region()
+            shared.SEQ_WIDGET.open_region()
         window.close()
 
     window = QDialog(shared.MAIN_WINDOW)
@@ -309,7 +309,7 @@ def header_loop_start():
     shared.CURRENT_REGION.set_loop_marker(marker)
     shared.PROJECT.save_region(shared.CURRENT_REGION)
     shared.PROJECT.commit(_("Set region start"))
-    shared.REGION_SETTINGS.open_region()
+    shared.SEQ_WIDGET.open_region()
 
 def header_loop_end():
     tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
@@ -326,7 +326,7 @@ def header_loop_end():
         )
     shared.PROJECT.save_region(shared.CURRENT_REGION)
     shared.PROJECT.commit(_("Set region end"))
-    shared.REGION_SETTINGS.open_region()
+    shared.SEQ_WIDGET.open_region()
 
 def copy_region():
     region_start = shared.CURRENT_REGION.loop_marker.start_beat
@@ -371,5 +371,5 @@ def insert_region():
     shared.CURRENT_REGION.automation_save_callback()
     shared.PROJECT.save_region(shared.CURRENT_REGION)
     shared.PROJECT.commit(_("Insert region"))
-    shared.REGION_SETTINGS.open_region()
+    shared.SEQ_WIDGET.open_region()
 
