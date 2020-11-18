@@ -96,7 +96,7 @@ int MASTER_OUT_R = 1;
 #define MK_CONFIGURE_KEY_ENGINE "engine"
 #define MK_CONFIGURE_KEY_CLEAN_WAV_POOL "cwp"
 
-#define MK_HOST_DAWNEXT 0
+#define MK_HOST_DAW 0
 #define MK_HOST_WAVENEXT 1
 
 
@@ -829,7 +829,7 @@ void g_musikernel_get(MKFLT a_sr, t_midi_device_list * a_midi_devices)
     for(f_i = 0; f_i < MAX_WORKER_THREADS; ++f_i)
     {
         musikernel->thread_storage[f_i].sample_rate = a_sr;
-        musikernel->thread_storage[f_i].current_host = MK_HOST_DAWNEXT;
+        musikernel->thread_storage[f_i].current_host = MK_HOST_DAW;
     }
 
     /* Create OSC thread */

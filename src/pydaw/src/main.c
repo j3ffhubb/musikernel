@@ -109,7 +109,7 @@ int main(int argc, char **argv);
 int v_configure(const char * path, const char * key, const char * value);
 #endif
 
-int dawnext_main(int argc, char** argv);
+int daw_main(int argc, char** argv);
 void print_help();
 int main(int argc, char** argv);
 int main_loop(int argc, char **argv);
@@ -313,7 +313,7 @@ void print_help()
     printf("Usage:\n");
     printf("%s install_prefix project_path ui_pid "
             "huge_pages[--sleep]\n\n", MUSIKERNEL_VERSION);
-    printf("%s dawnext [project_dir] [output_file] [start_beat] "
+    printf("%s daw [project_dir] [output_file] [start_beat] "
         "[end_beat] [sample_rate] [buffer_size] [thread_count] "
         "[huge_pages] [stem]\n\n", MUSIKERNEL_VERSION);
 }
@@ -325,15 +325,15 @@ int main(int argc, char** argv)
         print_help();
         return 1;
     }
-    else if(!strcmp(argv[1], "dawnext"))
+    else if(!strcmp(argv[1], "daw"))
     {
-        return dawnext_main(argc, argv);
+        return daw_main(argc, argv);
     }
 
     return main_loop(argc, argv);
 }
 
-int dawnext_main(int argc, char** argv)
+int daw_main(int argc, char** argv)
 {
     if(argc < 11)
     {
@@ -402,9 +402,9 @@ int dawnext_main(int argc, char** argv)
 
     musikernel->sample_count = f_buffer_size;
 
-    v_dn_offline_render_prep(dawnext);
+    v_dn_offline_render_prep(daw);
 
-    v_dn_offline_render(dawnext, f_start_beat,
+    v_dn_offline_render(daw, f_start_beat,
         f_end_beat, f_output_file, f_create_file, f_stem_render);
 
     v_pydaw_destructor();
@@ -1046,7 +1046,7 @@ int v_configure(const char * path, const char * key, const char * value)
         v_wn_configure(key, value);
         return 0;
     }
-    else if(!strcmp(path, "/musikernel/dawnext"))
+    else if(!strcmp(path, "/musikernel/daw"))
     {
         v_dn_configure(key, value);
         return 0;

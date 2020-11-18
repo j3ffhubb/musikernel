@@ -26,7 +26,7 @@ import sys
 import time
 
 try: #this will fail if imported by device dialog, but that's OK
-    import mido
+    from mkpy.vendor import mido
 except ImportError:
     pass
 
@@ -180,30 +180,30 @@ def handle_engine_error(exitCode):
         print("Engine exited with return code 0, no errors.")
         return
 
-    import libmk
+    import glbl
 
     if exitCode == 1000:
         QMessageBox.warning(
-            libmk.MAIN_WINDOW, "Error", "Audio device not found")
+            glbl.MAIN_WINDOW, "Error", "Audio device not found")
     elif exitCode == 1001:
         QMessageBox.warning(
-            libmk.MAIN_WINDOW, "Error", "Device config not found")
+            glbl.MAIN_WINDOW, "Error", "Device config not found")
     elif exitCode == 1002:
         QMessageBox.warning(
-            libmk.MAIN_WINDOW, "Error",
+            glbl.MAIN_WINDOW, "Error",
             "Unknown error opening audio device")
     if exitCode == 1003:
         QMessageBox.warning(
-            libmk.MAIN_WINDOW, "Error",
+            glbl.MAIN_WINDOW, "Error",
             "The audio device was busy, make sure that no other applications "
             "are using the device and try restarting MusiKernel")
     else:
         QMessageBox.warning(
-            libmk.MAIN_WINDOW, "Error",
+            glbl.MAIN_WINDOW, "Error",
             "The audio engine died with error code {}, "
             "please try restarting MusiKernel".format(exitCode))
     if exitCode >= 1000 and exitCode <= 1002:
-        libmk.MAIN_WINDOW.on_change_audio_settings()
+        glbl.MAIN_WINDOW.on_change_audio_settings()
 
 
 PROJECT_DIR = None
@@ -308,8 +308,14 @@ def open_project(a_parent=None):
 print("\n\n\ninstall prefix:  {}\n\n\n".format(INSTALL_PREFIX))
 
 PROJECT_HISTORY_SCRIPT = os.path.join(
-    INSTALL_PREFIX, "lib", global_pydaw_version_string,
-    "pydaw", "mkpy", "libpydaw", "project_recover.py")
+    INSTALL_PREFIX,
+    "lib",
+    global_pydaw_version_string,
+    "pydaw",
+    "mkpy",
+    "scripts",
+    "project_recover.py",
+)
 
 pydaw_bad_chars = ["|", "\\", "~", "."]
 
@@ -475,17 +481,31 @@ PYTHON3 = sys.executable
 pydaw_rubberband_util = pydaw_which("rubberband")
 
 pydaw_paulstretch_util = os.path.join(
-    INSTALL_PREFIX, "lib", global_pydaw_version_string,
-    "pydaw", "mkpy", "libpydaw", "pydaw_paulstretch.py")
+    INSTALL_PREFIX,
+    "lib",
+    global_pydaw_version_string,
+    "pydaw",
+    "mkpy",
+    "scripts",
+    "pydaw_paulstretch.py",
+)
 
 if IS_WINDOWS:
     pydaw_sbsms_util = os.path.join(
-        INSTALL_PREFIX, "mkpy", "mkengine", "sbsms.exe")
+        INSTALL_PREFIX,
+        "mkpy",
+        "mkengine",
+        "sbsms.exe",
+    )
 else:
     pydaw_sbsms_util = os.path.join(
-        INSTALL_PREFIX, "lib", global_pydaw_version_string,
-        "sbsms", "bin", "sbsms")
-
+        INSTALL_PREFIX,
+        "lib",
+        global_pydaw_version_string,
+        "sbsms",
+        "bin",
+        "sbsms",
+    )
 
 def pydaw_rubberband(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift,
                      a_crispness, a_preserve_formants=False):

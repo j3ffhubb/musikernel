@@ -42,7 +42,7 @@ deb:
 
 deps:
 	make mingw_deps
-	cd pydaw/pyliblo-0.10.0 && python3 setup.py build && cp build/lib*/liblo* ../mkpy/libpydaw
+	cd pyliblo-0.10.0 && python3 setup.py build && cp build/lib*/liblo* ../pydaw/mkpy/vendor/
 
 mingw_deps:
 	cd sbsms && ( ./configure || ./configure --enable-sse=no ) && make

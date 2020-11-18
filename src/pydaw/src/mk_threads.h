@@ -21,7 +21,7 @@ GNU General Public License for more details.
     #define RT_SCHED SCHED_FIFO
 #endif
 
-#include "dawnext.h"
+#include "daw.h"
 #include "wave_edit.h"
 
 #ifdef MACOS
@@ -98,10 +98,10 @@ void v_pydaw_activate(
     /* Instantiate hosts */
     g_musikernel_get(a_sr, a_midi_devices);
 
-    musikernel->hosts[MK_HOST_DAWNEXT].run = v_dn_run_engine;
-    musikernel->hosts[MK_HOST_DAWNEXT].osc_send = v_dn_osc_send;
-    musikernel->hosts[MK_HOST_DAWNEXT].audio_inputs = v_dn_update_audio_inputs;
-    musikernel->hosts[MK_HOST_DAWNEXT].mix = v_default_mix;
+    musikernel->hosts[MK_HOST_DAW].run = v_dn_run_engine;
+    musikernel->hosts[MK_HOST_DAW].osc_send = v_dn_osc_send;
+    musikernel->hosts[MK_HOST_DAW].audio_inputs = v_dn_update_audio_inputs;
+    musikernel->hosts[MK_HOST_DAW].mix = v_default_mix;
 
     musikernel->hosts[MK_HOST_WAVENEXT].run = v_pydaw_run_wave_editor;
     musikernel->hosts[MK_HOST_WAVENEXT].osc_send = v_wn_osc_send;
@@ -288,7 +288,7 @@ void * v_pydaw_worker_thread(void* a_arg)
             break;
         }
 
-        if(f_storage->current_host == MK_HOST_DAWNEXT)
+        if(f_storage->current_host == MK_HOST_DAW)
         {
             v_dn_process(f_args);
         }
