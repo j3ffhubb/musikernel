@@ -16,8 +16,6 @@ import os
 import sys
 import shutil
 
-DELETE_ME = 'src/pydaw/mkpy/__pycache__'
-
 IS_INSTALL = "-i" in sys.argv
 
 if IS_INSTALL:
@@ -25,11 +23,6 @@ if IS_INSTALL:
         if f_file.startswith("core."):
             print("Deleting {}".format(f_file))
             os.remove(f_file)
-
-#these files may or may not exist, and should not be packaged
-if os.path.isdir(DELETE_ME):
-    print('Deleting ' + DELETE_ME)
-    shutil.rmtree(DELETE_ME)
 
 # invoke sudo at the beginning of the script so that future invokations
 # will automatically work without a password
@@ -150,114 +143,114 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755, root, root) %{{_usr}}/bin/{0}.py
 %attr(755, root, root) %{{_usr}}/bin/{0}-engine-dbg
 %attr(755, root, root) %{{_usr}}/bin/{0}-engine-no-root
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/scripts/paulstretch.py
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/main.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/scripts/paulstretch.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/main.py
 %attr(755, root, root) %{{_usr}}/lib/{0}/sbsms/bin/sbsms
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/scripts/project_recover.py
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/lib/device_dialog.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/scripts/project_recover.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/lib/device_dialog.py
 
-%{{_usr}}/lib/{0}/pydaw/mkengine/{0}.so
+%{{_usr}}/lib/{0}/musikernel/mkengine/{0}.so
 %{{_usr}}/lib/{0}/presets/MODULEX.mkp
 %{{_usr}}/lib/{0}/presets/RAYV.mkp
 %{{_usr}}/lib/{0}/presets/RAYV2.mkp
 %{{_usr}}/lib/{0}/presets/WAYV.mkp
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/history.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/midi.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/portaudio.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/portmidi.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/theme.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/util.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/history.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/midi.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/portaudio.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/portmidi.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/theme.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/util.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/_shared.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/abstract_plugin_ui.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/add_mul_dialog.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/additive_osc.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/adsr.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/audio_item_viewer.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/cc_mapping.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/control.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/distortion.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/eq.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/file_browser.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/file_select.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/filter.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/knob.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/lfo.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/lfo_dialog.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/master.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/modulex.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/modulex_settings.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/note_selector.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/ordered_table.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/paif.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/peak_meter.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/perc_env.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/playback_widget.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/plugin_file.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/preset_browser.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/preset_manager.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/pysound.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/ramp_env.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/rect_item.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/routing_matrix.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/sample_viewer.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/spectrum.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/widgets/va_osc.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/_shared.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/abstract_plugin_ui.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/add_mul_dialog.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/additive_osc.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/adsr.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/audio_item_viewer.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/cc_mapping.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/control.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/distortion.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/eq.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/file_browser.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/file_select.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/filter.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/knob.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/lfo.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/lfo_dialog.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/master.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/modulex.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/modulex_settings.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/note_selector.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/ordered_table.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/paif.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/peak_meter.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/perc_env.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/playback_widget.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/plugin_file.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/preset_browser.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/preset_manager.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/pysound.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/ramp_env.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/rect_item.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/routing_matrix.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/sample_viewer.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/spectrum.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/widgets/va_osc.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/staging.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/super_formant_maker.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/translate.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/staging.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/super_formant_maker.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/translate.py
 %{{_usr}}/lib/{0}/major-version.txt
 %{{_usr}}/lib/{0}/minor-version.txt
 
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/filedragdrop.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/hardware.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/__init__.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/abstract.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/audio/__init__.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/audio/_shared.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/audio/fade_vol_dialog.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/audio/item.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/audio/item_context_menu.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/audio/time_pitch_dialog.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/automation.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/editor.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/filedragdrop.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/hardware.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/__init__.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/abstract.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/audio/__init__.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/audio/_shared.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/audio/fade_vol_dialog.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/audio/item.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/audio/item_context_menu.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/audio/time_pitch_dialog.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/automation.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/editor.py
 
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/notes/__init__.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/notes/editor.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/notes/key.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/notes/note.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/item_editor/notes/_shared.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/notes/__init__.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/notes/editor.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/notes/key.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/notes/note.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/item_editor/notes/_shared.py
 
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/__init__.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/_shared.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/atm_point.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/atm_region.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/audio_item.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/item.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/midi_file.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/project.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/region_marker.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/seq_item.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/sequencer.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/tempo_marker.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/project/text_marker.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/__init__.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/_shared.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/atm_point.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/atm_region.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/audio_item.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/item.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/midi_file.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/project.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/region_marker.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/seq_item.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/sequencer.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/tempo_marker.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/project/text_marker.py
 
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/__init__.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/_shared.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/atm_context_menu.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/atm_item.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/audio_input.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/context_menu.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/header_context_menu.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/item.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/seq.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/track.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/sequencer/transport.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/shared.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/__init__.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/_shared.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/atm_context_menu.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/atm_item.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/audio_input.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/context_menu.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/header_context_menu.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/item.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/seq.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/track.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/sequencer/transport.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/shared.py
 
 %{{_usr}}/lib/{0}/themes/default/play_checked.svg
 %{{_usr}}/lib/{0}/themes/default/rec_checked.svg
@@ -293,74 +286,74 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/share/doc/{0}/copyright
 %{{_usr}}/share/pixmaps/{0}.png
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/splash.png
-%{{_usr}}/lib/{0}/pydaw/mkpy/mkqt.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/splash.png
+%{{_usr}}/lib/{0}/musikernel/mkpy/mkqt.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/strings.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/scales.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/strings.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/lib/scales.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/euphoria.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/mk_channel.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/mk_compressor.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/mk_delay.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/mk_eq.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/mk_limiter.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/mk_vocoder.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/modulex.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/rayv2.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/sidechain_comp.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/simple_fader.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/simple_reverb.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/trigger_fx.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/wayv.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/plugins/xfade.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/euphoria.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/mk_channel.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/mk_compressor.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/mk_delay.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/mk_eq.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/mk_limiter.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/mk_vocoder.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/modulex.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/rayv2.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/sidechain_comp.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/simple_fader.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/simple_reverb.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/trigger_fx.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/wayv.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/plugins/xfade.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/audio_inputs.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/audio_item.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/midi_events.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/project.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/routing.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/sample_graph.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/takes.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/glbl/mk_project/tracks.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/audio_inputs.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/audio_item.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/midi_events.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/project.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/routing.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/sample_graph.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/takes.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/glbl/mk_project/tracks.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/wave_edit/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/wave_edit/__init__.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/daw/__init__.py
-%{{_usr}}/lib/musikernel3/pydaw/mkpy/daw/entrypoint.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/daw/osc.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/daw/strings.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/daw/__init__.py
+%{{_usr}}/lib/musikernel3/musikernel/mkpy/daw/entrypoint.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/daw/osc.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/daw/strings.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/liblo.*.so
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/wavefile/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/wavefile/libsndfile.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/wavefile/wavefile.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/backend.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/portmidi.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/portmidi_init.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/pygame.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/rtmidi.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/parser.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/ports.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/sockets.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/syx.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/__about__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/_parser_queue.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/amidi.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/rtmidi_python.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/backends/rtmidi_utils.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/frozen.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/messages/
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/midifiles/
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/py2.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/tokenizer.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/vendor/mido/version.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/liblo.*.so
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/wavefile/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/wavefile/libsndfile.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/wavefile/wavefile.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/__init__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/backend.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/portmidi.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/portmidi_init.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/pygame.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/rtmidi.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/parser.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/ports.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/sockets.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/syx.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/__about__.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/_parser_queue.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/amidi.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/rtmidi_python.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/backends/rtmidi_utils.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/frozen.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/messages/
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/midifiles/
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/py2.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/tokenizer.py
+%{{_usr}}/lib/{0}/musikernel/mkpy/vendor/mido/version.py
 
 %doc
 

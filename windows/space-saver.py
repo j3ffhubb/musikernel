@@ -74,11 +74,11 @@ def on_error(func, path, exc_info):
     If the error is for another reason it re-raises the error.
 
     Usage : ``shutil.rmtree(path, onerror=on_error)``
-    """    
+    """
     # Is the error an access error ?
     os.chmod(path, stat.S_IWUSR)
     func(path)
-    
+
 
 def delete_path(a_path):
     if os.path.isdir(a_path):
@@ -142,8 +142,9 @@ for bits in ("64", "32"):
 
     delete_it_all(mingw_dir)
     shutil.copy(
-        r"..\{MAJOR_VERSION}.ico".format(MAJOR_VERSION=MAJOR_VERSION),
-        mingw_dir)
+        r"{MAJOR_VERSION}.ico".format(MAJOR_VERSION=MAJOR_VERSION),
+        mingw_dir,
+    )
     shutil.copy(bat_script, bin_dir)
 
 MB = round(SAVED / (1024 * 1024), 2)

@@ -10,25 +10,25 @@ MK_DIR = $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 
 all:
 	make deps
-	make pydaw_src
+	make musikernel_src
 
 mingw:
-	CFLAGS+=" -static-libgcc " make -C pydaw mingw
+	CFLAGS+=" -static-libgcc " make -C musikernel mingw
 
 clang:
 	OPTIMIZE_FLAGS= CC=clang make
 
 mac_osx:
 	OPTIMIZE_FLAGS= CC=clang PREFIX=/usr/local make deps
-	OPTIMIZE_FLAGS= CC=clang make -C pydaw mac_osx
+	OPTIMIZE_FLAGS= CC=clang make -C musikernel mac_osx
 native:
 	make PLAT_FLAGS=" -march=native " CFLAGS+=" -O2 "
 
-pydaw_src:
-	make -C pydaw PREFIX=$(PREFIX) CFLAGS+=" -O2 "
+musikernel_src:
+	make -C musikernel PREFIX=$(PREFIX) CFLAGS+=" -O2 "
 
 native_src:
-	make -C pydaw PREFIX=$(PREFIX) CFLAGS+=" -O2 " PLAT_FLAGS=" -march=native "
+	make -C musikernel PREFIX=$(PREFIX) CFLAGS+=" -O2 " PLAT_FLAGS=" -march=native "
 
 rpm:
 	../rpm.py
@@ -42,7 +42,7 @@ deb:
 
 deps:
 	make mingw_deps
-	cd pyliblo-0.10.0 && python3 setup.py build && cp build/lib*/liblo* ../pydaw/mkpy/vendor/
+	cd pyliblo-0.10.0 && python3 setup.py build && cp build/lib*/liblo* ../musikernel/mkpy/vendor/
 
 mingw_deps:
 	cd sbsms && ( ./configure || ./configure --enable-sse=no ) && make
@@ -54,7 +54,7 @@ mingw_deps_clean:
 
 deps_clean:
 	make mingw_deps_clean
-	cd pydaw/pyliblo-0.10.0 && python3 setup.py clean
+	cd pyliblo-0.10.0 && python3 setup.py clean
 
 # --------------------------------------------------------------
 
@@ -62,7 +62,7 @@ install:
 	install -d $(MK_DIR)
 	install -d $(MK_DIR)/sbsms
 	install -d $(MK_DIR)/sbsms/bin
-	make -C pydaw PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) install
+	make -C musikernel PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) install
 	install sbsms/cli/sbsms $(MK_DIR)/sbsms/bin
 
 install_mac_osx:
@@ -70,7 +70,7 @@ install_mac_osx:
 
 install_non_linux:
 	install -d $(MK_DIR)
-	make -C pydaw PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) install_non_linux
+	make -C musikernel PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) install_non_linux
 
 # --------------------------------------------------------------
 
@@ -81,7 +81,7 @@ uninstall:
 # --------------------------------------------------------------
 
 clean:
-	make -C pydaw clean
+	make -C musikernel clean
 
 
 
