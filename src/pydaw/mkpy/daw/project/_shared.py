@@ -2,10 +2,10 @@ from mkpy import glbl
 from mkpy import plugins
 from mkpy.daw.osc import DawOsc
 from mkpy.glbl.mk_project import *
-from mkpy.libpydaw import pydaw_history
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib import history
+from mkpy.lib.util import *
 from mkpy.widgets import pydaw_modulex_settings
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import numpy
 import os

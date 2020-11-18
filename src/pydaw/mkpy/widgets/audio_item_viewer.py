@@ -1,6 +1,6 @@
 from . import _shared
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 from mkpy.glbl.mk_project import (
     AUDIO_ITEM_SCENE_HEIGHT,
     AUDIO_ITEM_SCENE_WIDTH,
@@ -78,7 +78,7 @@ class pydaw_audio_marker_widget(QGraphicsRectItem):
 
     def __str__(self):
         f_val = self.value * 0.001 * self.graph_object.length_in_seconds
-        f_val = pydaw_util.pydaw_seconds_to_time_str(f_val)
+        f_val = util.pydaw_seconds_to_time_str(f_val)
         if self.marker_type == 0 and self.marker_mode == 0:
             return "Start {}".format(f_val)
         elif self.marker_type == 1 and self.marker_mode == 0:
@@ -104,7 +104,7 @@ class pydaw_audio_marker_widget(QGraphicsRectItem):
         elif self.marker_type == 1:
             f_new_val = (self.value *
                 AUDIO_ITEM_VAL_TO_PX) - self.audio_item_marker_height
-        f_new_val = pydaw_util.pydaw_clip_value(
+        f_new_val = util.pydaw_clip_value(
             f_new_val, self.min_x, self.max_x)
         self.setPos(f_new_val, self.y_pos)
 
@@ -121,7 +121,7 @@ class pydaw_audio_marker_widget(QGraphicsRectItem):
         a_event.setAccepted(True)
         QGraphicsRectItem.mouseMoveEvent(self, a_event)
         self.pos_x = a_event.scenePos().x()
-        self.pos_x = pydaw_util.pydaw_clip_value(
+        self.pos_x = util.pydaw_clip_value(
             self.pos_x, self.min_x, self.max_x)
         self.setPos(self.pos_x, self.y_pos)
         if self.marker_type == 0:
@@ -137,20 +137,20 @@ class pydaw_audio_marker_widget(QGraphicsRectItem):
             self.fade_marker.pos().x() > self.pos_x:
                 self.fade_marker.value = f_new_val
                 self.fade_marker.set_pos()
-        f_new_val = pydaw_util.pydaw_clip_value(f_new_val, 0.0, 994.0)
+        f_new_val = util.pydaw_clip_value(f_new_val, 0.0, 994.0)
         self.value = f_new_val
         if self.other is not None:
             if self.marker_type == 0:
                 if self.value > self.other.value - MARKER_MIN_DIFF:
                     self.other.value = self.value + MARKER_MIN_DIFF
-                    self.other.value = pydaw_util.pydaw_clip_value(
+                    self.other.value = util.pydaw_clip_value(
                         self.other.value, MARKER_MIN_DIFF,
                         1000.0, a_round=True)
                     self.other.set_pos()
             elif self.marker_type == 1:
                 if self.other.value > self.value - MARKER_MIN_DIFF:
                     self.other.value = self.value - MARKER_MIN_DIFF
-                    self.other.value = pydaw_util.pydaw_clip_value(
+                    self.other.value = util.pydaw_clip_value(
                         self.other.value, 0.0,
                         1000.0 - MARKER_MIN_DIFF, a_round=True)
                     self.other.set_pos()
@@ -213,7 +213,7 @@ class pydaw_audio_fade_marker_widget(QGraphicsRectItem):
 
     def __str__(self):
         f_val = self.value * 0.001 * self.graph_object.length_in_seconds
-        f_val = pydaw_util.pydaw_seconds_to_time_str(f_val)
+        f_val = util.pydaw_seconds_to_time_str(f_val)
         if self.marker_type == 0:
             return "Fade In {}".format(f_val)
         elif self.marker_type == 1:
@@ -263,7 +263,7 @@ class pydaw_audio_fade_marker_widget(QGraphicsRectItem):
         elif self.marker_type == 1:
             f_new_val = (self.value *
                 AUDIO_ITEM_VAL_TO_PX) - self.audio_item_marker_height
-        f_new_val = pydaw_util.pydaw_clip_value(
+        f_new_val = util.pydaw_clip_value(
             f_new_val, self.min_x, self.max_x)
         self.setPos(f_new_val, self.y_pos)
         self.draw_lines()
@@ -276,13 +276,13 @@ class pydaw_audio_fade_marker_widget(QGraphicsRectItem):
         a_event.setAccepted(True)
         QGraphicsRectItem.mouseMoveEvent(self, a_event)
         self.pos_x = a_event.scenePos().x()
-        self.pos_x = pydaw_util.pydaw_clip_value(
+        self.pos_x = util.pydaw_clip_value(
             self.pos_x, self.min_x, self.max_x)
         if self.marker_type == 0:
-            self.pos_x = pydaw_util.pydaw_clip_max(
+            self.pos_x = util.pydaw_clip_max(
                 self.pos_x, self.other.scenePos().x())
         elif self.marker_type == 1:
-            self.pos_x = pydaw_util.pydaw_clip_min(
+            self.pos_x = util.pydaw_clip_min(
                 self.pos_x, self.other.scenePos().x())
         self.setPos(self.pos_x, self.y_pos)
         if self.marker_type == 0:
@@ -296,7 +296,7 @@ class pydaw_audio_fade_marker_widget(QGraphicsRectItem):
             if self.pos_x > self.start_end_marker.scenePos().x():
                 self.start_end_marker.value = f_new_val
                 self.start_end_marker.set_pos()
-        f_new_val = pydaw_util.pydaw_clip_value(f_new_val, 0.0, 1000.0)
+        f_new_val = util.pydaw_clip_value(f_new_val, 0.0, 1000.0)
         self.value = f_new_val
         self.draw_lines()
 
@@ -402,7 +402,7 @@ class pydaw_audio_item_viewer_widget(QGraphicsView):
                 self.graph_object.length_in_seconds) * 1000.0
             for f_marker in self.drag_end_markers:
                 f_new = f_marker.other.value + f_result
-                f_new = pydaw_util.pydaw_clip_value(
+                f_new = util.pydaw_clip_value(
                     f_new, f_marker.other.value + 1.0, 1000.0)
                 f_marker.set_value(f_new)
             self.last_tempo_combobox_index = \
@@ -468,7 +468,7 @@ class pydaw_audio_item_viewer_widget(QGraphicsView):
 
     def pos_to_marker_val(self, a_pos_x):
         f_result = AUDIO_ITEM_SCENE_WIDTH_RECIP * a_pos_x * 1000.0
-        f_result = pydaw_util.pydaw_clip_value(
+        f_result = util.pydaw_clip_value(
             f_result, 0.0, AUDIO_ITEM_MAX_MARKER_VAL)
         return f_result
 
@@ -528,7 +528,7 @@ class pydaw_audio_item_viewer_widget(QGraphicsView):
         self.pixmaps = []
         self.graph_object = a_graph_object
         self.length_str = ["Length: {}".format(
-            pydaw_util.pydaw_seconds_to_time_str(
+            util.pydaw_seconds_to_time_str(
             self.graph_object.length_in_seconds))]
         self.path_list = a_graph_object.create_sample_graph(True)
         self.path_count = len(self.path_list)

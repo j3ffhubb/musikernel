@@ -14,7 +14,7 @@ GNU General Public License for more details.
 """
 
 from mkpy.widgets import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 
 
 MODULEX_FIRST_CONTROL_PORT = 4

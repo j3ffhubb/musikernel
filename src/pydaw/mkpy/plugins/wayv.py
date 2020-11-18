@@ -14,7 +14,7 @@ GNU General Public License for more details.
 """
 
 from mkpy.widgets import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 import sys
 
 #Total number of LFOs, ADSRs, other envelopes, etc...
@@ -1163,7 +1163,7 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
         for f_spinbox, f_knob, f_origin in zip(
         self.fm_macro_spinboxes[a_index], self.fm_knobs, self.fm_origin):
             f_value = f_knob.get_value() - f_origin
-            f_value = pydaw_util.pydaw_clip_value(f_value, -100, 100)
+            f_value = util.pydaw_clip_value(f_value, -100, 100)
             f_spinbox.set_value(f_value, True)
 
     def clear_all(self):
@@ -1182,7 +1182,7 @@ class wayv_plugin_ui(pydaw_abstract_plugin_ui):
         for f_spinbox, f_knob, f_origin in zip(
         self.fm_macro_spinboxes[a_index], self.fm_knobs, self.fm_origin):
             f_value = f_spinbox.get_value() + f_origin
-            f_value = pydaw_util.pydaw_clip_value(f_value, 0, 100)
+            f_value = util.pydaw_clip_value(f_value, 0, 100)
             f_knob.set_value(f_value, True)
         self.reset_fm_macro_knobs()
 

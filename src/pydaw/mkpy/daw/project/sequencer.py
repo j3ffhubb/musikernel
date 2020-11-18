@@ -3,8 +3,8 @@ from .region_marker import pydaw_loop_marker
 from .seq_item import pydaw_sequencer_item
 from .tempo_marker import pydaw_tempo_marker
 from mkpy.glbl.mk_project import *
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 

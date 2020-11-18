@@ -2,9 +2,9 @@ from mkpy import glbl
 from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.plugins import *
 from mkpy.mkqt import *
 
@@ -131,8 +131,8 @@ class AudioInputWidget:
             self.layout.addWidget(QLabel(f_label), 0, f_i)
         self.inputs = []
         f_count = 0
-        if "audioInputs" in pydaw_util.global_device_val_dict:
-            f_count = int(pydaw_util.global_device_val_dict["audioInputs"])
+        if "audioInputs" in util.global_device_val_dict:
+            f_count = int(util.global_device_val_dict["audioInputs"])
         for f_i in range(f_count):
             f_input = AudioInput(f_i, self.layout, self.callback, f_count - 1)
             self.inputs.append(f_input)

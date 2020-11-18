@@ -4,9 +4,9 @@ from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
 from mkpy.glbl import mk_project
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 

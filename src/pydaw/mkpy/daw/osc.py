@@ -11,7 +11,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
-from mkpy.libpydaw.pydaw_util import (
+from mkpy.lib.util import (
     bool_to_int,
     pydaw_get_wait_file_path,
     pydaw_wait_for_finished_file,

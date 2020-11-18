@@ -3,10 +3,10 @@ from mkpy import glbl
 from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw import strings as mk_strings
+from mkpy.lib import strings as mk_strings
 from mkpy import widgets
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.plugins import *
 from mkpy.mkqt import *
 

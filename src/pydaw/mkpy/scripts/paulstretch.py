@@ -28,7 +28,7 @@ f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "..", ".."))
 sys.path.insert(0, f_parent_dir)
 
 from mkpy.vendor import wavefile
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib.util import *
 
 def optimize_windowsize(n):
     orig_n = n

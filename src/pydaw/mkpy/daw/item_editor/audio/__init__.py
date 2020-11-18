@@ -9,10 +9,10 @@ from mkpy.daw import shared
 from mkpy.daw.filedragdrop import FileDragDropper
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw import strings as mk_strings
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib import strings as mk_strings
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -135,7 +135,7 @@ class AudioItemSeq(AbstractItemEditor):
         f_changed = False
 
         for f_item in f_list:
-            f_start_sec = pydaw_util.musical_time_to_seconds(
+            f_start_sec = util.musical_time_to_seconds(
                 f_tempo, f_item.audio_item.start_bar,
                 f_item.audio_item.start_beat)
             f_time_frac = f_item.audio_item.sample_end - \
@@ -146,7 +146,7 @@ class AudioItemSeq(AbstractItemEditor):
             f_list2 = [x for x in f_list if x.audio_item != f_item.audio_item]
 
             for f_item2 in f_list2:
-                f_start_sec2 = pydaw_util.musical_time_to_seconds(
+                f_start_sec2 = util.musical_time_to_seconds(
                     f_tempo, f_item2.audio_item.start_bar,
                     f_item2.audio_item.start_beat)
                 f_time_frac2 = f_item2.audio_item.sample_end - \
@@ -424,7 +424,7 @@ class AudioItemSeqWidget(FileDragDropper):
         AudioItemSeq
     """
     def __init__(self):
-        FileDragDropper.__init__(self, pydaw_util.is_audio_file)
+        FileDragDropper.__init__(self, util.is_audio_file)
 
         self.modulex = widgets.pydaw_per_audio_item_fx_widget(
             global_paif_rel_callback,

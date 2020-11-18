@@ -1,5 +1,5 @@
-from mkpy.libpydaw import *
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib import *
+from mkpy.lib.util import *
 
 
 class MkTakes:

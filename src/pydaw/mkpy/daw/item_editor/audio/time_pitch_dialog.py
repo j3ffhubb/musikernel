@@ -2,9 +2,9 @@ from mkpy import glbl
 from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -124,7 +124,7 @@ class TimePitchDialogWidget:
             self.timestretch_amt_end.setValue(self.timestretch_amt.value())
 
     def timestretch_mode_changed(self, a_val=None):
-        a_val = pydaw_util.TIMESTRETCH_INDEXES[
+        a_val = util.TIMESTRETCH_INDEXES[
             str(self.timestretch_mode.currentText())]
         if a_val == 0:
             self.pitch_shift.setEnabled(False)

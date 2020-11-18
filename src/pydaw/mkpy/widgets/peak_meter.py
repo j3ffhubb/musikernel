@@ -1,5 +1,5 @@
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -45,7 +45,7 @@ class peak_meter:
         if self.high == 0:
             f_val = -100.0
         else:
-            f_val = round(pydaw_util.pydaw_lin_to_db(self.high), 1)
+            f_val = round(util.pydaw_lin_to_db(self.high), 1)
         self.widget.setToolTip(
             _("Peak {}dB\nClick with mouse to reset").format(f_val))
 
@@ -64,8 +64,8 @@ class peak_meter:
                 f_rect_y = 0.0
                 f_rect_height = f_height
             else:
-                f_db = pydaw_util.pydaw_lin_to_db(f_val)
-                f_db = pydaw_util.pydaw_clip_min(f_db, -29.0)
+                f_db = util.pydaw_lin_to_db(f_val)
+                f_db = util.pydaw_clip_min(f_db, -29.0)
                 f_rect_y = f_height * f_db * -0.033333333 # / -30.0
                 f_rect_height = f_height - f_rect_y
             if f_val > self.high:

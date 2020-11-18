@@ -1,6 +1,6 @@
 from .modulex import pydaw_modulex_single
 from .modulex_settings import pydaw_modulex_settings
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 

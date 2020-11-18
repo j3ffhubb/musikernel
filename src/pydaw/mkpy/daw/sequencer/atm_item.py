@@ -2,9 +2,9 @@ from . import _shared
 from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.plugins import *
 from mkpy.mkqt import *
 
@@ -65,8 +65,8 @@ class SeqAtmItem(QGraphicsEllipseItem):
             f_x = round(
                 f_x / _shared.SEQUENCER_QUANTIZE_64TH
             ) * _shared.SEQUENCER_QUANTIZE_64TH
-        f_x = pydaw_util.pydaw_clip_min(f_x, 0.0)
-        f_y = pydaw_util.pydaw_clip_value(f_pos.y(), self.min_y, self.max_y)
+        f_x = util.pydaw_clip_min(f_x, 0.0)
+        f_y = util.pydaw_clip_value(f_pos.y(), self.min_y, self.max_y)
         self.setPos(f_x, f_y)
 
     def mouseReleaseEvent(self, a_event):
@@ -80,8 +80,8 @@ class SeqAtmItem(QGraphicsEllipseItem):
         f_pos = self.pos()
         f_point = self.item
         (track, beat, cc_val) = shared.SEQUENCER.get_item_coord(f_pos, a_clip=True)
-        beat = pydaw_util.pydaw_clip_min(beat, 0.0)
-        cc_val = pydaw_util.pydaw_clip_value(cc_val, 0.0, 127.0, True)
+        beat = util.pydaw_clip_min(beat, 0.0)
+        cc_val = util.pydaw_clip_value(cc_val, 0.0, 127.0, True)
         f_point.beat, f_point.cc_val = (beat, cc_val)
 
     def __lt__(self, other):

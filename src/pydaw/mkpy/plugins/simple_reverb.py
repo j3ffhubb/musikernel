@@ -14,7 +14,7 @@ GNU General Public License for more details.
 """
 
 from mkpy.widgets import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 
 
 SREVERB_REVERB_TIME = 0

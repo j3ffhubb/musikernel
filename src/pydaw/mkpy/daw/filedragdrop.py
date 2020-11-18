@@ -1,6 +1,6 @@
 from mkpy import glbl, widgets
 from mkpy.daw import shared
-from mkpy.libpydaw import pydaw_util
+from mkpy.lib import util
 from mkpy.mkqt import *
 import os
 
@@ -8,7 +8,7 @@ import os
 class FileDragDropper(widgets.AbstractFileBrowserWidget):
     def __init__(
         self,
-        a_filter_func=pydaw_util.is_audio_file,
+        a_filter_func=util.is_audio_file,
     ):
         widgets.AbstractFileBrowserWidget.__init__(
             self,
@@ -43,7 +43,7 @@ class FileDragDropper(widgets.AbstractFileBrowserWidget):
         for f_item in self.list_file.selectedItems():
             f_path = os.path.join(
                 *(str(x) for x in (self.last_open_dir, f_item.text())))
-            if pydaw_util.is_midi_file(f_path):
+            if util.is_midi_file(f_path):
                 shared.MIDI_FILES_TO_DROP.append(f_path)
             else:
                 shared.AUDIO_ITEMS_TO_DROP.append(f_path)

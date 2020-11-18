@@ -7,10 +7,10 @@ from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
 from mkpy.glbl import mk_project
-from mkpy.libpydaw import strings as mk_strings
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import strings as mk_strings
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -254,7 +254,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                     f_path_item.setPos(
                         self.sample_start_offset_px,
                         f_y_offset + (f_y_inc * f_i))
-                f_x_scale, f_y_scale = pydaw_util.scale_to_rect(
+                f_x_scale, f_y_scale = util.scale_to_rect(
                     mk_project.pydaw_audio_item_scene_rect, self.rect_orig)
                 f_y_scale *= self.vol_linear
                 f_scale_transform = QTransform()
@@ -313,7 +313,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
             self.audio_item.sample_end = \
                 ((self.rect().width() + self.length_px_start) /
                 self.length_seconds_orig_px) * 1000.0
-            self.audio_item.sample_end = pydaw_util.pydaw_clip_value(
+            self.audio_item.sample_end = util.pydaw_clip_value(
                 self.audio_item.sample_end, 1.0, 1000.0, True)
             self.draw()
             return True
@@ -674,7 +674,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
         return f_lane_num, f_y_pos
 
     def lane_number_to_y_pos(self, a_lane_num):
-        a_lane_num = pydaw_util.pydaw_clip_value(
+        a_lane_num = util.pydaw_clip_value(
             a_lane_num,
             0,
             TRACK_COUNT_ALL,
@@ -803,7 +803,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                         (shared.AUDIO_ITEM_HANDLE_HEIGHT * 0.5))
         elif self.is_amp_dragging:
             for f_item in shared.AUDIO_SEQ.get_selected():
-                f_new_vel = pydaw_util.pydaw_clip_value(
+                f_new_vel = util.pydaw_clip_value(
                     f_val + f_item.orig_value, -24.0, 24.0)
                 f_new_vel = round(f_new_vel, 1)
                 f_item.audio_item.vol = f_new_vel
@@ -819,15 +819,15 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                     if f_start > self.vc_mid:
                         f_frac =  (f_start -
                             self.vc_mid) / (self.vc_end - self.vc_mid)
-                        f_new_vel = pydaw_util.linear_interpolate(
+                        f_new_vel = util.linear_interpolate(
                             f_val, 0.3 * f_val, f_frac)
                     else:
                         f_frac = (f_start -
                             self.vc_start) / (self.vc_mid - self.vc_start)
-                        f_new_vel = pydaw_util.linear_interpolate(
+                        f_new_vel = util.linear_interpolate(
                             0.3 * f_val, f_val, f_frac)
                     f_new_vel += f_item.orig_value
-                f_new_vel = pydaw_util.pydaw_clip_value(f_new_vel, -24.0, 24.0)
+                f_new_vel = util.pydaw_clip_value(f_new_vel, -24.0, 24.0)
                 f_new_vel = round(f_new_vel, 1)
                 f_item.audio_item.vol = f_new_vel
                 f_item.set_vol_line()
@@ -897,7 +897,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                         f_audio_item.length_px_start
                     ) / f_audio_item.length_seconds_orig_px
                 ) * 1000.0
-                f_item.sample_end = pydaw_util.pydaw_clip_value(
+                f_item.sample_end = util.pydaw_clip_value(
                     f_item.sample_end, 1.0, 1000.0, True)
             elif f_audio_item.is_start_resizing:
                 f_x = f_audio_item.start_handle.scenePos().x()

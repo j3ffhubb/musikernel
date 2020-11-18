@@ -1,7 +1,7 @@
 from . import _shared
 from .knob import pydaw_pixmap_knob
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import collections
 import math
@@ -94,13 +94,13 @@ class AbstractUiControl:
         elif self.val_conversion in (_shared.KC_INTEGER, _shared.KC_INT_PITCH, _shared.KC_MILLISECOND):
             retval = str(int(f_value))
         elif self.val_conversion == _shared.KC_PITCH:
-            f_val = int(pydaw_util.pydaw_pitch_to_hz(f_value))
+            f_val = int(util.pydaw_pitch_to_hz(f_value))
             if f_val >= 1000:
                 f_val = str(round(f_val * 0.001, 1)) + "k"
             retval = (str(f_val))
         elif self.val_conversion == _shared.KC_127_PITCH:
             f_val = (
-                int(pydaw_util.pydaw_pitch_to_hz(
+                int(util.pydaw_pitch_to_hz(
                 (f_value * 0.818897638) + 20.0)))
             if f_val >= 1000:
                 f_val = str(round(f_val * 0.001, 1)) + "k"
@@ -193,7 +193,7 @@ class AbstractUiControl:
                 f_result = round(math.sqrt(f_seconds_per_beat * f_frac) * 100)
             elif self.val_conversion == _shared.KC_MILLISECOND:
                 f_result = round(f_seconds_per_beat * f_frac * 1000)
-            f_result = pydaw_util.pydaw_clip_value(
+            f_result = util.pydaw_clip_value(
                 f_result, self.control.minimum(), self.control.maximum())
             self.control.setValue(f_result)
             LAST_TEMPO_COMBOBOX_INDEX = f_beat_frac_combobox.currentIndex()
@@ -228,7 +228,7 @@ class AbstractUiControl:
     def set_note_dialog(self):
         def ok_button_pressed():
             f_value = f_note_selector.get_value()
-            f_value = pydaw_util.pydaw_clip_value(
+            f_value = util.pydaw_clip_value(
                 f_value, self.control.minimum(), self.control.maximum())
             self.set_value(f_value)
             f_dialog.close()
@@ -252,7 +252,7 @@ class AbstractUiControl:
 
     def set_ratio_dialog(self):
         def ok_button_pressed():
-            f_value = pydaw_util.pydaw_ratio_to_pitch(f_ratio_spinbox.value())
+            f_value = util.pydaw_ratio_to_pitch(f_ratio_spinbox.value())
             if self.ratio_callback:
                 f_int = round(f_value)
                 self.set_value(f_int, True)
@@ -268,12 +268,12 @@ class AbstractUiControl:
         f_layout.addWidget(QLabel(_("Ratio:")), 0, 0)
         f_ratio_spinbox = QDoubleSpinBox()
 
-        f_min = pydaw_util.pydaw_pitch_to_ratio(self.control.minimum())
-        f_max = pydaw_util.pydaw_pitch_to_ratio(self.control.maximum())
+        f_min = util.pydaw_pitch_to_ratio(self.control.minimum())
+        f_max = util.pydaw_pitch_to_ratio(self.control.maximum())
         f_ratio_spinbox.setRange(f_min, round(f_max))
         f_ratio_spinbox.setDecimals(4)
         f_ratio_spinbox.setValue(
-            pydaw_util.pydaw_pitch_to_ratio(self.get_value()))
+            util.pydaw_pitch_to_ratio(self.get_value()))
         f_layout.addWidget(f_ratio_spinbox, 0, 1)
 
         f_ok_button = QPushButton(_("OK"))
@@ -314,11 +314,11 @@ class AbstractUiControl:
         global CC_CLIPBOARD
         f_value = ((self.get_value() - self.control.minimum()) /
                   (self.control.maximum() - self.control.minimum())) * 127.0
-        CC_CLIPBOARD = pydaw_util.pydaw_clip_value(f_value, 0.0, 127.0)
+        CC_CLIPBOARD = util.pydaw_clip_value(f_value, 0.0, 127.0)
 
     def paste_automation(self):
         f_frac = CC_CLIPBOARD / 127.0
-        f_frac = pydaw_util.pydaw_clip_value(f_frac, 0.0, 1.0)
+        f_frac = util.pydaw_clip_value(f_frac, 0.0, 1.0)
         f_min = self.control.minimum()
         f_max = self.control.maximum()
         f_value = round(((f_max - f_min) * f_frac) + f_min)

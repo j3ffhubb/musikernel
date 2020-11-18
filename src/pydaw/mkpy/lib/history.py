@@ -16,7 +16,7 @@ GNU General Public License for more details.
 import os, time, difflib
 
 
-class pydaw_history_file:
+class history_file:
     def __init__(self, a_folder, a_file_name, a_text_new,
                  a_text_old, a_existed):
         self.folder = str(a_folder)
@@ -35,7 +35,7 @@ class pydaw_history_file:
             f_result += f_line + "\n"
         return f_result
 
-class pydaw_history_commit:
+class history_commit:
     def __init__(self, a_files, a_message):
         self.files = a_files
         self.message = a_message

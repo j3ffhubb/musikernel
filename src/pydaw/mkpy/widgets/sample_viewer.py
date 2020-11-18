@@ -1,5 +1,5 @@
 from .audio_item_viewer import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 

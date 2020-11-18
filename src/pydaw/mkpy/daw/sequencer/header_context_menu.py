@@ -2,9 +2,9 @@ from . import _shared
 from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -295,7 +295,7 @@ def header_loop_start():
         shared.SEQUENCER.header_event_pos,
     )
     if shared.CURRENT_REGION.loop_marker:
-        end = pydaw_util.pydaw_clip_min(
+        end = util.pydaw_clip_min(
             shared.CURRENT_REGION.loop_marker.beat,
             shared.SEQUENCER.header_event_pos + tsig_beats,
         )
@@ -315,12 +315,12 @@ def header_loop_end():
     tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
         shared.SEQUENCER.header_event_pos,
     )
-    shared.CURRENT_REGION.loop_marker.beat = pydaw_util.pydaw_clip_min(
+    shared.CURRENT_REGION.loop_marker.beat = util.pydaw_clip_min(
         shared.SEQUENCER.header_event_pos,
         tsig_beats,
     )
     shared.CURRENT_REGION.loop_marker.start_beat = \
-        pydaw_util.pydaw_clip_max(
+        util.pydaw_clip_max(
             shared.CURRENT_REGION.loop_marker.start_beat,
             shared.CURRENT_REGION.loop_marker.beat - tsig_beats,
         )

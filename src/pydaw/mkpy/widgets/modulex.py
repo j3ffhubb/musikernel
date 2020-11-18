@@ -1,7 +1,7 @@
 from . import _shared
 from .control import *
 from .modulex_settings import pydaw_modulex_settings
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 

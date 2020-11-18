@@ -14,7 +14,7 @@ GNU General Public License for more details.
 """
 
 from mkpy.widgets import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 
 MKCHNL_VOL_SLIDER = 0
 MKCHNL_GAIN = 1

@@ -24,9 +24,9 @@ f_parent_dir = os.path.dirname(os.path.abspath(__file__))
 f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "../.."))
 sys.path.insert(0, f_parent_dir)
 
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
-import mkpy.libpydaw.pydaw_util as pydaw_util
+import mkpy.lib.util as util
 
 class project_history_widget(QTreeWidget):
     def __init__(self, a_backup_dir, a_backup_file, a_project_dir):
@@ -102,14 +102,14 @@ class project_history_widget(QTreeWidget):
 
 def project_recover_dialog(a_file):
     f_window = QMainWindow()
-    f_window.setStyleSheet(pydaw_util.STYLESHEET)
+    f_window.setStyleSheet(util.STYLESHEET)
     f_window.setWindowState(QtCore.Qt.WindowMaximized)
     f_window.setWindowTitle("Project History")
     if a_file is None:
         f_file, f_filter = QFileDialog.getOpenFileName(
             caption='Open Project',
-            filter=pydaw_util.global_pydaw_file_type_string,
-            directory=pydaw_util.global_default_project_folder,
+            filter=util.global_pydaw_file_type_string,
+            directory=util.global_default_project_folder,
             options=QFileDialog.DontUseNativeDialog,
         )
         if f_file is None or not str(f_file):
@@ -126,9 +126,9 @@ def project_recover_dialog(a_file):
             "or 'Cancel' to close MusiKernel"),
             QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
             QMessageBox.Cancel)
-        if (f_answer == QMessageBox.Yes and pydaw_util.open_project()) or \
-        (f_answer == QMessageBox.No and pydaw_util.new_project()):
-            pydaw_util.run_musikernel()
+        if (f_answer == QMessageBox.Yes and util.open_project()) or \
+        (f_answer == QMessageBox.No and util.new_project()):
+            util.run_musikernel()
             exit(0)
         exit(1)
     f_backup_dir = os.path.join(f_project_dir, "backups")

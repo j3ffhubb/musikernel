@@ -1,7 +1,7 @@
 from . import _shared
 from .control import pydaw_knob_control
 from .playback_widget import pydaw_playback_widget
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 def lfo_dialog(a_update_callback, a_save_callback):

@@ -1,7 +1,7 @@
 from mkpy import glbl
 from mkpy.daw import shared
 from mkpy.daw.shared import *
-from mkpy.libpydaw import  pydaw_util
+from mkpy.lib import  util
 from mkpy.mkqt import *
 
 
@@ -61,13 +61,13 @@ class MidiDevicesDialog:
         self.layout = QGridLayout()
         self.devices = []
         self.devices_dict = {}
-        if not pydaw_util.MIDI_IN_DEVICES:
+        if not util.MIDI_IN_DEVICES:
             return
         self.layout.addWidget(QLabel(_("On")), 0, 0)
         self.layout.addWidget(QLabel(_("MIDI Device")), 0, 1)
         self.layout.addWidget(QLabel(_("Output")), 0, 2)
         for f_name, f_i in zip(
-        pydaw_util.MIDI_IN_DEVICES, range(len(pydaw_util.MIDI_IN_DEVICES))):
+        util.MIDI_IN_DEVICES, range(len(util.MIDI_IN_DEVICES))):
             f_device = MidiDevice(
                 f_name, f_i, self.layout, self.save_callback)
             self.devices.append(f_device)

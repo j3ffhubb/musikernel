@@ -1,5 +1,5 @@
-from mkpy.libpydaw.translate import _
-from mkpy.glbl import pydaw_util
+from mkpy.lib.translate import _
+from mkpy.glbl import util
 from mkpy.mkqt import *
 import os
 import shutil
@@ -21,18 +21,18 @@ class pydaw_preset_manager_widget:
         self.configure_dict = a_configure_dict
         self.reconfigure_callback = a_reconfigure_callback
         self.factory_preset_path = os.path.join(
-            pydaw_util.INSTALL_PREFIX,
+            util.INSTALL_PREFIX,
             "lib",
-            pydaw_util.global_pydaw_version_string,
+            util.global_pydaw_version_string,
             "presets",
             "{}.mkp".format(a_plugin_name),
         )
-        self.bank_dir = os.path.join(pydaw_util.PRESET_DIR, a_plugin_name)
+        self.bank_dir = os.path.join(util.PRESET_DIR, a_plugin_name)
         if not os.path.isdir(self.bank_dir):
             os.makedirs(self.bank_dir)
         self.user_factory_presets = os.path.join(self.bank_dir, "factory.mkp")
         self.bank_file = os.path.join(
-            pydaw_util.PRESET_DIR, "{}-last-bank.txt".format(a_plugin_name))
+            util.PRESET_DIR, "{}-last-bank.txt".format(a_plugin_name))
         self.group_box = QWidget()
         self.group_box.setObjectName("plugin_groupbox")
         self.layout = QHBoxLayout(self.group_box)
@@ -131,7 +131,7 @@ class pydaw_preset_manager_widget:
             self.bank_dir,
             "{}.mkp".format(self.bank_combobox.currentText())
         )
-        pydaw_util.pydaw_write_file_text(
+        util.pydaw_write_file_text(
             self.bank_file,
             self.preset_path,
         )
@@ -140,7 +140,7 @@ class pydaw_preset_manager_widget:
     def load_default_preset_path(self):
         self.preset_path = self.user_factory_presets
         if os.path.isfile(self.bank_file):
-            f_text = pydaw_util.pydaw_read_file_text(self.bank_file)
+            f_text = util.pydaw_read_file_text(self.bank_file)
             if os.path.isfile(f_text):
                 print("Setting self.preset_path to {}".format(f_text))
                 self.preset_path = f_text
@@ -188,7 +188,7 @@ class pydaw_preset_manager_widget:
 
     def on_save_as(self, a_new=False):
         def ok_handler():
-            f_name = pydaw_util.pydaw_remove_bad_chars(f_lineedit.text())
+            f_name = util.pydaw_remove_bad_chars(f_lineedit.text())
             f_file = os.path.join(self.bank_dir, f_name)
             if not f_file.endswith(".mkp"):
                 f_file += ".mkp"
@@ -198,12 +198,12 @@ class pydaw_preset_manager_widget:
                     _("This bank name already exists"))
                 return
             if a_new:
-                pydaw_util.pydaw_write_file_text(
+                util.pydaw_write_file_text(
                     f_file, "\n".join([self.plugin_name]))
             else:
                 shutil.copy(self.preset_path, f_file)
             self.preset_path = f_file
-            pydaw_util.pydaw_write_file_text(self.bank_file, self.preset_path)
+            util.pydaw_write_file_text(self.bank_file, self.preset_path)
             self.load_banks()
             self.program_combobox.setCurrentIndex(
                 self.program_combobox.findText(f_name))
@@ -227,14 +227,14 @@ class pydaw_preset_manager_widget:
         f_file, f_filter = QFileDialog.getOpenFileName(
             parent=self.group_box,
             caption=_('Open preset bank...'),
-            directory=pydaw_util.global_home,
+            directory=util.global_home,
             filter=PRESET_FILE_DIALOG_STRING,
             options=QFileDialog.DontUseNativeDialog,
         )
         if not f_file is None and not str(f_file) == "":
             f_file = str(f_file)
             self.preset_path = f_file
-            pydaw_util.pydaw_write_file_text(self.bank_file, self.preset_path)
+            util.pydaw_write_file_text(self.bank_file, self.preset_path)
             self.program_combobox.setCurrentIndex(0)
             self.load_presets()
 
@@ -254,10 +254,10 @@ class pydaw_preset_manager_widget:
     def load_presets(self):
         if os.path.isfile(self.preset_path):
             print("loading presets from file {}".format(self.preset_path))
-            f_text = pydaw_util.pydaw_read_file_text(self.preset_path)
+            f_text = util.pydaw_read_file_text(self.preset_path)
         else:
             print("loading factory presets")
-            f_text = pydaw_util.pydaw_read_file_text(
+            f_text = util.pydaw_read_file_text(
                 self.user_factory_presets)
         f_line_arr = f_text.split("\n")
 
@@ -314,7 +314,7 @@ class pydaw_preset_manager_widget:
         f_presets = "\n".join("|".join([x] + self.presets_delimited[x])
             for x in sorted(self.presets_delimited, key=lambda s: s.lower()))
         f_result = "{}\n{}".format(self.plugin_name, f_presets)
-        pydaw_util.pydaw_write_file_text(self.preset_path, f_result)
+        util.pydaw_write_file_text(self.preset_path, f_result)
         self.load_presets()
 
     def program_changed(self, a_val=None):

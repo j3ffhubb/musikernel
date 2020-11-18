@@ -12,10 +12,10 @@ from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
 from mkpy.glbl import mk_project
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw import scales
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib import scales
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -218,7 +218,7 @@ class PianoRollEditorWidget:
         shared.PIANO_ROLL_EDITOR.draw_item()
 
     def save_vzoom(self):
-        pydaw_util.set_file_setting("PIANO_VZOOM", self.vzoom_slider.value())
+        util.set_file_setting("PIANO_VZOOM", self.vzoom_slider.value())
 
     def quantize_dialog(self):
         if not shared.ITEM_EDITOR.enabled:

@@ -12,7 +12,7 @@ GNU General Public License for more details.
 
 """
 
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 
 sequencer = _(
 """Click 'Menu->Show Tooltips' in the transport to disable these tooltips

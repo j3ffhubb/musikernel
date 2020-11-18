@@ -19,10 +19,10 @@ import sys
 glbl.plugins = sys.modules[__name__]
 
 from mkpy.glbl.mk_project import *
-from mkpy.libpydaw import strings as mk_strings
-from mkpy.libpydaw.translate import _
+from mkpy.lib import strings as mk_strings
+from mkpy.lib.translate import _
 from mkpy import widgets
-from mkpy.libpydaw import strings as mk_string
+from mkpy.lib import strings as mk_string
 
 from mkpy.plugins import euphoria
 from mkpy.plugins import rayv2
@@ -42,7 +42,7 @@ from mkpy.plugins import mk_limiter
 
 from mkpy.mkqt import *
 
-from mkpy.libpydaw.pydaw_util import pydaw_clip_value
+from mkpy.lib.util import pydaw_clip_value
 
 PLUGIN_INSTRUMENT_COUNT = 3  # For inserting the split line into the menu
 

@@ -17,13 +17,13 @@ import os
 
 from mkpy.mkqt import *
 
-from mkpy.libpydaw import *
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib import *
+from mkpy.lib.util import *
 from mkpy.widgets import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.plugins import *
 from mkpy import glbl
-from mkpy.libpydaw import strings as mk_strings
+from mkpy.lib import strings as mk_strings
 
 TRACK_COUNT_ALL = 1
 
@@ -297,8 +297,8 @@ class AudioInputWidget:
             self.layout.addWidget(QLabel(f_label), 0, f_i)
         self.inputs = []
         f_count = 0
-        if "audioInputs" in pydaw_util.global_device_val_dict:
-            f_count = int(pydaw_util.global_device_val_dict["audioInputs"])
+        if "audioInputs" in util.global_device_val_dict:
+            f_count = int(util.global_device_val_dict["audioInputs"])
         for f_i in range(f_count):
             f_input = AudioInput(f_i, self.layout, self.callback, f_count - 1)
             self.inputs.append(f_input)
@@ -901,11 +901,11 @@ class pydaw_wave_editor_widget:
             self.last_offline_dir = os.path.dirname(f_file)
 
             if f_algo == 0:
-                f_proc = pydaw_util.pydaw_rubberband(
+                f_proc = util.pydaw_rubberband(
                     f_path, f_file, f_stretch, f_pitch, f_crispness,
                     f_preserve_formants)
             elif f_algo == 1:
-                f_proc = pydaw_util.pydaw_sbsms(
+                f_proc = util.pydaw_sbsms(
                     f_path, f_file, f_stretch, f_pitch)
 
             f_proc.wait()

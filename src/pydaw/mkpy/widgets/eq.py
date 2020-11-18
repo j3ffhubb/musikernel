@@ -1,8 +1,8 @@
 from . import _shared
 from .control import *
 from .spectrum import pydaw_spectrum
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -22,9 +22,9 @@ class eq_item(QGraphicsEllipseItem):
     def mouseMoveEvent(self, a_event):
         QGraphicsEllipseItem.mouseMoveEvent(self, a_event)
         f_pos = self.pos()
-        f_pos_x = pydaw_util.pydaw_clip_value(
+        f_pos_x = util.pydaw_clip_value(
             f_pos.x(), -_shared.EQ_POINT_RADIUS, _shared.EQ_WIDTH)
-        f_pos_y = pydaw_util.pydaw_clip_value(
+        f_pos_y = util.pydaw_clip_value(
             f_pos.y(), -_shared.EQ_POINT_RADIUS, _shared.EQ_HEIGHT)
 
         if f_pos_x != f_pos.x() or f_pos_y != f_pos.y():
@@ -58,11 +58,11 @@ class eq_item(QGraphicsEllipseItem):
             (
                 (f_pos.x() + _shared.EQ_POINT_RADIUS) / _shared.EQ_WIDTH
             ) * _shared.EQ_HIGH_PITCH) + _shared.EQ_LOW_PITCH
-        f_freq = pydaw_util.pydaw_clip_value(
+        f_freq = util.pydaw_clip_value(
             f_freq, _shared.EQ_LOW_PITCH, _shared.EQ_HIGH_PITCH)
         f_gain = ((1.0 - ((f_pos.y() + _shared.EQ_POINT_RADIUS) /
             _shared.EQ_HEIGHT)) * 480.0) - 240.0
-        f_gain = pydaw_util.pydaw_clip_value(f_gain, -240.0, 240.0)
+        f_gain = util.pydaw_clip_value(f_gain, -240.0, 240.0)
         return round(f_freq, 2), round(f_gain, 1)
 
     def __lt__(self, other):
@@ -185,7 +185,7 @@ class eq_viewer(QGraphicsView):
         f_label_inc = _shared.EQ_WIDTH / (_shared.EQ_HIGH_PITCH / f_pitch_inc)
 
         for i in range(7):
-            f_hz = int(pydaw_util.pydaw_pitch_to_hz(f_pitch))
+            f_hz = int(util.pydaw_pitch_to_hz(f_pitch))
             if f_hz > 950:
                 f_hz = round(f_hz, -1)
                 f_hz = "{}khz".format(round(f_hz / 1000, 1))
@@ -397,7 +397,7 @@ class eq6_widget:
         f_hz_list, f_db_list, f_bw_list = EQ6_FORMANTS[f_key]
         for f_eq, f_hz, f_db, f_bw in zip(
         self.eqs, f_hz_list, f_db_list, f_bw_list):
-            f_pitch = pydaw_util.pydaw_hz_to_pitch(f_hz)
+            f_pitch = util.pydaw_hz_to_pitch(f_hz)
             f_eq.freq_knob.set_value(f_pitch, True)
             f_bw_adjusted = f_bw + 60
             f_eq.res_knob.set_value(f_bw_adjusted, True)

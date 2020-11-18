@@ -7,11 +7,11 @@ from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
 from mkpy.glbl import mk_project
-from mkpy.libpydaw import strings as mk_strings
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw import scales
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import strings as mk_strings
+from mkpy.lib import util
+from mkpy.lib import scales
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -445,7 +445,7 @@ class PianoRollEditor(AbstractItemEditor):
                     0, (self.note_height * j) + (self.octave_height * (i - 1)))
 
                 f_key.setToolTip("{} - {}hz - MIDI note #{}".format(
-                    pydaw_util.note_num_to_string(f_note_num),
+                    util.note_num_to_string(f_note_num),
                     round(pydaw_pitch_to_hz(f_note_num)), f_note_num))
                 f_note_num += 1
                 if j == 12:

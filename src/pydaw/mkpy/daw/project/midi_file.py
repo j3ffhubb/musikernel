@@ -1,7 +1,7 @@
 from . import _shared
 from mkpy.glbl.mk_project import *
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -11,7 +11,7 @@ class DawMidiFile:
         @a_project:  An instance of DawProject
     """
     def __init__(self, a_file, a_project):
-        f_item_list = pydaw_util.load_midi_file(a_file)
+        f_item_list = util.load_midi_file(a_file)
         self.result_dict = {}
 
         for f_event in f_item_list:

@@ -36,8 +36,8 @@ from .routing_matrix import *
 from .sample_viewer import *
 from .spectrum import pydaw_spectrum
 from .va_osc import pydaw_osc_widget
-from mkpy.libpydaw import pydaw_util
+from mkpy.lib import util
 from mkpy import glbl
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 

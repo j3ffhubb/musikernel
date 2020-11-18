@@ -480,14 +480,14 @@ PYTHON3 = sys.executable
 
 pydaw_rubberband_util = pydaw_which("rubberband")
 
-pydaw_paulstretch_util = os.path.join(
+paulstretch_util = os.path.join(
     INSTALL_PREFIX,
     "lib",
     global_pydaw_version_string,
     "pydaw",
     "mkpy",
     "scripts",
-    "pydaw_paulstretch.py",
+    "paulstretch.py",
 )
 
 if IS_WINDOWS:

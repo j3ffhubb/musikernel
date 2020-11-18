@@ -1,7 +1,7 @@
 from .atm_point import DawAtmPoint
 from mkpy.glbl.mk_project import *
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -118,7 +118,7 @@ class DawAtmRegion:
         self.clear_range(a_index, a_port_num, f_start.beat, f_end.beat)
         f_inc = 0.0625 # 64th note
         f_result = self.plugins[a_index][a_port_num]
-        f_smoother = pydaw_util.OnePoleLP(f_start.cc_val)
+        f_smoother = util.OnePoleLP(f_start.cc_val)
         for f_point, f_next in zip(a_points, a_points[1:]):
             f_beat = f_point.beat + f_inc
             f_val = f_point.cc_val
@@ -134,10 +134,10 @@ class DawAtmRegion:
             f_inc_count = int(round(f_beat_diff / f_inc))
             for f_i in range(1, f_inc_count + 1):
                 if a_linear:
-                    f_int_val = pydaw_util.linear_interpolate(
+                    f_int_val = util.linear_interpolate(
                         f_val, f_val_next, (f_i / f_inc_count))
                 else:
-                    f_int_val = pydaw_util.cosine_interpolate(
+                    f_int_val = util.cosine_interpolate(
                         f_val, f_val_next, (f_i / f_inc_count))
                 f_int_val = f_smoother.process(f_int_val)
                 f_point2 = DawAtmPoint(

@@ -46,15 +46,15 @@ from .sequencer import (
     TransportWidget,
 )
 from mkpy.glbl import mk_project
-from mkpy.libpydaw import *
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib import *
+from mkpy.lib.util import *
 from mkpy.widgets import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.plugins import *
 from mkpy import glbl
 from mkpy import plugins
 from mkpy.daw import strings as daw_strings
-from mkpy.libpydaw import strings as mk_strings
+from mkpy.lib import strings as mk_strings
 
 
 class MainWindow(QScrollArea):
@@ -144,7 +144,7 @@ class MainWindow(QScrollArea):
         self.midi_hlayout.addWidget(shared.TRACK_PANEL.tracks_widget)
         self.midi_hlayout.addWidget(shared.SEQUENCER)
 
-        self.file_browser = FileDragDropper(pydaw_util.is_audio_midi_file)
+        self.file_browser = FileDragDropper(util.is_audio_midi_file)
         self.file_browser.set_multiselect(True)
         self.file_browser.hsplitter.setSizePolicy(
             QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -199,17 +199,17 @@ class MainWindow(QScrollArea):
             f_out_file = f_name.text()
             f_fini = os.path.join(f_out_file, "finished") if f_stem else None
             f_samp_rate = f_sample_rate.currentText()
-            f_buff_size = pydaw_util.global_device_val_dict["bufferSize"]
-            f_thread_count = 1 if pydaw_util.IS_WINDOWS else \
-                pydaw_util.global_device_val_dict["threads"]
+            f_buff_size = util.global_device_val_dict["bufferSize"]
+            f_thread_count = 1 if util.IS_WINDOWS else \
+                util.global_device_val_dict["threads"]
 
             self.last_offline_dir = os.path.dirname(str(f_name.text()))
 
             f_window.close()
 
-            if pydaw_util.IS_LINUX and f_debug_checkbox.isChecked():
+            if util.IS_LINUX and f_debug_checkbox.isChecked():
                 f_cmd = "{} -e bash -c 'gdb {}-dbg'".format(
-                    pydaw_util.TERMINAL, pydaw_util.BIN_PATH)
+                    util.TERMINAL, util.BIN_PATH)
                 f_run_cmd = [str(x) for x in
                     ("run", "daw", "'{}'".format(f_dir),
                     "'{}'".format(f_out_file), f_start_beat, f_end_beat,
@@ -219,10 +219,10 @@ class MainWindow(QScrollArea):
                 subprocess.Popen(f_cmd, shell=True)
             else:
                 f_cmd = [str(x) for x in
-                    (pydaw_util.BIN_PATH, "daw",
+                    (util.BIN_PATH, "daw",
                      f_dir, f_out_file, f_start_beat, f_end_beat,
                      f_samp_rate, f_buff_size, f_thread_count,
-                     pydaw_util.USE_HUGEPAGES, f_stem)]
+                     util.USE_HUGEPAGES, f_stem)]
                 glbl.MAIN_WINDOW.show_offline_rendering_wait_window_v2(
                     f_cmd,
                     f_out_file,
@@ -324,7 +324,7 @@ class MainWindow(QScrollArea):
 
         try:
             f_sr_index = f_sample_rate.findText(
-                pydaw_util.global_device_val_dict["sampleRate"])
+                util.global_device_val_dict["sampleRate"])
             f_sample_rate.setCurrentIndex(f_sr_index)
         except:
             pass
@@ -350,7 +350,7 @@ class MainWindow(QScrollArea):
         f_layout.addWidget(f_copy_to_clipboard_checkbox, 7, 1)
         f_ok_layout = QHBoxLayout()
 
-        if pydaw_util.IS_LINUX:
+        if util.IS_LINUX:
             f_debug_checkbox = QCheckBox("Debug with GDB?")
             f_ok_layout.addWidget(f_debug_checkbox)
 

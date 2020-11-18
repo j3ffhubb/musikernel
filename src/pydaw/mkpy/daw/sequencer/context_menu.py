@@ -1,8 +1,8 @@
 from .  import _shared
 from mkpy.daw import shared
 from mkpy.daw.project import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 MENU = None
@@ -344,7 +344,7 @@ def glue_selected():
                     shared.CURRENT_REGION.remove_item_ref(f_ref)
                 else:
                     f_first = False
-            pydaw_util.print_sorted_dict(locals())
+            util.print_sorted_dict(locals())
             shared.PROJECT.save_item(f_new_name, f_new_item)
     if f_did_something:
         shared.PROJECT.save_region(shared.CURRENT_REGION)

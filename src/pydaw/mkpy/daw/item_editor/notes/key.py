@@ -1,7 +1,7 @@
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 

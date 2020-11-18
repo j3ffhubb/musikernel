@@ -4,9 +4,9 @@ from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
 from mkpy.glbl import mk_project
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 PIANO_NOTE_GRADIENT_TUPLE = (
@@ -79,7 +79,7 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
 
     def set_brush(self):
         f_val = (1.0 - (self.note_item.velocity / 127.0)) * 9.0
-        f_val = pydaw_util.pydaw_clip_value(f_val, 0.0, 9.0)
+        f_val = util.pydaw_clip_value(f_val, 0.0, 9.0)
         f_int = int(f_val)
         f_frac = f_val - f_int
         f_vals = []
@@ -236,7 +236,7 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
                 f_item.setPos(f_item.resize_pos.x(), f_item.resize_pos.y())
                 QCursor.setPos(QCursor.pos().x(), self.mouse_y_pos)
             elif self.is_velocity_dragging:
-                f_new_vel = pydaw_util.pydaw_clip_value(
+                f_new_vel = util.pydaw_clip_value(
                     f_val + f_item.orig_value, 1, 127)
                 f_new_vel = int(f_new_vel)
                 f_item.note_item.velocity = f_new_vel
@@ -251,15 +251,15 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
                     if f_start > self.vc_mid:
                         f_frac = (f_start -
                             self.vc_mid) / (self.vc_end - self.vc_mid)
-                        f_new_vel = pydaw_util.linear_interpolate(
+                        f_new_vel = util.linear_interpolate(
                             f_val, 0.3 * f_val, f_frac)
                     else:
                         f_frac = (f_start -
                             self.vc_start) / (self.vc_mid - self.vc_start)
-                        f_new_vel = pydaw_util.linear_interpolate(
+                        f_new_vel = util.linear_interpolate(
                             0.3 * f_val, f_val, f_frac)
                     f_new_vel += f_item.orig_value
-                f_new_vel = pydaw_util.pydaw_clip_value(f_new_vel, 1, 127)
+                f_new_vel = util.pydaw_clip_value(f_new_vel, 1, 127)
                 f_new_vel = int(f_new_vel)
                 f_item.note_item.velocity = f_new_vel
                 f_item.note_text.setText(str(f_new_vel))

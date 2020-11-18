@@ -1,8 +1,8 @@
 from mkpy import glbl
 from mkpy.daw import shared
 from mkpy.daw.shared import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib import util
+from mkpy.lib.util import *
 from mkpy.mkqt import *
 
 
@@ -40,7 +40,7 @@ class AbstractItemEditor(QGraphicsView):
             shared.CURRENT_ITEM_REF.length_beats +
             shared.CURRENT_ITEM_REF.start_offset
         )
-        self.playback_pos = pydaw_util.pydaw_clip_value(
+        self.playback_pos = util.pydaw_clip_value(
             shared.PLAYBACK_POS - start, 0.0, length)
         f_pos = (self.playback_pos * self.px_per_beat) + self.cursor_offset
         self.playback_cursor.setPos(f_pos, 0.0)

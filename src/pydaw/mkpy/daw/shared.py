@@ -3,8 +3,8 @@
 """
 from mkpy import glbl
 from mkpy.daw.project import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -68,7 +68,7 @@ AUDIO_ITEM_LINE_SELECTED_PEN = QPen(
 
 SEQUENCER_HEADER_BRUSH = QBrush(
     QColor(
-        pydaw_util.COLOR_PALETTE["SEQUENCER_HEADER_BRUSH"]
+        util.COLOR_PALETTE["SEQUENCER_HEADER_BRUSH"]
     )
 )
 
@@ -113,7 +113,7 @@ TAB_MIXER = 4
 TAB_NOTES = 5
 
 REGION_EDITOR_TRACK_HEIGHT = 64
-PROJECT = DawProject(pydaw_util.global_pydaw_with_audio)
+PROJECT = DawProject(util.global_pydaw_with_audio)
 TRACK_NAMES = [
     "Master" if x == 0 else "track{}".format(x)
     for x in range(TRACK_COUNT_ALL)
@@ -144,7 +144,7 @@ PIANO_ROLL_SNAP = False
 PIANO_ROLL_GRID_WIDTH = 1000.0
 PIANO_KEYS_WIDTH = 34  #Width of the piano keys in px
 PIANO_ROLL_GRID_MAX_START_TIME = 999.0 + PIANO_KEYS_WIDTH
-PIANO_ROLL_NOTE_HEIGHT = pydaw_util.get_file_setting("PIANO_VZOOM", int, 21)
+PIANO_ROLL_NOTE_HEIGHT = util.get_file_setting("PIANO_VZOOM", int, 21)
 PIANO_ROLL_SNAP_DIVISOR = 4.0
 PIANO_ROLL_SNAP_BEATS = 1.0
 PIANO_ROLL_SNAP_VALUE = PIANO_ROLL_GRID_WIDTH / PIANO_ROLL_SNAP_DIVISOR
@@ -277,7 +277,7 @@ def open_last():
 #Opens or creates a new project
 def global_open_project(a_project_file):
     global PROJECT, TRACK_NAMES, TRACK_COLORS
-    PROJECT = DawProject(pydaw_util.global_pydaw_with_audio)
+    PROJECT = DawProject(util.global_pydaw_with_audio)
     PROJECT.suppress_updates = True
     PROJECT.open_project(a_project_file, False)
     TRACK_COLORS = PROJECT.get_track_colors()
@@ -302,7 +302,7 @@ def global_open_project(a_project_file):
 
 def global_new_project(a_project_file):
     global PROJECT, TRACK_COLORS
-    PROJECT = DawProject(pydaw_util.global_pydaw_with_audio)
+    PROJECT = DawProject(util.global_pydaw_with_audio)
     PROJECT.new_project(a_project_file)
     TRACK_COLORS = PROJECT.get_track_colors()
     global_update_track_comboboxes()
@@ -447,7 +447,7 @@ def pydaw_set_piano_roll_quantize(a_index=None):
     PIANO_ROLL_SNAP_DIVISOR = ITEM_SNAP_DIVISORS[PIANO_ROLL_QUANTIZE_INDEX]
 
     PIANO_ROLL_SNAP_BEATS = 1.0 / PIANO_ROLL_SNAP_DIVISOR
-    LAST_NOTE_RESIZE = pydaw_util.pydaw_clip_min(
+    LAST_NOTE_RESIZE = util.pydaw_clip_min(
         LAST_NOTE_RESIZE,
         PIANO_ROLL_SNAP_BEATS,
     )

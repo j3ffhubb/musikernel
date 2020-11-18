@@ -2,8 +2,8 @@ from .  import _shared
 from mkpy import glbl, widgets
 from mkpy.daw import shared
 from mkpy.daw.project import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import math
 
@@ -147,7 +147,7 @@ def transform_atm_callback(a_add, a_mul):
         shared.SEQUENCER.atm_selected_vals,
     ):
         f_val = (f_val * a_mul) + a_add
-        f_val = pydaw_util.pydaw_clip_value(f_val, 0.0, 127.0, True)
+        f_val = util.pydaw_clip_value(f_val, 0.0, 127.0, True)
         f_point.item.cc_val = f_val
         f_point.setPos(
             shared.SEQUENCER.get_pos_from_point(f_point.item),
@@ -229,9 +229,9 @@ def lfo_atm_callback(
     for f_point in shared.SEQUENCER.atm_selected:
         f_pos_beats = f_point.item.beat - f_start_beat
         f_pos = f_pos_beats * f_length_beats_recip
-        f_center = pydaw_util.linear_interpolate(
+        f_center = util.linear_interpolate(
             a_start_center, a_end_center, f_pos)
-        f_amp = pydaw_util.linear_interpolate(
+        f_amp = util.linear_interpolate(
             a_start_amp, a_end_amp, f_pos)
 
         if f_pos < a_start_fade:
@@ -241,11 +241,11 @@ def lfo_atm_callback(
                 (f_pos - a_end_fade) / (1.0 - a_end_fade))
 
         f_val = (math.sin(a_phase) * f_amp) + f_center
-        f_val = pydaw_util.pydaw_clip_value(f_val, 0.0, 127.0, True)
+        f_val = util.pydaw_clip_value(f_val, 0.0, 127.0, True)
         f_point.item.cc_val = f_val
         f_point.setPos(shared.SEQUENCER.get_pos_from_point(f_point.item))
 
-        a_phase += pydaw_util.linear_interpolate(
+        a_phase += util.linear_interpolate(
             f_start_radians_p64, f_end_radians_p64, f_pos)
         if a_phase >= two_pi:
             a_phase -= two_pi

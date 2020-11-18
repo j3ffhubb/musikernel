@@ -4,9 +4,9 @@ from mkpy.daw import shared
 from mkpy.daw import strings as daw_strings
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.plugins import *
 from mkpy.mkqt import *
 
@@ -185,14 +185,14 @@ class TransportWidget(glbl.AbstractTransport):
                 return
 
             f_sample_count = shared.CURRENT_REGION.get_sample_count(
-                self.rec_start, self.rec_end, pydaw_util.SAMPLE_RATE)
+                self.rec_start, self.rec_end, util.SAMPLE_RATE)
 
             shared.PROJECT.save_recorded_items(
                 f_file_name, MREC_EVENTS, self.overdub_checkbox.isChecked(),
-                pydaw_util.SAMPLE_RATE, self.rec_start, self.rec_end,
+                util.SAMPLE_RATE, self.rec_start, self.rec_end,
                 f_inputs, f_sample_count, f_file_name)
             shared.REGION_SETTINGS.open_region()
-            if pydaw_util.IS_ENGINE_LIB:
+            if util.IS_ENGINE_LIB:
                 glbl.clean_wav_pool()
             elif a_restart:
                 glbl.restart_engine()

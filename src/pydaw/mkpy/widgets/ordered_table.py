@@ -1,7 +1,7 @@
 from ._shared import SCENE_BACKGROUND_BRUSH
 from mkpy.mkqt import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 
 
 class OrderedTable(QGraphicsView):
@@ -21,7 +21,7 @@ class OrderedTable(QGraphicsView):
         self.setScene(self.scene)
         self.setFixedSize(
             self.item_width + 20,
-            pydaw_util.pydaw_clip_max(self.total_height + 10, 600),
+            util.pydaw_clip_max(self.total_height + 10, 600),
         )
         self.item_list = []
         for f_i, f_label in zip(

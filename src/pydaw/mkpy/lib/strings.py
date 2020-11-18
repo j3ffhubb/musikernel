@@ -12,7 +12,7 @@ GNU General Public License for more details.
 
 """
 
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 
 
 audio_viewer_widget_folders = _(

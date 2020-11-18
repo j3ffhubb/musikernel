@@ -4,9 +4,9 @@ from mkpy.daw import shared
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
 from mkpy.daw import strings as daw_strings
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 
@@ -338,7 +338,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             self.audio_item.sample_end = \
                 ((self.rect().width() + self.length_px_start) /
                 self.length_orig) * 1000.0
-            self.audio_item.sample_end = pydaw_util.pydaw_clip_value(
+            self.audio_item.sample_end = util.pydaw_clip_value(
                 self.audio_item.sample_end, 1.0, 1000.0, True)
             self.draw()
             return True
@@ -627,7 +627,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
         return f_lane_num, f_y_pos
 
     def lane_number_to_y_pos(self, a_lane_num):
-        a_lane_num = pydaw_util.pydaw_clip_value(
+        a_lane_num = util.pydaw_clip_value(
             a_lane_num, 0, TRACK_COUNT_ALL)
         return (a_lane_num *
             shared.REGION_EDITOR_TRACK_HEIGHT) + _shared.REGION_EDITOR_HEADER_HEIGHT
@@ -755,7 +755,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             a_event.accept()
         for f_audio_item in shared.SEQUENCER.get_selected():
             f_item = f_audio_item.audio_item
-            f_pos_x = pydaw_util.pydaw_clip_min(f_audio_item.pos().x(), 0.0)
+            f_pos_x = util.pydaw_clip_min(f_audio_item.pos().x(), 0.0)
             if f_audio_item.is_resizing:
                 f_x = (f_audio_item.width_orig + f_event_diff +
                     f_audio_item.quantize_offset)

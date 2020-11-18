@@ -1,4 +1,4 @@
-from mkpy.libpydaw import pydaw_util
+from mkpy.lib import util
 
 class pydaw_plugin_file:
     """ Abstracts an instrument state file.  Plugins are not required
@@ -11,7 +11,7 @@ class pydaw_plugin_file:
         self.configure_dict = {}
         self.cc_map = {}
         if a_path is not None:
-            f_text = pydaw_util.pydaw_read_file_text(a_path)
+            f_text = util.pydaw_read_file_text(a_path)
             self.set_from_str(f_text)
 
     def set_from_str(self, a_str):

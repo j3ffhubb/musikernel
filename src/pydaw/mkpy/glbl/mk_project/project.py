@@ -4,8 +4,8 @@ from .sample_graph import (
     pydaw_sample_graph,
 )
 from mkpy import glbl
-from mkpy.libpydaw import *
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib import *
+from mkpy.lib.util import *
 import collections
 import datetime
 import json
@@ -375,18 +375,18 @@ class MkProject(glbl.AbstractProject):
             elif a_audio_item.time_stretch_mode == 6:
                 if a_audio_item.pitch_shift != 0.0:
                     f_cmd = [
-                        pydaw_paulstretch_util, "-s",
+                        paulstretch_util, "-s",
                         str(a_audio_item.timestretch_amt), "-p",
                         str(a_audio_item.pitch_shift), f_src_path, f_dest_path
                         ]
                 else:
                     f_cmd = [
-                        pydaw_paulstretch_util, "-s",
+                        paulstretch_util, "-s",
                         str(a_audio_item.timestretch_amt), f_src_path,
                         f_dest_path
                         ]
-                if pydaw_util.IS_WINDOWS:
-                    f_cmd.insert(0, pydaw_util.PYTHON3)
+                if util.IS_WINDOWS:
+                    f_cmd.insert(0, util.PYTHON3)
 
             self.timestretch_cache[f_key] = f_uid
             self.timestretch_reverse_lookup[f_dest_path] = f_src_path
@@ -449,7 +449,7 @@ class MkProject(glbl.AbstractProject):
             f_uid_dict = self.get_wavs_dict()
         else:
             f_uid_dict = a_uid_dict
-        if pydaw_util.IS_WINDOWS:
+        if util.IS_WINDOWS:
             f_path = str(a_path)
         else:
             f_path = str(a_path).replace("//", "/")
@@ -501,7 +501,7 @@ class MkProject(glbl.AbstractProject):
 
     def create_sample_graph(self, a_path, a_uid):
         f_uid = int(a_uid)
-        a_path = pydaw_util.pi_path(a_path)
+        a_path = util.pi_path(a_path)
         f_sample_dir_path = "{}{}".format(self.samples_folder, a_path)
         if os.path.isfile(a_path):
             f_path = a_path

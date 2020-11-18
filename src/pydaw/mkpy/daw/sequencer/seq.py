@@ -11,9 +11,9 @@ from mkpy.daw import shared
 from mkpy.daw import strings as daw_strings
 from mkpy.daw.project import *
 from mkpy.daw.shared import *
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.plugins import *
 from mkpy.mkqt import *
 
@@ -300,8 +300,8 @@ class ItemSequencer(QGraphicsView):
         f_pos_x > 0 and
         f_pos_y > 0 and
         f_pos_y < _shared.REGION_EDITOR_TOTAL_HEIGHT):
-            f_pos_x = pydaw_util.pydaw_clip_min(f_pos_x, 0.0)
-            f_pos_y = pydaw_util.pydaw_clip_value(
+            f_pos_x = util.pydaw_clip_min(f_pos_x, 0.0)
+            f_pos_y = util.pydaw_clip_value(
                 f_pos_y,
                 0.0,
                 _shared.REGION_EDITOR_TOTAL_HEIGHT,

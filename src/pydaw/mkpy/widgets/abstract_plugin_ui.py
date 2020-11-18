@@ -1,7 +1,7 @@
 from .plugin_file import pydaw_plugin_file
 from mkpy import glbl
 from mkpy.glbl.mk_project import pydaw_folder_plugins
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import os
 

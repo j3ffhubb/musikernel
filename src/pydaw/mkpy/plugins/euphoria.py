@@ -14,7 +14,7 @@ GNU General Public License for more details.
 """
 
 from mkpy.widgets import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy import glbl
 
 import time
@@ -1326,13 +1326,13 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                 f_graph = self.mk_project.get_sample_graph_by_name(
                     f_file_name)
                 f_note = self.loop_tune_note_selector.get_value()
-                f_hz = pydaw_util.pydaw_pitch_to_hz(f_note)
+                f_hz = util.pydaw_pitch_to_hz(f_note)
                 f_time = 1.0 / f_hz
                 f_loop_length = (f_time / f_graph.length_in_seconds) * 1000.0
                 f_loop_end_value = \
                     self.loop_starts[
                     self.selected_row_index].get_value() + f_loop_length
-                f_loop_end_value = pydaw_util.pydaw_clip_value(
+                f_loop_end_value = util.pydaw_clip_value(
                     f_loop_end_value,
                     self.loop_starts[self.selected_row_index].get_value() +
                     MARKER_MIN_DIFF,
@@ -1792,11 +1792,11 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
             f_dir = self.mk_project.audio_tmp_folder
             f_selected_index = self.selected_row_index
-            f_uid = pydaw_util.pydaw_gen_uid()
+            f_uid = util.pydaw_gen_uid()
 
             for f_i in range(f_bottom, f_top, f_step):
                 f_new_note = f_i + f_base_note
-                f_note_str = pydaw_util.note_num_to_string(f_new_note)
+                f_note_str = util.note_num_to_string(f_new_note)
                 if f_new_note < 0 or f_new_note > 90:
                     print("Skipping note {}, out of permissible "
                         "range".format(f_note_str))
@@ -1813,11 +1813,11 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     f_dir, "{}-{}-{}.wav".format(
                         f_uid, f_base_file_name, f_note_str))
                 if f_algo == 0:
-                    f_proc = pydaw_util.pydaw_rubberband(
+                    f_proc = util.pydaw_rubberband(
                         f_path, f_file, f_stretch, f_i,
                         f_crispness, f_preserve_formants)
                 elif f_algo == 1:
-                    f_proc = pydaw_util.pydaw_sbsms(
+                    f_proc = util.pydaw_sbsms(
                         f_path, f_file, f_stretch, f_i)
                 f_file_list.append(f_file)
                 f_proc_list.append(f_proc)
@@ -1986,8 +1986,8 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             f_selected_path, f_filter = QFileDialog.getSaveFileName(
                 self.widget,
                 _("Select a directory to copy the samples to..."),
-                pydaw_util.global_home,
-                filter=pydaw_util.global_euphoria_file_type_string,
+                util.global_home,
+                filter=util.global_euphoria_file_type_string,
                 options=QFileDialog.DontUseNativeDialog,
             )
             if f_selected_path is not None:
@@ -1995,8 +1995,8 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                 if f_selected_path == "":
                     break
                 if not f_selected_path.endswith(
-                pydaw_util.global_euphoria_file_type_ext):
-                    f_selected_path += pydaw_util.global_euphoria_file_type_ext
+                util.global_euphoria_file_type_ext):
+                    f_selected_path += util.global_euphoria_file_type_ext
                 f_dir = os.path.dirname(f_selected_path)
                 if len(os.listdir(f_dir)) > 0:
                     f_answer = QMessageBox.warning(
@@ -2011,7 +2011,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                 f_plugin_file = pydaw_plugin_file.from_dict(
                     self.port_dict, {}, {})
                 f_result_str = "{}{}".format(f_sample_str, f_plugin_file)
-                pydaw_util.pydaw_write_file_text(f_selected_path, f_result_str)
+                util.pydaw_write_file_text(f_selected_path, f_result_str)
             else:
                 break
 
@@ -2019,8 +2019,8 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         f_selected_path, f_filter = QFileDialog.getOpenFileName(
             self.widget,
             _("Select a directory to move the samples to..."),
-            pydaw_util.global_home,
-            filter=pydaw_util.global_euphoria_file_type_string,
+            util.global_home,
+            filter=util.global_euphoria_file_type_string,
             options=QFileDialog.DontUseNativeDialog,
         )
         if f_selected_path is not None:
@@ -2028,7 +2028,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             if f_selected_path == "":
                 return
             f_dir = os.path.dirname(f_selected_path)
-            f_file_str = pydaw_util.pydaw_read_file_text(f_selected_path)
+            f_file_str = util.pydaw_read_file_text(f_selected_path)
             self.clearAllSamples()
 
             for f_line in f_file_str.split("\n"):
@@ -2062,7 +2062,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             f_selected_path, f_filter = QFileDialog.getOpenFileName(
                 None,
                 _("Import SFZ instrument..."),
-                pydaw_util.global_home,
+                util.global_home,
                 filter="SFZ file (*.sfz)",
                 options=QFileDialog.DontUseNativeDialog,
             )
@@ -2072,7 +2072,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     return
                 try:
                     #Ensuring that it does not raise an exception
-                    pydaw_util.sfz_file(f_selected_path)
+                    util.sfz_file(f_selected_path)
                     f_file_lineedit.setText(f_selected_path)
                 except Exception as ex:
                     QMessageBox.warning(
@@ -2127,7 +2127,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
     def import_sfz(self, a_sfz_path):
         try:
             f_sfz_path = str(a_sfz_path)
-            f_sfz = pydaw_util.sfz_file(f_sfz_path)
+            f_sfz = util.sfz_file(f_sfz_path)
             f_sfz_dir = os.path.dirname(f_sfz_path)
             self.clearAllSamples()
 
@@ -2157,7 +2157,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     else:
                         assert False, "Unknown os.path.sep {}".format(
                             os.path.sep)
-                    f_new_file_path = pydaw_util.case_insensitive_path(
+                    f_new_file_path = util.case_insensitive_path(
                         f_new_file_path)
 
                     yield f_new_file_path
@@ -2199,7 +2199,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if "offset" in f_sample.dict:
                         f_val = (float(f_sample.dict["offset"]) /
                             f_frame_count) * 1000.0
-                        f_val = pydaw_util.pydaw_clip_value(f_val, 0.0, 998.0)
+                        f_val = util.pydaw_clip_value(f_val, 0.0, 998.0)
                         self.sample_starts[f_index].set_value(f_val)
                     else:
                         self.sample_starts[f_index].set_value(0.0)
@@ -2210,7 +2210,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if "end" in f_sample.dict:
                         f_val = (float(f_sample.dict["end"]) /
                             f_frame_count) * 1000.0
-                        f_val = pydaw_util.pydaw_clip_value(f_val, 1.0, 999.0)
+                        f_val = util.pydaw_clip_value(f_val, 1.0, 999.0)
                         self.sample_ends[f_index].set_value(f_val)
                     else:
                         self.sample_ends[f_index].set_value(999.0)
@@ -2233,7 +2233,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if "loop_start" in f_sample.dict:
                         f_val = (float(f_sample.dict["loop_start"]) /
                             f_frame_count) * 1000.0
-                        f_val = pydaw_util.pydaw_clip_value(f_val, 0.0, 1000.0)
+                        f_val = util.pydaw_clip_value(f_val, 0.0, 1000.0)
                         self.loop_starts[f_index].set_value(f_val)
                     else:
                         self.loop_starts[f_index].set_value(0.0)
@@ -2244,7 +2244,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if "loop_end" in f_sample.dict:
                         f_val = (float(f_sample.dict["loop_end"]) /
                             f_frame_count) * 1000.0
-                        f_val = pydaw_util.pydaw_clip_value(f_val, 0.0, 1000.0)
+                        f_val = util.pydaw_clip_value(f_val, 0.0, 1000.0)
                         self.loop_ends[f_index].set_value(f_val)
                     else:
                         self.loop_ends[f_index].set_value(1000.0)
@@ -2254,7 +2254,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
                     if "volume" in f_sample.dict:
                         f_val = int(float(f_sample.dict["volume"]))
-                        f_val = pydaw_util.pydaw_clip_value(f_val, -40, 12)
+                        f_val = util.pydaw_clip_value(f_val, -40, 12)
                         self.sample_vols[f_index].set_value(f_val)
                         self.sample_vols[f_index].control_value_changed(f_val)
 

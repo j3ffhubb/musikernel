@@ -23,8 +23,8 @@ f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "../.."))
 sys.path.insert(0, f_parent_dir)
 from mkpy.mkqt import *
 
-from mkpy.libpydaw import pydaw_util, portaudio, portmidi
-from mkpy.libpydaw.translate import _, global_encoding
+from mkpy.lib import util, portaudio, portmidi
+from mkpy.lib.translate import _, global_encoding
 
 f_device_tooltip = _(
 """
@@ -117,13 +117,13 @@ HOST_API_TOOLTIP = _("""Select the host API to list devices for in the
 "Audio Device" dropdown.
 """)
 
-if pydaw_util.IS_LINUX:
+if util.IS_LINUX:
     HOST_API_TOOLTIP += _("""
 Unless you are using Firewire (for which JACK is the only choice on Linux),
 it is recommended that you stop the JACK server and use your
 device directly using ALSA for best performance, stability and latency.
 """)
-elif pydaw_util.IS_WINDOWS:
+elif util.IS_WINDOWS:
     HOST_API_TOOLTIP += _("""
 If possible, you should use an API capable of low latency
 such as ASIO or WDM-KS.
@@ -133,7 +133,7 @@ DEVICE_TOOLTIP = _("""
 Select your audio interface from this list.
 """)
 
-class pydaw_device_dialog:
+class device_dialog:
     def __init__(self, a_is_running=False):
         self.devices_open = False
         self.is_running = a_is_running
@@ -142,17 +142,17 @@ class pydaw_device_dialog:
         self.buffer_sizes = ["32", "64", "128", "256", "512", "1024", "2048"]
 
     def open_devices(self):
-        if pydaw_util.IS_LINUX:
+        if util.IS_LINUX:
             f_portaudio_so_path = "libportaudio.so"
             f_pm_dll = "libportmidi.so"
-        elif pydaw_util.IS_MAC_OSX:
+        elif util.IS_MAC_OSX:
             f_portaudio_so_path = "libportaudio.dylib"
             f_pm_dll = "libportmidi.dylib"
-        elif pydaw_util.IS_WINDOWS:
+        elif util.IS_WINDOWS:
             f_pm_dll = os.path.join(
-                pydaw_util.BIN_DIR, "libportmidi.dll")
+                util.BIN_DIR, "libportmidi.dll")
             f_portaudio_so_path = os.path.join(
-                pydaw_util.BIN_DIR, "libportaudio-2.dll")
+                util.BIN_DIR, "libportaudio-2.dll")
         else:
             print("Unsupported platform {}, don't know where to look "
                 "for shared libraries.")
@@ -193,7 +193,7 @@ class pydaw_device_dialog:
             self.pypm.Pm_Terminate()
             print("Cleaning up...")
             for x in (self.pyaudio._handle, self.pypm._handle):
-                if pydaw_util.IS_WINDOWS:
+                if util.IS_WINDOWS:
                     _ctypes.FreeLibrary(x)
                 else:
                     _ctypes.dlclose(x)
@@ -210,7 +210,7 @@ class pydaw_device_dialog:
 #            traceback.print_stack()
 
     def check_device(self, a_splash_screen=None):
-        if not pydaw_util.global_device_val_dict:
+        if not util.global_device_val_dict:
             if a_splash_screen:
                 a_splash_screen.hide()
             self.show_device_dialog(
@@ -221,7 +221,7 @@ class pydaw_device_dialog:
                 a_splash_screen.show()
             return
         elif [x for x in ("hostApi", "name")
-        if x not in pydaw_util.global_device_val_dict]:
+        if x not in util.global_device_val_dict]:
             if a_splash_screen:
                 a_splash_screen.hide()
             self.show_device_dialog(
@@ -232,7 +232,7 @@ class pydaw_device_dialog:
                 a_splash_screen.show()
             return
 
-        f_device_str = pydaw_util.global_device_val_dict["name"]
+        f_device_str = util.global_device_val_dict["name"]
 
         self.open_devices()
 
@@ -251,7 +251,7 @@ class pydaw_device_dialog:
 
         if not f_device_str in f_audio_device_names:
             print("{} not in {}".format(f_device_str, f_audio_device_names))
-            pydaw_util.global_device_val_dict.pop("name")
+            util.global_device_val_dict.pop("name")
             if "(hw:" in f_device_str:
                 f_device_arr = f_device_str.split("(hw:")
                 f_device_name = f_device_arr[0]
@@ -264,11 +264,11 @@ class pydaw_device_dialog:
                             "ALSA hw:X number, fixing it all sneaky-like "
                             "in the background.  (grumble, grumble...)"))
                         print(f_device)
-                        pydaw_util.global_device_val_dict["name"] = f_device
+                        util.global_device_val_dict["name"] = f_device
                         f_file = open(
-                            pydaw_util.global_pydaw_device_config,
+                            util.global_pydaw_device_config,
                             "w", newline="\n")
-                        for k, v in pydaw_util.global_device_val_dict.items():
+                        for k, v in util.global_device_val_dict.items():
                             f_file.write("{}|{}\n".format(k, v))
                         f_file.write("\\")
                         f_file.close()
@@ -315,7 +315,7 @@ class pydaw_device_dialog:
 
         f_window.closeEvent = f_close_event
         f_window.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        f_window.setStyleSheet(pydaw_util.STYLESHEET)
+        f_window.setStyleSheet(util.STYLESHEET)
         f_window.setWindowTitle(_("Hardware Settings..."))
         f_main_layout = QVBoxLayout(f_window)
         f_tab_widget = QTabWidget()
@@ -340,7 +340,7 @@ class pydaw_device_dialog:
         f_device_name_combobox.setToolTip(DEVICE_TOOLTIP)
         f_device_name_combobox.setMinimumWidth(390)
         f_window_layout.addWidget(f_device_name_combobox, 5, 1)
-        if pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX:
+        if util.IS_WINDOWS or util.IS_MAC_OSX:
             f_window_layout.addWidget(QLabel(_("Input Device")), 6, 0)
             f_input_name_combobox = QComboBox()
             f_input_name_combobox.setMinimumWidth(390)
@@ -357,7 +357,7 @@ class pydaw_device_dialog:
         f_latency_label = QLabel("")
         f_window_layout.addWidget(f_latency_label, 20, 2)
 
-        if pydaw_util.IS_LINUX:
+        if util.IS_LINUX:
             f_window_layout.addWidget(QLabel(_("Audio Engine")), 40, 0)
             f_audio_engine_combobox = QComboBox()
             f_audio_engine_combobox.addItems([
@@ -377,11 +377,11 @@ class pydaw_device_dialog:
         f_window_layout.addWidget(QLabel(_("Worker Threads")), 30, 0)
         f_worker_threads_combobox = QComboBox()
         f_worker_threads_combobox.addItems(
-            [_("Auto")] + [str(x) for x in range(1, pydaw_util.CPU_COUNT + 1)])
+            [_("Auto")] + [str(x) for x in range(1, util.CPU_COUNT + 1)])
         f_worker_threads_combobox.setToolTip(THREADS_TOOLTIP)
         f_window_layout.addWidget(f_worker_threads_combobox, 30, 1)
 
-        if pydaw_util.IS_LINUX:
+        if util.IS_LINUX:
             f_thread_affinity_checkbox = QCheckBox(
                 _("Lock worker threads to own core?"))
             f_thread_affinity_checkbox.setToolTip(
@@ -499,7 +499,7 @@ class pydaw_device_dialog:
 #                    f_midi_device.contents.opened))
             if f_midi_device.contents.input == 1:
                 f_checkbox = QCheckBox(f_midi_device_name)
-                if f_midi_device_name in pydaw_util.MIDI_IN_DEVICES:
+                if f_midi_device_name in util.MIDI_IN_DEVICES:
                     f_checkbox.setChecked(True)
                 self.midi_in_checkboxes[f_midi_device_name] = f_checkbox
 
@@ -525,7 +525,7 @@ class pydaw_device_dialog:
             f_device_name_combobox.clear()
             f_device_name_combobox.addItems(
                 f_host_api_device_names[self.subsystem])
-            if pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX:
+            if util.IS_WINDOWS or util.IS_MAC_OSX:
                 f_input_name_combobox.clear()
                 f_input_name_combobox.addItems(
                     f_host_api_input_names[self.subsystem])
@@ -541,17 +541,17 @@ class pydaw_device_dialog:
             if f_samplerate in self.sample_rates:
                 f_samplerate_combobox.setCurrentIndex(
                     f_samplerate_combobox.findText(f_samplerate))
-            if not pydaw_util.IS_WINDOWS and not pydaw_util.IS_MAC_OSX:
+            if not util.IS_WINDOWS and not util.IS_MAC_OSX:
                 f_in_count = f_result_dict[
                     self.subsystem][self.device_name].maxInputChannels
-                f_in_count = pydaw_util.pydaw_clip_value(f_in_count, 0, 128)
+                f_in_count = util.pydaw_clip_value(f_in_count, 0, 128)
                 f_audio_in_spinbox.setMaximum(f_in_count)
                 f_audio_in_spinbox.setValue(
                     f_in_count if f_in_count < 16 else 16)
 
             f_out_count = f_result_dict[
                 self.subsystem][self.device_name].maxOutputChannels
-            f_out_count = pydaw_util.pydaw_clip_value(f_out_count, 0, 128)
+            f_out_count = util.pydaw_clip_value(f_out_count, 0, 128)
             if f_out_count == 1:
                 f_audio_out_spinbox.setMinimum(1)
             else:
@@ -566,7 +566,7 @@ class pydaw_device_dialog:
                 return
             f_in_count = f_result_dict[
                 self.subsystem][self.input_name].maxInputChannels
-            f_in_count = pydaw_util.pydaw_clip_value(f_in_count, 0, 128)
+            f_in_count = util.pydaw_clip_value(f_in_count, 0, 128)
             f_audio_in_spinbox.setMaximum(f_in_count)
             f_audio_in_spinbox.setValue(
                     f_in_count if f_in_count < 16 else 16)
@@ -595,9 +595,9 @@ class pydaw_device_dialog:
                     "please de-select some devices"))
                 return
             f_worker_threads = f_worker_threads_combobox.currentIndex()
-            if pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX:
+            if util.IS_WINDOWS or util.IS_MAC_OSX:
                 f_audio_engine = 8
-            elif pydaw_util.IS_LINUX:
+            elif util.IS_LINUX:
                 f_audio_engine = f_audio_engine_combobox.currentIndex()
                 f_thread_affinity = \
                     1 if f_thread_affinity_checkbox.isChecked() else 0
@@ -615,15 +615,15 @@ class pydaw_device_dialog:
                     or
                     not self.is_running
                     or
-                    "name" not in pydaw_util.global_device_val_dict
+                    "name" not in util.global_device_val_dict
                     or (
-                        pydaw_util.global_device_val_dict["name"]
+                        util.global_device_val_dict["name"]
                         !=
                         self.device_name
                     )
                 ):
                     if (
-                        (pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX)
+                        (util.IS_WINDOWS or util.IS_MAC_OSX)
                         and
                         f_audio_inputs
                     ):
@@ -643,17 +643,17 @@ class pydaw_device_dialog:
                     if not f_supported:
                         raise Exception()
                 f_file = open(
-                    pydaw_util.global_pydaw_device_config, "w", newline="\n")
+                    util.global_pydaw_device_config, "w", newline="\n")
                 f_file.write("hostApi|{}\n".format(self.subsystem))
                 f_file.write("name|{}\n".format(self.device_name))
-                if (pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX) \
+                if (util.IS_WINDOWS or util.IS_MAC_OSX) \
                 and self.input_name:
                     f_file.write("inputName|{}\n".format(self.input_name))
                 f_file.write("bufferSize|{}\n".format(f_buffer_size))
                 f_file.write("sampleRate|{}\n".format(f_samplerate))
                 f_file.write("threads|{}\n".format(f_worker_threads))
 
-                if pydaw_util.IS_LINUX:
+                if util.IS_LINUX:
                     f_file.write("audioEngine|{}\n".format(f_audio_engine))
                     f_file.write("threadAffinity|{}\n".format(
                         f_thread_affinity))
@@ -671,7 +671,7 @@ class pydaw_device_dialog:
                 self.dialog_result = True
 
                 time.sleep(1.0)
-                pydaw_util.pydaw_read_device_config()
+                util.pydaw_read_device_config()
                 f_window.close()
 
             except Exception as ex:
@@ -689,7 +689,7 @@ class pydaw_device_dialog:
 
         f_subsystem_combobox.currentIndexChanged.connect(subsystem_changed)
         f_device_name_combobox.currentIndexChanged.connect(combobox_changed)
-        if pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX:
+        if util.IS_WINDOWS or util.IS_MAC_OSX:
             f_input_name_combobox.currentIndexChanged.connect(
                 input_combobox_changed)
 
@@ -699,15 +699,15 @@ class pydaw_device_dialog:
             )
         )
 
-        if "hostApi" in pydaw_util.global_device_val_dict:
-            f_host_api = pydaw_util.global_device_val_dict["hostApi"]
+        if "hostApi" in util.global_device_val_dict:
+            f_host_api = util.global_device_val_dict["hostApi"]
             if f_host_api in f_host_api_device_names:
                 self.subsystem = f_host_api
                 f_subsystem_combobox.setCurrentIndex(
                     f_subsystem_combobox.findText(self.subsystem))
 
-                if "name" in pydaw_util.global_device_val_dict:
-                    f_name = pydaw_util.global_device_val_dict["name"]
+                if "name" in util.global_device_val_dict:
+                    f_name = util.global_device_val_dict["name"]
                     if f_name in f_result_dict[self.subsystem]:
                         f_device_name_combobox.setCurrentIndex(
                             f_device_name_combobox.findText(f_name))
@@ -720,55 +720,55 @@ class pydaw_device_dialog:
                                     f_device_name_combobox.findText(f_dev))
                                 break
                 if (
-                    (pydaw_util.IS_WINDOWS or pydaw_util.IS_MAC_OSX)
+                    (util.IS_WINDOWS or util.IS_MAC_OSX)
                     and
-                    "inputName" in pydaw_util.global_device_val_dict
+                    "inputName" in util.global_device_val_dict
                 ):
-                    f_name = pydaw_util.global_device_val_dict["inputName"]
+                    f_name = util.global_device_val_dict["inputName"]
                     if f_name in f_result_dict[self.subsystem]:
                         f_input_name_combobox.setCurrentIndex(
                             f_input_name_combobox.findText(f_name))
 
-        if "audioInputs" in pydaw_util.global_device_val_dict:
-            f_count = int(pydaw_util.global_device_val_dict["audioInputs"])
+        if "audioInputs" in util.global_device_val_dict:
+            f_count = int(util.global_device_val_dict["audioInputs"])
             f_audio_in_spinbox.setValue(f_count)
 
-        if "audioOutputs" in pydaw_util.global_device_val_dict:
+        if "audioOutputs" in util.global_device_val_dict:
             f_count, f_L, f_R = (int(x) for x in
-                pydaw_util.global_device_val_dict["audioOutputs"].split("|"))
+                util.global_device_val_dict["audioOutputs"].split("|"))
             f_audio_out_spinbox.setValue(f_count)
             f_default_L.setValue(f_L)
             f_default_R.setValue(f_R)
 
-        if "bufferSize" in pydaw_util.global_device_val_dict and \
-        pydaw_util.global_device_val_dict["bufferSize"] in self.buffer_sizes:
+        if "bufferSize" in util.global_device_val_dict and \
+        util.global_device_val_dict["bufferSize"] in self.buffer_sizes:
             f_buffer_size_combobox.setCurrentIndex(
                 f_buffer_size_combobox.findText(
-                    pydaw_util.global_device_val_dict["bufferSize"]))
+                    util.global_device_val_dict["bufferSize"]))
 
-        if "sampleRate" in pydaw_util.global_device_val_dict and \
-        pydaw_util.global_device_val_dict["sampleRate"] in self.sample_rates:
+        if "sampleRate" in util.global_device_val_dict and \
+        util.global_device_val_dict["sampleRate"] in self.sample_rates:
             f_samplerate_combobox.setCurrentIndex(
                 f_samplerate_combobox.findText(
-                    pydaw_util.global_device_val_dict["sampleRate"]))
+                    util.global_device_val_dict["sampleRate"]))
 
-        if "threads" in pydaw_util.global_device_val_dict:
+        if "threads" in util.global_device_val_dict:
             f_worker_threads_combobox.setCurrentIndex(
-                int(pydaw_util.global_device_val_dict["threads"]))
+                int(util.global_device_val_dict["threads"]))
 
-        if pydaw_util.IS_LINUX:
-            if "threadAffinity" in pydaw_util.global_device_val_dict:
-                if int(pydaw_util.global_device_val_dict[
+        if util.IS_LINUX:
+            if "threadAffinity" in util.global_device_val_dict:
+                if int(util.global_device_val_dict[
                 "threadAffinity"]) == 1:
                     f_thread_affinity_checkbox.setChecked(True)
 
-            if "hugePages" in pydaw_util.global_device_val_dict and \
-            int(pydaw_util.global_device_val_dict["hugePages"]) == 1:
+            if "hugePages" in util.global_device_val_dict and \
+            int(util.global_device_val_dict["hugePages"]) == 1:
                 f_hugepages_checkbox.setChecked(True)
 
-            if "audioEngine" in pydaw_util.global_device_val_dict:
+            if "audioEngine" in util.global_device_val_dict:
                 f_audio_engine_combobox.setCurrentIndex(
-                    int(pydaw_util.global_device_val_dict["audioEngine"]))
+                    int(util.global_device_val_dict["audioEngine"]))
 
         if a_msg is not None:
             QMessageBox.warning(f_window, _("Error"), a_msg)
@@ -788,15 +788,15 @@ class pydaw_device_dialog:
             f_window.show()
 
 if __name__ == "__main__":
-    def _pydaw_device_dialog_standalone():
+    def _device_dialog_standalone():
         app = QApplication(sys.argv)
         if len(sys.argv) == 2:
             f_msg = sys.argv[1]
         else:
             f_msg = None
 
-        f_pydaw_device_dialog = pydaw_device_dialog()
-        f_pydaw_device_dialog.show_device_dialog(f_msg)
+        f_device_dialog = device_dialog()
+        f_device_dialog.show_device_dialog(f_msg)
         sys.exit(app.exec_())
 
-    _pydaw_device_dialog_standalone()
+    _device_dialog_standalone()

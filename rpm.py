@@ -150,22 +150,22 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755, root, root) %{{_usr}}/bin/{0}.py
 %attr(755, root, root) %{{_usr}}/bin/{0}-engine-dbg
 %attr(755, root, root) %{{_usr}}/bin/{0}-engine-no-root
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/scripts/pydaw_paulstretch.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/scripts/paulstretch.py
 %attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/main.py
 %attr(755, root, root) %{{_usr}}/lib/{0}/sbsms/bin/sbsms
 %attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/scripts/project_recover.py
-%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/pydaw_device_dialog.py
+%attr(755, root, root) %{{_usr}}/lib/{0}/pydaw/mkpy/lib/device_dialog.py
 
 %{{_usr}}/lib/{0}/pydaw/mkengine/{0}.so
 %{{_usr}}/lib/{0}/presets/MODULEX.mkp
 %{{_usr}}/lib/{0}/presets/RAYV.mkp
 %{{_usr}}/lib/{0}/presets/RAYV2.mkp
 %{{_usr}}/lib/{0}/presets/WAYV.mkp
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/portaudio.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/portmidi.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/pydaw_history.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/pydaw_util.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/portaudio.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/portmidi.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/history.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/util.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/widgets/__init__.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/widgets/_shared.py
@@ -204,9 +204,9 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/mkpy/widgets/spectrum.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/widgets/va_osc.py
 
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/staging.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/super_formant_maker.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/translate.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/staging.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/super_formant_maker.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/translate.py
 %{{_usr}}/lib/{0}/major-version.txt
 %{{_usr}}/lib/{0}/minor-version.txt
 
@@ -294,8 +294,8 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/pydaw/mkpy/mkqt.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/__init__.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/strings.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/libpydaw/scales.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/strings.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/scales.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/plugins/__init__.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/plugins/euphoria.py

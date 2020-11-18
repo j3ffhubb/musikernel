@@ -14,7 +14,7 @@ GNU General Public License for more details.
 """
 
 
-from mkpy.libpydaw.pydaw_util import INSTALL_PREFIX
+from mkpy.lib.util import INSTALL_PREFIX
 
 import locale
 import gettext

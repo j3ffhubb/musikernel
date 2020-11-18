@@ -1,4 +1,4 @@
-from mkpy.libpydaw import pydaw_util
+from mkpy.lib import util
 
 
 class pydaw_modulex_settings:
@@ -18,7 +18,7 @@ class pydaw_modulex_settings:
     def __str__(self):
         return "|{}".format(
             "|".join(
-                pydaw_util.proj_file_str(x)
+                util.proj_file_str(x)
                 for x in (
                     self.knobs[0],
                     self.knobs[1],

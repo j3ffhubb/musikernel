@@ -1,9 +1,9 @@
-from mkpy.libpydaw import pydaw_util
+from mkpy.lib import util
 from mkpy.mkqt import *
 import os
 
 
-PYSOUND_FOLDER = os.path.join(pydaw_util.global_pydaw_home, "presets")
+PYSOUND_FOLDER = os.path.join(util.global_pydaw_home, "presets")
 
 class pysound_file:
     """ Pre-production, work in progress... """

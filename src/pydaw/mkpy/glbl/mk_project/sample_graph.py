@@ -1,5 +1,5 @@
-from mkpy.libpydaw import *
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib import *
+from mkpy.lib.util import *
 from mkpy.mkqt import *
 import numpy
 import os
@@ -174,7 +174,7 @@ class pydaw_sample_graph:
             f_ss = a_audio_item.sample_start * 0.001
             f_se = a_audio_item.sample_end * 0.001
             #f_width_frac = f_se - f_ss
-            f_vol = pydaw_util.pydaw_db_to_lin(a_audio_item.vol)
+            f_vol = util.pydaw_db_to_lin(a_audio_item.vol)
             f_len = len(self.high_peaks[0])
             f_slice_low = int(f_ss * f_len)
             f_slice_high = int(f_se * f_len)

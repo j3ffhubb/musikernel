@@ -2,8 +2,8 @@ from .  import _shared
 from mkpy import glbl
 from mkpy.daw import shared
 from mkpy.daw.project import *
-from mkpy.libpydaw.translate import _
-from mkpy.libpydaw import pydaw_util
+from mkpy.lib.translate import _
+from mkpy.lib import util
 from mkpy.mkqt import *
 
 

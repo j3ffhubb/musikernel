@@ -8,9 +8,9 @@ from mkpy import glbl
 from mkpy import plugins as _plugins
 from mkpy.daw.osc import DawOsc
 from mkpy.glbl.mk_project import *
-from mkpy.libpydaw import pydaw_history
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib import history
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import os
 import re
@@ -53,10 +53,10 @@ class DawProject(glbl.AbstractProject):
             self, a_folder, a_file, a_text, a_force_new)
         if f_result:
             f_existed, f_old = f_result
-            f_history_file = pydaw_history.pydaw_history_file(
+            f_history_file = history.history_file(
                 a_folder, a_file, a_text, f_old, f_existed)
             self.history_files.append(f_history_file)
-            if not pydaw_util.IS_A_TTY:
+            if not util.IS_A_TTY:
                 print(str(f_history_file))
 
     def set_undo_context(self, a_context):
@@ -74,7 +74,7 @@ class DawProject(glbl.AbstractProject):
                 self.undo_context][:self.history_undo_cursor]
             self.history_undo_cursor = 0
         if self.history_files and not a_discard:
-            f_commit = pydaw_history.pydaw_history_commit(
+            f_commit = history.history_commit(
                 self.history_files, a_message)
             self.history_commits[self.undo_context].append(f_commit)
         self.history_files = []
@@ -538,8 +538,8 @@ class DawProject(glbl.AbstractProject):
                 f_start = (f_audio_frame / f_frames) * 1000.0
                 f_end = 1000.0
                 #(f_audio_frame / (f_frames + a_sample_count)) * 1000.0
-                f_start = pydaw_util.pydaw_clip_value(f_start, 0.0, f_end)
-                f_end = pydaw_util.pydaw_clip_value(f_end, f_start, 1000.0)
+                f_start = util.pydaw_clip_value(f_start, 0.0, f_end)
+                f_end = util.pydaw_clip_value(f_end, f_start, 1000.0)
                 f_audio_item = DawAudioItem(
                     f_uid, a_sample_start=f_start, a_sample_end=f_end,
                     a_output_track=f_mode, a_lane_num=f_lane)
@@ -639,7 +639,7 @@ class DawProject(glbl.AbstractProject):
                 self.rec_item.add_cc(f_cc)
             elif f_type == "pb":
                 f_val = float(f_event[3]) / 8192.0
-                f_val = pydaw_util.pydaw_clip_value(f_val, -1.0, 1.0)
+                f_val = util.pydaw_clip_value(f_val, -1.0, 1.0)
                 f_pb = pydaw_pitchbend(f_beat, f_val)
                 self.rec_item.add_pb(f_pb)
             else:
@@ -771,7 +771,7 @@ class DawProject(glbl.AbstractProject):
                 self.pixmap_cache_unscaled[a_uid] = f_path
             if a_uid not in self.painter_path_cache:
                 self.painter_path_cache[a_uid] = {}
-            f_x, f_y = pydaw_util.scale_sizes(
+            f_x, f_y = util.scale_sizes(
                 PIXMAP_BEAT_WIDTH,
                 PIXMAP_TILE_HEIGHT,
                 a_px_per_beat,

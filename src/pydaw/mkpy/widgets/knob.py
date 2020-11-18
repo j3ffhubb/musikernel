@@ -1,6 +1,6 @@
 from mkpy import glbl
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import os
 
@@ -38,9 +38,9 @@ class PixmapKnobCache:
         return self.cache[a_size]
 
 DEFAULT_KNOB_FG_PIXMAP_CACHE = PixmapKnobCache(
-    os.path.join(pydaw_util.STYLESHEET_DIR, "knob-fg.png"))
+    os.path.join(util.STYLESHEET_DIR, "knob-fg.png"))
 DEFAULT_KNOB_BG_PIXMAP_CACHE = PixmapKnobCache(
-    os.path.join(pydaw_util.STYLESHEET_DIR, "knob-bg.png"))
+    os.path.join(util.STYLESHEET_DIR, "knob-bg.png"))
 
 class pydaw_pixmap_knob(QDial):
     def __init__(
@@ -128,7 +128,7 @@ class pydaw_pixmap_knob(QDial):
             f_diff_y = self.orig_y - f_y
             f_val = ((f_diff_y * self.val_step) +
                 (f_diff_x * self.val_step_small)) + self.orig_value
-        f_val = pydaw_util.pydaw_clip_value(
+        f_val = util.pydaw_clip_value(
             f_val, self.minimum(), self.maximum())
         f_val = int(f_val)
         if f_val != self.value():

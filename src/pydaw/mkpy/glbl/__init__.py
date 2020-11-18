@@ -7,13 +7,13 @@ import datetime
 import os
 import traceback
 
-from mkpy.libpydaw import pydaw_util
-from mkpy.libpydaw.translate import _
+from mkpy.lib import util
+from mkpy.lib.translate import _
 
 if (
-    pydaw_util.IS_LINUX
+    util.IS_LINUX
     and
-    not pydaw_util.IS_ENGINE_LIB
+    not util.IS_ENGINE_LIB
 ):
     from mkpy.vendor import liblo
 
@@ -38,7 +38,7 @@ OSC = None
 PROJECT = None
 PLUGIN_UI_DICT = None
 CURRENT_HOST = 0
-TOOLTIPS_ENABLED = pydaw_util.get_file_setting("tooltips", int, 1)
+TOOLTIPS_ENABLED = util.get_file_setting("tooltips", int, 1)
 MEMORY_ENTROPY = datetime.timedelta(minutes=0)
 MEMORY_ENTROPY_LIMIT = datetime.timedelta(minutes=30)
 MEMORY_ENTROPY_UIDS = set()
@@ -56,7 +56,7 @@ def clean_wav_pool():
         print(host, uids)
         result.update(uids)
 
-    if pydaw_util.USE_HUGEPAGES:
+    if util.USE_HUGEPAGES:
         for f_uid in (x for x in result if x in MEMORY_ENTROPY_UIDS):
             MEMORY_ENTROPY_UIDS.remove(f_uid)
     #invert
@@ -69,7 +69,7 @@ def clean_wav_pool():
         f_msg = "|".join(str(x) for x in sorted(f_result))
         IPC.clean_wavpool(f_msg)
 
-    if pydaw_util.USE_HUGEPAGES:
+    if util.USE_HUGEPAGES:
         for f_uid in (x for x in f_result if x not in MEMORY_ENTROPY_UIDS):
             MEMORY_ENTROPY_UIDS.add(f_uid)
             f_sg = PROJECT.get_sample_graph_by_uid(f_uid)
@@ -96,7 +96,7 @@ def add_entropy(a_timedelta):
         return False
 
 def restart_engine():
-    if pydaw_util.IS_ENGINE_LIB:
+    if util.IS_ENGINE_LIB:
         print("Not restarting engine because the engine is running "
             "as a shared library")
     else:
@@ -114,7 +114,7 @@ def set_window_title():
         os.path.join(
             PROJECT.project_folder, '{}.{}'.format(
                 PROJECT.project_file,
-                pydaw_util.global_pydaw_version_string))))
+                util.global_pydaw_version_string))))
 
 def pydaw_print_generic_exception(a_ex):
     QMessageBox.warning(
@@ -142,8 +142,8 @@ class AbstractIPC:
                 "Would've sent configure message: key: \""
                 "{}\" value: \"{}\"".format(key, value))
             return
-        if pydaw_util.IS_ENGINE_LIB:
-            pydaw_util.engine_lib_configure(self.configure_path, key, value)
+        if util.IS_ENGINE_LIB:
+            util.engine_lib_configure(self.configure_path, key, value)
         elif self.with_osc:
             liblo.send(OSC, self.configure_path, key, value)
         else:
@@ -178,14 +178,14 @@ class AbstractProject:
         f_full_path = os.path.join(
             *(str(x) for x in (self.project_folder, a_folder, a_file)))
         if not a_force_new and os.path.isfile(f_full_path):
-            f_old = pydaw_util.pydaw_read_file_text(f_full_path)
+            f_old = util.pydaw_read_file_text(f_full_path)
             if f_old == a_text:
                 return None
             f_existed = 1
         else:
             f_old = ""
             f_existed = 0
-        pydaw_util.pydaw_write_file_text(f_full_path, a_text)
+        util.pydaw_write_file_text(f_full_path, a_text)
         return f_existed, f_old
 
     def get_track_plugins(self, a_track_num):
@@ -225,7 +225,7 @@ class AbstractTransport:
     pass
 
 DEFAULT_TRACK_COLORS = [
-    QColor(x) for x in pydaw_util.COLOR_PALETTE["DEFAULT_TRACK_COLORS"]]
+    QColor(x) for x in util.COLOR_PALETTE["DEFAULT_TRACK_COLORS"]]
 
 class TrackColors:
     def __init__(self):

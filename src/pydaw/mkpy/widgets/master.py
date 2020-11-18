@@ -1,7 +1,7 @@
 from . import _shared
 from .control import *
 from .note_selector import pydaw_note_selector_widget
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 
 

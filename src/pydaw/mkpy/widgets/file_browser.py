@@ -1,12 +1,12 @@
-from mkpy.libpydaw import pydaw_util
+from mkpy.lib import util
 from mkpy import glbl
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import os
 import shutil
 
 class AbstractFileBrowserWidget():
-    def __init__(self, a_filter_func=pydaw_util.is_audio_file):
+    def __init__(self, a_filter_func=util.is_audio_file):
         self.scroll_dict = {}
         self.filter_func = a_filter_func
         self.hsplitter = QSplitter(QtCore.Qt.Horizontal)
@@ -118,8 +118,8 @@ class AbstractFileBrowserWidget():
         self.refresh_button.pressed.connect(self.on_refresh)
         self.file_vlayout.addLayout(self.file_hlayout)
 
-        self.last_open_dir = pydaw_util.global_home
-        self.history = [pydaw_util.global_home]
+        self.last_open_dir = util.global_home
+        self.history = [util.global_home]
         self.set_folder(".")
         self.open_bookmarks()
         self.modulex_clipboard = None
@@ -147,7 +147,7 @@ class AbstractFileBrowserWidget():
         f_file, f_filter = QFileDialog.getSaveFileName(
             parent=self.bookmarks_tab,
             caption=_('Save bookmark file...'),
-            directory=pydaw_util.global_home,
+            directory=util.global_home,
             filter=BM_FILE_DIALOG_STRING,
             options=QFileDialog.DontUseNativeDialog,
         )
@@ -155,19 +155,19 @@ class AbstractFileBrowserWidget():
             f_file = str(f_file)
             if not f_file.endswith(".pybm4"):
                 f_file += ".pybm4"
-            shutil.copy(pydaw_util.BOOKMARKS_FILE, f_file)
+            shutil.copy(util.BOOKMARKS_FILE, f_file)
 
     def on_bookmark_open(self):
         f_file, f_filter = QFileDialog.getOpenFileName(
             parent=self.bookmarks_tab,
             caption=_('Open bookmark file...'),
-            directory=pydaw_util.global_home,
+            directory=util.global_home,
             filter=BM_FILE_DIALOG_STRING,
             options=QFileDialog.DontUseNativeDialog,
         )
         if not f_file is None and not str(f_file) == "":
             f_file = str(f_file)
-            shutil.copy(f_file, pydaw_util.BOOKMARKS_FILE)
+            shutil.copy(f_file, util.BOOKMARKS_FILE)
             self.open_bookmarks()
 
     def on_refresh(self):
@@ -190,13 +190,13 @@ class AbstractFileBrowserWidget():
         f_menu.exec_(QCursor.pos())
 
     def up_contextMenuEvent(self, a_event):
-        if (pydaw_util.IS_LINUX and self.last_open_dir != "/") or (
-        pydaw_util.IS_WINDOWS and self.last_open_dir):
+        if (util.IS_LINUX and self.last_open_dir != "/") or (
+        util.IS_WINDOWS and self.last_open_dir):
             f_menu = QMenu(self.up_button)
             f_menu.triggered.connect(self.open_path_from_action)
             f_arr = self.last_open_dir.split(os.path.sep)
             f_paths = []
-            if pydaw_util.IS_WINDOWS:
+            if util.IS_WINDOWS:
                 for f_i in range(1, len(f_arr)):
                     f_paths.append("\\".join(f_arr[:f_i]))
                 f_paths[0] += "\\"
@@ -207,7 +207,7 @@ class AbstractFileBrowserWidget():
             for f_path in reversed(f_paths):
                 f_action = f_menu.addAction(f_path)
                 f_action.path = f_path
-            if pydaw_util.IS_WINDOWS:
+            if util.IS_WINDOWS:
                 f_action = f_menu.addAction("")
                 f_action.path = ""
             f_menu.exec_(QCursor.pos())
@@ -236,7 +236,7 @@ class AbstractFileBrowserWidget():
 
     def open_bookmarks(self):
         self.list_bookmarks.clear()
-        f_dict = pydaw_util.global_get_file_bookmarks()
+        f_dict = util.global_get_file_bookmarks()
         for k in sorted(f_dict.keys(), key=lambda s: s.lower()):
             f_parent = QTreeWidgetItem()
             f_parent.setText(0, k)
@@ -261,7 +261,7 @@ class AbstractFileBrowserWidget():
                 for f_i in range(dir_list_widget.count()):
                     item = dir_list_widget.item(f_i)
                     if not item.isHidden() and item.isSelected():
-                         pydaw_util.global_add_file_bookmark(
+                         util.global_add_file_bookmark(
                              item.dirname_abbrev[-30:], item.dir_name, f_text)
                          added_bm = True
                 if not added_bm:
@@ -274,7 +274,7 @@ class AbstractFileBrowserWidget():
                     QMessageBox.warning(
                         f_window, _("Error"), _("Name cannot be empty"))
                     return
-                pydaw_util.global_add_file_bookmark(
+                util.global_add_file_bookmark(
                     f_val, self.last_open_dir, f_text)
             self.open_bookmarks()
             if not a_recursive:
@@ -297,7 +297,7 @@ class AbstractFileBrowserWidget():
         f_window.setLayout(f_layout)
         f_grid_layout = QGridLayout()
         f_layout.addLayout(f_grid_layout)
-        f_dict = pydaw_util.global_get_file_bookmarks()
+        f_dict = util.global_get_file_bookmarks()
         if not f_dict:
             f_dict = {'default':None}
         f_grid_layout.addWidget(QLabel(_("Category:")), 0, 0)
@@ -382,7 +382,7 @@ class AbstractFileBrowserWidget():
         f_parent = a_item.parent()
         if f_parent is not None:
             f_parent_str = str(f_parent.text(0))
-            f_dict = pydaw_util.global_get_file_bookmarks()
+            f_dict = util.global_get_file_bookmarks()
             f_folder_name = str(a_item.text(0))
             if f_parent_str in f_dict:
                 if f_folder_name in f_dict[f_parent_str]:
@@ -403,10 +403,10 @@ class AbstractFileBrowserWidget():
                 f_parent = f_items[0]
                 for f_i in range(f_parent.childCount()):
                     f_child = f_parent.child(f_i)
-                    pydaw_util.global_delete_file_bookmark(
+                    util.global_delete_file_bookmark(
                         f_parent.text(0), f_child.text(0))
             else:
-                pydaw_util.global_delete_file_bookmark(
+                util.global_delete_file_bookmark(
                     f_parent.text(0), f_items[0].text(0))
                 self.list_bookmarks.clear()
             self.open_bookmarks()
@@ -435,13 +435,13 @@ class AbstractFileBrowserWidget():
         if a_full_path and a_folder:  # a_folder being empty is handled...
             self.last_open_dir = a_folder
         else:
-            if pydaw_util.IS_WINDOWS and (
+            if util.IS_WINDOWS and (
             (a_full_path and not a_folder) or #...here, should be Windows only
             (not a_full_path and len(self.last_open_dir) == 3
             and a_folder == "..")):
                 self.last_open_dir = ""
                 self.folder_path_lineedit.setText("")
-                for drive, label in pydaw_util.get_win_drives():
+                for drive, label in util.get_win_drives():
                     f_item = QListWidgetItem(drive)
                     f_item.setToolTip(label)
                     self.list_folder.addItem(f_item)
@@ -474,7 +474,7 @@ class AbstractFileBrowserWidget():
                     self.list_folder.addItem(f_item)
                 elif self.filter_func(f_file) and \
                 os.path.isfile(f_full_path):
-                    if not pydaw_util.pydaw_str_has_bad_chars(f_full_path):
+                    if not util.pydaw_str_has_bad_chars(f_full_path):
                         f_item = QListWidgetItem(f_file)
                         f_item.setToolTip(f_file)
                         self.list_file.addItem(f_item)
@@ -482,7 +482,7 @@ class AbstractFileBrowserWidget():
                         QMessageBox.warning(self.widget, _("Error"),
                         _("Not adding '{}' because it contains bad chars, "
                         "you must rename this file path without:\n{}").format(
-                        f_full_path, "\n".join(pydaw_util.pydaw_bad_chars)))
+                        f_full_path, "\n".join(util.pydaw_bad_chars)))
         self.on_filter_files()
         self.on_filter_folders()
         if self.last_open_dir in self.scroll_dict:

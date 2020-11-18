@@ -1,6 +1,6 @@
 from mkpy.glbl.mk_project import *
-from mkpy.libpydaw.pydaw_util import *
-from mkpy.libpydaw.translate import _
+from mkpy.lib.util import *
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import numpy
 
@@ -62,8 +62,8 @@ def envelope_to_automation(self, a_is_cc, a_tempo):
     f_result = []
     f_arr = numpy.array(f_list)
     #  Smooth the array by sampling smaller and then larger
-    f_arr = pydaw_util.np_resample(f_arr, int(f_length_beats * 4.0))
-    f_arr = pydaw_util.np_resample(f_arr, f_point_count)
+    f_arr = util.np_resample(f_arr, int(f_length_beats * 4.0))
+    f_arr = util.np_resample(f_arr, f_point_count)
     f_max = numpy.amax(f_arr)
     if f_max > 0.0:
         f_arr *= (1.0 / f_max)
@@ -91,7 +91,7 @@ def envelope_to_notes(self, a_tempo):
     print("Resampling {} to {}".format(len(f_list), f_point_count))
     f_result = []
     f_arr = numpy.array(f_list)
-    f_arr = pydaw_util.np_resample(f_arr, f_point_count)
+    f_arr = util.np_resample(f_arr, f_point_count)
     f_current_note = None
     f_max = numpy.amax(f_arr)
     if f_max > 0.0:

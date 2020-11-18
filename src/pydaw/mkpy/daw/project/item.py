@@ -2,9 +2,9 @@ from . import _shared
 from .audio_item import DawAudioItem
 from mkpy import glbl
 from mkpy.glbl.mk_project import *
-from mkpy.libpydaw.pydaw_util import *
+from mkpy.lib.util import *
 from mkpy.widgets import pydaw_modulex_settings
-from mkpy.libpydaw.translate import _
+from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import traceback
 
@@ -55,7 +55,7 @@ class pydaw_item:
                 set(x.note_num for x in self.notes), reverse=True)
             f_note_h_area = (a_height * 0.6)
             f_note_height = round(f_note_h_area / len(f_note_set))
-            f_note_height = pydaw_util.pydaw_clip_max(
+            f_note_height = util.pydaw_clip_max(
                 f_note_height, a_height * 0.1)
             f_min = 1.0 - (min(f_note_set) / 127.0)
             f_note_bias = (f_note_h_area -
