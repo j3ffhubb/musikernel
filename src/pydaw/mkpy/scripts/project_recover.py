@@ -26,7 +26,10 @@ sys.path.insert(0, f_parent_dir)
 
 from mkpy.lib.translate import _
 from mkpy.mkqt import *
-import mkpy.lib.util as util
+from mkpy.lib import (
+    theme,
+    util,
+)
 
 class project_history_widget(QTreeWidget):
     def __init__(self, a_backup_dir, a_backup_file, a_project_dir):
@@ -102,7 +105,7 @@ class project_history_widget(QTreeWidget):
 
 def project_recover_dialog(a_file):
     f_window = QMainWindow()
-    f_window.setStyleSheet(util.STYLESHEET)
+    f_window.setStyleSheet(theme.STYLESHEET)
     f_window.setWindowState(QtCore.Qt.WindowMaximized)
     f_window.setWindowTitle("Project History")
     if a_file is None:

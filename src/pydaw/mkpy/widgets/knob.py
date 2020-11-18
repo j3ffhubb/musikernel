@@ -1,5 +1,8 @@
 from mkpy import glbl
-from mkpy.lib import util
+from mkpy.lib import (
+    theme,
+    util,
+)
 from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import os
@@ -38,9 +41,9 @@ class PixmapKnobCache:
         return self.cache[a_size]
 
 DEFAULT_KNOB_FG_PIXMAP_CACHE = PixmapKnobCache(
-    os.path.join(util.STYLESHEET_DIR, "knob-fg.png"))
+    os.path.join(theme.STYLESHEET_DIR, "knob-fg.png"))
 DEFAULT_KNOB_BG_PIXMAP_CACHE = PixmapKnobCache(
-    os.path.join(util.STYLESHEET_DIR, "knob-bg.png"))
+    os.path.join(theme.STYLESHEET_DIR, "knob-bg.png"))
 
 class pydaw_pixmap_knob(QDial):
     def __init__(

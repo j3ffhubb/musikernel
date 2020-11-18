@@ -124,16 +124,8 @@ ENGINE_LIB_THREAD = None
 ENGINE_LIB_CALLBACK = None
 ENGINE_LIB_CALLBACK_SIG = None
 
-ICON_PATH = os.path.join(
-    INSTALL_PREFIX, "share", "pixmaps",
-    "{}.png".format(global_pydaw_version_string))
-
-print("ICON_PATH = '{}'".format(ICON_PATH))
-
 if IS_WINDOWS:
     DLL_EXT = ".dll"
-    ICON_PATH = os.path.join(
-        INSTALL_PREFIX, "{}.ico".format(global_pydaw_version_string))
 elif IS_LINUX:
     DLL_EXT = ".so"
 elif IS_MAC_OSX:
@@ -228,14 +220,6 @@ def pydaw_set_bin_path():
     BIN_PATH = os.path.join(
         INSTALL_PREFIX, "bin",
         "{}-engine".format(global_pydaw_version_string))
-
-
-def pydaw_escape_stylesheet(a_stylesheet, a_path):
-    f_dir = os.path.dirname(str(a_path))
-    if IS_WINDOWS:
-        f_dir = f_dir[0].lower() + f_dir[1:].replace("\\", "/")
-    f_result = a_stylesheet.replace("$STYLE_FOLDER", f_dir)
-    return f_result
 
 def check_for_rw_perms(a_parent, a_file):
     if not os.access(os.path.dirname(str(a_file)), os.W_OK):
@@ -621,40 +605,6 @@ class MidiEvent:
 
     def __lt__(self, other):
         return self.start_beat < other.start_beat
-
-def load_midi_file(a_file):
-    f_midi_text_arr = mido.MidiFile(str(a_file))
-    #First fix the lengths of events that have note-off events
-    f_note_on_dict = {}
-    f_item_list = []
-    f_pos = 0
-    f_sec_per_beat = 0.5
-    for f_ev in f_midi_text_arr:
-        if f_ev.type == "set_tempo":
-            f_sec_per_beat = f_ev.tempo / 1000000.0
-        elif f_ev.type == "note_off" or (
-        f_ev.type == "note_on" and f_ev.velocity == 0):
-            f_tuple = (f_ev.channel, f_ev.note)
-            if f_tuple in f_note_on_dict:
-                f_event = f_note_on_dict[f_tuple]
-                f_event.length = f_pos - f_event.start_beat
-                f_item_list.append(f_event)
-                f_note_on_dict.pop(f_tuple)
-            else:
-                print("Error, note-off event does not correspond to a "
-                      "note-on event, ignoring event:\n{}".format(f_ev))
-        elif f_ev.type == "note_on":
-            f_event = MidiEvent(f_ev, f_pos)
-            f_tuple = (f_ev.channel, f_ev.note)
-            if f_tuple in f_note_on_dict:
-                f_note_on_dict[f_tuple].length = f_pos - f_event.start_beat
-            f_note_on_dict[f_tuple] = f_event
-        else:
-            print("Ignoring event: {}".format(f_ev))
-        f_pos += f_ev.time / f_sec_per_beat
-
-    f_item_list.sort()
-    return f_item_list
 
 def print_sorted_dict(a_dict):
     """ Mostly intended for printing locals() and globals() """
@@ -1128,55 +1078,12 @@ class sfz_file:
         return f_result
 
 
-DEFAULT_STYLESHEET_FILE = os.path.join(
-    INSTALL_PREFIX, "lib", global_pydaw_version_string,
-    "themes", "default", "default.pytheme")
-
-STYLESHEET_FILE = get_file_setting("default-style", str, None)
-
-if not (STYLESHEET_FILE and os.path.isfile(STYLESHEET_FILE)):
-    STYLESHEET_FILE = DEFAULT_STYLESHEET_FILE
-
-print("Using stylesheet " + STYLESHEET_FILE)
-STYLESHEET = pydaw_read_file_text(STYLESHEET_FILE)
-STYLESHEET = pydaw_escape_stylesheet(STYLESHEET, STYLESHEET_FILE)
-STYLESHEET_DIR = os.path.dirname(STYLESHEET_FILE)
-
 COLOR_PALETTE = {
     "DEFAULT_TRACK_COLORS":
         ["#ac1c1c", "#acac1c", "#ac1cac", "#1cac1c", "#1c1cac"],
     "SCENE_BACKGROUND_BRUSH": "#424242",
     "SEQUENCER_HEADER_BRUSH": "#1d1e22",
 }
-
-
-def load_color_palette():
-    css_hex_color_regex = re.compile("#(?:[0-9a-fA-F]{6})$")
-
-    def test_value(a_val):
-        if len(a_val) != 7 or not css_hex_color_regex.match(a_val):
-            raise Exception("Invalid value '{}'".format(a_val))
-
-    filename = os.path.join(STYLESHEET_DIR, "palette.json")
-    if os.path.isfile(filename):
-        print("Attempting to load '{}'".format(filename))
-        with open(filename) as fh:
-            try:
-                tmp_palette = ast.literal_eval(fh.read())
-                for k, v in tmp_palette.items():
-                    if k not in COLOR_PALETTE:
-                        print("Unknown key '{}'".format(k))
-                        continue
-                    if isinstance(v, list):
-                        for val in v:
-                            test_value(val)
-                    else:
-                        test_value(v)
-                    COLOR_PALETTE[k] = v
-            except Exception as ex:
-                print("Error loading color palette: {}".format(ex))
-
-load_color_palette()
 
 
 def pydaw_rgb_minus(a_rgb, a_amt):

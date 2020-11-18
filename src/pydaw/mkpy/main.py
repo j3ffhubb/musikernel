@@ -14,7 +14,11 @@ GNU General Public License for more details.
 """
 
 from .glbl import mk_project
-from .lib import util, device_dialog
+from .lib import (
+    device_dialog,
+    theme,
+    util,
+)
 from .lib.util import *
 from .lib.translate import _
 from .plugins import MkPluginUiDict
@@ -856,7 +860,7 @@ class MkMainWindow(QMainWindow):
                 f_file = str(f_file)
                 f_style = pydaw_read_file_text(f_file)
                 f_dir = os.path.dirname(f_file)
-                f_style = pydaw_escape_stylesheet(f_style, f_dir)
+                f_style = theme.pydaw_escape_stylesheet(f_style, f_dir)
                 util.set_file_setting("default-style", f_file)
                 QMessageBox.warning(
                     MAIN_WINDOW, _("Theme Applied..."),
@@ -1459,12 +1463,12 @@ def main():
     default_project_file = util.get_file_setting("last-project", str, None)
     RESPAWN = False
 
-    if util.ICON_PATH:
-        glbl.APP.setWindowIcon(QIcon(util.ICON_PATH))
+    if theme.ICON_PATH:
+        glbl.APP.setWindowIcon(QIcon(theme.ICON_PATH))
 
     QPixmapCache.setCacheLimit(1024 * 1024 * 1024)
     glbl.APP.setStyle(QStyleFactory.create("Fusion"))
-    glbl.APP.setStyleSheet(STYLESHEET)
+    glbl.APP.setStyleSheet(theme.STYLESHEET)
     QtCore.QTextCodec.setCodecForLocale(QtCore.QTextCodec.codecForName("UTF-8"))
     global_check_device()
     MAIN_WINDOW.setup()

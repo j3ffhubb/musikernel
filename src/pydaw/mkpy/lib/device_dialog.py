@@ -23,7 +23,12 @@ f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "../.."))
 sys.path.insert(0, f_parent_dir)
 from mkpy.mkqt import *
 
-from mkpy.lib import util, portaudio, portmidi
+from mkpy.lib import (
+    portaudio,
+    portmidi,
+    theme,
+    util,
+)
 from mkpy.lib.translate import _, global_encoding
 
 f_device_tooltip = _(
@@ -315,7 +320,7 @@ class device_dialog:
 
         f_window.closeEvent = f_close_event
         f_window.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        f_window.setStyleSheet(util.STYLESHEET)
+        f_window.setStyleSheet(theme.STYLESHEET)
         f_window.setWindowTitle(_("Hardware Settings..."))
         f_main_layout = QVBoxLayout(f_window)
         f_tab_widget = QTabWidget()

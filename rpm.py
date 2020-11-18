@@ -161,10 +161,13 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/presets/RAYV.mkp
 %{{_usr}}/lib/{0}/presets/RAYV2.mkp
 %{{_usr}}/lib/{0}/presets/WAYV.mkp
+
 %{{_usr}}/lib/{0}/pydaw/mkpy/lib/__init__.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/history.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/midi.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/lib/portaudio.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/lib/portmidi.py
-%{{_usr}}/lib/{0}/pydaw/mkpy/lib/history.py
+%{{_usr}}/lib/{0}/pydaw/mkpy/lib/theme.py
 %{{_usr}}/lib/{0}/pydaw/mkpy/lib/util.py
 
 %{{_usr}}/lib/{0}/pydaw/mkpy/widgets/__init__.py
