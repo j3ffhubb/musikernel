@@ -285,8 +285,8 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/share/applications/{0}.desktop
 %{{_usr}}/share/doc/{0}/copyright
 %{{_usr}}/share/pixmaps/{0}.png
+%{{_usr}}/share/pixmaps/{0}_splash.png
 
-%{{_usr}}/lib/{0}/musikernel/mkpy/splash.png
 %{{_usr}}/lib/{0}/musikernel/mkpy/mkqt.py
 
 %{{_usr}}/lib/{0}/musikernel/mkpy/__init__.py
@@ -357,8 +357,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %doc
 
-""".format(MAJOR_VERSION, global_version_fedora,
-    TARBALL_URL, f_native, PYTHON_VERSION)
+""".format(
+    MAJOR_VERSION,
+    global_version_fedora,
+    TARBALL_URL,
+    f_native,
+    PYTHON_VERSION,
+)
 
 f_spec_file = open(global_spec_file, "w")
 f_spec_file.write(f_spec_template)

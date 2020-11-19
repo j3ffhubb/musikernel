@@ -276,8 +276,11 @@ class TransportWidget:
     def set_tooltips(self, a_enabled):
         if a_enabled:
             self.panic_button.setToolTip(
-                _("Panic button:   Sends a note-off signal on every "
-                "note to every instrument\nYou can also use CTRL+P"))
+                _(
+                    "Panic button:   Sends a note-off signal on every "
+                    "note to every instrument\nYou can also use CTRL+P"
+                )
+            )
             self.group_box.setToolTip(mk_strings.transport)
         else:
             self.panic_button.setToolTip("")
@@ -286,13 +289,29 @@ class TransportWidget:
 class SplashScreen(QSplashScreen):
     def __init__(self):
         self.pixmap = QPixmap(
-            os.path.join(util.PYTHON_DIR, "splash.png"))
-        QSplashScreen.__init__(self, MAIN_WINDOW, self.pixmap)
+            os.path.join(
+                util.INSTALL_PREFIX,
+                "share",
+                "pixmaps",
+                "{}_splash.png".format(
+                    util.global_pydaw_version_string,
+                ),
+            )
+        )
+        QSplashScreen.__init__(
+            self,
+            MAIN_WINDOW,
+            self.pixmap,
+        )
         self.show()
         glbl.APP.processEvents()
 
     def status_update(self, a_text):
-        self.showMessage(a_text, QtCore.Qt.AlignBottom, QtCore.Qt.white)
+        self.showMessage(
+            a_text,
+            QtCore.Qt.AlignBottom,
+            QtCore.Qt.white,
+        )
         glbl.APP.processEvents()
 
 
