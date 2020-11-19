@@ -5,7 +5,6 @@ from .add_mul_dialog import add_mul_dialog
 from .additive_osc import *
 from .adsr import pydaw_adsr_widget
 from .audio_item_viewer import *
-from .cc_mapping import cc_mapping
 from .control import *
 from .distortion import MultiDistWidget
 from .eq import *

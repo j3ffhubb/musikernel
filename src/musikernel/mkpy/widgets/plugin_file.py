@@ -1,3 +1,4 @@
+from .cc_mapping import cc_mapping
 from mkpy.lib import util
 
 class pydaw_plugin_file:

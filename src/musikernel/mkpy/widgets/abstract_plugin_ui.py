@@ -1,3 +1,4 @@
+from .cc_mapping import cc_mapping
 from .plugin_file import pydaw_plugin_file
 from mkpy import glbl
 from mkpy.glbl.mk_project import pydaw_folder_plugins
