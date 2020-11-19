@@ -227,7 +227,10 @@ class PianoRollEditor(AbstractItemEditor):
             return
         if not self.clipboard:
             QMessageBox.warning(
-                self, _("Error"), _("Nothing copied to the clipboard"))
+                self,
+                _("Error"),
+                _("Nothing copied to the clipboard"),
+            )
             return
         for f_item in self.clipboard:
             shared.CURRENT_ITEM.add_note(mk_project.pydaw_note.from_str(f_item))

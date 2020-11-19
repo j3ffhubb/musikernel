@@ -1,5 +1,8 @@
 """
 Utility functions that are global to the entire application
+
+References to the main MAIN_WINDOW and TRANSPORT are stored here
+for all modules to access
 """
 
 import ast

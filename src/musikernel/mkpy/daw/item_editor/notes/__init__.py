@@ -62,19 +62,19 @@ class PianoRollEditorWidget:
 
         self.edit_actions_menu = self.edit_menu.addMenu(_("Edit"))
 
-        self.copy_action = self.edit_actions_menu.addAction(_("Copy"))
-        self.copy_action.triggered.connect(
-            shared.PIANO_ROLL_EDITOR.copy_selected,
-        )
-        self.copy_action.setShortcut(QKeySequence.Copy)
+        #self.copy_action = self.edit_actions_menu.addAction(_("Copy"))
+        #self.copy_action.triggered.connect(
+        #    shared.PIANO_ROLL_EDITOR.copy_selected,
+        #)
+        #self.copy_action.setShortcut(QKeySequence.Copy)
 
-        self.cut_action = self.edit_actions_menu.addAction(_("Cut"))
-        self.cut_action.triggered.connect(self.on_cut)
-        self.cut_action.setShortcut(QKeySequence.Cut)
+        #self.cut_action = self.edit_actions_menu.addAction(_("Cut"))
+        #self.cut_action.triggered.connect(self.on_cut)
+        #self.cut_action.setShortcut(QKeySequence.Cut)
 
-        self.paste_action = self.edit_actions_menu.addAction(_("Paste"))
-        self.paste_action.triggered.connect(shared.PIANO_ROLL_EDITOR.paste)
-        self.paste_action.setShortcut(QKeySequence.Paste)
+        #self.paste_action = self.edit_actions_menu.addAction(_("Paste"))
+        #self.paste_action.triggered.connect(shared.PIANO_ROLL_EDITOR.paste)
+        #self.paste_action.setShortcut(QKeySequence.Paste)
 
         self.select_all_action = self.edit_actions_menu.addAction(
             _("Select All"))
