@@ -64,6 +64,11 @@ void g_wave_edit_get()
     }
 }
 
+/* Set the plaaback mode
+ * @self:   The wave editor to set playback mode for
+ * @a_mode: The mode to set it to, one of PYDAW_PLAYBACK_MODE_{OFF,PLAY,REC}
+ * @a_lock: 1 to lock the main_lock, 0 to not
+ */
 void v_wn_set_playback_mode(t_wave_edit * self, int a_mode, int a_lock)
 {
     switch(a_mode)
