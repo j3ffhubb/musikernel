@@ -586,6 +586,9 @@ class MainWindow(QScrollArea):
                     WAVE_EDITOR.set_playback_cursor(float(a_val))
             elif a_key == "ready":
                 glbl.on_ready()
+            elif a_key == "stop":
+                print("Received message to stop playback from engine")
+                glbl.TRANSPORT.stop_button.setChecked(True)
         #This prevents multiple events from moving the same control,
         #only the last goes through
         for k, f_val in f_ui_dict.items():

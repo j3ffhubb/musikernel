@@ -306,9 +306,12 @@ void v_pydaw_set_wave_editor_item(t_wave_edit * self,
 }
 
 
-inline void v_pydaw_run_wave_editor(int sample_count,
-        MKFLT **output, MKFLT * a_input)
-{
+inline void v_pydaw_run_wave_editor(
+    int sample_count,
+    MKFLT **output,
+    MKFLT * a_input
+){
+    int sent_stop = 0;
     t_wave_edit * self = wave_edit;
     t_pydaw_plugin * f_plugin;
 
@@ -334,21 +337,24 @@ inline void v_pydaw_run_wave_editor(int sample_count,
     {
         for(f_i = 0; f_i < sample_count; ++f_i)
         {
-            if((self->ab_audio_item->sample_read_heads[0].whole_number) <
-                (self->ab_audio_item->sample_end_offset))
-            {
+            if(
+                self->ab_audio_item->sample_read_heads[0].whole_number
+                <
+                self->ab_audio_item->sample_end_offset
+            ){
                 v_adsr_run(&self->ab_audio_item->adsrs[0]);
                 v_pydaw_audio_item_set_fade_vol(self->ab_audio_item, 0);
 
                 if(self->ab_wav_item->channels == 1)
                 {
                     MKFLT f_tmp_sample = f_cubic_interpolate_ptr_ifh(
-                    (self->ab_wav_item->samples[0]),
-                    (self->ab_audio_item->sample_read_heads[0].whole_number),
-                    (self->ab_audio_item->sample_read_heads[0].fraction)) *
-                    (self->ab_audio_item->adsrs[0].output) *
-                    (self->ab_audio_item->vols_linear[0]) *
-                    (self->ab_audio_item->fade_vols[0]);
+                        self->ab_wav_item->samples[0],
+                        self->ab_audio_item->sample_read_heads[0].whole_number,
+                        self->ab_audio_item->sample_read_heads[0].fraction
+                    ) *
+                    self->ab_audio_item->adsrs[0].output *
+                    self->ab_audio_item->vols_linear[0] *
+                    self->ab_audio_item->fade_vols[0];
 
                     output[0][f_i] = f_tmp_sample;
                     output[1][f_i] = f_tmp_sample;
@@ -356,12 +362,13 @@ inline void v_pydaw_run_wave_editor(int sample_count,
                 else if(self->ab_wav_item->channels > 1)
                 {
                     output[0][f_i] = f_cubic_interpolate_ptr_ifh(
-                    (self->ab_wav_item->samples[0]),
-                    (self->ab_audio_item->sample_read_heads[0].whole_number),
-                    (self->ab_audio_item->sample_read_heads[0].fraction)) *
-                    (self->ab_audio_item->adsrs[0].output) *
-                    (self->ab_audio_item->vols_linear[0]) *
-                    (self->ab_audio_item->fade_vols[0]);
+                        self->ab_wav_item->samples[0],
+                        self->ab_audio_item->sample_read_heads[0].whole_number,
+                        self->ab_audio_item->sample_read_heads[0].fraction
+                    ) *
+                    self->ab_audio_item->adsrs[0].output *
+                    self->ab_audio_item->vols_linear[0] *
+                    self->ab_audio_item->fade_vols[0];
 
                     output[1][f_i] = f_cubic_interpolate_ptr_ifh(
                     (self->ab_wav_item->samples[1]),
@@ -372,13 +379,27 @@ inline void v_pydaw_run_wave_editor(int sample_count,
                     (self->ab_audio_item->fade_vols[0]);
                 }
 
-                v_ifh_run(&self->ab_audio_item->sample_read_heads[0],
-                        self->ab_audio_item->ratio);
+                v_ifh_run(
+                    &self->ab_audio_item->sample_read_heads[0],
+                    self->ab_audio_item->ratio
+                );
 
-                if(musikernel->playback_mode != PYDAW_PLAYBACK_MODE_PLAY &&
-                    self->ab_audio_item->adsrs[0].stage < ADSR_STAGE_RELEASE)
-                {
+                if(
+                    musikernel->playback_mode != PYDAW_PLAYBACK_MODE_PLAY
+                    &&
+                    self->ab_audio_item->adsrs[0].stage < ADSR_STAGE_RELEASE
+                ){
                     v_adsr_release(&self->ab_audio_item->adsrs[0]);
+                }
+            } else {
+                if(!sent_stop){
+                    sent_stop = 1;
+                    v_wn_set_playback_mode(
+                        self,
+                        PYDAW_PLAYBACK_MODE_OFF,
+                        0
+                    );
+                    v_queue_osc_message("stop", "");
                 }
             }
         }
@@ -398,8 +419,11 @@ inline void v_pydaw_run_wave_editor(int sample_count,
         if(f_plugin && f_plugin->power)
         {
             f_plugin->descriptor->run_replacing(
-                f_plugin->PYFX_handle, sample_count, f_track->event_list,
-                f_plugin->atm_list);
+                f_plugin->PYFX_handle,
+                sample_count,
+                f_track->event_list,
+                f_plugin->atm_list
+            );
         }
     }
 
@@ -409,8 +433,12 @@ inline void v_pydaw_run_wave_editor(int sample_count,
         output[1][f_i] = f_buff[1][f_i];
     }
 
-    v_pkm_run(f_track->peak_meter, f_buff[0], f_buff[1],
-        musikernel->sample_count);
+    v_pkm_run(
+        f_track->peak_meter,
+        f_buff[0],
+        f_buff[1],
+        musikernel->sample_count
+    );
 }
 
 void v_wn_osc_send(t_osc_send_data * a_buffers)
@@ -438,15 +466,16 @@ void v_wn_osc_send(t_osc_send_data * a_buffers)
 
     if(musikernel->osc_queue_index > 0)
     {
-        f_i = 0;
-
-        while(f_i < musikernel->osc_queue_index)
+        for(f_i = 0; f_i < musikernel->osc_queue_index; ++f_i)
         {
-            strcpy(a_buffers->osc_queue_keys[f_i],
-                musikernel->osc_queue_keys[f_i]);
-            strcpy(a_buffers->osc_queue_vals[f_i],
-                musikernel->osc_queue_vals[f_i]);
-            ++f_i;
+            strcpy(
+                a_buffers->osc_queue_keys[f_i],
+                musikernel->osc_queue_keys[f_i]
+            );
+            strcpy(
+                a_buffers->osc_queue_vals[f_i],
+                musikernel->osc_queue_vals[f_i]
+            );
         }
 
         pthread_spin_lock(&musikernel->main_lock);
@@ -467,17 +496,19 @@ void v_wn_osc_send(t_osc_send_data * a_buffers)
 
         pthread_spin_unlock(&musikernel->main_lock);
 
-        f_i = 0;
-
         a_buffers->f_tmp1[0] = '\0';
 
-        while(f_i < f_index)
+        for(f_i = 0; f_i < f_index; ++f_i)
         {
-            sprintf(a_buffers->f_tmp2, "%s|%s\n",
+            sprintf(
+                a_buffers->f_tmp2, "%s|%s\n",
                 a_buffers->osc_queue_keys[f_i],
-                a_buffers->osc_queue_vals[f_i]);
-            strcat(a_buffers->f_tmp1, a_buffers->f_tmp2);
-            ++f_i;
+                a_buffers->osc_queue_vals[f_i]
+            );
+            strcat(
+                a_buffers->f_tmp1,
+                a_buffers->f_tmp2
+            );
         }
 
         if(!musikernel->is_offline_rendering)
