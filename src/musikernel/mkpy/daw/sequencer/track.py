@@ -147,7 +147,7 @@ class SeqTrack:
         self.menu_gridlayout.addLayout(self.color_hlayout, 29, 21)
 
         self.color_button = QPushButton(_("Custom..."))
-        self.color_button.pressed.connect(self.on_color_change)
+        self.color_button.clicked.connect(self.on_color_change)
         self.color_hlayout.addWidget(self.color_button)
 
         self.color_copy_button = QPushButton(_("Copy"))
@@ -221,9 +221,13 @@ class SeqTrack:
                 f_list = shared.ATM_REGION.get_ports(self.automation_uid)
                 self.ccs_in_use_combobox.addItems(
                     [""] +
-                    [CONTROLLER_PORT_NUM_DICT[
-                        self.automation_plugin_name][x].name
-                    for x in f_list])
+                    [
+                        CONTROLLER_PORT_NUM_DICT[
+                            self.automation_plugin_name
+                        ][x].name
+                        for x in f_list
+                    ],
+                )
 
     def on_solo(self, value):
         if not self.suppress_osc:
