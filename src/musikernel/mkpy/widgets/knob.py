@@ -13,8 +13,6 @@ DEFAULT_KNOB_SIZE = 48
 KNOB_ARC_PEN = QPen(QtCore.Qt.white, 5.0)
 KNOB_BACKGROUND_PEN = QPen(QColor.fromRgb(90, 90, 90, 255), 5.0)
 
-CC_CLIPBOARD = None
-
 class PixmapKnobCache:
     def __init__(self, a_path):
         self.cache = {}

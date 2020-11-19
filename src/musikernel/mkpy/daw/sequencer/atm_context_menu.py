@@ -31,7 +31,7 @@ def paste_atm_point():
     if glbl.IS_PLAYING:
         return
     shared.SEQUENCER.context_menu_enabled = False
-    if widgets.CC_CLIPBOARD is None:
+    if glbl.CC_CLIPBOARD is None:
         QMessageBox.warning(
             shared.SEQUENCER,
             _("Error"),
@@ -43,7 +43,7 @@ def paste_atm_point():
         return
     f_track, f_beat, f_val = shared.SEQUENCER.current_coord
     f_beat = shared.SEQUENCER.quantize(f_beat)
-    f_val = widgets.CC_CLIPBOARD
+    f_val = glbl.CC_CLIPBOARD
     f_port, f_index = shared.TRACK_PANEL.has_automation(
         shared.SEQUENCER.current_coord[0],
     )

@@ -45,6 +45,8 @@ TOOLTIPS_ENABLED = util.get_file_setting("tooltips", int, 1)
 MEMORY_ENTROPY = datetime.timedelta(minutes=0)
 MEMORY_ENTROPY_LIMIT = datetime.timedelta(minutes=30)
 MEMORY_ENTROPY_UIDS = set()
+CC_CLIPBOARD = None
+
 
 def on_ready():
     print("Engine sent 'ready' message")

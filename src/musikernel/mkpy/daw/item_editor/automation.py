@@ -470,13 +470,17 @@ class AutomationEditorWidget:
         self.automation_viewer.clear_current_item()
 
     def paste_cc_point(self):
-        if widgets.CC_CLIPBOARD is None:
+        if glbl.CC_CLIPBOARD is None:
             QMessageBox.warning(
-                self.widget, _("Error"),
-                _("Nothing copied to the clipboard.\n"
-                "Right-click->'Copy' on any knob on any plugin."))
+                self.widget,
+                _("Error"),
+                _(
+                    "Nothing copied to the clipboard.\n"
+                    "Right-click->'Copy' on any knob on any plugin."
+                ),
+            )
             return
-        self.add_cc_point(widgets.CC_CLIPBOARD)
+        self.add_cc_point(glbl.CC_CLIPBOARD)
 
     def add_cc_point(self, a_value=None):
         if not shared.ITEM_EDITOR.enabled:  #TODO:  Make this global...

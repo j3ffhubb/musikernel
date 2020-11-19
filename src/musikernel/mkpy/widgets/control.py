@@ -1,11 +1,11 @@
 from . import _shared
 from .knob import pydaw_pixmap_knob
+from mkpy import glbl
 from mkpy.lib import util
 from mkpy.lib.translate import _
 from mkpy.mkqt import *
 import collections
 import math
-
 
 LAST_TEMPO_COMBOBOX_INDEX = 2
 
@@ -311,13 +311,12 @@ class AbstractUiControl:
         f_dialog.exec_()
 
     def copy_automation(self):
-        global CC_CLIPBOARD
         f_value = ((self.get_value() - self.control.minimum()) /
                   (self.control.maximum() - self.control.minimum())) * 127.0
-        CC_CLIPBOARD = util.pydaw_clip_value(f_value, 0.0, 127.0)
+        glbl.CC_CLIPBOARD = util.pydaw_clip_value(f_value, 0.0, 127.0)
 
     def paste_automation(self):
-        f_frac = CC_CLIPBOARD / 127.0
+        f_frac = glbl.CC_CLIPBOARD / 127.0
         f_frac = util.pydaw_clip_value(f_frac, 0.0, 1.0)
         f_min = self.control.minimum()
         f_max = self.control.maximum()
@@ -431,13 +430,17 @@ class AbstractUiControl:
         f_menu.addSeparator()
         f_copy_automation_action = f_menu.addAction(_("Copy"))
         f_copy_automation_action.triggered.connect(self.copy_automation)
-        if CC_CLIPBOARD:
+        if glbl.CC_CLIPBOARD:
             f_paste_automation_action = f_menu.addAction(_("Paste"))
             f_paste_automation_action.triggered.connect(self.paste_automation)
         f_menu.addSeparator()
 
         if self.val_conversion in (
-        _shared.KC_TIME_DECIMAL, _shared.KC_HZ_DECIMAL, _shared.KC_LOG_TIME, _shared.KC_MILLISECOND):
+            _shared.KC_TIME_DECIMAL,
+            _shared.KC_HZ_DECIMAL,
+            _shared.KC_LOG_TIME,
+            _shared.KC_MILLISECOND,
+        ):
             f_tempo_sync_action = f_menu.addAction(_("Tempo Sync..."))
             f_tempo_sync_action.triggered.connect(self.tempo_sync_dialog)
         if self.val_conversion == _shared.KC_PITCH:
@@ -458,9 +461,15 @@ class pydaw_null_control:
         depending on selected index, so that they can participate
         normally in the data representation mechanisms
     """
-    def __init__(self, a_port_num, a_rel_callback,
-                 a_val_callback, a_default_val,
-                 a_port_dict, a_preset_mgr=None):
+    def __init__(
+        self,
+        a_port_num,
+        a_rel_callback,
+        a_val_callback,
+        a_default_val,
+        a_port_dict,
+        a_preset_mgr=None,
+    ):
         self.name_label = None
         self.value_label = None
         self.port_num = int(a_port_num)
@@ -502,10 +511,20 @@ class pydaw_null_control:
         pass
 
 class pydaw_knob_control(AbstractUiControl):
-    def __init__(self, a_size, a_label, a_port_num,
-                 a_rel_callback, a_val_callback,
-                 a_min_val, a_max_val, a_default_val, a_val_conversion=_shared.KC_NONE,
-                 a_port_dict=None, a_preset_mgr=None):
+    def __init__(
+        self,
+        a_size,
+        a_label,
+        a_port_num,
+        a_rel_callback,
+        a_val_callback,
+        a_min_val,
+        a_max_val,
+        a_default_val,
+        a_val_conversion=_shared.KC_NONE,
+        a_port_dict=None,
+        a_preset_mgr=None,
+    ):
         AbstractUiControl.__init__(
             self, a_label, a_port_num, a_rel_callback,
             a_val_callback, a_val_conversion, a_port_dict, a_preset_mgr,
