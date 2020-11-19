@@ -6,6 +6,7 @@ from .additive_osc import *
 from .adsr import pydaw_adsr_widget
 from .audio_item_viewer import *
 from .control import *
+from .hardware_dialog import hardware_dialog
 from .distortion import MultiDistWidget
 from .eq import *
 from .file_browser import (

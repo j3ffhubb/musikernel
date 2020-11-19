@@ -147,7 +147,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/main.py
 %attr(755, root, root) %{{_usr}}/lib/{0}/sbsms/bin/sbsms
 %attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/scripts/project_recover.py
-%attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/lib/device_dialog.py
 
 %{{_usr}}/lib/{0}/musikernel/mkengine/{0}.so
 %{{_usr}}/lib/{0}/presets/MODULEX.mkp
@@ -163,6 +162,7 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/musikernel/mkpy/lib/theme.py
 %{{_usr}}/lib/{0}/musikernel/mkpy/lib/util.py
 
+%attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/widgets/hardware_dialog.py
 %{{_usr}}/lib/{0}/musikernel/mkpy/widgets/__init__.py
 %{{_usr}}/lib/{0}/musikernel/mkpy/widgets/_shared.py
 %{{_usr}}/lib/{0}/musikernel/mkpy/widgets/abstract_plugin_ui.py

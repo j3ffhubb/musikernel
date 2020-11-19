@@ -15,7 +15,6 @@ GNU General Public License for more details.
 
 from .glbl import mk_project
 from .lib import (
-    device_dialog,
     theme,
     util,
 )
@@ -893,8 +892,8 @@ class MkMainWindow(QMainWindow):
     def on_change_audio_settings(self):
         close_pydaw_engine()
         time.sleep(2.0)
-        f_dialog = device_dialog.device_dialog(True)
-        f_dialog.show_device_dialog()
+        f_dialog = widgets.hardware_dialog(True)
+        f_dialog.show_hardware_dialog()
         # Doesn't re-send the 'ready' message?
         #open_pydaw_engine(PROJECT_FILE)
         global RESPAWN
@@ -1291,9 +1290,9 @@ def flush_events():
 
 
 def global_check_device():
-    f_device_dialog = device_dialog.device_dialog(
+    f_hardware_dialog = widgets.hardware_dialog(
         a_is_running=True)
-    f_device_dialog.check_device(a_splash_screen=SPLASH_SCREEN)
+    f_hardware_dialog.check_device(a_splash_screen=SPLASH_SCREEN)
 
     if not util.global_device_val_dict:
         print("It appears that the user did not select "

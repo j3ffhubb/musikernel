@@ -18,9 +18,11 @@ import os
 import sys
 import time
 
-f_parent_dir = os.path.dirname(os.path.abspath(__file__))
-f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "../.."))
-sys.path.insert(0, f_parent_dir)
+if __name__ == "__main__":
+    # For running as a stand-alone script
+    f_parent_dir = os.path.dirname(os.path.abspath(__file__))
+    f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "../.."))
+    sys.path.insert(0, f_parent_dir)
 from mkpy.mkqt import *
 
 from mkpy.lib import (
@@ -31,8 +33,7 @@ from mkpy.lib import (
 )
 from mkpy.lib.translate import _, global_encoding
 
-f_device_tooltip = _(
-"""
+f_device_tooltip = _("""\
 Normal:  Run the audio engine without elevated privileges.  This generally
 works well enough, but may require higher latency settings.
 (YOU SHOULD PROBABLY USE THIS IF YOU ARE USING THE LIVE DVD/USB OR HAVE
@@ -67,8 +68,8 @@ No Audio:  No audio or MIDI, mostly useful for attaching an external debugger.
 Module:  Load the engine as a shared library in the UI's process
 """)
 
-THREADS_TOOLTIP = _(
-"""This sets the number of worker threads for processing
+THREADS_TOOLTIP = _("""\
+This sets the number of worker threads for processing
 plugins and effects.
 
 Setting to 1 can result in the best latency, but
@@ -95,8 +96,8 @@ dual-core:  1 worker thread
 quad-core:  1 - 3 worker threads
 """)
 
-HUGEPAGES_TOOLTIP = _(
-"""HugePages can improve memory/cache performance (sometimes significantly),
+HUGEPAGES_TOOLTIP = _("""\
+HugePages can improve memory/cache performance (sometimes significantly),
 but you must allocate system memory for it that can only be used for HugePages.
 
 It is recommended that you allocate at least 1GB of HugePages, and that you
@@ -118,27 +119,28 @@ disable this if it causes performance problems on your configuration.
 """
 )
 
-HOST_API_TOOLTIP = _("""Select the host API to list devices for in the
+HOST_API_TOOLTIP = _("""\
+Select the host API to list devices for in the
 "Audio Device" dropdown.
 """)
 
 if util.IS_LINUX:
-    HOST_API_TOOLTIP += _("""
+    HOST_API_TOOLTIP += _("""\
 Unless you are using Firewire (for which JACK is the only choice on Linux),
 it is recommended that you stop the JACK server and use your
 device directly using ALSA for best performance, stability and latency.
 """)
 elif util.IS_WINDOWS:
-    HOST_API_TOOLTIP += _("""
+    HOST_API_TOOLTIP += _("""\
 If possible, you should use an API capable of low latency
 such as ASIO or WDM-KS.
 """)
 
-DEVICE_TOOLTIP = _("""
+DEVICE_TOOLTIP = _("""\
 Select your audio interface from this list.
 """)
 
-class device_dialog:
+class hardware_dialog:
     def __init__(self, a_is_running=False):
         self.devices_open = False
         self.is_running = a_is_running
@@ -216,20 +218,18 @@ class device_dialog:
 
     def check_device(self, a_splash_screen=None):
         if not util.global_device_val_dict:
-            if a_splash_screen:
-                a_splash_screen.hide()
-            self.show_device_dialog(
-                _("No device configuration found"),
+            self.show_hardware_dialog(
+                None,
                 a_exit_on_cancel=True,
             )
-            if a_splash_screen:
-                a_splash_screen.show()
             return
-        elif [x for x in ("hostApi", "name")
-        if x not in util.global_device_val_dict]:
+        elif [
+            x for x in ("hostApi", "name")
+            if x not in util.global_device_val_dict
+        ]:
             if a_splash_screen:
                 a_splash_screen.hide()
-            self.show_device_dialog(
+            self.show_hardware_dialog(
                 _("Invalid device configuration"),
                 a_exit_on_cancel=True,
             )
@@ -280,7 +280,7 @@ class device_dialog:
                         return
                 if a_splash_screen:
                     a_splash_screen.hide()
-                self.show_device_dialog(
+                self.show_hardware_dialog(
                     _("Device not found: {}\n\n"
                     "If this is not expected, then another application "
                     "may be using the device").format(f_device_str),
@@ -291,14 +291,14 @@ class device_dialog:
             else:
                 if a_splash_screen:
                     a_splash_screen.hide()
-                self.show_device_dialog(
+                self.show_hardware_dialog(
                     _("Device not found: {}").format(f_device_str),
                     a_exit_on_cancel=True,
                 )
                 if a_splash_screen:
                     a_splash_screen.show()
 
-    def show_device_dialog(
+    def show_hardware_dialog(
         self,
         a_msg=None,
         a_exit_on_cancel=False,
@@ -340,11 +340,12 @@ class device_dialog:
         f_subsystem_combobox.setMinimumWidth(390)
         f_window_layout.addWidget(f_subsystem_combobox, 2, 1)
 
-        f_window_layout.addWidget(QLabel(_("Output Device")), 5, 0)
+        f_window_layout.addWidget(QLabel(_("Audio Device")), 5, 0)
         f_device_name_combobox = QComboBox()
         f_device_name_combobox.setToolTip(DEVICE_TOOLTIP)
         f_device_name_combobox.setMinimumWidth(390)
         f_window_layout.addWidget(f_device_name_combobox, 5, 1)
+        # TODO: Investigate if this is sitll needed
         if util.IS_WINDOWS or util.IS_MAC_OSX:
             f_window_layout.addWidget(QLabel(_("Input Device")), 6, 0)
             f_input_name_combobox = QComboBox()
@@ -793,15 +794,15 @@ class device_dialog:
             f_window.show()
 
 if __name__ == "__main__":
-    def _device_dialog_standalone():
+    def _hardware_dialog_standalone():
         app = QApplication(sys.argv)
         if len(sys.argv) == 2:
             f_msg = sys.argv[1]
         else:
             f_msg = None
 
-        f_device_dialog = device_dialog()
-        f_device_dialog.show_device_dialog(f_msg)
+        f_hardware_dialog = hardware_dialog()
+        f_hardware_dialog.show_hardware_dialog(f_msg)
         sys.exit(app.exec_())
 
-    _device_dialog_standalone()
+    _hardware_dialog_standalone()
