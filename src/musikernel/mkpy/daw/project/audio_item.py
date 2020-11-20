@@ -6,8 +6,13 @@ import numpy
 
 
 class DawAudioItem(MkAudioItem):
-    def clip_at_region_end(self, a_region_length, a_tempo,
-            a_sample_length_seconds, a_truncate=True):
+    def clip_at_region_end(
+        self,
+        a_region_length,
+        a_tempo,
+        a_sample_length_seconds,
+        a_truncate=True
+    ):
         f_region_length_beats = a_region_length
         f_seconds_per_beat = (60.0 / a_tempo)
         f_region_length_seconds = f_seconds_per_beat * f_region_length_beats

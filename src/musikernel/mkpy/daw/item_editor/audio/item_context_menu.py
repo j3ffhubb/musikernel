@@ -98,9 +98,9 @@ def show():
     f_reset_end_action = f_properties_menu.addAction(_("Reset Ends"))
     f_reset_end_action.triggered.connect(reset_end)
     f_move_to_end_action = f_properties_menu.addAction(
-        _("Move to Region End"),
+        _("Move to Item End"),
     )
-    f_move_to_end_action.triggered.connect(move_to_region_end)
+    f_move_to_end_action.triggered.connect(move_to_item_end)
     f_reverse_action = f_properties_menu.addAction(_("Reverse/Unreverse"))
     f_reverse_action.triggered.connect(_reverse)
     f_time_pitch_action = f_properties_menu.addAction(_("Time/Pitch..."))
@@ -309,7 +309,7 @@ def reset_end():
     shared.PROJECT.commit(_("Reset sample ends for audio item(s)"))
     global_open_audio_items()
 
-def move_to_region_end():
+def move_to_item_end():
     f_list = shared.AUDIO_SEQ.get_selected()
     if f_list:
         f_current_region_length = pydaw_get_current_region_length()
