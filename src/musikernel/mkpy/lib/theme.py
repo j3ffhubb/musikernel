@@ -3,14 +3,21 @@ from mkpy.log import LOG
 
 
 ICON_PATH = os.path.join(
-    INSTALL_PREFIX, "share", "pixmaps",
-    "{}.png".format(global_pydaw_version_string))
+    INSTALL_PREFIX,
+    "share",
+    "pixmaps",
+    "{}.png".format(
+        global_pydaw_version_string
+    ),
+)
 
 print("ICON_PATH = '{}'".format(ICON_PATH))
 if IS_WINDOWS:
     ICON_PATH = os.path.join(
         INSTALL_PREFIX,
-        "{}.ico".format(global_pydaw_version_string),
+        "{}.ico".format(
+            global_pydaw_version_string,
+        ),
     )
 
 DEFAULT_STYLESHEET_FILE = os.path.join(
@@ -31,6 +38,10 @@ if not (
 ):
     STYLESHEET_FILE = DEFAULT_STYLESHEET_FILE
 
+print("Using stylesheet " + STYLESHEET_FILE)
+STYLESHEET_DIR = os.path.dirname(STYLESHEET_FILE)
+STYLESHEET = None
+
 def pydaw_escape_stylesheet(a_stylesheet, a_path):
     f_dir = os.path.dirname(str(a_path))
     if IS_WINDOWS:
@@ -39,6 +50,10 @@ def pydaw_escape_stylesheet(a_stylesheet, a_path):
     return f_result
 
 def load_color_palette():
+    global STYLESHEET
+    STYLESHEET = pydaw_read_file_text(STYLESHEET_FILE)
+    STYLESHEET = pydaw_escape_stylesheet(STYLESHEET, STYLESHEET_FILE)
+
     css_hex_color_regex = re.compile("#(?:[0-9a-fA-F]{6})$")
 
     def test_value(a_val):
@@ -64,9 +79,3 @@ def load_color_palette():
             except Exception as ex:
                 LOG.error("Error loading color palette: {}".format(ex))
 
-print("Using stylesheet " + STYLESHEET_FILE)
-STYLESHEET = pydaw_read_file_text(STYLESHEET_FILE)
-STYLESHEET = pydaw_escape_stylesheet(STYLESHEET, STYLESHEET_FILE)
-STYLESHEET_DIR = os.path.dirname(STYLESHEET_FILE)
-
-load_color_palette()

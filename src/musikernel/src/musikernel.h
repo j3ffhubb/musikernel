@@ -319,7 +319,9 @@ typedef struct
 
 typedef struct
 {
+    // index of the track to send to
     int output;
+    // 1 if active, 0 if not active
     int active;
     int type;
     char padding[4];
@@ -387,17 +389,21 @@ void v_ui_send(char * a_path, char * a_msg)
 
 #endif
 
-void v_pytrack_routing_set(t_pytrack_routing * self, int a_output, int a_type)
-{
+/*
+ * @output: The track number to output to
+ * @type:   ROUTE_TYPE_AUDIO 0, ROUTE_TYPE_SIDECHAIN 1, ROUTE_TYPE_MIDI 2
+*/
+void v_pytrack_routing_set(
+    t_pytrack_routing* self,
+    int a_output,
+    int a_type
+){
     self->output = a_output;
     self->type = a_type;
 
-    if(a_output >= 0)
-    {
+    if(a_output >= 0){
         self->active = 1;
-    }
-    else
-    {
+    } else {
         self->active = 0;
     }
 }
@@ -978,16 +984,20 @@ inline void v_pydaw_zero_buffer(MKFLT ** a_buffers, int a_count)
     }
 }
 
-void v_pydaw_open_track(t_pytrack * a_track, char * a_tracks_folder,
-        int a_index)
-{
+void v_pydaw_open_track(
+    t_pytrack* a_track,
+    char* a_tracks_folder,
+    int a_index
+){
     char f_file_name[1024];
 
     sprintf(f_file_name, "%s%s%i", a_tracks_folder, PATH_SEP, a_index);
 
     if(i_pydaw_file_exists(f_file_name)){
-        t_2d_char_array * f_2d_array = g_get_2d_array_from_file(f_file_name,
-                PYDAW_LARGE_STRING);
+        t_2d_char_array * f_2d_array = g_get_2d_array_from_file(
+            f_file_name,
+            PYDAW_LARGE_STRING
+        );
 
         while(1){
             v_iterate_2d_char_array(f_2d_array);
@@ -1009,8 +1019,14 @@ void v_pydaw_open_track(t_pytrack * a_track, char * a_tracks_folder,
                 v_iterate_2d_char_array(f_2d_array);
                 int f_power = atoi(f_2d_array->current_str);
 
-                v_pydaw_set_plugin_index(a_track, f_index, f_plugin_index,
-                    f_plugin_uid, f_power, 0);
+                v_pydaw_set_plugin_index(
+                    a_track,
+                    f_index,
+                    f_plugin_index,
+                    f_plugin_uid,
+                    f_power,
+                    0
+                );
             } else {
                 printf(
                     "Invalid track identifier '%c'\n",
@@ -1570,9 +1586,13 @@ void v_wait_for_threads()
     }
 }
 
-void g_pynote_init(t_pydaw_seq_event * f_result, int a_note, int a_vel,
-        MKFLT a_start, MKFLT a_length)
-{
+void g_pynote_init(
+    t_pydaw_seq_event* f_result,
+    int a_note,
+    int a_vel,
+    MKFLT a_start,
+    MKFLT a_length
+){
     f_result->type = PYDAW_EVENT_NOTEON;
     f_result->length = a_length;
     f_result->note = a_note;
@@ -1744,10 +1764,14 @@ void v_mk_set_playback_pos(
 
 
 void v_mk_seq_event_list_set(t_mk_seq_event_list * self,
-        t_mk_seq_event_result * a_result,
-        MKFLT ** a_buffers, MKFLT * a_input_buffers, int a_input_count,
-        int a_sample_count, long a_current_sample, int a_loop_mode)
-{
+    t_mk_seq_event_result* a_result,
+    MKFLT** a_buffers,
+    MKFLT* a_input_buffers,
+    int a_input_count,
+    int a_sample_count,
+    long a_current_sample,
+    int a_loop_mode
+){
     int f_i;
     for(f_i = 0; f_i < 2; ++f_i)
     {

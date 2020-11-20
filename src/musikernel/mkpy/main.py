@@ -1520,6 +1520,7 @@ def splash_screen_opening(default_project_file):
 
 
 def main():
+    theme.load_color_palette()
     setup_logging()
     global MAIN_WINDOW, SPLASH_SCREEN, ENGINE_SUBPROCESS, RESPAWN
     glbl.APP = QApplication(sys.argv)
