@@ -635,12 +635,12 @@ void v_dn_sum_track_outputs(
 
         f_bus = self->track_pool[f_bus_num];
 
-        if(f_route->type == ROUTE_TYPE_MIDI)
-        {
-            for(f_i2 = 0; f_i2 < a_track->event_list->len; ++f_i2)
-            {
+        if(f_route->type == ROUTE_TYPE_MIDI){
+            for(f_i2 = 0; f_i2 < a_track->event_list->len; ++f_i2){
                 shds_list_append(
-                    f_bus->event_list, a_track->event_list->data[f_i2]);
+                    f_bus->event_list,
+                    a_track->event_list->data[f_i2]
+                );
             }
 
             pthread_spin_lock(&f_bus->lock);
@@ -1925,8 +1925,14 @@ void g_dn_song_get(t_daw* self, int a_lock)
 void v_dn_open_tracks()
 {
     char f_file_name[1024];
-    sprintf(f_file_name, "%s%sprojects%sdaw%stracks.txt",
-        musikernel->project_folder, PATH_SEP, PATH_SEP, PATH_SEP);
+    sprintf(
+        f_file_name,
+        "%s%sprojects%sdaw%stracks.txt",
+        musikernel->project_folder,
+        PATH_SEP,
+        PATH_SEP,
+        PATH_SEP
+    );
 
     if(i_pydaw_file_exists(f_file_name))
     {
@@ -1955,8 +1961,11 @@ void v_dn_open_tracks()
             assert(f_solo == 0 || f_solo == 1);
             assert(f_mute == 0 || f_mute == 1);
 
-            v_pydaw_open_track(daw->track_pool[f_track_index],
-                daw->tracks_folder, f_track_index);
+            v_pydaw_open_track(
+                daw->track_pool[f_track_index],
+                daw->tracks_folder,
+                f_track_index
+            );
 
             daw->track_pool[f_track_index]->solo = f_solo;
             daw->track_pool[f_track_index]->mute = f_mute;
@@ -1966,15 +1975,16 @@ void v_dn_open_tracks()
     }
     else   //ensure everything is closed...
     {
-        int f_i = 0;
+        int f_i;
 
-        while(f_i < DN_TRACK_COUNT)
-        {
+        for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i){
             daw->track_pool[f_i]->solo = 0;
             daw->track_pool[f_i]->mute = 0;
-            v_pydaw_open_track(daw->track_pool[f_i],
-                daw->tracks_folder, f_i);
-            ++f_i;
+            v_pydaw_open_track(
+                daw->track_pool[f_i],
+                daw->tracks_folder,
+                f_i
+            );
         }
     }
 }
@@ -3043,37 +3053,35 @@ t_dn_routing_graph * g_dn_routing_graph_get(t_daw * self)
     f_result->track_pool_sorted_count = 0;
 
     char f_tmp[1024];
-    sprintf(f_tmp, "%s%sprojects%sdaw%srouting.txt",
-        musikernel->project_folder, PATH_SEP, PATH_SEP, PATH_SEP);
+    sprintf(
+        f_tmp,
+        "%s%sprojects%sdaw%srouting.txt",
+        musikernel->project_folder,
+        PATH_SEP,
+        PATH_SEP,
+        PATH_SEP
+    );
 
-    if(i_pydaw_file_exists(f_tmp))
-    {
+    if(i_pydaw_file_exists(f_tmp)){
         t_2d_char_array * f_2d_array = g_get_2d_array_from_file(
         f_tmp, PYDAW_LARGE_STRING);
-        while(1)
-        {
+        while(1){
             v_iterate_2d_char_array(f_2d_array);
-            if(f_2d_array->eof)
-            {
+            if(f_2d_array->eof){
                 break;
             }
 
-            if(f_2d_array->current_str[0] == 't')
-            {
+            if(f_2d_array->current_str[0] == 't'){
                 v_iterate_2d_char_array(f_2d_array);
                 int f_track_num = atoi(f_2d_array->current_str);
 
                 v_iterate_2d_char_array(f_2d_array);
                 int f_index = atoi(f_2d_array->current_str);
 
-                for(f_i = 0; f_i < MAX_WORKER_THREADS; ++f_i)
-                {
+                for(f_i = 0; f_i < MAX_WORKER_THREADS; ++f_i){
                     f_result->track_pool_sorted[f_i][f_index] = f_track_num;
                 }
-
-            }
-            else if(f_2d_array->current_str[0] == 's')
-            {
+            } else if(f_2d_array->current_str[0] == 's'){
                 v_iterate_2d_char_array(f_2d_array);
                 int f_track_num = atoi(f_2d_array->current_str);
 
@@ -3087,18 +3095,16 @@ t_dn_routing_graph * g_dn_routing_graph_get(t_daw * self)
                 int f_sidechain = atoi(f_2d_array->current_str);
 
                 v_pytrack_routing_set(
-                    &f_result->routes[f_track_num][f_index], f_output,
-                    f_sidechain);
+                    &f_result->routes[f_track_num][f_index],
+                    f_output,
+                    f_sidechain
+                );
                 ++f_result->bus_count[f_output];
-            }
-            else if(f_2d_array->current_str[0] == 'c')
-            {
+            } else if(f_2d_array->current_str[0] == 'c'){
                 v_iterate_2d_char_array(f_2d_array);
                 int f_count = atoi(f_2d_array->current_str);
                 f_result->track_pool_sorted_count = f_count;
-            }
-            else
-            {
+            } else {
                 assert(0);
             }
         }

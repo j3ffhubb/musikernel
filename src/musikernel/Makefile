@@ -89,7 +89,8 @@ install_non_linux: clean_pyc
 	install -s -m 755 $(PYDAW_VERSION)-engine $(DESTDIR)$(PREFIX)/bin
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel
-	cp -r mkpy $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel
+	cp -r sgui $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel
+	cp -r sglib $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel/mkengine
 	install -m 555 $(PYDAW_VERSION).dll \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel/mkengine || \
@@ -97,9 +98,9 @@ install_non_linux: clean_pyc
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel/mkengine || \
 	install -m 555 $(PYDAW_VERSION).dylib \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel/mkengine
-	cp -r themes $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
-	cp -r presets $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
-	cp -r share $(DESTDIR)$(PREFIX)
+	cp -r files/themes $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
+	cp -r files/presets $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
+	cp -r files/share $(DESTDIR)$(PREFIX)
 	install -m 644 ../major-version.txt \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	install -m 644 ../minor-version.txt \
@@ -119,15 +120,16 @@ install: clean_pyc
 	install -s -m 4755 $(PYDAW_VERSION)-engine $(DESTDIR)$(PREFIX)/bin
 	install -s -m 755 $(PYDAW_VERSION)-engine \
 	$(DESTDIR)$(PREFIX)/bin/$(PYDAW_VERSION)-engine-no-root
-	cp -r mkpy $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel
+	cp -r sgui $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel
+	cp -r sglib $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel
 	install -d $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel/mkengine
 	install -m 555 $(PYDAW_VERSION).dll \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel/mkengine || \
 	install -m 555 $(PYDAW_VERSION).so \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)/musikernel/mkengine
-	cp -r themes $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
-	cp -r presets $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
-	cp -r share $(DESTDIR)$(PREFIX)
+	cp -r files/themes $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
+	cp -r files/presets $(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
+	cp -r files/share $(DESTDIR)$(PREFIX)
 	install -m 644 ../major-version.txt \
 		$(DESTDIR)$(PREFIX)/lib/$(PYDAW_VERSION)
 	install -m 644 ../minor-version.txt \
@@ -139,7 +141,7 @@ install: clean_pyc
                 fi
 
 clean:
-	rm -f src/*.o *.so $(PYDAW_VERSION)-engine* core mkpy/core  \
+	rm -f src/*.o *.so $(PYDAW_VERSION)-engine* core sgui/core  \
 	*.pyo *.pyc */*.pyo */*.pyc */*/*.pyo */*/*.pyc \
 	*~ */*~ */*/*~ */*/*/*~
 

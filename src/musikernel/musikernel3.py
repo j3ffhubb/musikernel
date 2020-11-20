@@ -47,5 +47,5 @@ else:
     f_path = os.path.abspath(f_path)
     print(f_path)
     sys.path.insert(0, f_path)
-    from mkpy.main import main
+    from sgui.main import main
     main()

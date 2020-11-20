@@ -42,7 +42,7 @@ deb:
 
 deps:
 	make mingw_deps
-	cd pyliblo-0.10.0 && python3 setup.py build && cp build/lib*/liblo* ../musikernel/mkpy/vendor/
+	cd pyliblo-0.10.0 && python3 setup.py build && cp build/lib*/liblo* ../musikernel/sgui/vendor/
 
 mingw_deps:
 	cd sbsms && ( ./configure || ./configure --enable-sse=no ) && make
