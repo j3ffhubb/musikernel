@@ -3,6 +3,7 @@ from .audio_item import DawAudioItem
 from mkpy import glbl
 from mkpy.glbl.mk_project import *
 from mkpy.lib.util import *
+from mkpy.log import LOG
 from mkpy.widgets import pydaw_modulex_settings
 from mkpy.lib.translate import _
 from mkpy.mkqt import *
@@ -133,7 +134,7 @@ class pydaw_item:
         for k, v in self.items.items():
             f_item_start = v.start_beat
             if f_item_start > f_end:
-                print("Delete after {} {}".format(f_item_start, f_end))
+                LOG.info("Delete after {} {}".format(f_item_start, f_end))
                 f_to_delete.append(k)
                 continue
             f_graph = glbl.PROJECT.get_sample_graph_by_uid(v.uid)
@@ -142,7 +143,7 @@ class pydaw_item:
             f_end_beat = ((f_graph.length_in_seconds / f_spb) *
                 f_diff) + f_item_start
             if f_end_beat < f_start:
-                print("Delete before {} {}".format(f_end_beat, f_start))
+                LOG.info("Delete before {} {}".format(f_end_beat, f_start))
                 f_to_delete.append(k)
                 continue
             if f_item_start < f_start:
@@ -151,20 +152,20 @@ class pydaw_item:
                 f_offset = (f_seconds / f_graph.length_in_seconds) * 1000.0
                 v.sample_start += f_offset
                 v.start_beat = f_start
-                print("LT")
+                LOG.info("LT")
             if f_end_beat > f_end:
                 f_beat_diff = f_end_beat - f_end
                 f_seconds = f_spb * f_beat_diff
                 f_offset = (f_seconds / f_graph.length_in_seconds) * 1000.0
                 v.sample_end -= f_offset
-                print("GT")
+                LOG.info("GT")
             f_new_length_seconds = ((v.sample_end - v.sample_start) *
                 0.001) * f_graph.length_in_seconds
             if f_new_length_seconds < f_min_len:
-                print("Popping item of length {}".format(f_new_length_seconds))
+                LOG.info("Popping item of length {}".format(f_new_length_seconds))
                 f_to_delete.append(k)
             for f_tuple in locals().items():
-                print(f_tuple)
+                LOG.info(f_tuple)
         for k in f_to_delete:
             self.items.pop(k)
 
@@ -205,7 +206,7 @@ class pydaw_item:
         for k, v in a_item2.items.items():
             f_index = self.get_next_index()
             if f_index == -1:
-                print("Exceeded the max audio item count, dropping items")
+                LOG.info("Exceeded the max audio item count, dropping items")
                 break
             v.start_beat += f_offset
             self.add_item(f_index, v)
@@ -234,7 +235,7 @@ class pydaw_item:
         if int(a_row_index) in self.fx_list:
             return self.fx_list[int(a_row_index)]
         else:
-            # print("Index {} not found in "
+            # LOG.info("Index {} not found in "
             #     "DawAudioItem_fx_region".format(a_row_index))
             if a_return_none:
                 return None
@@ -263,9 +264,8 @@ class pydaw_item:
         try:
             self.notes.remove(a_note)
         except Exception as ex:
-            print("\n\n\nException in remove_note:\n{}".format(ex))
+            LOG.error("Exception in remove_note:\n{}".format(ex))
             print((repr(traceback.extract_stack())))
-            print("\n\n\n")
 
     def velocity_mod(self, a_amt, a_start_beat=0.0,
                      a_end_beat=4.0, a_line=False,
@@ -644,7 +644,7 @@ class pydaw_item:
                 elif f_event_arr[0] == "M":
                     pass
                 else:
-                    print("Error: {}".format(f_event_arr))
+                    LOG.error("Error: {}".format(f_event_arr))
                     assert False, "Invalid type '{}'".format(f_event_arr[0])
         return f_result
 
@@ -653,7 +653,7 @@ class pydaw_item:
         f_note_set = {str(x) for x in self.notes}
         note_diff = len_orig - len(f_note_set)
         if note_diff:
-            print("Deduplicated {} notes".format(note_diff))
+            LOG.info("Deduplicated {} notes".format(note_diff))
             self.notes = [pydaw_note.from_str(x) for x in f_note_set]
             self.notes.sort()
         # TODO:  Others
@@ -717,7 +717,7 @@ class pydaw_item:
             else:
                 f_values.append(f_str)
         for f_key in f_to_delete:
-            print("Removing duplicate audio item at {}".format(f_key))
+            LOG.info("Removing duplicate audio item at {}".format(f_key))
             self.items.pop(f_key)
             if f_key in self.fx_list:
                 self.fx_list.pop(f_key)
@@ -732,7 +732,7 @@ class pydaw_item:
         for k, v in list(self.items.items()):
             if v.start_bar >= f_length:
                 f_to_delete.append(k)
-                print("Item begins after new region length of "
+                LOG.info("Item begins after new region length of "
                       "{}, deleting: {}".format(a_length, v))
         for f_key in f_to_delete:
             self.items.pop(f_key)

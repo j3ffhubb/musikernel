@@ -15,28 +15,36 @@ GNU General Public License for more details.
 
 
 from mkpy.lib.util import INSTALL_PREFIX
-
-import locale
+from mkpy.log import LOG
 import gettext
+import locale
 import os
 
 try:
     global_locale, global_encoding = locale.getdefaultlocale()
-    print("locale: {}".format(global_locale))
-    print("encoding: {}".format(global_encoding))
+    LOG.info("locale: {}".format(global_locale))
+    LOG.info("encoding: {}".format(global_encoding))
     global_language = gettext.translation(
         "musikernel3",
         os.path.join(INSTALL_PREFIX, "share", "locale"),
         [global_locale])
-    print("global_language.info: {}".format(global_language.info()))
+    LOG.info("global_language.info: {}".format(global_language.info()))
     global_language.install()
-    print("Installed language for {}".format(global_locale))
+    LOG.info("Installed language for {}".format(global_locale))
     if not "_" in globals():
-        print("'_' not defined by Python gettext module, setting to global_language.gettext")
+        LOG.info(
+            "'_' not defined by Python gettext module, setting to "
+            "global_language.gettext",
+        )
         _ = global_language.gettext
 except Exception as ex:
-    print("Exception while setting locale, falling back to English (hopefully):\n".format(ex))
+    LOG.error(
+        "Exception while setting locale, falling back to "
+        "English (hopefully):\n".format(ex),
+    )
 
 if not "_" in globals():
-    print("'_' not defined by Python gettext module, setting to lambda x: x")
+    LOG.info(
+        "'_' not defined by Python gettext module, setting to lambda x: x",
+    )
     _ = lambda x: x

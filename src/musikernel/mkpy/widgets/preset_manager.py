@@ -1,5 +1,6 @@
-from mkpy.lib.translate import _
 from mkpy.glbl import util
+from mkpy.lib.translate import _
+from mkpy.log import LOG
 from mkpy.mkqt import *
 import os
 import shutil
@@ -101,9 +102,9 @@ class pydaw_preset_manager_widget:
         f_name = self.program_combobox.currentText()
         if f_name:
             f_name = str(f_name)
-        print(f_name)
+        LOG.info(f_name)
         if f_name and f_name in self.presets_delimited:
-            print("Found preset, deleting")
+            LOG.info("Found preset, deleting")
             self.presets_delimited.pop(f_name)
             self.program_combobox.clearEditText()
             self.commit_presets()
@@ -142,14 +143,14 @@ class pydaw_preset_manager_widget:
         if os.path.isfile(self.bank_file):
             f_text = util.pydaw_read_file_text(self.bank_file)
             if os.path.isfile(f_text):
-                print("Setting self.preset_path to {}".format(f_text))
+                LOG.info("Setting self.preset_path to {}".format(f_text))
                 self.preset_path = f_text
                 self.bank_name = os.path.basename(f_text).rsplit(".", 1)[0]
                 return
             else:
-                print("{} does not exist".format(f_text))
+                LOG.info("{} does not exist".format(f_text))
         else:
-            print("{} does not exist".format(self.bank_file))
+            LOG.info("{} does not exist".format(self.bank_file))
         self.bank_name = "factory"
 
     def reload_default_presets(self):
@@ -253,10 +254,10 @@ class pydaw_preset_manager_widget:
 
     def load_presets(self):
         if os.path.isfile(self.preset_path):
-            print("loading presets from file {}".format(self.preset_path))
+            LOG.info("loading presets from file {}".format(self.preset_path))
             f_text = util.pydaw_read_file_text(self.preset_path)
         else:
-            print("loading factory presets")
+            LOG.info("loading factory presets")
             f_text = util.pydaw_read_file_text(
                 self.user_factory_presets)
         f_line_arr = f_text.split("\n")
@@ -284,7 +285,7 @@ class pydaw_preset_manager_widget:
                 self.program_combobox.addItem(f_name)
 
     def save_presets(self):
-        print("saving preset")
+        LOG.info("saving preset")
         f_index = self.program_combobox.currentIndex()
         f_preset_name = str(self.program_combobox.currentText())
         if not f_index and not f_preset_name:

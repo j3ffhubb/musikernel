@@ -3,6 +3,7 @@ from .plugin_file import pydaw_plugin_file
 from mkpy import glbl
 from mkpy.glbl.mk_project import pydaw_folder_plugins
 from mkpy.lib.translate import _
+from mkpy.log import LOG
 from mkpy.mkqt import *
 import os
 
@@ -142,7 +143,7 @@ class pydaw_abstract_plugin_ui:
                     self.set_configure(k, v)
                 self.cc_map = f_file.cc_map
             else:
-                print(
+                LOG.warning(
                     "pydaw_abstract_plugin_ui.open_plugin_file():"
                     " '{}' did not exist, not loading.".format(f_file_path)
                 )
@@ -192,7 +193,7 @@ class pydaw_abstract_plugin_ui:
         if f_port in self.port_dict:
             self.port_dict[int(a_port)].set_value(a_val)
         else:
-            print("pydaw_abstract_plugin_ui.set_control_val():  "
+            LOG.warning("pydaw_abstract_plugin_ui.set_control_val():  "
                 "Did not have port {}".format(f_port))
 
     def set_cc_val(self, a_cc, a_val):
@@ -230,6 +231,6 @@ class pydaw_abstract_plugin_ui:
         """ Override to display ephemeral data such as
             meters/scopes/spectra using key value pairs
         """
-        print("Unknown ui_message: {} : {}".format(a_name, a_value))
+        LOG.warning("Unknown ui_message: {} : {}".format(a_name, a_value))
 
 

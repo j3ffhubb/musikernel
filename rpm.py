@@ -162,6 +162,8 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/lib/{0}/musikernel/mkpy/lib/theme.py
 %{{_usr}}/lib/{0}/musikernel/mkpy/lib/util.py
 
+%{{_usr}}/lib/{0}/musikernel/mkpy/log.py
+
 %attr(755, root, root) %{{_usr}}/lib/{0}/musikernel/mkpy/widgets/hardware_dialog.py
 %{{_usr}}/lib/{0}/musikernel/mkpy/widgets/__init__.py
 %{{_usr}}/lib/{0}/musikernel/mkpy/widgets/_shared.py

@@ -20,6 +20,10 @@ from .lib import (
 )
 from .lib.util import *
 from .lib.translate import _
+from .log import (
+    LOG,
+    setup_logging,
+)
 from .plugins import MkPluginUiDict
 from mkpy import glbl, widgets
 from mkpy.daw import entrypoint as daw
@@ -39,7 +43,7 @@ HOST_INDEX_WAVE_EDIT = 1
 
 def handle_engine_error(exitCode):
     if exitCode == 0:
-        print("Engine exited with return code 0, no errors.")
+        LOG.info("Engine exited with return code 0, no errors.")
         return
 
     if exitCode == 1000:
@@ -72,7 +76,7 @@ class MkIpc(glbl.AbstractIPC):
         glbl.AbstractIPC.__init__(self, True, "/musikernel/master")
 
     def stop_server(self):
-        print("stop_server called")
+        LOG.info("stop_server called")
         if self.with_osc:
             self.send_configure("exit", "")
             glbl.IPC_ENABLED = False
@@ -332,10 +336,10 @@ class MkMainWindow(QMainWindow):
             try:
                 glbl.OSC = liblo.Address(19271)
             except liblo.AddressError as err:
-                print((str(err)))
+                LOG.error((str(err)))
                 sys.exit()
             except:
-                print("Unable to start OSC with {}".format(19271))
+                LOG.error("Unable to start OSC with {}".format(19271))
                 glbl.OSC = None
         glbl.IPC = MkIpc()
         glbl.TRANSPORT = TransportWidget()
@@ -533,10 +537,10 @@ class MkMainWindow(QMainWindow):
             try:
                 self.osc_server = liblo.Server(30321)
             except liblo.ServerError as err:
-                print("Error creating OSC server: {}".format(err))
+                LOG.error("Error creating OSC server: {}".format(err))
                 self.osc_server = None
             if self.osc_server is not None:
-                print(self.osc_server.get_url())
+                LOG.info(self.osc_server.get_url())
                 self.osc_server.add_method(
                     "musikernel/wave_edit", 's',
                     wave_edit.MAIN_WINDOW.configure_callback)
@@ -646,7 +650,7 @@ class MkMainWindow(QMainWindow):
             try:
                 f_proc.kill()
             except Exception as ex:
-                print("Exception while killing process\n{}".format(ex))
+                LOG.error("Exception while killing process\n{}".format(ex))
             if os.path.isfile(a_file_name):
                 os.remove(a_file_name)
             if os.path.isfile(f_file_name):
@@ -663,7 +667,7 @@ class MkMainWindow(QMainWindow):
                 os.remove(f_file_name)
                 f_proc.communicate()[0]
                 #f_output = f_proc.communicate()[0]
-                #print(f_output)
+                #LOG.info(f_output)
                 f_exitCode = f_proc.returncode
                 if f_exitCode != 0:
                     f_window.close()
@@ -729,15 +733,15 @@ class MkMainWindow(QMainWindow):
                 self.subprocess_timer.stop()
                 handle_engine_error(util.ENGINE_RETCODE)
         except Exception as ex:
-            print("subprocess_monitor: {}".format(ex))
+            LOG.error("subprocess_monitor: {}".format(ex))
 
     def osc_time_callback(self):
         self.osc_server.recv(1)
 
     def osc_fallback(self, path, args, types, src):
-        print("got unknown message '{}' from '{}'".format(path, src))
+        LOG.warning("got unknown message '{}' from '{}'".format(path, src))
         for a, t in zip(args, types):
-            print("argument of type '{}': {}".format(t, a))
+            LOG.warning("argument of type '{}': {}".format(t, a))
 
     def on_new(self):
         if glbl.IS_PLAYING:
@@ -834,7 +838,7 @@ class MkMainWindow(QMainWindow):
                 else:
                     break
         except Exception as ex:
-            glbl.pydaw_print_generic_exception(ex)
+            util.show_generic_exception(ex)
 
 
     def prepare_to_quit(self):
@@ -866,9 +870,9 @@ class MkMainWindow(QMainWindow):
             f_quit_timer.timeout.connect(self.close)
             f_quit_timer.start(1000)
         except Exception as ex:
-            print("Exception thrown while attempting to exit, "
+            LOG.error("Exception thrown while attempting to exit, "
                 "forcing MusiKernel to exit")
-            print("Exception:  {}".format(ex))
+            LOG.error("Exception:  {}".format(ex))
             exit(999)
 
     def closeEvent(self, event):
@@ -927,7 +931,7 @@ class MkMainWindow(QMainWindow):
                     MAIN_WINDOW, _("Theme Applied..."),
                     _("Please restart MusiKernel to update the UI"))
         except Exception as ex:
-            glbl.pydaw_print_generic_exception(ex)
+            util.show_generic_exception(ex)
 
     def on_version(self):
         f_window = QDialog(MAIN_WINDOW)
@@ -1014,7 +1018,7 @@ class MkMainWindow(QMainWindow):
                 elif a_enc == "lame":
                     f_cmd = [a_enc, "-b", str(f_mp3_br_combobox.currentText()),
                          f_input_file, f_output_file]
-            print(f_cmd)
+            LOG.info(f_cmd)
             return f_cmd
 
         def ok_handler():
@@ -1106,7 +1110,7 @@ class MkMainWindow(QMainWindow):
                         set_output_file_name()
                         self.last_ac_dir = os.path.dirname(f_file_name)
             except Exception as ex:
-                glbl.pydaw_print_generic_exception(ex)
+                util.show_generic_exception(ex)
 
         def file_name_select_output():
             try:
@@ -1140,7 +1144,7 @@ class MkMainWindow(QMainWindow):
                         f_output_name.setText(f_file_name)
                         self.last_ac_dir = os.path.dirname(f_file_name)
             except Exception as ex:
-                glbl.pydaw_print_generic_exception(ex)
+                LOG.error(ex)
 
         def format_changed(a_val=None):
             if f_wav_radiobutton.isChecked():
@@ -1259,14 +1263,14 @@ def final_gc(a_print=True):
     f_last_unreachable = gc.collect()
     if not f_last_unreachable:
         if a_print:
-            print("Successfully garbage collected all objects")
+            LOG.info("Successfully garbage collected all objects")
         return
     for f_i in range(2, 12):
         time.sleep(0.1)
         f_unreachable = gc.collect()
         if f_unreachable == 0:
             if a_print:
-                print("Successfully garbage collected all objects "
+                LOG.info("Successfully garbage collected all objects "
                     "in {} iterations".format(f_i))
             return
         elif f_unreachable >= f_last_unreachable:
@@ -1274,7 +1278,7 @@ def final_gc(a_print=True):
         else:
             f_last_unreachable = f_unreachable
     if a_print:
-        print("gc.collect() returned {} unreachable objects "
+        LOG.warning("gc.collect() returned {} unreachable objects "
             "after {} iterations".format(f_unreachable, f_i))
 
 def flush_events():
@@ -1283,10 +1287,10 @@ def flush_events():
             glbl.APP.processEvents()
             time.sleep(0.1)
         else:
-            print("Successfully processed all pending events "
+            LOG.info("Successfully processed all pending events "
                 "in {} iterations".format(f_i))
             return
-    print("Could not process all events")
+    LOG.warning("Could not process all events")
 
 
 def global_check_device():
@@ -1295,7 +1299,7 @@ def global_check_device():
     f_hardware_dialog.check_device(a_splash_screen=SPLASH_SCREEN)
 
     if not util.global_device_val_dict:
-        print("It appears that the user did not select "
+        LOG.info("It appears that the user did not select "
             "an audio device, quitting...")
         sys.exit(999)
 
@@ -1316,15 +1320,15 @@ def close_pydaw_engine():
         if not f_exited:
             try:
                 if util.global_pydaw_is_sandboxed:
-                    print("ENGINE_SUBPROCESS did not exit on it's own, "
+                    LOG.warning("ENGINE_SUBPROCESS did not exit on it's own, "
                           "sending SIGTERM to helper script...")
                     ENGINE_SUBPROCESS.terminate()
                 else:
-                    print("ENGINE_SUBPROCESS did not exit on it's "
+                    LOG.warning("ENGINE_SUBPROCESS did not exit on it's "
                         "own, sending SIGKILL...")
                     ENGINE_SUBPROCESS.kill()
             except Exception as ex:
-                print("Exception raised while trying to kill process: "
+                LOG.error("Exception raised while trying to kill process: "
                     "{}".format(ex))
         ENGINE_SUBPROCESS = None
 
@@ -1336,24 +1340,24 @@ def kill_pydaw_engine():
     try:
         f_val = subprocess.check_output(['ps', '-ef'])
     except Exception as ex:
-        print("kill_pydaw_engine raised Exception during process search, "
+        LOG.error("kill_pydaw_engine raised Exception during process search, "
               "assuming no zombie processes {}\n".format(ex))
         return
     f_engine_name = "{}-engine".format(global_pydaw_version_string)
     f_val = f_val.decode()
     f_result = []
     for f_line in f_val.split("\n"):
-        #print(f_line)
+        #LOG.info(f_line)
         if f_engine_name in f_line:
             try:
                 f_arr = f_line.split()
                 f_result.append(int(f_arr[1]))
             except Exception as ex:
-                print("kill_pydaw_engine Exception adding PID {}\n\t"
+                LOG.error("kill_pydaw_engine Exception adding PID {}\n\t"
                     "{}".format(f_arr[1], ex))
 
     if len(f_result) > 0:
-        print(f_result)
+        LOG.warning(f_result)
         f_answer = QMessageBox.warning(
             MAIN_WINDOW,
             _("Warning"),
@@ -1366,16 +1370,16 @@ def kill_pydaw_engine():
             for f_pid in set(f_result):
                 try:
                     f_kill = ["kill", "-9", f_arr[1]]
-                    print(f_kill)
+                    LOG.info(f_kill)
                     f_result = subprocess.check_output(f_kill)
-                    print(f_result)
+                    LOG.info(f_result)
                 except Exception as ex:
-                    print("kill_pydaw_engine : Exception: {}".format(ex))
+                    LOG.error("kill_pydaw_engine : Exception: {}".format(ex))
             time.sleep(3.0)
 
 def open_pydaw_engine(a_project_path):
     if not global_pydaw_with_audio:
-        print(_("Not starting audio because of the audio engine setting, "
+        LOG.info(_("Not starting audio because of the audio engine setting, "
               "you can change this in File->HardwareSettings"))
         return
 
@@ -1387,7 +1391,7 @@ def open_pydaw_engine(a_project_path):
         return
 
     f_pid = os.getpid()
-    print(_("Starting audio engine with {}").format(a_project_path))
+    LOG.info(_("Starting audio engine with {}").format(a_project_path))
     global ENGINE_SUBPROCESS
     if util.pydaw_which("pasuspender") is not None:
         f_pa_suspend = True
@@ -1435,7 +1439,7 @@ def open_pydaw_engine(a_project_path):
                 util.BIN_PATH,
                 util.INSTALL_PREFIX,
                 f_project_dir, f_pid, util.USE_HUGEPAGES)
-    print(f_cmd)
+    LOG.info(f_cmd)
     ENGINE_SUBPROCESS = subprocess.Popen([f_cmd], shell=True)
 
 def reopen_pydaw_engine():
@@ -1472,7 +1476,7 @@ def global_open_project(a_project_file, a_wait=True):
     try:
         glbl.PROJECT.create_backup()
     except Exception as ex:
-        print("ERROR:  glbl.PROJECT.create_backup() failed: {}".format(ex))
+        LOG.error("ERROR:  glbl.PROJECT.create_backup() failed: {}".format(ex))
     glbl.PLUGIN_UI_DICT = MkPluginUiDict(
         glbl.PROJECT, glbl.IPC, MAIN_WINDOW.styleSheet())
     for f_module in glbl.HOST_MODULES:
@@ -1491,7 +1495,7 @@ def global_new_project(a_project_file, a_wait=True):
     open_pydaw_engine(a_project_file)
 
 def respawn():
-    print("Spawning child UI process {}".format(sys.argv))
+    LOG.info("Spawning child UI process {}".format(sys.argv))
     if util.IS_WINDOWS:
         CHILD_PROC = subprocess.Popen([
             "python3.exe", util.global_pydaw_version_string + ".py",
@@ -1504,7 +1508,7 @@ def respawn():
         #, shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
     #CHILD_PROC.wait()
     #time.sleep(6.0)
-    print("Parent UI process exiting")
+    LOG.info("Parent UI process exiting")
 
 
 def splash_screen_opening(default_project_file):
@@ -1516,6 +1520,7 @@ def splash_screen_opening(default_project_file):
 
 
 def main():
+    setup_logging()
     global MAIN_WINDOW, SPLASH_SCREEN, ENGINE_SUBPROCESS, RESPAWN
     glbl.APP = QApplication(sys.argv)
     MAIN_WINDOW = MkMainWindow()
@@ -1546,7 +1551,7 @@ def main():
         default_project_file = os.path.join(
             global_pydaw_home, "default-project",
             "default.{}".format(global_pydaw_version_string))
-        print("No default project using {}".format(default_project_file))
+        LOG.info("No default project using {}".format(default_project_file))
 
     if os.path.exists(default_project_file) and \
     not os.access(os.path.dirname(default_project_file), os.W_OK):

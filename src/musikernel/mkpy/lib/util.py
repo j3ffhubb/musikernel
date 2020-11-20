@@ -25,6 +25,7 @@ import subprocess
 import sys
 import time
 
+from mkpy.log import LOG
 from mkpy.mkqt import *
 
 assert "cygwin" not in sys.platform, "Cygwin is unsupported"
@@ -66,6 +67,12 @@ def get_win_drives():
         bitmask >>= 1
     return drives
 
+def show_generic_exception(a_ex):
+    QMessageBox.warning(
+        MAIN_WINDOW,
+        _("Warning"),
+        _("The following error happened:\n{}").format(a_ex),
+    )
 
 PYTHON_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 MKENGINE_DIR = os.path.abspath(os.path.join(PYTHON_DIR, "..", "mkengine"))
@@ -130,7 +137,7 @@ def load_engine_lib(a_engine_callback):
     global ENGINE_LIB, ENGINE_LIB_CALLBACK, ENGINE_LIB_CALLBACK_SIG
     f_dll_name = "{}{}".format(global_pydaw_version_string, DLL_EXT)
     f_dll = os.path.join(MKENGINE_DIR, f_dll_name)
-    print("Using {}".format(f_dll))
+    LOG.info("Using {}".format(f_dll))
     ENGINE_LIB = ctypes.CDLL(f_dll)
     ENGINE_LIB.main.restype = ctypes.c_int
     ENGINE_LIB.main.argstype = [ctypes.c_int, ctypes.POINTER(ctypes.c_char_p)]
@@ -160,7 +167,7 @@ class EngineLibThread(QtCore.QThread):
             PROJECT_DIR.encode("ascii"), b"0",
             str(USE_HUGEPAGES).encode("ascii"))
         ENGINE_RETCODE = ENGINE_LIB.main(5, ctypes.byref(argv))
-        print("ENGINE_RETCODE: {}".format(ENGINE_RETCODE))
+        LOG.info("ENGINE_RETCODE: {}".format(ENGINE_RETCODE))
 
 PROJECT_DIR = None
 
@@ -340,7 +347,7 @@ def case_insensitive_path(a_path, a_assert=True):
                         assert False, "File not found '{}'".format(a_path)
                     else:
                         return None
-        print(f_path)
+        LOG.info(f_path)
         return f_path
 
 def count_beats(a_start_bar, a_start_beat, a_end_bar, a_end_beat):
@@ -486,7 +493,7 @@ def pydaw_rubberband(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift,
             a_src_path,
             a_dest_path,
         ]
-    print("Running {}".format(" ".join(f_cmd)))
+    LOG.info("Running {}".format(" ".join(f_cmd)))
     f_proc = subprocess.Popen(f_cmd)
     return f_proc
 
@@ -499,7 +506,7 @@ def pydaw_sbsms(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift):
         str(1.0 / a_timestretch_amt),
         str(a_pitch_shift), str(a_pitch_shift)
     ]
-    print("Running {}".format(" ".join(f_cmd)))
+    LOG.info("Running {}".format(" ".join(f_cmd)))
     f_proc = subprocess.Popen(f_cmd)
     return f_proc
 
@@ -717,7 +724,7 @@ def pydaw_wait_for_finished_file(a_file):
                 os.remove(a_file)
                 break
             except:
-                print("pydaw_wait_for_finished_file:  Exception "
+                LOG.error("pydaw_wait_for_finished_file:  Exception "
                     "when deleting {}".format(a_file))
         else:
             time.sleep(0.1)
@@ -773,7 +780,7 @@ def get_file_setting(a_name, a_type, a_default):
             with open(f_file_name) as f_file:
                 return a_type(f_file.read())
         except Exception as ex:
-            print("Error in get_file_setting {}".format(ex))
+            LOG.error("Error in get_file_setting {}".format(ex))
             os.remove(f_file_name)
     return a_default
 
@@ -833,12 +840,12 @@ def pydaw_read_device_config():
                     "getenforce").strip().lower() == b"enforcing":
                         f_selinux = True
                 except Exception as ex:
-                    print("Exception while checking getenforce, "
+                    LOG.error("Exception while checking getenforce, "
                         "assuming SELinux is enabled\n{}".format(ex))
                     f_selinux = True
 
                 if f_selinux:
-                    print("SELinux detected, not using any setuid "
+                    LOG.info("SELinux detected, not using any setuid "
                         "binaries to prevent lockups.")
 
             if not IS_LINUX:
@@ -871,11 +878,11 @@ def pydaw_read_device_config():
             SAMPLE_RATE = int(global_device_val_dict["sampleRate"])
             NYQUIST_FREQ = SAMPLE_RATE / 2
     except Exception as ex:
-        print("Exception while reading device config,"
+        LOG.error("Exception while reading device config,"
             " deleting and starting over\n{}".format(ex))
         global_device_val_dict = {}
 
-    print("BIN_PATH == {}".format(BIN_PATH))
+    LOG.info("BIN_PATH == {}".format(BIN_PATH))
 
 pydaw_read_device_config()
 
@@ -896,12 +903,12 @@ def global_get_file_bookmarks():
                         f_result[f_line_arr[1]] = {}
                     f_result[f_line_arr[1]][f_line_arr[0]] = f_line_arr[2]
                 else:
-                    print("Warning:  Not loading bookmark '{}' "
+                    LOG.warning("Warning:  Not loading bookmark '{}' "
                         "because the directory '{}' does not "
                         "exist.".format(f_line_arr[0], f_line_arr[2]))
         return f_result
     except Exception as ex:
-        print("Error getting bookmarks:\n".format(ex))
+        LOG.error("Error getting bookmarks:\n".format(ex))
         return {}
 
 def global_write_file_bookmarks(a_dict):
@@ -930,7 +937,7 @@ def global_delete_file_bookmark(a_category, a_name):
             f_dict[f_key].pop(f_name)
             global_write_file_bookmarks(f_dict)
         else:
-            print("{} was not in the bookmarks file, it may "
+            LOG.warning("{} was not in the bookmarks file, it may "
                 "have been deleted in a different "
                 "file browser widget".format(f_key))
 
@@ -1042,10 +1049,13 @@ class sfz_file:
                     f_key, f_value = f_line.split("=")
                     f_value = string_to_note_num(f_value)
                 except Exception as ex:
-                    print("ERROR:  {}".format(f_line))
+                    LOG.error("ERROR:  {}".format(f_line))
                     raise sfz_exception(
                         "Error parsing key/value pair\n{}\n{}".format(
-                        f_line, ex))
+                            f_line,
+                            ex,
+                        )
+                    )
                 if f_key.lower() == "sample" and \
                 not is_audio_file(f_value.strip()):
                     raise sfz_exception(

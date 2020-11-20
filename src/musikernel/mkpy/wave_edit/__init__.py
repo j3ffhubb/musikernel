@@ -19,6 +19,7 @@ from mkpy.mkqt import *
 
 from mkpy.lib import *
 from mkpy.lib.util import *
+from mkpy.log import LOG
 from mkpy.widgets import *
 from mkpy.lib.translate import _
 from mkpy.plugins import *
@@ -117,7 +118,7 @@ class WaveNextProject(glbl.AbstractProject):
     def open_project(self, a_project_file, a_notify_osc=True):
         self.set_project_folders(a_project_file)
         if not os.path.exists(a_project_file):
-            print("project file {} does not exist, creating as "
+            LOG.warning("project file {} does not exist, creating as "
                 "new project".format(a_project_file))
             self.new_project(a_project_file)
 
@@ -128,7 +129,7 @@ class WaveNextProject(glbl.AbstractProject):
         self.set_project_folders(a_project_file)
 
         for project_dir in self.project_folders:
-            print(project_dir)
+            LOG.info(project_dir)
             if not os.path.isdir(project_dir):
                 os.makedirs(project_dir)
 
@@ -432,7 +433,7 @@ class TransportWidget(glbl.AbstractTransport):
                             f_new_path += ".wav"
                         shutil.move(f_path, f_new_path)
                     else:
-                        print("Error, path did not exist: {}".format(f_path))
+                        LOG.error("Error, path did not exist: {}".format(f_path))
             self.open_rec_dir = f_open_rec_dir_checkbox.isChecked()
             if self.open_rec_dir:
                 WAVE_EDITOR.file_browser.set_folder(
@@ -587,7 +588,7 @@ class MainWindow(QScrollArea):
             elif a_key == "ready":
                 glbl.on_ready()
             elif a_key == "stop":
-                print("Received message to stop playback from engine")
+                LOG.info("Received message to stop playback from engine")
                 glbl.TRANSPORT.stop_button.setChecked(True)
         #This prevents multiple events from moving the same control,
         #only the last goes through
@@ -619,7 +620,7 @@ def global_update_peak_meters(a_val):
             for f_pkm in ALL_PEAK_METERS[f_index]:
                 f_pkm.set_value(f_list[1:])
         else:
-            print("{} not in ALL_PEAK_METERS".format(f_index))
+            LOG.warning("{} not in ALL_PEAK_METERS".format(f_index))
 
 
 class pydaw_wave_editor_widget:
@@ -808,7 +809,7 @@ class pydaw_wave_editor_widget:
             if not os.path.isfile(f_item):
                 f_resave = True
                 f_list.remove(f_item)
-                print("os.path.isfile({}) returned False, removing "
+                LOG.warning("os.path.isfile({}) returned False, removing "
                     "from bookmarks".format(f_item))
         if f_resave:
             PROJECT.set_we_bm(f_list)
@@ -878,7 +879,7 @@ class pydaw_wave_editor_widget:
 
         f_base_file_name = f_path.rsplit("/", 1)[1]
         f_base_file_name = f_base_file_name.rsplit(".", 1)[0]
-        print(f_base_file_name)
+        LOG.info(f_base_file_name)
 
         def on_ok(a_val=None):
             f_stretch = f_timestretch_amt.value()
@@ -1024,7 +1025,7 @@ class pydaw_wave_editor_widget:
                         f_name.setText(f_file_name)
                     self.last_offline_dir = os.path.dirname(f_file_name)
             except Exception as ex:
-                glbl.pydaw_print_generic_exception(ex)
+                util.show_generic_exception(ex)
 
         def on_overwrite(a_val=None):
             f_name.setText(self.file_lineedit.text())

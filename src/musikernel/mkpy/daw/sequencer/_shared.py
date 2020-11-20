@@ -147,17 +147,13 @@ def delete_selected():
 
 def init():
     global copy_action, delete_action
-    print('Creating copy_action')
     copy_action = QAction(
         parent=shared.SEQUENCER,
         text=_("Copy"),
     )
     copy_action.triggered.connect(copy_selected)
-    print('Setting shortcut for copy_action')
     copy_action.setShortcut(QKeySequence.Copy)
 
-    print('Creating delete_action')
     delete_action = QAction(text=_("Delete"))
     delete_action.triggered.connect(delete_selected)
-    print('Setting shortcut for delete_action')
     delete_action.setShortcut(QKeySequence.Delete)

@@ -5,13 +5,14 @@ References to the main MAIN_WINDOW and TRANSPORT are stored here
 for all modules to access
 """
 
+from mkpy.lib import util
+from mkpy.lib.translate import _
+from mkpy.log import LOG
+from mkpy.mkqt import *
 import ast
 import datetime
 import os
 import traceback
-
-from mkpy.lib import util
-from mkpy.lib.translate import _
 
 if (
     util.IS_LINUX
@@ -20,7 +21,6 @@ if (
 ):
     from mkpy.vendor import liblo
 
-from mkpy.mkqt import *
 
 #Circular dependency, so it assigns a pointer to itself here when loaded
 #import plugins
@@ -49,7 +49,7 @@ CC_CLIPBOARD = None
 
 
 def on_ready():
-    print("Engine sent 'ready' message")
+    LOG.info("Engine sent 'ready' message")
     for mod in HOST_MODULES:
         mod.on_ready()
 
@@ -58,7 +58,7 @@ def clean_wav_pool():
     result = set()
     for host in HOST_MODULES:
         uids = host.active_wav_pool_uids()
-        print(host, uids)
+        LOG.info(host, uids)
         result.update(uids)
 
     if util.USE_HUGEPAGES:
@@ -66,10 +66,10 @@ def clean_wav_pool():
             MEMORY_ENTROPY_UIDS.remove(f_uid)
     #invert
     wd = PROJECT.get_wavs_dict()
-    print(wd)
+    LOG.info(wd)
     f_len = len(wd)
     f_result = [x for x in range(f_len) if x not in result]
-    print("clean_wav_pool '{}', '{}'".format(f_len, f_result))
+    LOG.info("clean_wav_pool '{}', '{}'".format(f_len, f_result))
     if f_result:
         f_msg = "|".join(str(x) for x in sorted(f_result))
         IPC.clean_wavpool(f_msg)
@@ -93,7 +93,7 @@ def add_entropy(a_timedelta):
     global MEMORY_ENTROPY
     MEMORY_ENTROPY += a_timedelta
     if MEMORY_ENTROPY > MEMORY_ENTROPY_LIMIT:
-        print("Recording entropy exceeded, restarting engine "
+        LOG.info("Recording entropy exceeded, restarting engine "
             "to clean and defragment memory")
         MEMORY_ENTROPY = datetime.timedelta(minutes=0)
         return True
@@ -102,7 +102,7 @@ def add_entropy(a_timedelta):
 
 def restart_engine():
     if util.IS_ENGINE_LIB:
-        print("Not restarting engine because the engine is running "
+        LOG.info("Not restarting engine because the engine is running "
             "as a shared library")
     else:
         close_pydaw_engine()
@@ -121,11 +121,6 @@ def set_window_title():
                 PROJECT.project_file,
                 util.global_pydaw_version_string))))
 
-def pydaw_print_generic_exception(a_ex):
-    QMessageBox.warning(
-        MAIN_WINDOW, _("Warning"),
-        _("The following error happened:\n{}").format(a_ex))
-
 class AbstractIPC:
     """ Abstract class containing the minimum contract
         to run MK Plugins for host communication to the
@@ -143,7 +138,7 @@ class AbstractIPC:
 
     def send_configure(self, key, value):
         if not IPC_ENABLED and key != "exit":
-            print("IPC_ENABLED == False, "
+            LOG.info("IPC_ENABLED == False, "
                 "Would've sent configure message: key: \""
                 "{}\" value: \"{}\"".format(key, value))
             return
@@ -152,7 +147,7 @@ class AbstractIPC:
         elif self.with_osc:
             liblo.send(OSC, self.configure_path, key, value)
         else:
-            print("Running standalone UI without OSC.  "
+            LOG.info("Running standalone UI without OSC.  "
                 "Would've sent configure message: key: \""
                 "{}\" value: \"{}\"".format(key, value))
 

@@ -11,6 +11,7 @@ from mkpy.glbl.mk_project import *
 from mkpy.lib import history
 from mkpy.lib.util import *
 from mkpy.lib.translate import _
+from mkpy.log import LOG
 from mkpy.mkqt import *
 import os
 import re
@@ -57,7 +58,7 @@ class DawProject(glbl.AbstractProject):
                 a_folder, a_file, a_text, f_old, f_existed)
             self.history_files.append(f_history_file)
             if not util.IS_A_TTY:
-                print(str(f_history_file))
+                LOG.info(str(f_history_file))
 
     def set_undo_context(self, a_context):
         self.undo_context = a_context
@@ -156,7 +157,7 @@ class DawProject(glbl.AbstractProject):
     def open_project(self, a_project_file, a_notify_osc=True):
         self.set_project_folders(a_project_file)
         if not os.path.exists(a_project_file):
-            print("project file {} does not exist, creating as "
+            LOG.info("project file {} does not exist, creating as "
                 "new project".format(a_project_file))
             self.new_project(a_project_file)
 
@@ -167,7 +168,7 @@ class DawProject(glbl.AbstractProject):
         self.set_project_folders(a_project_file)
 
         for project_dir in self.project_folders:
-            print(project_dir)
+            LOG.info(project_dir)
             if not os.path.isdir(project_dir):
                 os.makedirs(project_dir)
 
@@ -467,7 +468,7 @@ class DawProject(glbl.AbstractProject):
             self, a_item_name, a_mrec_list, a_overdub,
             a_sr, a_start_beat, a_end_beat, a_audio_inputs,
             a_sample_count, a_file_name):
-        print("\n".join(a_mrec_list))
+        LOG.info("\n".join(a_mrec_list))
 
         f_audio_files_dict = {}
 
@@ -499,13 +500,13 @@ class DawProject(glbl.AbstractProject):
                         f_new_path, f_uid, sg.frame_count,
                         f_val.output, f_val.sidechain)
                 else:
-                    print("Error, path did not exist: {}".format(f_path))
+                    LOG.error("Error, path did not exist: {}".format(f_path))
 
         f_audio_frame = 0
 
         f_mrec_items = [x.split("|") for x in a_mrec_list]
         f_mrec_items.sort(key=lambda x: int(x[-1]))
-        print("\n".join(str(x) for x in f_mrec_items))
+        LOG.info("\n".join(str(x) for x in f_mrec_items))
         f_item_length = a_end_beat - a_start_beat
         f_sequencer = self.get_region()
         f_note_tracker = {}
@@ -585,11 +586,11 @@ class DawProject(glbl.AbstractProject):
                 f_note.set_length(f_length)
             else:
                 assert False, "Need a different algorithm for this"
-                print("Using tick length for:")
+                LOG.info("Using tick length for:")
                 f_sample_count = f_tick - f_note.start_sample
                 f_seconds = float(f_sample_count) / float(a_sr)
                 f_note.set_length(f_seconds * f_beats_per_second)
-            print(f_note_tracker[a_track_num].pop(f_note_num))
+            LOG.info(f_note_tracker[a_track_num].pop(f_note_num))
 
         new_take()
 
@@ -606,7 +607,7 @@ class DawProject(glbl.AbstractProject):
                 new_take()
 
             if f_type == "loop":
-                print("Loop event")
+                LOG.info("Loop event")
                 f_audio_frame += a_sample_count
                 continue
 
@@ -614,11 +615,11 @@ class DawProject(glbl.AbstractProject):
 
             if f_type == "on":
                 f_note_num, f_velocity, f_tick = (int(x) for x in f_event[3:])
-                print("New note: {} {}".format(f_beat, f_note_num))
+                LOG.info("New note: {} {}".format(f_beat, f_note_num))
                 f_note = pydaw_note(f_beat, 1.0, f_note_num, f_velocity)
                 f_note.start_sample = f_tick
                 if f_note_num in f_note_tracker[f_track]:
-                    print("Terminating note early: {}".format(
+                    LOG.info("Terminating note early: {}".format(
                         (f_track, f_note_num, f_tick)))
                     set_note_length(
                         f_track, f_note_num, f_beat, f_tick)
@@ -630,7 +631,7 @@ class DawProject(glbl.AbstractProject):
                     set_note_length(
                         f_track, f_note_num, f_beat, f_tick)
                 else:
-                    print("Error:  note event not in note tracker")
+                    LOG.error("Error:  note event not in note tracker")
             elif f_type == "cc":
                 f_port, f_val, f_tick = f_event[3:]
                 f_port = int(f_port)
@@ -643,7 +644,7 @@ class DawProject(glbl.AbstractProject):
                 f_pb = pydaw_pitchbend(f_beat, f_val)
                 self.rec_item.add_pb(f_pb)
             else:
-                print("Invalid mrec event type {}".format(f_type))
+                LOG.error("Invalid mrec event type {}".format(f_type))
 
         for f_uid, f_item in f_items_to_save.items():
             f_item.fix_overlaps()

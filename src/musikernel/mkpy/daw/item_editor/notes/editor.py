@@ -12,6 +12,7 @@ from mkpy.lib import util
 from mkpy.lib import scales
 from mkpy.lib.util import *
 from mkpy.lib.translate import _
+from mkpy.log import LOG
 from mkpy.mkqt import *
 
 
@@ -197,14 +198,14 @@ class PianoRollEditor(AbstractItemEditor):
                 f_vels = [x.note_item.velocity for x in f_dict[k]]
                 f_vel = int(sum(f_vels) // len(f_vels))
 
-                print(str(f_max))
-                print(str(f_min))
+                LOG.info(str(f_max))
+                LOG.info(str(f_min))
                 f_length = f_max - f_min
-                print(str(f_length))
+                LOG.info(str(f_length))
                 f_start = f_min
-                print(str(f_start))
+                LOG.info(str(f_start))
                 f_new_note = mk_project.pydaw_note(f_start, f_length, k, f_vel)
-                print(str(f_new_note))
+                LOG.info(str(f_new_note))
                 f_result.append(f_new_note)
 
         self.delete_selected(False)

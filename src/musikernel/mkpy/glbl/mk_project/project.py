@@ -6,6 +6,7 @@ from .sample_graph import (
 from mkpy import glbl
 from mkpy.lib import *
 from mkpy.lib.util import *
+from mkpy.log import LOG
 import collections
 import datetime
 import json
@@ -87,7 +88,7 @@ class MkProject(glbl.AbstractProject):
     def open_project(self, a_project_file, a_notify_osc=True):
         self.set_project_folders(a_project_file)
         if not os.path.exists(a_project_file):
-            print("project file {} does not exist, creating as "
+            LOG.info("project file {} does not exist, creating as "
                 "new project".format(a_project_file))
             self.new_project(a_project_file)
         else:
@@ -97,7 +98,7 @@ class MkProject(glbl.AbstractProject):
         self.set_project_folders(a_project_file)
 
         for project_dir in self.project_folders:
-            print(project_dir)
+            LOG.info(project_dir)
             if not os.path.isdir(project_dir):
                 os.makedirs(project_dir)
 
@@ -121,7 +122,7 @@ class MkProject(glbl.AbstractProject):
 
     def save_project_as(self, a_file_name):
         f_file_name = str(a_file_name)
-        print("Saving project as {} ...".format(f_file_name))
+        LOG.info("Saving project as {} ...".format(f_file_name))
         f_new_project_folder = os.path.dirname(f_file_name)
         #The below is safe because we already checked that the folder
         #should be empty before calling this
@@ -153,19 +154,19 @@ class MkProject(glbl.AbstractProject):
         if  ":" in x and x.endswith(".tar.bz2")):
             f_old = os.path.join(self.backups_folder, f_name)
             f_new = os.path.join(self.backups_folder, f_name.replace(":", "-"))
-            print("Renaming {} -- to -- {}".format(f_old, f_new))
+            LOG.info("Renaming {} -- to -- {}".format(f_old, f_new))
             shutil.move(f_old, f_new)
             f_found = True
         if not f_found:
-            print("History was clean, not modifying anything")
+            LOG.info("History was clean, not modifying anything")
             return
         # Also clean up the history tree
         f_history = self.get_backups_history()
         if not f_history:
             return
-        print('Old f_history["CURRENT"] = {}'.format(f_history["CURRENT"]))
+        LOG.info('Old f_history["CURRENT"] = {}'.format(f_history["CURRENT"]))
         f_history["CURRENT"] = f_history["CURRENT"].replace(":", "-")
-        print('New f_history["CURRENT"] = {}'.format(f_history["CURRENT"]))
+        LOG.info('New f_history["CURRENT"] = {}'.format(f_history["CURRENT"]))
         # breadth-first search to fix the file names
         fifo = collections.deque([f_history["NODES"]])
         while fifo:
@@ -178,7 +179,7 @@ class MkProject(glbl.AbstractProject):
                     f_node.pop(k)
                 if v:
                     fifo.append(v)
-        print("New f_history:  {}".format(f_history))
+        LOG.info("New f_history:  {}".format(f_history))
         self.save_backups_history(f_history)
 
     def create_backup(self, a_name=None):
@@ -187,7 +188,7 @@ class MkProject(glbl.AbstractProject):
             datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S.tar.bz2")
         f_file_path = os.path.join(self.backups_folder, f_backup_name)
         if os.path.exists(f_file_path):
-            print("create_backup:  '{}' exists".format(f_file_path))
+            LOG.info("create_backup:  '{}' exists".format(f_file_path))
             return False
         with tarfile.open(f_file_path, "w:bz2") as f_tar:
             f_tar.add(
@@ -205,8 +206,8 @@ class MkProject(glbl.AbstractProject):
                     [f_history["CURRENT"], f_backup_name])
                 self.save_backups_history(f_history)
             except Exception as ex:
-                print("ERROR:  create_backup() failed {}".format(ex))
-                print("Resetting project history")
+                LOG.error("ERROR:  create_backup() failed {}".format(ex))
+                LOG.error("Resetting project history")
                 self.save_backups_history(
                     {"NODES":{f_backup_name:{}}, "CURRENT":f_backup_name})
         else:
@@ -393,7 +394,7 @@ class MkProject(glbl.AbstractProject):
             a_audio_item.uid = self.timestretch_cache[f_key]
 
             if f_cmd is not None:
-                print("Running {}".format(" ".join(f_cmd)))
+                LOG.info("Running {}".format(" ".join(f_cmd)))
                 f_proc = subprocess.Popen(f_cmd)
                 return f_dest_path, f_uid, f_proc
             else:
@@ -406,7 +407,7 @@ class MkProject(glbl.AbstractProject):
             f_old_path = self.timestretch_reverse_lookup[f_new_path]
             return self.get_wav_uid_by_name(f_old_path)
         else:
-            print("\n####\n####\nWARNING:  "
+            LOG.warning("\n####\n####\nWARNING:  "
                 "timestretch_get_orig_file_uid could not find uid {}"
                 "\n####\n####\n".format(a_uid))
             return a_uid
@@ -422,7 +423,7 @@ class MkProject(glbl.AbstractProject):
         f_result = pydaw_sample_graph.create(
             f_pygraph_file, self.samples_folder)
         if not f_result.is_valid(): # or not f_result.check_mtime():
-            print("\n\nNot valid, or else mtime is newer than graph time, "
+            LOG.info("\n\nNot valid, or else mtime is newer than graph time, "
                   "deleting sample graph...\n")
             pydaw_remove_item_from_sg_cache(f_pygraph_file)
             self.create_sample_graph(self.get_wav_path_by_uid(a_uid), a_uid)
@@ -523,6 +524,6 @@ class MkProject(glbl.AbstractProject):
                     pydaw_folder_plugins, a_new, file_handle.read())
                 #self.commit("Copy plugin UID {} to {}".format(a_old, a_new))
         else:
-            print("{} does not exist, not copying".format(f_old_path))
+            LOG.info("{} does not exist, not copying".format(f_old_path))
 
 

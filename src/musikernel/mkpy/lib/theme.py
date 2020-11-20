@@ -1,4 +1,6 @@
 from .util import *
+from mkpy.log import LOG
+
 
 ICON_PATH = os.path.join(
     INSTALL_PREFIX, "share", "pixmaps",
@@ -45,13 +47,13 @@ def load_color_palette():
 
     filename = os.path.join(STYLESHEET_DIR, "palette.json")
     if os.path.isfile(filename):
-        print("Attempting to load '{}'".format(filename))
+        LOG.info("COLOR_PALETTE: Attempting to load '{}'".format(filename))
         with open(filename) as fh:
             try:
                 tmp_palette = ast.literal_eval(fh.read())
                 for k, v in tmp_palette.items():
                     if k not in COLOR_PALETTE:
-                        print("Unknown key '{}'".format(k))
+                        LOG.info("COLOR_PALLETTE: Unknown key '{}'".format(k))
                         continue
                     if isinstance(v, list):
                         for val in v:
@@ -60,7 +62,7 @@ def load_color_palette():
                         test_value(v)
                     COLOR_PALETTE[k] = v
             except Exception as ex:
-                print("Error loading color palette: {}".format(ex))
+                LOG.error("Error loading color palette: {}".format(ex))
 
 print("Using stylesheet " + STYLESHEET_FILE)
 STYLESHEET = pydaw_read_file_text(STYLESHEET_FILE)

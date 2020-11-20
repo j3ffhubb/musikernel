@@ -32,6 +32,10 @@ from mkpy.lib import (
     util,
 )
 from mkpy.lib.translate import _, global_encoding
+from mkpy.log import (
+    LOG,
+    setup_logging,
+)
 
 f_device_tooltip = _("""\
 Normal:  Run the audio engine without elevated privileges.  This generally
@@ -161,11 +165,11 @@ class hardware_dialog:
             f_portaudio_so_path = os.path.join(
                 util.BIN_DIR, "libportaudio-2.dll")
         else:
-            print("Unsupported platform {}, don't know where to look "
+            LOG.error("Unsupported platform {}, don't know where to look "
                 "for shared libraries.")
             raise NotImplementedError
 
-        print("Loading Portaudio library")
+        LOG.info("Loading Portaudio library")
         ctypes.cdll.LoadLibrary(f_portaudio_so_path)
         self.pyaudio = ctypes.CDLL(f_portaudio_so_path)
         self.pyaudio.Pa_GetDeviceInfo.restype = ctypes.POINTER(
@@ -177,28 +181,28 @@ class hardware_dialog:
         self.pyaudio.Pa_IsFormatSupported.argstype = [
             ctypes.POINTER(portaudio.PaStreamParameters),
             ctypes.POINTER(portaudio.PaStreamParameters), ctypes.c_double]
-        print("Initializing Portaudio")
+        LOG.info("Initializing Portaudio")
         self.pyaudio.Pa_Initialize()
 
-        print("Loading PortMIDI library")
+        LOG.info("Loading PortMIDI library")
         ctypes.cdll.LoadLibrary(f_pm_dll)
         self.pypm = ctypes.CDLL(f_pm_dll)
         self.pypm.Pm_GetDeviceInfo.restype = ctypes.POINTER(
             portmidi.PmDeviceInfo)
-        print("Initializing PortMIDI")
+        LOG.info("Initializing PortMIDI")
         self.pypm.Pm_Initialize()
         self.devices_open = True
-        print("Finished opening hardware devices")
+        LOG.info("Finished opening hardware devices")
 
     def close_devices(self):
         if self.devices_open:
             import _ctypes
             import gc
-            print("Terminating Portaudio")
+            LOG.info("Terminating Portaudio")
             self.pyaudio.Pa_Terminate()
-            print("Terminating PortMIDI")
+            LOG.info("Terminating PortMIDI")
             self.pypm.Pm_Terminate()
-            print("Cleaning up...")
+            LOG.info("Cleaning up...")
             for x in (self.pyaudio._handle, self.pypm._handle):
                 if util.IS_WINDOWS:
                     _ctypes.FreeLibrary(x)
@@ -209,10 +213,10 @@ class hardware_dialog:
             gc.collect()
             self.devices_open = False
             time.sleep(0.5)  # Give the kernel audio API time to close
-            print("Finished")
+            LOG.info("Finished")
         else:
             pass
-#            print("close_devices called, but devices are not open")
+#            LOG.error("close_devices called, but devices are not open")
 #            import traceback
 #            traceback.print_stack()
 
@@ -255,7 +259,7 @@ class hardware_dialog:
         self.close_devices()
 
         if not f_device_str in f_audio_device_names:
-            print("{} not in {}".format(f_device_str, f_audio_device_names))
+            LOG.info("{} not in {}".format(f_device_str, f_audio_device_names))
             util.global_device_val_dict.pop("name")
             if "(hw:" in f_device_str:
                 f_device_arr = f_device_str.split("(hw:")
@@ -264,11 +268,11 @@ class hardware_dialog:
                 for f_device in f_audio_device_names:
                     if f_device.startswith(f_device_name) and \
                     f_device.endswith(f_device_num):
-                        print(
+                        LOG.info(
                             _("It appears that the system switched up the "
                             "ALSA hw:X number, fixing it all sneaky-like "
                             "in the background.  (grumble, grumble...)"))
-                        print(f_device)
+                        LOG.info(f_device)
                         util.global_device_val_dict["name"] = f_device
                         f_file = open(
                             util.global_pydaw_device_config,
@@ -310,7 +314,7 @@ class hardware_dialog:
         else:
             f_window = QWidget()
             f_window.setObjectName("plugin_ui")
-        print("Created dialog window, adding widgets")
+        LOG.info("Created dialog window, adding widgets")
 
         def f_close_event(a_self=None, a_event=None):
             self.close_devices()
@@ -428,22 +432,21 @@ class hardware_dialog:
         f_name_to_index = {x:{} for x in f_host_api_names}
         f_host_api_device_names = {x:[] for x in f_host_api_names}
 
-        print("Enumerating audio devices")
+        LOG.info("Enumerating audio devices")
         for i in range(f_count):
             f_dev = self.pyaudio.Pa_GetDeviceInfo(i)
             f_dev_name = f_dev.contents.name.decode(global_encoding)
-            print("\nDevice Index: {}".format(i))
-            print("Name : {}".format(f_dev_name))
-            print("maxInputChannels : {}".format(
+            LOG.info("\nDevice Index: {}".format(i))
+            LOG.info("Name : {}".format(f_dev_name))
+            LOG.info("maxInputChannels : {}".format(
                 f_dev.contents.maxInputChannels))
-            print("maxOutputChannels : {}".format(
+            LOG.info("maxOutputChannels : {}".format(
                 f_dev.contents.maxOutputChannels))
-            print()
             f_host_api = f_host_api_names[f_dev.contents.hostApi]
             f_name_to_index[f_host_api][f_dev_name] = i
             f_result_dict[f_host_api][f_dev_name] = f_dev.contents
             f_host_api_device_names[f_host_api].append(f_dev_name)
-        print("Finished enumerating audio devices")
+        LOG.info("Finished enumerating audio devices")
 
         f_host_api_input_names = {
             k:[x for x in v if f_result_dict[k][x].maxInputChannels]
@@ -493,12 +496,12 @@ class hardware_dialog:
 
         self.midi_in_checkboxes = {}
 
-        print("Enumerating MIDI devices")
+        LOG.info("Enumerating MIDI devices")
         for loop in range(self.pypm.Pm_CountDevices()):
             f_midi_device = self.pypm.Pm_GetDeviceInfo(loop)
             f_midi_device_name = \
                 f_midi_device.contents.name.decode(global_encoding)
-#                print("DeviceID: {} Name: '{}' Input?: {} "
+#                LOG.info("DeviceID: {} Name: '{}' Input?: {} "
 #                    "Output?: {} Opened: {} ".format(
 #                    loop, f_midi_device_name, f_midi_device.contents.input,
 #                    f_midi_device.contents.output,
@@ -512,7 +515,7 @@ class hardware_dialog:
             for f_cbox in sorted(
             self.midi_in_checkboxes, key=lambda x: x.lower()):
                 f_midi_in_layout.addWidget(self.midi_in_checkboxes[f_cbox])
-        print("Finished enumerating MIDI devices")
+        LOG.info("Finished enumerating MIDI devices")
 
         f_midi_in_layout.addItem(
             QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Expanding))
@@ -721,7 +724,7 @@ class hardware_dialog:
                         f_name = f_name.split("(hw:")[0]
                         for f_dev in f_result_dict[self.subsystem]:
                             if f_dev.startswith(f_name):
-                                print("Device number changed, fixing")
+                                LOG.info("Device number changed, fixing")
                                 f_device_name_combobox.setCurrentIndex(
                                     f_device_name_combobox.findText(f_dev))
                                 break
@@ -779,7 +782,7 @@ class hardware_dialog:
         if a_msg is not None:
             QMessageBox.warning(f_window, _("Error"), a_msg)
 
-        print("Setting dialog size")
+        LOG.info("Setting dialog size")
         f_screen = QDesktopWidget().screenGeometry()
         f_size = f_window.geometry()
         f_hpos = (f_screen.width() - f_size.width()) / 2
@@ -787,13 +790,14 @@ class hardware_dialog:
         f_window.move(f_hpos, f_vpos)
         latency_changed()
         f_window.raise_()
-        print("Showing dialog")
+        LOG.info("Showing dialog")
         if self.is_running:
             f_window.exec_()
         else:
             f_window.show()
 
 if __name__ == "__main__":
+    setup_logging()
     def _hardware_dialog_standalone():
         app = QApplication(sys.argv)
         if len(sys.argv) == 2:
