@@ -521,8 +521,8 @@ class ItemSequencer(QGraphicsView):
         f_pos = a_event.scenePos()
         if shared.AUDIO_ITEMS_TO_DROP:
             self.add_items(f_pos, shared.AUDIO_ITEMS_TO_DROP)
-        elif MIDI_FILES_TO_DROP:
-            f_midi_path = MIDI_FILES_TO_DROP[0]
+        elif shared.MIDI_FILES_TO_DROP:
+            f_midi_path = shared.MIDI_FILES_TO_DROP[0]
             f_beat, f_lane_num = self.pos_to_beat_and_track(f_pos)
             f_midi = DawMidiFile(f_midi_path, shared.PROJECT)
             shared.PROJECT.import_midi_file(f_midi, f_beat, f_lane_num)
