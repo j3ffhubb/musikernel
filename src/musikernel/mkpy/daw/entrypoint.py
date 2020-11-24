@@ -57,6 +57,9 @@ from mkpy.daw import strings as daw_strings
 from mkpy.lib import strings as mk_strings
 
 
+CLOSE_ENGINE_ON_RENDER = True
+
+
 class MainWindow(QScrollArea):
     """ The main window for DAW-Next that contains all widgets
         except TransportWidget

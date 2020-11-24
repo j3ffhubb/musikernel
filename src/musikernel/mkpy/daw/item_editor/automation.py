@@ -194,7 +194,12 @@ class AutomationEditor(AbstractItemEditor):
                 f_cc_val = 1.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
                     self.viewer_height) * 2.0)
                 f_cc_val = pydaw_clip_value(f_cc_val, -1.0, 1.0)
-                shared.ITEM_EDITOR.add_pb(pydaw_pitchbend(f_cc_start, f_cc_val))
+                shared.ITEM_EDITOR.add_pb(
+                    mk_project.pydaw_pitchbend(
+                        f_cc_start,
+                        f_cc_val,
+                    )
+                )
             self.selected_str = []
             global_save_and_reload_items()
         QGraphicsScene.mousePressEvent(self.scene, a_event)
@@ -560,7 +565,10 @@ class AutomationEditorWidget:
             f_value = pydaw_clip_value(
                 f_epb_spinbox.value() / f_ipb_spinbox.value(),
                 -1.0, 1.0, a_round=True)
-            f_pb = pydaw_pitchbend(f_pos_spinbox.value() - 1.0, f_value)
+            f_pb = mk_project.pydaw_pitchbend(
+                f_pos_spinbox.value() - 1.0,
+                f_value,
+            )
             shared.CURRENT_ITEM.add_pb(f_pb)
 
             global LAST_IPB_VALUE
