@@ -136,7 +136,8 @@ class Item:
                     note_off=end,
                 )
                 for send in send_lookup[pattern_uid]:
-                    result[send.plugin_rack_uid].append(rack_event)
+                    if not send.mute_notes:
+                        result[send.plugin_rack_uid].append(rack_event)
             for cc in pattern.ccs:
                 if cc.pos < item_ref.item_start:
                     continue
@@ -148,7 +149,8 @@ class Item:
                     note_uid=cc.note_uid,
                 )
                 for send in send_lookup[pattern_uid]:
-                    result[send.plugin_rack_uid].append(rack_event)
+                    if not send.mute_ccs:
+                        result[send.plugin_rack_uid].append(rack_event)
             for pb in pattern.pbs:
                 if pb.pos < item_ref.item_start:
                     continue
@@ -159,5 +161,6 @@ class Item:
                     note_uid=pb.note_uid,
                 )
                 for send in send_lookup[pattern_uid]:
-                    result[send.plugin_rack_uid].append(rack_event)
+                    if not send.mute_pbs:
+                        result[send.plugin_rack_uid].append(rack_event)
 

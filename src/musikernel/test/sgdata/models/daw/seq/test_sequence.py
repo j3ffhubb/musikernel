@@ -76,7 +76,8 @@ def test_compile(daw_project_folders, wav_pool):
                 AudioSend(0, 0, 0, 0, 0.),
             ],
             [
-                MIDISend(0, 0, 0),
+                MIDISend(0, 0, 0, False, False, False),
+                MIDISend(1, 0, 0, True, True, True),
             ],
         ),
     )
@@ -91,4 +92,5 @@ def test_compile(daw_project_folders, wav_pool):
         set(range(32)),
     )
     assert result, result
+    assert len(result[0]) == 4, result[0]
 
