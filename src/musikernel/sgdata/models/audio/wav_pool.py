@@ -110,14 +110,17 @@ class WavPoolEntry:
         uid,
         path,
         wav_dir,
-        cache,
+        cached,
         paifx_uid,
     ):
         """ Add a new file to the wav pool, caching it in the project
             @uid:       int, The next available uid in this project
             @path:      str, The local path to the file
             @wav_dir:   str, The project wav file cache dir
-            @cache:     bool, True to cache the file, otherwise False
+            @cached:    bool, True to cache the file, otherwise False.  The
+                        file should be in $project/audio/local if False,
+                        and @path should be only a file name rather than an
+                        absolute path to the source
             @paifx_uid: int, The default per-audio-item effects uid for
                         this file
         """
@@ -126,7 +129,7 @@ class WavPoolEntry:
         sample_rate = mut.info.sample_rate
         channels = mut.info.channels
         # Current behavior is to overwrite even if it exists
-        if cache:
+        if cached:
             # TODO: Windows
             cache_file = os.path.join(
                 wav_dir,
@@ -141,9 +144,8 @@ class WavPoolEntry:
             sample_count,
             sample_rate,
             channels,
-            int(cache),
+            int(cached),
             path,
             paifx_uid,
         )
-
 
