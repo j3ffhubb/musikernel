@@ -1,4 +1,4 @@
-from sgdata.models.daw.track import DawTrack, DawTracks
+from sgdata.models.daw.project.track import DawTrack, DawTracks
 
 
 def test_active_tracks():

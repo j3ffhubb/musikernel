@@ -1,3 +1,4 @@
+from .track import DawTracks
 from sgdata.models.util.next_uid import NextUID
 from sgdata.models.util.object_name import ObjectName, ObjectNames
 from pymarshal.json import type_assert
@@ -6,6 +7,7 @@ from pymarshal.json import type_assert
 class DawProject:
     def __init__(
         self,
+        tracks,
         next_audio_item_uid,
         next_audio_pattern_uid,
         next_midi_pattern_uid,
@@ -15,6 +17,11 @@ class DawProject:
         audio_pattern_names,
         midi_pattern_names,
     ):
+        self.tracks = type_assert(
+            tracks,
+            DawTracks,
+            desc="The tracks for this project",
+        )
         self.next_audio_item_uid = type_assert(
             next_audio_item_uid,
             NextUID,
@@ -56,6 +63,7 @@ class DawProject:
     def new():
         """ Create a new, empty project """
         return DawProject(
+            DawTracks.new(),
             NextUID.new(),
             NextUID.new(),
             NextUID.new(),

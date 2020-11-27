@@ -1,6 +1,6 @@
 from sgdata.models.files import ProjectFileJSON, ProjectFolderJSON
 from sgdata.models.daw.pattern.note import Note
-from sgdata.models.daw.track import DawTracks
+from sgdata.models.daw.project.track import DawTracks
 import os
 import pytest
 import shutil
