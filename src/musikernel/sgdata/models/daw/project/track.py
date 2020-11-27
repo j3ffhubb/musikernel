@@ -34,6 +34,12 @@ class DawTracks:
                 if not x.mute
             )
 
+    def by_uid(self):
+        return {
+            x.uid: x
+            for x in self.tracks
+        }
+
 class DawTrack:
     def __init__(
         self,
