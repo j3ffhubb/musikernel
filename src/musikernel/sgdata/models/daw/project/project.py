@@ -12,6 +12,7 @@ class DawProject:
         next_audio_pattern_uid,
         next_midi_pattern_uid,
         next_note_uid,
+        next_paifx_uid,
         sequence_names,
         item_names,
         audio_pattern_names,
@@ -37,6 +38,11 @@ class DawProject:
         self.next_note_uid = type_assert(
             next_note_uid,
             NextUID,
+        )
+        self.next_paifx_uid = type_assert(
+            next_paifx_uid,
+            NextUID,
+            desc="The next available per-audio-item-effects uid",
         )
         self.sequence_names = type_assert(
             sequence_names,
@@ -64,6 +70,7 @@ class DawProject:
         """ Create a new, empty project """
         return DawProject(
             DawTracks.new(),
+            NextUID.new(),
             NextUID.new(),
             NextUID.new(),
             NextUID.new(),

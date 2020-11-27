@@ -8,7 +8,6 @@ class GlobalProject:
         self,
         next_wav_pool_uid,
         next_plugin_uid,
-        next_paifx_uid,
     ):
         self.next_wav_pool_uid = type_assert(
             next_wav_pool_uid,
@@ -20,16 +19,10 @@ class GlobalProject:
             NextUID,
             desc="The next available plugin uid",
         )
-        self.next_paifx_uid = type_assert(
-            next_paifx_uid,
-            NextUID,
-            desc="The next available per-audio-item-effects uid",
-        )
 
     @staticmethod
     def new():
         return GlobalProject(
-            NextUID.new(),
             NextUID.new(),
             NextUID.new(),
         )
