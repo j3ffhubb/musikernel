@@ -8,6 +8,12 @@ class AbstractProjectFolders:
     """ A grouping of related project folders  """
     def create(self):
         """ Create a new project directory structure """
+        if (
+            hasattr(self, 'root')
+            and
+            not os.path.isdir(self.root)
+        ):
+            os.makedirs(self.root)
         for v in (
             x for x in self.__dict__.values()
             if hasattr(x, 'create')

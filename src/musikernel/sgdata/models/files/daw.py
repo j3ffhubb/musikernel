@@ -3,7 +3,10 @@ from .lib.csv import (
     ProjectFolderCSV,
     ProjectFolderNestedCSV,
 )
-from .lib.json import ProjectFolderJSON
+from .lib.json import (
+    ProjectFileJSON,
+    ProjectFolderJSON,
+)
 from mkpy.log import LOG
 from pymarshal import type_assert
 from sgdata.models.daw.engine import *
@@ -11,6 +14,7 @@ from sgdata.models.daw.item import Item
 from sgdata.models.daw.paifx import PerAudioItemFXControls
 from sgdata.models.daw.pattern.audio import AudioPattern
 from sgdata.models.daw.pattern.midi import MIDIPattern
+from sgdata.models.daw.project import DawProject
 from sgdata.models.daw.seq import Sequence
 from sgdata.models.plugin import Plugin
 from sgdata.models.plugin import PluginRack
@@ -24,6 +28,8 @@ __all__ = [
 class ProjectFoldersDaw(AbstractProjectFolders):
     def __init__(
         self,
+        root,
+        project,
         audio_patterns,
         engine_plugins,
         engine_rack_events,
@@ -34,7 +40,22 @@ class ProjectFoldersDaw(AbstractProjectFolders):
         plugins,
         sequences,
     ):
-        self.audio_patterns = type_assert(audio_patterns, ProjectFolderJSON)
+        self.root = type_assert(
+            root,
+            str,
+            desc="""
+                The root directory of the DAW files,
+                $project_root/projects/daw
+            """,
+        )
+        self.project = type_assert(
+            project,
+            ProjectFileJSON,
+        )
+        self.audio_patterns = type_assert(
+            audio_patterns,
+            ProjectFolderJSON,
+        )
         self.engine_plugins = type_assert(
             engine_plugins,
             ProjectFolderCSV,
@@ -63,6 +84,11 @@ class ProjectFoldersDaw(AbstractProjectFolders):
             'daw',
         )
         return ProjectFoldersDaw(
+            root=root,
+            project=ProjectFileJSON(
+                os.path.join(root, 'project.json'),
+                DawProject,
+            ),
             audio_patterns=ProjectFolderJSON(
                 os.path.join(root, 'audio_patterns'),
                 AudioPattern,
