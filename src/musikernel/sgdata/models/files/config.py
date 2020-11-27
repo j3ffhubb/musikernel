@@ -1,5 +1,5 @@
-from .csv import ProjectFileCSV
-from .json import ProjectFileJSON
+from .lib.csv import ProjectFileCSV
+from .lib.json import ProjectFileJSON
 from mkpy.lib.util import global_pydaw_version_string
 from sgdata.models.config import (
     DeviceConfig,

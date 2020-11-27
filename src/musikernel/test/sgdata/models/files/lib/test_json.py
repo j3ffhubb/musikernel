@@ -1,4 +1,7 @@
-from sgdata.models.files import ProjectFileJSON, ProjectFolderJSON
+from sgdata.models.files.lib.json import (
+    ProjectFileJSON,
+    ProjectFolderJSON,
+)
 from sgdata.models.daw.pattern.note import Note
 from sgdata.models.daw.project.track import DawTracks
 import os

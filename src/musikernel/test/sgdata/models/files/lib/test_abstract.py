@@ -1,4 +1,4 @@
-from sgdata.models.files.abstract import (
+from sgdata.models.files.lib.abstract import (
     AbstractProjectFile,
     AbstractProjectFolder,
     AbstractProjectNestedFolder,

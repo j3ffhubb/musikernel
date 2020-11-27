@@ -1,4 +1,4 @@
-from .abstract import AbstractProjectFolders
+from .lib.abstract import AbstractProjectFolders
 from pymarshal.json import type_assert
 import os
 

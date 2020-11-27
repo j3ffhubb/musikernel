@@ -1,4 +1,4 @@
-from sgdata.models.files import (
+from sgdata.models.files.lib.csv import (
     ProjectFileCSV,
     ProjectFolderCSV,
 )
