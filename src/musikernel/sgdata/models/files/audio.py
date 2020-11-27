@@ -1,5 +1,8 @@
 from .lib.abstract import AbstractProjectFolders
+from .lib.csv import ProjectFileCSV
+from .lib.json import ProjectFileJSON
 from pymarshal.json import type_assert
+from sgdata.models.audio import *
 import os
 
 
@@ -10,6 +13,9 @@ class ProjectFoldersAudio(AbstractProjectFolders):
         cache,
         local,
         samplegraph,
+        wav_pool,
+        recordings,
+        stretches,
     ):
         self.root = type_assert(
             root,
@@ -39,6 +45,21 @@ class ProjectFoldersAudio(AbstractProjectFolders):
             str,
             desc="Generated sample graphs data files for each wav pool entry",
         )
+        self.wav_pool = type_assert(
+            wav_pool,
+            ProjectFileCSV,
+            desc="The wave pool for this project",
+        )
+        self.recordings = type_assert(
+            recordings,
+            ProjectFileJSON,
+            desc="Tracks files that were created by recordings",
+        )
+        self.stretches = type_assert(
+            stretches,
+            ProjectFileJSON,
+            desc="Tracks files that were time stretched or pitch shifted",
+        )
 
     @staticmethod
     def new(project_root):
@@ -51,5 +72,26 @@ class ProjectFoldersAudio(AbstractProjectFolders):
             cache=os.path.join(root, 'cache'),
             local=os.path.join(root, 'local'),
             samplegraph=os.path.join(root, 'samplegraph'),
+            wav_pool=ProjectFileCSV(
+                os.path.join(root, 'wav_pool.csv'),
+                WavPool,
+            ),
+            recordings=ProjectFileJSON(
+                os.path.join(root, 'recordings.json'),
+                Recordings,
+            ),
+            stretches=ProjectFileJSON(
+                os.path.join(root, 'stretches.json'),
+                Stretches,
+            ),
         )
+
+    def create(self):
+        for dirname in (
+            self.root,
+            self.cache,
+            self.local,
+            self.samplegraph,
+        ):
+            os.makedirs(dirname)
 

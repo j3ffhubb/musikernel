@@ -10,6 +10,7 @@ class Stretch:
         wav_pool_uid,
         algorithm,
         ratio,
+        pitch,
     ):
         self.uid = type_assert(uid, int)
         self.wav_pool_uid = type_assert(
@@ -28,12 +29,18 @@ class Stretch:
             check=lambda x: x >= 0.01 and x != 1.0,
             desc="The amount of stretch.  0.5 == half length, 2.0 == double",
         )
+        self.pitch = type_assert(
+            pitch,
+            float,
+            desc="The pitch shift of this file",
+        )
 
     def key(self):
         return (
             self.wav_pool_uid,
             self.algorithm,
             self.ratio,
+            self.pitch,
         )
 
 class Stretches:

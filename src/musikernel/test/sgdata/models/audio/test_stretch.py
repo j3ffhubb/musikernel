@@ -8,6 +8,7 @@ def test_add():
         0,
         "SBSMS",
         1.25,
+        12.,
     )
     stretches.add(stretch)
     stretches.add(stretch)
