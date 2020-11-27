@@ -1,3 +1,4 @@
+from mkpy.lib.util import pydaw_db_to_lin
 from pymarshal.json import type_assert, type_assert_iter
 
 
@@ -19,6 +20,8 @@ class AudioItem:
         reverse,
         send_mode,
         paifx_uid,
+        attack,
+        release,
     ):
         self.wav_pool_uid = type_assert(
             wav_pool_uid,
@@ -121,3 +124,72 @@ class AudioItem:
                 audio item.
             """,
         )
+        self.attack = type_assert(
+            attack,
+            int,
+            check=lambda x: x >= 0 and x <= 50,
+            desc="""
+                The attack of the audio item envelope, in milliseconds.
+                Will go from linear 0.0 to the bottom of the fade in volume
+                in this time.  If attack is longer than the fade in, there
+                will be no fade in.  If there is no fade in, there will be
+                no attack.
+            """,
+        )
+        self.release = type_assert(
+            release,
+            int,
+            check=lambda x: x >= 0 and x <= 50,
+            desc="""
+                The release of the audio item envelope, in milliseconds.
+                Will go from linear 0.0 to the bottom of the fade out volume
+                in this time.  If release is longer than the fade out, there
+                will be no fade out.  If there is no fade out, there will be
+                no release.
+            """
+        )
+
+    def compile_fade_in(
+        self,
+        start,
+        length,
+        sr,
+    ):
+        """
+            @start:  int, The global positon of of the audio item, in samples
+            @length: int, The length of the item, in samples
+            @sr:     int, The sample rate of the audio device, in hertz
+            @return:
+                attack_end:
+                    int, The global sample that attack ends on, or -1 for
+                    no attack
+                attack_recip:
+                    float, The reciprocal of the length of the attack
+                attack_vol:
+                    float, The linear (not decibels) value that the attack
+                    ends at before transitioning to the fade in
+                fade_in_end:
+                    int, The global sample that fade in ends on, or -1 for
+                    no fade in
+        """
+        attack_length = int(
+            round(self.attack * 0.001 * sr),
+        )
+        attack_recip = 1. / (attack_length or 1.)
+        attack_end = attack_length + start
+        fade_in_length = int(
+            round(length * self.fade_in_end)
+        )
+        fade_in_end = fade_in_length + attack_end
+        if fade_in_end > attack_end:
+            attack_vol = pydaw_db_to_lin(self.fade_in_vol)
+        else:
+            attack_vol = 1.0
+
+        return (
+            attack_end,
+            attack_recip,
+            attack_vol,
+            fade_in_end,
+        )
+

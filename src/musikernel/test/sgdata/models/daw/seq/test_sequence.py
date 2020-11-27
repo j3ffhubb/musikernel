@@ -63,6 +63,8 @@ def test_compile(daw_project_folders, wav_pool):
                     0,
                     0,
                     0,
+                    5,
+                    5,
                 ),
             ],
         ),
