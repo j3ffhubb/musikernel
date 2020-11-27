@@ -54,32 +54,33 @@ class Item:
             send_lookup[send.pattern_uid].append(send)
         for pattern_uid in self.audio_patterns:
             pattern = audio_p.load(pattern_uid)
-            for item in pattern.items:
-                wav = wp_by_uid[item.wav_pool_uid]
+            for audio_item in pattern.items:
+                wav = wp_by_uid[audio_item.wav_pool_uid]
                 start = tempo_map.sample_num(
-                    item_ref.pos + item.pos
+                    item_ref.pos + audio_item.pos
                 )
                 end = tempo_map.sample_num(
-                    item_ref.pos + item.end
+                    item_ref.pos + audio_item.end
                 )
+                length = end - start
                 fade_in_end = int(
-                    round((end - start) * item.fade_in_end)
+                    round(length * audio_item.fade_in_end)
                 ) + start
                 fade_out_start = int(
-                    round((end - start) * item.fade_out_start)
+                    round(length * audio_item.fade_out_start)
                 ) + start
                 # This is at the audio file's sample rate, not the project
                 # as above
                 start_offset = int(
                     round(
-                        (item.start_offset * wav.sample_count)
+                        (audio_item.start_offset * wav.sample_count)
                         *
                         (wav.sample_rate / sr)
                     )
                 )
                 for send in send_lookup[pattern_uid]:
                     rack_event = RackAudioEvent(
-                        item.wav_pool_uid,
+                        audio_item.wav_pool_uid,
                         start,
                         end,
                         start_offset,
@@ -87,15 +88,15 @@ class Item:
                         1. / (fade_in_end - start or 1.),
                         fade_out_start,
                         1. / (end - fade_out_start or 1.),
-                        item.fade_in_vol,
-                        item.fade_out_vol,
-                        item.volume + send.volume,
-                        item.pitch_mode,
-                        item.pitch_start,
-                        item.pitch_end,
-                        item.reverse,
+                        audio_item.fade_in_vol,
+                        audio_item.fade_out_vol,
+                        audio_item.volume + send.volume,
+                        audio_item.pitch_mode,
+                        audio_item.pitch_start,
+                        audio_item.pitch_end,
+                        audio_item.reverse,
                         send.send_mode,
-                        item.paifx_uid,
+                        audio_item.paifx_uid,
                     )
                     result[send.plugin_rack_uid].append(rack_event)
 
