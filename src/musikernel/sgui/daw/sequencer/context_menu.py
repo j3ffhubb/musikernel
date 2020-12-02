@@ -3,7 +3,7 @@ from sgui.daw import shared
 from sgui.daw.project import *
 from sgui.lib import util
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 MENU = None
 

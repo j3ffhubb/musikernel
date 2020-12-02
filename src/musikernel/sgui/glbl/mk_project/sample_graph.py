@@ -1,6 +1,6 @@
 from sgui.lib import *
 from sgui.lib.util import *
-from sgui.mkqt import *
+from sgui.sgqt import *
 import numpy
 import os
 

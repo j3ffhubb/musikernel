@@ -5,7 +5,7 @@ from sgui.glbl.mk_project import (
     AUDIO_ITEM_SCENE_HEIGHT,
     AUDIO_ITEM_SCENE_WIDTH,
 )
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 AUDIO_ITEM_END_MARKER_MIN_VAL = 6.0
 AUDIO_ITEM_MAX_MARKER_VAL = 1000.0

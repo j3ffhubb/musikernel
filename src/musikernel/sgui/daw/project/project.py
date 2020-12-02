@@ -13,7 +13,7 @@ from sgui.lib import history
 from sgui.lib.util import *
 from sgui.lib.translate import _
 from sglib.log import LOG
-from sgui.mkqt import *
+from sgui.sgqt import *
 import os
 import re
 

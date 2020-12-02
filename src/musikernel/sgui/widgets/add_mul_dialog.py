@@ -1,4 +1,4 @@
-from sgui.mkqt import *
+from sgui.sgqt import *
 from .playback_widget import pydaw_playback_widget
 
 

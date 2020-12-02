@@ -3,7 +3,7 @@ from sgui.daw import shared
 from sgui.daw.shared import *
 from sgui.lib import util
 from sgui.lib.util import *
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 class ItemEditorHeader(QGraphicsRectItem):

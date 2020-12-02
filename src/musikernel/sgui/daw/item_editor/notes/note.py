@@ -7,7 +7,7 @@ from sgui.glbl import mk_project
 from sgui.lib import util
 from sgui.lib.util import *
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 PIANO_NOTE_GRADIENT_TUPLE = (
     (255, 0, 0),

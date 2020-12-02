@@ -1,4 +1,4 @@
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 # Default background color for QGraphicsScene
 SCENE_BACKGROUND_BRUSH = QBrush(QColor("#424242"))

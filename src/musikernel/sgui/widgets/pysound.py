@@ -1,5 +1,5 @@
 from sgui.lib import util
-from sgui.mkqt import *
+from sgui.sgqt import *
 import os
 
 

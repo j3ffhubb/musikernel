@@ -288,7 +288,7 @@ rm -rf $RPM_BUILD_ROOT
 %{{_usr}}/share/pixmaps/{0}.png
 %{{_usr}}/share/pixmaps/{0}_splash.png
 
-%{{_usr}}/lib/{0}/musikernel/sgui/mkqt.py
+%{{_usr}}/lib/{0}/musikernel/sgui/sgqt.py
 
 %{{_usr}}/lib/{0}/musikernel/sgui/__init__.py
 %{{_usr}}/lib/{0}/musikernel/sgui/lib/strings.py

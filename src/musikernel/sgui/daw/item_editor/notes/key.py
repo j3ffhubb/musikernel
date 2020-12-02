@@ -2,7 +2,7 @@ from sgui.daw.project import *
 from sgui.daw.shared import *
 from sgui.lib.util import *
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 class PianoKeyItem(QGraphicsRectItem):

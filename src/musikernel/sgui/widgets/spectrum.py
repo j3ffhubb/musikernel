@@ -1,6 +1,6 @@
 from . import _shared
 from sgui.lib import util
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 class pydaw_spectrum(QGraphicsPathItem):

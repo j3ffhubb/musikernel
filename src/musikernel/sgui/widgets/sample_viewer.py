@@ -1,6 +1,6 @@
 from .audio_item_viewer import *
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 AUDIO_LOOP_CLIPBOARD = None

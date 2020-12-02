@@ -1,5 +1,5 @@
 
-class cc_mapping:
+class CCMapping:
     def __init__(self, a_cc_num):
         self.cc_num = int(a_cc_num)
         self.ports = {}  # port_num : (low, high)
@@ -28,7 +28,7 @@ class cc_mapping:
     def from_str(a_str):
         f_cc_num, f_count, f_list = a_str.split("|", 2)
         f_list = f_list.split("|")
-        f_result = cc_mapping(f_cc_num)
+        f_result = CCMapping(f_cc_num)
         for f_i in range(0, int(f_count) * 3, 3):
             f_result.set_port(*f_list[f_i:f_i + 3])
         return f_result

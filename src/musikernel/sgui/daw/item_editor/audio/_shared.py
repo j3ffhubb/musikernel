@@ -1,4 +1,4 @@
-from sgui.mkqt import *
+from sgui.sgqt import *
 import os
 
 CURRENT_AUDIO_ITEM_INDEX = None

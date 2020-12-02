@@ -4,7 +4,7 @@ from sgui.daw import shared
 from sgui.daw.project import *
 from sgui.lib.translate import _
 from sgui.lib import util
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 DRAW_SEQUENCER_GRAPHS = True

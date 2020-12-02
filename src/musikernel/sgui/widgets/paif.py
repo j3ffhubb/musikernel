@@ -1,7 +1,7 @@
 from .modulex import pydaw_modulex_single
 from .modulex_settings import pydaw_modulex_settings
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 class pydaw_per_audio_item_fx_widget:

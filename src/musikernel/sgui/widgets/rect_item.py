@@ -1,4 +1,4 @@
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 class QGraphicsRectItemNDL(QGraphicsRectItem):
     """ QGraphicsRectItem without that awful dotted line when selected """

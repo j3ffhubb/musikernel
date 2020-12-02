@@ -28,7 +28,7 @@ from .plugins import MkPluginUiDict
 from sgui import glbl, widgets
 from sgui.daw import entrypoint as daw
 from sgui.lib import strings as mk_strings
-from sgui.mkqt import *
+from sgui.sgqt import *
 import gc
 import subprocess
 import sys

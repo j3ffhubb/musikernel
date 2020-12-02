@@ -3,7 +3,7 @@ from sgui.glbl.mk_project import *
 from sgui.lib.util import *
 from sgui.lib.midi import load_midi_file
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 class DawMidiFile:

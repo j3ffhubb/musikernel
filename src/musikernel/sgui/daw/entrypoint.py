@@ -21,7 +21,7 @@ import shutil
 import subprocess
 import traceback
 
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 from . import *
 from .filedragdrop import FileDragDropper

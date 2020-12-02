@@ -1,10 +1,10 @@
-from .cc_mapping import cc_mapping
+from .cc_mapping import CCMapping
 from .plugin_file import pydaw_plugin_file
 from sgui import glbl
 from sgui.glbl.mk_project import pydaw_folder_plugins
 from sgui.lib.translate import _
 from sglib.log import LOG
-from sgui.mkqt import *
+from sgui.sgqt import *
 import os
 
 
@@ -95,7 +95,7 @@ class pydaw_abstract_plugin_ui:
     def update_cc_map(self, a_cc_num, a_ctrl):
         a_cc_num = int(a_cc_num)
         if a_cc_num not in self.cc_map:
-            self.cc_map[a_cc_num] = cc_mapping(a_cc_num)
+            self.cc_map[a_cc_num] = CCMapping(a_cc_num)
         f_result = self.cc_map[a_cc_num].set_port(a_ctrl.port_num)
         if f_result:
             QMessageBox.warning(

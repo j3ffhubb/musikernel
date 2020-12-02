@@ -5,7 +5,7 @@ from sgui import glbl
 from sgui.daw.project import *
 from sgui.lib import util
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 AUDIO_ITEMS_TO_DROP = []

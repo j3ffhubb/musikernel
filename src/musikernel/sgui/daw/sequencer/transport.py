@@ -8,7 +8,7 @@ from sgui.lib import util
 from sgui.lib.util import *
 from sgui.lib.translate import _
 from sgui.plugins import *
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 MREC_EVENTS = []

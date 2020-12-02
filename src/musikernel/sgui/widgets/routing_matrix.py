@@ -1,5 +1,5 @@
 from . import _shared
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 ROUTING_GRAPH_NODE_BRUSH = None
 ROUTING_GRAPH_TO_BRUSH = None

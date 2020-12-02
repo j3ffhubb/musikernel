@@ -26,7 +26,7 @@ import sys
 import time
 
 from sglib.log import LOG
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 assert "cygwin" not in sys.platform, "Cygwin is unsupported"
 IS_WINDOWS = "win32" in sys.platform or "msys" in sys.platform

@@ -1,5 +1,5 @@
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 NOTE_SELECTOR_CLIPBOARD = None
 

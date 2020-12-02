@@ -1,6 +1,6 @@
 from sgui.daw import shared
 from sgui.daw.shared import *
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 PIANO_ROLL_DELETE_MODE = False

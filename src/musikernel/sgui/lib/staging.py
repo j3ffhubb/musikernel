@@ -13,7 +13,7 @@ GNU General Public License for more details.
 """
 
 
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 class wire_input_port(QGraphicsRectItem):
     def __init__(self):

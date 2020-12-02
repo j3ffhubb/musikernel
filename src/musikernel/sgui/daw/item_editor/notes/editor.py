@@ -13,7 +13,7 @@ from sgui.lib import scales
 from sgui.lib.util import *
 from sgui.lib.translate import _
 from sglib.log import LOG
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 class PianoRollEditor(AbstractItemEditor):

@@ -6,7 +6,7 @@ from sgui.lib.util import *
 from sglib.log import LOG
 from sgui.widgets import pydaw_modulex_settings
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 import traceback
 
 

@@ -7,7 +7,7 @@ from sgui.glbl import mk_project
 from sgui.lib import util
 from sgui.lib.util import *
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 AUTOMATION_POINT_DIAMETER = 15.0

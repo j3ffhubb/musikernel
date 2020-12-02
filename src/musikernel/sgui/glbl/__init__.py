@@ -8,7 +8,7 @@ for all modules to access
 from sgui.lib import util
 from sgui.lib.translate import _
 from sglib.log import LOG
-from sgui.mkqt import *
+from sgui.sgqt import *
 import ast
 import datetime
 import os

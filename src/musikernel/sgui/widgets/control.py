@@ -3,7 +3,7 @@ from .knob import pydaw_pixmap_knob
 from sgui import glbl
 from sgui.lib import util
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 import collections
 import math
 

@@ -13,7 +13,7 @@ from sgui.lib import util
 from sgui.lib import strings as mk_strings
 from sgui.lib.util import *
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 def global_paif_val_callback(a_port, a_val):

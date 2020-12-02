@@ -1,5 +1,5 @@
 from ._shared import SCENE_BACKGROUND_BRUSH
-from sgui.mkqt import *
+from sgui.sgqt import *
 from sgui.lib import util
 from sgui.lib.translate import _
 

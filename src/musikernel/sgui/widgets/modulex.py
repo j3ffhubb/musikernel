@@ -2,7 +2,7 @@ from . import _shared
 from .control import *
 from .modulex_settings import pydaw_modulex_settings
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 
 MODULEX_CLIPBOARD = None

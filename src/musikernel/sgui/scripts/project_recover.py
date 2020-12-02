@@ -25,7 +25,7 @@ f_parent_dir = os.path.abspath(os.path.join(f_parent_dir, "../.."))
 sys.path.insert(0, f_parent_dir)
 
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 from sgui.lib import (
     theme,
     util,

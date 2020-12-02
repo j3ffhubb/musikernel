@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 import os
 
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 from sgui.lib import *
 from sgui.lib.util import *

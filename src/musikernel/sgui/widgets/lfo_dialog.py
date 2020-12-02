@@ -2,7 +2,7 @@ from . import _shared
 from .control import pydaw_knob_control
 from .playback_widget import pydaw_playback_widget
 from sgui.lib.translate import _
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 def lfo_dialog(a_update_callback, a_save_callback):
     """ Generic dialog for doing event transforms that are LFO-like.

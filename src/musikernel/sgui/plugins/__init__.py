@@ -40,7 +40,7 @@ from sgui.plugins import mk_compressor
 from sgui.plugins import mk_vocoder
 from sgui.plugins import mk_limiter
 
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 from sgui.lib.util import pydaw_clip_value
 

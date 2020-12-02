@@ -1,7 +1,7 @@
 from sgui import glbl, widgets
 from sgui.daw import shared
 from sgui.lib import util
-from sgui.mkqt import *
+from sgui.sgqt import *
 import os
 
 

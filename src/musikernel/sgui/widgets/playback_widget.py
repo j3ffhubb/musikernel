@@ -1,5 +1,5 @@
 from sgui import glbl
-from sgui.mkqt import *
+from sgui.sgqt import *
 
 class pydaw_playback_widget:
     def __init__(self):

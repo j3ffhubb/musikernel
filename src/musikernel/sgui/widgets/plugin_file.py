@@ -1,4 +1,4 @@
-from .cc_mapping import cc_mapping
+from .cc_mapping import CCMapping
 from sgui.lib import util
 
 class pydaw_plugin_file:
@@ -26,7 +26,7 @@ class pydaw_plugin_file:
                 self.configure_dict[(f_items2[0])] = f_items2[1]
             elif f_items[0] == 'm':
                 f_cc, f_val = f_items[1].split("|", 1)
-                self.cc_map[int(f_cc)] = cc_mapping.from_str(f_items[1])
+                self.cc_map[int(f_cc)] = CCMapping.from_str(f_items[1])
             else:
                 self.port_dict[int(f_items[0])] = int(float(f_items[1]))
 
