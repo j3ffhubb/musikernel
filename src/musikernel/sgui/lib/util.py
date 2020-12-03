@@ -645,10 +645,6 @@ def musical_time_to_seconds(a_tempo, a_bar, a_beat):
     f_beats = (float(a_bar) * 4.0) + float(a_beat)
     return f_seconds_per_beat * f_beats
 
-def seconds_to_beats(a_tempo, a_seconds):
-    f_seconds_per_beat = 60.0 / float(a_tempo)
-    return float(a_seconds) / f_seconds_per_beat
-
 def linear_interpolate(a_point1, a_point2, a_frac):
     return ((1.0 - a_frac) * a_point1) + (a_frac * a_point2)
 

@@ -90,7 +90,7 @@ void _mk_exit()
 static sigset_t _signals;
 #endif
 
-int PYDAW_NO_HARDWARE = 0;
+int NO_HARDWARE = 0;
 
 #ifdef WITH_LIBLO
 lo_server_thread serverThread;
@@ -380,7 +380,7 @@ int daw_main(int argc, char** argv)
     v_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 0);
 
     /*
-    PYDAW_AUDIO_INPUT_TRACK_COUNT = 2;
+    AUDIO_INPUT_TRACK_COUNT = 2;
     v_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 1);
     v_wn_test();
     */
@@ -597,8 +597,8 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
 
 #endif
 
-    char * f_key_char = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
-    char * f_value_char = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
+    char * f_key_char = (char*)malloc(sizeof(char) * TINY_STRING);
+    char * f_value_char = (char*)malloc(sizeof(char) * TINY_STRING);
 
     int f_api_count = Pa_GetHostApiCount();
     int f_host_api_index = -1;
@@ -613,7 +613,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
         if(i_file_exists(f_device_file_path)){
             printf("device.txt exists\n");
             t_2d_char_array * f_current_string = g_get_2d_array_from_file(
-                    f_device_file_path, PYDAW_LARGE_STRING);
+                    f_device_file_path, LARGE_STRING);
             f_device_name[0] = '\0';
             f_host_api_index = -1;
 #if defined(_WIN32) || defined(__APPLE__)
@@ -664,9 +664,9 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
                     int f_engine = atoi(f_value_char);
                     printf("audioEngine: %i\n", f_engine);
                     if(f_engine == 4 || f_engine == 5 || f_engine == 7){
-                        PYDAW_NO_HARDWARE = 1;
+                        NO_HARDWARE = 1;
                     } else {
-                        PYDAW_NO_HARDWARE = 0;
+                        NO_HARDWARE = 0;
                     }
                 } else if(!strcmp(f_key_char, "sampleRate")){
                     sample_rate = atof(f_value_char);
@@ -729,7 +729,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
                     printf("audioInputs: %s\n", f_value_char);
                     assert(f_audio_input_count >= 0 &&
                         f_audio_input_count <= 128);
-                    PYDAW_AUDIO_INPUT_TRACK_COUNT = f_audio_input_count;
+                    AUDIO_INPUT_TRACK_COUNT = f_audio_input_count;
                 }
                 else if(!strcmp(f_key_char, "audioOutputs"))
                 {
@@ -850,7 +850,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
         inputParameters.device = outputParameters.device;
 #endif
 
-        if(!PYDAW_NO_HARDWARE)
+        if(!NO_HARDWARE)
         {
             PaStreamParameters * f_input_params = NULL;
 
@@ -880,7 +880,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
         break;
     }
 
-    char * f_master_vol_str = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
+    char * f_master_vol_str = (char*)malloc(sizeof(char) * TINY_STRING);
     get_file_setting(f_master_vol_str, "master_vol", "0.0");
     MKFLT f_master_vol = atof(f_master_vol_str);
     free(f_master_vol_str);
@@ -905,7 +905,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     MKFLT * f_portaudio_input_buffer = NULL;
     MKFLT * f_portaudio_output_buffer = NULL;
 
-    if(!PYDAW_NO_HARDWARE)
+    if(!NO_HARDWARE)
     {
         err = Pa_StartStream(stream);
         if(err != paNoError)
@@ -949,7 +949,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
         pthread_mutex_unlock(&musikernel->exit_mutex);
 
 
-        if(PYDAW_NO_HARDWARE)
+        if(NO_HARDWARE)
         {
             portaudioCallback(
                 f_portaudio_input_buffer,
@@ -968,7 +968,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
 
     }
 
-    if(!PYDAW_NO_HARDWARE)
+    if(!NO_HARDWARE)
     {
         err = Pa_CloseStream(stream);
         if(err != paNoError)

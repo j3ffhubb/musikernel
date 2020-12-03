@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_FILES_H
-#define	PYDAW_FILES_H
+#ifndef FILES_H
+#define	FILES_H
 
 #include <dirent.h>
 #include <stdlib.h>
@@ -42,13 +42,13 @@ void chown_file(const char *file_name)
 #define MUSIKERNEL_VERSION "musikernel3"
 
 /*Standard string sizes*/
-#define PYDAW_XLARGE_STRING 1048576
-#define PYDAW_LARGE_STRING  65536 //1048576
-#define PYDAW_MEDIUM_STRING  32768 //262144 //8192
-#define PYDAW_SMALL_STRING  16384 //65536 //512
-#define PYDAW_TINY_STRING 4096 //16384 //32
+#define XLARGE_STRING 1048576
+#define LARGE_STRING  65536 //1048576
+#define MEDIUM_STRING  32768 //262144 //8192
+#define SMALL_STRING  16384 //65536 //512
+#define TINY_STRING 4096 //16384 //32
 
-#define PYDAW_TERMINATING_CHAR '\\'
+#define TERMINATING_CHAR '\\'
 
 #include <stdio.h>
 #include <time.h>
@@ -84,7 +84,7 @@ void write_log(char * a_string)
     strcat(buff, " - ");
     strcat(buff, a_string);
 
-    FILE* pFile = fopen("pydaw-engine.log", "a");
+    FILE* pFile = fopen("sg-engine.log", "a");
     fprintf(pFile, "%s\n",buff);
     fclose(pFile);
 }
@@ -300,7 +300,7 @@ t_2d_char_array * g_get_2d_array(int a_size)
     t_2d_char_array * f_result =
             (t_2d_char_array*)malloc(sizeof(t_2d_char_array));
     f_result->array = (char*)malloc(sizeof(char) * a_size);
-    f_result->current_str = (char*)malloc(sizeof(char) * PYDAW_SMALL_STRING);
+    f_result->current_str = (char*)malloc(sizeof(char) * SMALL_STRING);
 
     f_result->current_index = 0;
     f_result->current_row = 0;
@@ -328,7 +328,7 @@ void v_iterate_2d_char_array(t_2d_char_array* a_array)
 
     while(1)
     {
-        if((a_array->array[(a_array->current_index)] == PYDAW_TERMINATING_CHAR
+        if((a_array->array[(a_array->current_index)] == TERMINATING_CHAR
             && a_array->eol)
             ||
             (a_array->array[(a_array->current_index)] == '\0'))
@@ -378,7 +378,7 @@ void v_iterate_2d_char_array_to_next_line(t_2d_char_array* a_array)
     while(1)
     {
         //char a_test = a_array->array[(a_array->current_index)];
-        if(a_array->array[(a_array->current_index)] == PYDAW_TERMINATING_CHAR
+        if(a_array->array[(a_array->current_index)] == TERMINATING_CHAR
             && a_array->eol)
         {
             f_result[f_i] = '\0';
@@ -430,7 +430,7 @@ void get_file_setting(char * a_dest, char * a_name, char * a_default)
 
     if(i_file_exists(f_path))
     {
-        get_string_from_file(f_path, PYDAW_TINY_STRING, a_dest);
+        get_string_from_file(f_path, TINY_STRING, a_dest);
     }
     else
     {
@@ -460,13 +460,13 @@ t_line_split * g_split_line(char a_delimiter, const char * a_str)
 
     f_result->str_arr = (char**)malloc(sizeof(char*) * f_result->count);
     f_result->str_block = (char*)malloc(
-        sizeof(char) * PYDAW_TINY_STRING * f_result->count);
+        sizeof(char) * TINY_STRING * f_result->count);
 
     f_i = 0;
     while(f_i < f_result->count)
     {
         f_result->str_arr[f_i] =
-            &f_result->str_block[f_i * PYDAW_TINY_STRING];
+            &f_result->str_block[f_i * TINY_STRING];
         f_result->str_arr[f_i][0] = '\0';
         ++f_i;
     }
@@ -535,7 +535,7 @@ t_dir_list * g_get_dir_list(char * a_dir)
           }
 
           f_result->dir_list[(f_result->dir_count)] =
-                  (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
+                  (char*)malloc(sizeof(char) * TINY_STRING);
 
             strcpy(f_result->dir_list[(f_result->dir_count)], ent->d_name);
 
@@ -600,5 +600,5 @@ int i_file_exists(char * f_file_name)
 }
 
 
-#endif	/* PYDAW_FILES_H */
+#endif	/* FILES_H */
 

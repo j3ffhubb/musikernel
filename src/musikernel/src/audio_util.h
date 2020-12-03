@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_AUDIO_UTIL_H
-#define	PYDAW_AUDIO_UTIL_H
+#ifndef AUDIO_UTIL_H
+#define	AUDIO_UTIL_H
 
 #include <sndfile.h>
 #include <stdio.h>
@@ -318,5 +318,5 @@ void v_pitch_envelope(char * a_file_in, char * a_file_out,
 }
 
 
-#endif	/* PYDAW_AUDIO_UTIL_H */
+#endif	/* AUDIO_UTIL_H */
 

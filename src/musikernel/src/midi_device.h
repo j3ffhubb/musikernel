@@ -386,7 +386,7 @@ void midiDeviceRead(t_midi_device * self, MKFLT sample_rate,
             ev->tick = f_max_tick;
         }
 
-	if (ev->type == PYDAW_EVENT_CONTROLLER)
+	if (ev->type == EVENT_CONTROLLER)
         {
 	    int controller = ev->param;
 

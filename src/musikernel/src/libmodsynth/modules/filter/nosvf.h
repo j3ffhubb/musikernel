@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_NOSVF_H
-#define	PYDAW_NOSVF_H
+#ifndef NOSVF_H
+#define	NOSVF_H
 
 /* This is the same as the regular mono state variable filter,
  * except that is does not have built-in oversampling.  To use this,
@@ -508,4 +508,4 @@ t_nosvf_filter * g_nosvf_get(MKFLT a_sample_rate)
 }
 #endif
 
-#endif	/* PYDAW_NOSVF_H */
+#endif	/* NOSVF_H */

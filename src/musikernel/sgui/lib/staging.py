@@ -70,8 +70,5 @@ if __name__ == "__main__":
     f_widget = wire_canvas()
     f_widget.view.show()
 
-    #with open("/usr/lib/pydaw4/themes/default/default.pytheme") as f_file:
-    #    f_widget.widget.setStyleSheet(f_file.read().replace("$STYLE_FOLDER",
-    #                                  "/usr/lib/pydaw4/themes/default"))
     sys.exit(app.exec_())
 

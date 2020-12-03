@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_SVF_STEREO_H
-#define	PYDAW_SVF_STEREO_H
+#ifndef SVF_STEREO_H
+#define	SVF_STEREO_H
 
 #include "../../lib/pitch_core.h"
 #include "../../lib/amp.h"
@@ -574,5 +574,5 @@ void g_svf2_init(t_svf2_filter * f_svf, MKFLT a_sample_rate)
 }
 
 
-#endif	/* PYDAW_SVF_STEREO_H */
+#endif	/* SVF_STEREO_H */
 

@@ -691,7 +691,7 @@ static void v_wayv_process_midi_event(
     int f_min_note = (int)*plugin_data->min_note;
     int f_max_note = (int)*plugin_data->max_note;
 
-    if (a_event->type == PYDAW_EVENT_NOTEON)
+    if (a_event->type == EVENT_NOTEON)
     {
         if (a_event->velocity > 0)
         {
@@ -1034,24 +1034,24 @@ static void v_wayv_process_midi_event(
                 (a_event->tick));
         }
     }
-    else if (a_event->type == PYDAW_EVENT_NOTEOFF)
+    else if (a_event->type == EVENT_NOTEOFF)
     {
         v_voc_note_off(plugin_data->voices,
             a_event->note, (plugin_data->sampleNo),
             (a_event->tick));
     }
-    else if (a_event->type == PYDAW_EVENT_CONTROLLER)
+    else if (a_event->type == EVENT_CONTROLLER)
     {
         assert(a_event->param >= 1 && a_event->param < 128);
 
         v_plugin_event_queue_add(&plugin_data->midi_queue,
-            PYDAW_EVENT_CONTROLLER, a_event->tick,
+            EVENT_CONTROLLER, a_event->tick,
             a_event->value, a_event->param);
     }
-    else if (a_event->type == PYDAW_EVENT_PITCHBEND)
+    else if (a_event->type == EVENT_PITCHBEND)
     {
         v_plugin_event_queue_add(&plugin_data->midi_queue,
-            PYDAW_EVENT_PITCHBEND, a_event->tick,
+            EVENT_PITCHBEND, a_event->tick,
             a_event->value * 0.00012207f, 0);
     }
 }
@@ -1112,11 +1112,11 @@ static void v_run_wayv(
                 break;
             }
 
-            if(f_midi_item->type == PYDAW_EVENT_PITCHBEND)
+            if(f_midi_item->type == EVENT_PITCHBEND)
             {
                 plugin_data->sv_pitch_bend_value = f_midi_item->value;
             }
-            else if(f_midi_item->type == PYDAW_EVENT_CONTROLLER)
+            else if(f_midi_item->type == EVENT_CONTROLLER)
             {
                 v_cc_map_translate(
                     &plugin_data->cc_map, plugin_data->descriptor,

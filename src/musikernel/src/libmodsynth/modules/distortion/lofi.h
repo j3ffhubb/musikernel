@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_LOFI_H
-#define	PYDAW_LOFI_H
+#ifndef LOFI_H
+#define	LOFI_H
 
 #include <math.h>
 #include "../../lib/lmalloc.h"
@@ -76,5 +76,5 @@ void v_lfi_lofi_run(t_lfi_lofi* a_lfi, MKFLT a_in0, MKFLT a_in1)
 }
 #endif
 
-#endif	/* PYDAW_LOFI_H */
+#endif	/* LOFI_H */
 

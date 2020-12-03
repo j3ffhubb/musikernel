@@ -11,11 +11,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_REVERB_H
-#define	PYDAW_REVERB_H
+#ifndef REVERB_H
+#define	REVERB_H
 
-#define PYDAW_REVERB_DIFFUSER_COUNT 5
-#define PYDAW_REVERB_TAP_COUNT 12
+#define REVERB_DIFFUSER_COUNT 5
+#define REVERB_TAP_COUNT 12
 
 
 #include "../../lib/amp.h"
@@ -49,8 +49,8 @@ typedef struct
     t_state_variable_filter lp;
     t_state_variable_filter hp;
     MKFLT wet_linear;
-    t_rvb_tap taps[PYDAW_REVERB_TAP_COUNT];
-    t_rvb_diffuser diffusers[PYDAW_REVERB_DIFFUSER_COUNT];
+    t_rvb_tap taps[REVERB_TAP_COUNT];
+    t_rvb_diffuser diffusers[REVERB_DIFFUSER_COUNT];
     MKFLT * predelay_buffer;
     int predelay_counter;
     int predelay_size;
@@ -80,7 +80,7 @@ void v_rvb_reverb_set(t_rvb_reverb * self, MKFLT a_time, MKFLT a_wet,
         self->feedback = a_time - 1.03f;
         v_lfs_set(&self->lfo, 1.0f - (a_time * 0.9f));
 
-        for(f_i = 0; f_i < PYDAW_REVERB_TAP_COUNT; ++f_i)
+        for(f_i = 0; f_i < REVERB_TAP_COUNT; ++f_i)
         {
             self->taps[f_i].pitch = f_base + (((MKFLT)f_i) * f_factor);
             v_cmb_set_all(&self->taps[f_i].tap, 0.0f, self->feedback,
@@ -137,14 +137,14 @@ inline void v_rvb_reverb_run(t_rvb_reverb * self, MKFLT a_input0,
     f_tmp_sample = v_svf_run_2_pole_hp(&self->hp, f_tmp_sample);
     f_tmp_sample *= (self->wet_linear);
 
-    for(f_i = 0; f_i < PYDAW_REVERB_TAP_COUNT; ++f_i)
+    for(f_i = 0; f_i < REVERB_TAP_COUNT; ++f_i)
     {
         f_comb = &self->taps[f_i].tap;
         v_cmb_run(f_comb, f_tmp_sample);
         self->output += f_comb->output_sample;
     }
 
-    for(f_i = 0; f_i < PYDAW_REVERB_DIFFUSER_COUNT; ++f_i)
+    for(f_i = 0; f_i < REVERB_DIFFUSER_COUNT; ++f_i)
     {
         f_filter = &self->diffusers[f_i].diffuser;
         v_svf_set_cutoff_base(f_filter,
@@ -174,7 +174,7 @@ void v_rvb_panic(t_rvb_reverb * self)
         self->predelay_buffer[f_i] = 0.0f;
     }
 
-    for(f_i = 0; f_i < PYDAW_REVERB_TAP_COUNT; ++f_i)
+    for(f_i = 0; f_i < REVERB_TAP_COUNT; ++f_i)
     {
         f_tmp = self->taps[f_i].tap.input_buffer;
         f_count = self->taps[f_i].tap.buffer_size;
@@ -197,7 +197,7 @@ void g_rvb_reverb_init(t_rvb_reverb * f_result, MKFLT a_sr)
 
     f_result->sr = a_sr;
 
-    for(f_i = 0; f_i < PYDAW_REVERB_DIFFUSER_COUNT; ++f_i)
+    for(f_i = 0; f_i < REVERB_DIFFUSER_COUNT; ++f_i)
     {
         f_result->diffusers[f_i].pitch = 33.0f + (((MKFLT)f_i) * 7.0f);
     }
@@ -215,11 +215,11 @@ void g_rvb_reverb_init(t_rvb_reverb * f_result, MKFLT a_sr)
     g_svf_init(&f_result->lp, a_sr);
     v_svf_set_res(&f_result->lp, -36.0f);
 
-    f_result->volume_factor = (1.0f / (MKFLT)PYDAW_REVERB_DIFFUSER_COUNT) * 0.5;
+    f_result->volume_factor = (1.0f / (MKFLT)REVERB_DIFFUSER_COUNT) * 0.5;
 
     f_i = 0;
 
-    while(f_i < PYDAW_REVERB_TAP_COUNT)
+    while(f_i < REVERB_TAP_COUNT)
     {
         g_cmb_init(&f_result->taps[f_i].tap, a_sr, 1);
         ++f_i;
@@ -227,7 +227,7 @@ void g_rvb_reverb_init(t_rvb_reverb * f_result, MKFLT a_sr)
 
     f_i = 0;
 
-    while(f_i < PYDAW_REVERB_DIFFUSER_COUNT)
+    while(f_i < REVERB_DIFFUSER_COUNT)
     {
         g_svf_init(&f_result->diffusers[f_i].diffuser, a_sr);
         v_svf_set_cutoff_base(&f_result->diffusers[f_i].diffuser,
@@ -258,5 +258,5 @@ void g_rvb_reverb_init(t_rvb_reverb * f_result, MKFLT a_sr)
 }
 #endif
 
-#endif	/* PYDAW_REVERB_H */
+#endif	/* REVERB_H */
 

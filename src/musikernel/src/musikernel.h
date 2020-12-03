@@ -34,9 +34,9 @@ GNU General Public License for more details.
 
 #define MAX_WORKER_THREADS 8
 
-#define PYDAW_MAX_EVENT_BUFFER_SIZE 512
+#define MAX_EVENT_BUFFER_SIZE 512
 
-#define PYDAW_MIDI_NOTE_COUNT 128
+#define MIDI_NOTE_COUNT 128
 
 #define MAX_PLUGIN_COUNT 10
 #define MAX_ROUTING_COUNT 4
@@ -45,13 +45,13 @@ GNU General Public License for more details.
 #define MAX_PLUGIN_POOL_COUNT 1000
 
 #define MAX_AUDIO_INPUT_COUNT 128
-int PYDAW_AUDIO_INPUT_TRACK_COUNT = 0;
+int AUDIO_INPUT_TRACK_COUNT = 0;
 int OUTPUT_CH_COUNT = 2;
 int MASTER_OUT_L = 0;
 int MASTER_OUT_R = 1;
 
-#define PYDAW_OSC_SEND_QUEUE_SIZE 256
-#define PYDAW_OSC_MAX_MESSAGE_SIZE 65536
+#define OSC_SEND_QUEUE_SIZE 256
+#define OSC_MAX_MESSAGE_SIZE 65536
 
 #ifdef __linux__
     #define FRAMES_PER_BUFFER 4096
@@ -64,9 +64,9 @@ int MASTER_OUT_R = 1;
 #define STATUS_PROCESSING 1
 #define STATUS_PROCESSED 2
 
-#define PYDAW_PLAYBACK_MODE_OFF 0
-#define PYDAW_PLAYBACK_MODE_PLAY 1
-#define PYDAW_PLAYBACK_MODE_REC 2
+#define PLAYBACK_MODE_OFF 0
+#define PLAYBACK_MODE_PLAY 1
+#define PLAYBACK_MODE_REC 2
 
 #define FADE_STATE_OFF 0
 #define FADE_STATE_FADING 1
@@ -189,8 +189,8 @@ typedef struct
     char * f_tmp1;
     char * f_tmp2;
     char * f_msg;
-    char osc_queue_keys[PYDAW_OSC_SEND_QUEUE_SIZE][12];
-    char * osc_queue_vals[PYDAW_OSC_SEND_QUEUE_SIZE];
+    char osc_queue_keys[OSC_SEND_QUEUE_SIZE][12];
+    char * osc_queue_vals[OSC_SEND_QUEUE_SIZE];
 }t_osc_send_data;
 
 typedef struct
@@ -223,13 +223,13 @@ typedef struct
     int fade_state;
     /*When a note_on event is fired,
      * a sample number of when to release it is stored here*/
-    long note_offs[PYDAW_MIDI_NOTE_COUNT];
+    long note_offs[MIDI_NOTE_COUNT];
     int item_event_index;
     char * osc_cursor_message;
     int * extern_midi_count;
     t_midi_device * midi_device;
     t_seq_event * extern_midi;
-    t_seq_event event_buffer[PYDAW_MAX_EVENT_BUFFER_SIZE];
+    t_seq_event event_buffer[MAX_EVENT_BUFFER_SIZE];
     struct ShdsList * event_list;
 }t_pytrack;
 
@@ -289,8 +289,8 @@ typedef struct
 
     char * osc_cursor_message;
     int osc_queue_index;
-    char osc_queue_keys[PYDAW_OSC_SEND_QUEUE_SIZE][12];
-    char osc_queue_vals[PYDAW_OSC_SEND_QUEUE_SIZE][PYDAW_OSC_MAX_MESSAGE_SIZE];
+    char osc_queue_keys[OSC_SEND_QUEUE_SIZE][12];
+    char osc_queue_vals[OSC_SEND_QUEUE_SIZE][OSC_MAX_MESSAGE_SIZE];
     pthread_t osc_queue_thread;
     //Threads must hold this to write OSC messages
     pthread_spinlock_t ui_spinlock;
@@ -815,10 +815,10 @@ void g_musikernel_get(MKFLT a_sr, t_midi_device_list * a_midi_devices)
 
     hpalloc(
         (void**)&musikernel->audio_inputs,
-        sizeof(t_pyaudio_input) * PYDAW_AUDIO_INPUT_TRACK_COUNT
+        sizeof(t_pyaudio_input) * AUDIO_INPUT_TRACK_COUNT
     );
 
-    for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i){
+    for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i){
         g_pyaudio_input_init(
             &musikernel->audio_inputs[f_i],
             a_sr
@@ -886,7 +886,7 @@ void v_queue_osc_message(
     char* a_key,
     char * a_val
 ){
-    if(musikernel->osc_queue_index >= PYDAW_OSC_SEND_QUEUE_SIZE){
+    if(musikernel->osc_queue_index >= OSC_SEND_QUEUE_SIZE){
         printf(
             "Dropping OSC event to prevent buffer overrun:\n%s|%s\n\n",
             a_key,
@@ -996,7 +996,7 @@ void v_open_track(
     if(i_file_exists(f_file_name)){
         t_2d_char_array * f_2d_array = g_get_2d_array_from_file(
             f_file_name,
-            PYDAW_LARGE_STRING
+            LARGE_STRING
         );
 
         while(1){
@@ -1059,7 +1059,7 @@ t_pytrack * g_pytrack_get(int a_track_num, MKFLT a_sr)
     f_result->extern_midi_count = &ZERO;
     f_result->midi_device = 0;
     f_result->sc_buffers_dirty = 0;
-    f_result->event_list = shds_list_new(PYDAW_MAX_EVENT_BUFFER_SIZE, NULL);
+    f_result->event_list = shds_list_new(MAX_EVENT_BUFFER_SIZE, NULL);
 
     pthread_spin_init(&f_result->lock, 0);
 
@@ -1086,7 +1086,7 @@ t_pytrack * g_pytrack_get(int a_track_num, MKFLT a_sr)
 
     f_result->bus_counter = 0;
 
-    for(f_i = 0; f_i < PYDAW_MAX_EVENT_BUFFER_SIZE; ++f_i){
+    for(f_i = 0; f_i < MAX_EVENT_BUFFER_SIZE; ++f_i){
         v_ev_clear(&f_result->event_buffer[f_i]);
     }
 
@@ -1095,7 +1095,7 @@ t_pytrack * g_pytrack_get(int a_track_num, MKFLT a_sr)
         f_result->plugins[f_i] = NULL;
     }
 
-    for(f_i = 0; f_i < PYDAW_MIDI_NOTE_COUNT; ++f_i){
+    for(f_i = 0; f_i < MIDI_NOTE_COUNT; ++f_i){
         f_result->note_offs[f_i] = -1;
     }
 
@@ -1137,7 +1137,7 @@ void v_set_preview_file(const char * a_file)
 
             v_ifh_retrigger(
                 &musikernel->preview_audio_item->sample_read_heads[0],
-                PYDAW_AUDIO_ITEM_PADDING_DIV2
+                AUDIO_ITEM_PADDING_DIV2
             );
             v_adsr_retrigger(
                 &musikernel->preview_audio_item->adsrs[0]
@@ -1170,7 +1170,7 @@ void v_prepare_to_record_audio()
 
     pthread_mutex_lock(&musikernel->audio_inputs_mutex);
 
-    for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i){
+    for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i){
         f_ai = &musikernel->audio_inputs[f_i];
 
         f_ai->current_buffer = 0;
@@ -1193,7 +1193,7 @@ void v_stop_record_audio()
     printf("Stopping recording, shutdown is inhibited.\n");
     pthread_mutex_lock(&musikernel->audio_inputs_mutex);
 
-    for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i){
+    for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i){
         f_ai = &musikernel->audio_inputs[f_i];
         if(f_ai->rec){
             f_frames =
@@ -1265,8 +1265,8 @@ void * v_audio_recording_thread(void* a_arg)
             break;
         }
 
-        if(musikernel->playback_mode == PYDAW_PLAYBACK_MODE_REC){
-            for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i){
+        if(musikernel->playback_mode == PLAYBACK_MODE_REC){
+            for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i){
                 f_ai = &musikernel->audio_inputs[f_i];
                 if((f_ai->rec) && (f_ai->flush_last_buffer_pending)){
                     f_frames = f_ai->buffer_iterator[(f_ai->buffer_to_flush)]
@@ -1326,7 +1326,7 @@ void v_audio_input_run(
         *a_sc_dirty = 1;
     }
 
-    if(f_ai->rec && musikernel->playback_mode == PYDAW_PLAYBACK_MODE_REC){
+    if(f_ai->rec && musikernel->playback_mode == PLAYBACK_MODE_REC){
         int f_buffer_pos = f_index;
 
         if(
@@ -1334,7 +1334,7 @@ void v_audio_input_run(
                 f_ai->buffer_iterator[(f_ai->current_buffer)]
                 +
                 (sample_count * f_ai->channels)
-            ) >= PYDAW_AUDIO_INPUT_REC_BUFFER_SIZE
+            ) >= AUDIO_INPUT_REC_BUFFER_SIZE
         ){
             f_ai->buffer_to_flush = (f_ai->current_buffer);
             f_ai->flush_last_buffer_pending = 1;
@@ -1357,7 +1357,7 @@ void v_audio_input_run(
                 f_ai->buffer_iterator[f_current_buffer]] = f_tmp_sample;
             f_ai->buffer_iterator[f_current_buffer] += f_ai->channels;
 
-            f_buffer_pos += PYDAW_AUDIO_INPUT_TRACK_COUNT;
+            f_buffer_pos += AUDIO_INPUT_TRACK_COUNT;
         }
 
         if(f_ai->stereo_ch >= 0)
@@ -1373,7 +1373,7 @@ void v_audio_input_run(
                     f_ai->buffer_iterator[f_current_buffer]] = f_tmp_sample;
                 f_ai->buffer_iterator[f_current_buffer] += f_ai->channels;
 
-                f_buffer_pos += PYDAW_AUDIO_INPUT_TRACK_COUNT;
+                f_buffer_pos += AUDIO_INPUT_TRACK_COUNT;
             }
 
             // Move it back to the correct position
@@ -1412,7 +1412,7 @@ void v_audio_input_run(
                 }
             }
 
-            f_buffer_pos += PYDAW_AUDIO_INPUT_TRACK_COUNT;
+            f_buffer_pos += AUDIO_INPUT_TRACK_COUNT;
         }
 
         if(f_ai->stereo_ch >= 0)
@@ -1433,7 +1433,7 @@ void v_audio_input_run(
                     sc_output[1][f_i2] += f_tmp_sample;
                 }
 
-                f_buffer_pos += PYDAW_AUDIO_INPUT_TRACK_COUNT;
+                f_buffer_pos += AUDIO_INPUT_TRACK_COUNT;
             }
         }
     }
@@ -1451,11 +1451,11 @@ void v_update_audio_inputs(char * a_project_folder)
     {
         int f_i;
         t_2d_char_array * f_2d_array = g_get_2d_array_from_file(
-            f_inputs_file, PYDAW_LARGE_STRING);
+            f_inputs_file, LARGE_STRING);
 
         pthread_mutex_lock(&musikernel->audio_inputs_mutex);
 
-        for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i)
+        for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i)
         {
             v_iterate_2d_char_array(f_2d_array);
 
@@ -1481,7 +1481,7 @@ void v_update_audio_inputs(char * a_project_folder)
             v_iterate_2d_char_array(f_2d_array);
             int f_right_ch = atoi(f_2d_array->current_str);
 
-            if(f_right_ch >= PYDAW_AUDIO_INPUT_TRACK_COUNT)
+            if(f_right_ch >= AUDIO_INPUT_TRACK_COUNT)
             {
                 f_right_ch = -1;
             }
@@ -1492,7 +1492,7 @@ void v_update_audio_inputs(char * a_project_folder)
             // name, ignored by the engine
             v_iterate_2d_char_array_to_next_line(f_2d_array);
 
-            if(f_index >= PYDAW_AUDIO_INPUT_TRACK_COUNT)
+            if(f_index >= AUDIO_INPUT_TRACK_COUNT)
             {
                 continue;
             }
@@ -1520,7 +1520,7 @@ void v_update_audio_inputs(char * a_project_folder)
         printf("%s not found, setting default values\n", f_inputs_file);
         pthread_mutex_lock(&musikernel->audio_inputs_mutex);
         int f_i;
-        for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i)
+        for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i)
         {
             f_ai = &musikernel->audio_inputs[f_i];
             f_ai->rec = 0;
@@ -1593,7 +1593,7 @@ void g_pynote_init(
     MKFLT a_start,
     MKFLT a_length
 ){
-    f_result->type = PYDAW_EVENT_NOTEON;
+    f_result->type = EVENT_NOTEON;
     f_result->length = a_length;
     f_result->note = a_note;
     f_result->start = a_start;
@@ -1612,7 +1612,7 @@ t_seq_event * g_pynote_get(int a_note, int a_vel,
 void g_pycc_init(t_seq_event * f_result, int a_cc_num,
     MKFLT a_cc_val, MKFLT a_start)
 {
-    f_result->type = PYDAW_EVENT_CONTROLLER;
+    f_result->type = EVENT_CONTROLLER;
     f_result->param = a_cc_num;
     f_result->value = a_cc_val;
     f_result->start = a_start;
@@ -1629,7 +1629,7 @@ t_seq_event * g_pycc_get(int a_cc_num, MKFLT a_cc_val, MKFLT a_start)
 void g_pypitchbend_init(t_seq_event * f_result, MKFLT a_start,
     MKFLT a_value)
 {
-    f_result->type = PYDAW_EVENT_PITCHBEND;
+    f_result->type = EVENT_PITCHBEND;
     f_result->start = a_start;
     f_result->value = a_value;
 }
@@ -1994,7 +1994,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
     if(!strcmp(a_key, MK_CONFIGURE_KEY_UPDATE_PLUGIN_CONTROL))
     {
         t_1d_char_array * f_val_arr = c_split_str(a_value, '|', 3,
-                PYDAW_TINY_STRING);
+                TINY_STRING);
 
         int f_plugin_uid = atoi(f_val_arr->array[0]);
 
@@ -2021,7 +2021,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_CONFIGURE_PLUGIN))
     {
         t_1d_char_array * f_val_arr = c_split_str_remainder(a_value, '|', 3,
-                PYDAW_LARGE_STRING);
+                LARGE_STRING);
         int f_plugin_uid = atoi(f_val_arr->array[0]);
         char * f_key = f_val_arr->array[1];
         char * f_message = f_val_arr->array[2];
@@ -2048,7 +2048,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_AUDIO_IN_VOL))
     {
         t_1d_char_array * f_val_arr = c_split_str(a_value, '|', 2,
-                PYDAW_SMALL_STRING);
+                SMALL_STRING);
         int f_index = atoi(f_val_arr->array[0]);
         MKFLT f_vol = atof(f_val_arr->array[1]);
         MKFLT f_vol_linear = f_db_to_linear_fast(f_vol);
@@ -2074,7 +2074,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_LOAD_CC_MAP))
     {
         t_1d_char_array * f_val_arr = c_split_str_remainder(a_value, '|', 2,
-                PYDAW_SMALL_STRING);
+                SMALL_STRING);
         int f_plugin_uid = atoi(f_val_arr->array[0]);
         musikernel->plugin_pool[f_plugin_uid].descriptor->set_cc_map(
             musikernel->plugin_pool[f_plugin_uid].PYFX_handle,
@@ -2112,14 +2112,14 @@ void v_mk_configure(const char* a_key, const char* a_value)
     }
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_RATE_ENV))
     {
-        t_2d_char_array * f_arr = g_get_2d_array(PYDAW_SMALL_STRING);
-        char f_tmp_char[PYDAW_SMALL_STRING];
+        t_2d_char_array * f_arr = g_get_2d_array(SMALL_STRING);
+        char f_tmp_char[SMALL_STRING];
         sprintf(f_tmp_char, "%s", a_value);
         f_arr->array = f_tmp_char;
-        char * f_in_file = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
+        char * f_in_file = (char*)malloc(sizeof(char) * TINY_STRING);
         v_iterate_2d_char_array(f_arr);
         strcpy(f_in_file, f_arr->current_str);
-        char * f_out_file = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
+        char * f_out_file = (char*)malloc(sizeof(char) * TINY_STRING);
         v_iterate_2d_char_array(f_arr);
         strcpy(f_out_file, f_arr->current_str);
         v_iterate_2d_char_array(f_arr);
@@ -2150,14 +2150,14 @@ void v_mk_configure(const char* a_key, const char* a_value)
     }
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_PITCH_ENV))
     {
-        t_2d_char_array * f_arr = g_get_2d_array(PYDAW_SMALL_STRING);
-        char f_tmp_char[PYDAW_SMALL_STRING];
+        t_2d_char_array * f_arr = g_get_2d_array(SMALL_STRING);
+        char f_tmp_char[SMALL_STRING];
         sprintf(f_tmp_char, "%s", a_value);
         f_arr->array = f_tmp_char;
-        char * f_in_file = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
+        char * f_in_file = (char*)malloc(sizeof(char) * TINY_STRING);
         v_iterate_2d_char_array(f_arr);
         strcpy(f_in_file, f_arr->current_str);
-        char * f_out_file = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
+        char * f_out_file = (char*)malloc(sizeof(char) * TINY_STRING);
         v_iterate_2d_char_array(f_arr);
         strcpy(f_out_file, f_arr->current_str);
         v_iterate_2d_char_array(f_arr);
@@ -2175,7 +2175,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
     }
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_CLEAN_WAV_POOL))
     {
-        t_2d_char_array * f_arr = g_get_2d_array(PYDAW_LARGE_STRING);
+        t_2d_char_array * f_arr = g_get_2d_array(LARGE_STRING);
         int f_uid;
         strcpy(f_arr->array, a_value);
 

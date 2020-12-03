@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_PLUGIN_H
-#define	PYDAW_PLUGIN_H
+#ifndef PLUGIN_H
+#define	PLUGIN_H
 
 #ifdef	__cplusplus
 extern "C" {
@@ -133,4 +133,4 @@ void v_free_plugin(t_plugin * a_plugin)
 }
 */
 
-#endif	/* PYDAW_PLUGIN_H */
+#endif	/* PLUGIN_H */

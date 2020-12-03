@@ -316,12 +316,6 @@ def global_new_project(a_project_file):
     MIXER_WIDGET.set_project(PROJECT)
     PIANO_ROLL_EDITOR.default_vposition()
 
-def seconds_to_beats(a_seconds):
-    '''converts seconds to regions'''
-    return a_seconds * (CURRENT_REGION.get_tempo_at_pos(
-        CURRENT_ITEM_REF.start_beat) / 60.0)
-
-
 def global_set_playback_pos(a_beat=None):
     if a_beat is not None:
         global PLAYBACK_POS
@@ -565,6 +559,13 @@ def global_update_track_comboboxes(a_index=None, a_value=None):
         TRACK_PANEL.get_track_names(),
     )
     global_open_mixer()
+
+def seconds_to_beats(a_seconds):
+    return a_seconds * (
+        CURRENT_REGION.get_tempo_at_pos(
+            CURRENT_ITEM_REF.start_beat
+        ) / 60.0
+    )
 
 
 # Only functions, globals must accessed through the module

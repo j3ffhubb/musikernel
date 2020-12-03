@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_GATE_H
-#define	PYDAW_GATE_H
+#ifndef GATE_H
+#define	GATE_H
 
 #include "../filter/svf.h"
 #include "../signal_routing/audio_xfade.h"
@@ -88,5 +88,5 @@ void g_gat_init(t_gat_gate * f_result, MKFLT a_sr)
 }
 #endif
 
-#endif	/* PYDAW_GATE_H */
+#endif	/* GATE_H */
 

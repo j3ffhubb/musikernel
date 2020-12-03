@@ -11,19 +11,19 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_PLUGIN_HEADER_INCLUDED
-#define PYDAW_PLUGIN_HEADER_INCLUDED
+#ifndef PLUGIN_HEADER_INCLUDED
+#define PLUGIN_HEADER_INCLUDED
 
 #include <pthread.h>
 #include <assert.h>
 #include "files.h"
 #include "libmodsynth/lib/lmalloc.h"
 
-#define PYDAW_EVENT_NOTEON     0
-#define PYDAW_EVENT_NOTEOFF    1
-#define PYDAW_EVENT_PITCHBEND  2
-#define PYDAW_EVENT_CONTROLLER 3
-#define PYDAW_EVENT_AUTOMATION 4
+#define EVENT_NOTEON     0
+#define EVENT_NOTEOFF    1
+#define EVENT_PITCHBEND  2
+#define EVENT_CONTROLLER 3
+#define EVENT_AUTOMATION 4
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +55,7 @@ typedef struct
 	int note;		/**< note */
 	int velocity;		/**< velocity */
 	int duration;		/**< duration until note-off;
-                                 * only for #PYDAW_EVENT_NOTEON */
+                                 * only for #EVENT_NOTEON */
 	int param;		/**< control parameter */
         MKFLT value;
         MKFLT start;
@@ -326,7 +326,7 @@ inline void v_ev_clear(t_seq_event * a_event)
 inline void v_ev_set_pitchbend(t_seq_event* a_event,
         int a_channel, int a_value)
 {
-    a_event->type = PYDAW_EVENT_PITCHBEND;
+    a_event->type = EVENT_PITCHBEND;
     a_event->channel = a_channel;
     a_event->value = a_value;
 }
@@ -334,7 +334,7 @@ inline void v_ev_set_pitchbend(t_seq_event* a_event,
 inline void v_ev_set_noteoff(t_seq_event* a_event,
         int a_channel, int a_note, int a_velocity)
 {
-    a_event->type = PYDAW_EVENT_NOTEOFF;
+    a_event->type = EVENT_NOTEOFF;
     a_event->channel = a_channel;
     a_event->note = a_note;
     a_event->velocity = a_velocity;
@@ -343,7 +343,7 @@ inline void v_ev_set_noteoff(t_seq_event* a_event,
 inline void v_ev_set_noteon(t_seq_event* a_event,
         int a_channel, int a_note, int a_velocity)
 {
-    a_event->type = PYDAW_EVENT_NOTEON;
+    a_event->type = EVENT_NOTEON;
     a_event->channel = a_channel;
     a_event->note = a_note;
     a_event->velocity = a_velocity;
@@ -352,7 +352,7 @@ inline void v_ev_set_noteon(t_seq_event* a_event,
 inline void v_ev_set_controller(t_seq_event* a_event,
         int a_channel, int a_cc_num, int a_value)
 {
-    a_event->type = PYDAW_EVENT_CONTROLLER;
+    a_event->type = EVENT_CONTROLLER;
     a_event->channel = a_channel;
     a_event->param = a_cc_num;
     a_event->value = a_value;
@@ -361,7 +361,7 @@ inline void v_ev_set_controller(t_seq_event* a_event,
 inline void v_ev_set_atm(t_seq_event* a_event,
         int a_port_num, int a_value)
 {
-    a_event->type = PYDAW_EVENT_AUTOMATION;
+    a_event->type = EVENT_AUTOMATION;
     a_event->channel = 0;
     a_event->port = a_port_num;
     a_event->value = a_value;
@@ -443,7 +443,7 @@ MKFLT * g_get_port_table(PYFX_Handle * handle,
 
 void v_generic_cc_map_set(t_plugin_cc_map * a_cc_map, char * a_str)
 {
-    t_2d_char_array * f_2d_array = g_get_2d_array(PYDAW_SMALL_STRING);
+    t_2d_char_array * f_2d_array = g_get_2d_array(SMALL_STRING);
     f_2d_array->array = a_str;
     v_iterate_2d_char_array(f_2d_array);
     int f_cc = atoi(f_2d_array->current_str);
@@ -473,7 +473,7 @@ void generic_file_loader(PYFX_Handle Instance,
         t_plugin_cc_map * a_cc_map)
 {
     t_2d_char_array * f_2d_array = g_get_2d_array_from_file(a_path,
-                PYDAW_LARGE_STRING);
+                LARGE_STRING);
 
     while(1)
     {
@@ -489,11 +489,11 @@ void generic_file_loader(PYFX_Handle Instance,
         if(f_2d_array->current_str[0] == 'c')
         {
             char * f_config_key = (char*)malloc(
-                sizeof(char) * PYDAW_TINY_STRING);
+                sizeof(char) * TINY_STRING);
             v_iterate_2d_char_array(f_2d_array);
             strcpy(f_config_key, f_2d_array->current_str);
             char * f_value = (char*)malloc(
-                sizeof(char) * PYDAW_SMALL_STRING);
+                sizeof(char) * SMALL_STRING);
             v_iterate_2d_char_array_to_next_line(f_2d_array);
             strcpy(f_value, f_2d_array->current_str);
 
@@ -542,4 +542,4 @@ void generic_file_loader(PYFX_Handle Instance,
 }
 
 
-#endif /* PYDAW_PLUGIN_HEADER_INCLUDED */
+#endif /* PLUGIN_HEADER_INCLUDED */

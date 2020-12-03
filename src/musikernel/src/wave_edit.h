@@ -66,7 +66,7 @@ void g_wave_edit_get()
 
 /* Set the plaaback mode
  * @self:   The wave editor to set playback mode for
- * @a_mode: The mode to set it to, one of PYDAW_PLAYBACK_MODE_{OFF,PLAY,REC}
+ * @a_mode: The mode to set it to, one of PLAYBACK_MODE_{OFF,PLAY,REC}
  * @a_lock: 1 to lock the main_lock, 0 to not
  */
 void v_wn_set_playback_mode(t_wave_edit * self, int a_mode, int a_lock)
@@ -89,7 +89,7 @@ void v_wn_set_playback_mode(t_wave_edit * self, int a_mode, int a_lock)
                 pthread_spin_unlock(&musikernel->main_lock);
             }
 
-            if(f_old_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(f_old_mode == PLAYBACK_MODE_REC)
             {
                 v_stop_record_audio();
             }
@@ -121,7 +121,7 @@ void v_wn_set_playback_mode(t_wave_edit * self, int a_mode, int a_lock)
             break;
         }
         case 2:  //record
-            if(musikernel->playback_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(musikernel->playback_mode == PLAYBACK_MODE_REC)
             {
                 return;
             }
@@ -170,7 +170,7 @@ void v_we_export(t_wave_edit * self, const char * a_file_out)
         ++f_i;
     }
 
-    v_wn_set_playback_mode(self, PYDAW_PLAYBACK_MODE_PLAY, 0);
+    v_wn_set_playback_mode(self, PLAYBACK_MODE_PLAY, 0);
 
     printf("\nOpening SNDFILE with sample rate %f\n", f_sample_rate);
 
@@ -226,7 +226,7 @@ void v_we_export(t_wave_edit * self, const char * a_file_out)
 
 #endif
 
-    v_wn_set_playback_mode(self, PYDAW_PLAYBACK_MODE_OFF, 0);
+    v_wn_set_playback_mode(self, PLAYBACK_MODE_OFF, 0);
 
     sf_close(f_sndfile);
 
@@ -292,7 +292,7 @@ void v_wn_open_project()
 void v_set_wave_editor_item(t_wave_edit * self,
         const char * a_val)
 {
-    t_2d_char_array * f_current_string = g_get_2d_array(PYDAW_MEDIUM_STRING);
+    t_2d_char_array * f_current_string = g_get_2d_array(MEDIUM_STRING);
     sprintf(f_current_string->array, "%s", a_val);
     t_audio_item * f_old = self->ab_audio_item;
     t_audio_item * f_result = g_audio_item_load_single(
@@ -332,13 +332,13 @@ inline void v_run_wave_editor(
 
     if(a_input)
     {
-        for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i)
+        for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i)
         {
             v_audio_input_run(f_i, output, NULL, a_input, sample_count, NULL);
         }
     }
 
-    if(musikernel->playback_mode == PYDAW_PLAYBACK_MODE_PLAY)
+    if(musikernel->playback_mode == PLAYBACK_MODE_PLAY)
     {
         for(f_i = 0; f_i < sample_count; ++f_i)
         {
@@ -390,7 +390,7 @@ inline void v_run_wave_editor(
                 );
 
                 if(
-                    musikernel->playback_mode != PYDAW_PLAYBACK_MODE_PLAY
+                    musikernel->playback_mode != PLAYBACK_MODE_PLAY
                     &&
                     self->ab_audio_item->adsrs[0].stage < ADSR_STAGE_RELEASE
                 ){
@@ -401,7 +401,7 @@ inline void v_run_wave_editor(
                     sent_stop = 1;
                     v_wn_set_playback_mode(
                         self,
-                        PYDAW_PLAYBACK_MODE_OFF,
+                        PLAYBACK_MODE_OFF,
                         0
                     );
                     v_queue_osc_message("stop", "");
@@ -557,7 +557,7 @@ void v_wn_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, WN_CONFIGURE_KEY_PLUGIN_INDEX))
     {
         t_1d_char_array * f_val_arr = c_split_str(a_value, '|', 5,
-                PYDAW_TINY_STRING);
+                TINY_STRING);
         int f_track_num = atoi(f_val_arr->array[0]);
         int f_index = atoi(f_val_arr->array[1]);
         int f_plugin_index = atoi(f_val_arr->array[2]);
@@ -584,7 +584,7 @@ void v_wn_test()
     musikernel->sample_count = 512;
 
     v_set_host(MK_HOST_WAVENEXT);
-    v_wn_set_playback_mode(wave_edit, PYDAW_PLAYBACK_MODE_REC, 0);
+    v_wn_set_playback_mode(wave_edit, PLAYBACK_MODE_REC, 0);
     MKFLT * f_output_arr[2];
 
     int f_i, f_i2;
@@ -612,7 +612,7 @@ void v_wn_test()
         v_run_wave_editor(512, f_output_arr, f_input_arr);
     }
 
-    v_wn_set_playback_mode(wave_edit, PYDAW_PLAYBACK_MODE_OFF, 0);
+    v_wn_set_playback_mode(wave_edit, PLAYBACK_MODE_OFF, 0);
 
     printf("End Wave-Next test\n");
 }

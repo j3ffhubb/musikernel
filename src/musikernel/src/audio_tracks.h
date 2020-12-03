@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_AUDIO_TRACKS_H
-#define	PYDAW_AUDIO_TRACKS_H
+#ifndef AUDIO_TRACKS_H
+#define	AUDIO_TRACKS_H
 
 #include <sndfile.h>
 #include "libmodsynth/lib/amp.h"
@@ -27,12 +27,12 @@ GNU General Public License for more details.
 #include "files.h"
 
 
-#define PYDAW_MAX_AUDIO_ITEM_COUNT 256
-#define PYDAW_MAX_WAV_POOL_ITEM_COUNT 1500
+#define MAX_AUDIO_ITEM_COUNT 256
+#define MAX_WAV_POOL_ITEM_COUNT 1500
 
-#define PYDAW_AUDIO_ITEM_PADDING 64
-#define PYDAW_AUDIO_ITEM_PADDING_DIV2 32
-#define PYDAW_AUDIO_ITEM_PADDING_DIV2_FLOAT 32.0f
+#define AUDIO_ITEM_PADDING 64
+#define AUDIO_ITEM_PADDING_DIV2 32
+#define AUDIO_ITEM_PADDING_DIV2_FLOAT 32.0f
 
 #define MK_AUDIO_ITEM_SEND_COUNT 3
 
@@ -109,7 +109,7 @@ typedef struct
 {
     MKFLT sample_rate;
     int count;
-    t_wav_pool_item items[PYDAW_MAX_WAV_POOL_ITEM_COUNT];
+    t_wav_pool_item items[MAX_WAV_POOL_ITEM_COUNT];
     char samples_folder[2048];  //This must be set when opening a project
 }t_wav_pool;
 
@@ -121,8 +121,8 @@ typedef struct
 
 typedef struct
 {
-    t_audio_item * items[PYDAW_MAX_AUDIO_ITEM_COUNT];
-    t_audio_item_index indexes[DN_TRACK_COUNT][PYDAW_MAX_AUDIO_ITEM_COUNT];
+    t_audio_item * items[MAX_AUDIO_ITEM_COUNT];
+    t_audio_item_index indexes[DN_TRACK_COUNT][MAX_AUDIO_ITEM_COUNT];
     int index_counts[DN_TRACK_COUNT];
     int sample_rate;
     int uid;
@@ -248,7 +248,7 @@ int i_wav_pool_item_load(t_wav_pool_item *a_wav_pool_item, int a_huge_pages)
         f_adjusted_channel_count = 2;
     }
 
-    int f_actual_array_size = (samples + PYDAW_AUDIO_ITEM_PADDING);
+    int f_actual_array_size = (samples + AUDIO_ITEM_PADDING);
     f_i = 0;
 
     while(f_i < f_adjusted_channel_count)
@@ -270,15 +270,15 @@ int i_wav_pool_item_load(t_wav_pool_item *a_wav_pool_item, int a_huge_pages)
 
     //For performing a 5ms fadeout of the sample, for preventing clicks
     MKFLT f_fade_out_dec = (1.0f / (MKFLT)(info.samplerate)) / (0.005);
-    int f_fade_out_start = (samples + PYDAW_AUDIO_ITEM_PADDING_DIV2) -
+    int f_fade_out_start = (samples + AUDIO_ITEM_PADDING_DIV2) -
         ((int)(0.005f * ((MKFLT)(info.samplerate))));
     MKFLT f_fade_out_envelope = 1.0f;
     MKFLT f_temp_sample = 0.0f;
 
     for(f_i = 0; f_i < f_actual_array_size; f_i++)
     {
-        if((f_i > PYDAW_AUDIO_ITEM_PADDING_DIV2) &&
-                (f_i < (samples + PYDAW_AUDIO_ITEM_PADDING_DIV2)))
+        if((f_i > AUDIO_ITEM_PADDING_DIV2) &&
+                (f_i < (samples + AUDIO_ITEM_PADDING_DIV2)))
         {
             if(f_i >= f_fade_out_start)
             {
@@ -293,7 +293,7 @@ int i_wav_pool_item_load(t_wav_pool_item *a_wav_pool_item, int a_huge_pages)
 	    for (j = 0; j < f_adjusted_channel_count; ++j)
             {
                 f_temp_sample =
-                        (tmpFrames[(f_i - PYDAW_AUDIO_ITEM_PADDING_DIV2) *
+                        (tmpFrames[(f_i - AUDIO_ITEM_PADDING_DIV2) *
                         info.channels + j]);
 
                 if(f_i >= f_fade_out_start)
@@ -330,7 +330,7 @@ int i_wav_pool_item_load(t_wav_pool_item *a_wav_pool_item, int a_huge_pages)
     }
 
     //-20 to ensure we don't read past the end of the array
-    a_wav_pool_item->length = (samples + PYDAW_AUDIO_ITEM_PADDING_DIV2 - 20);
+    a_wav_pool_item->length = (samples + AUDIO_ITEM_PADDING_DIV2 - 20);
 
     a_wav_pool_item->sample_rate = info.samplerate;
 
@@ -366,7 +366,7 @@ t_wav_pool * g_wav_pool_get(MKFLT a_sr){
     f_result->count = 0;
 
     int f_i;
-    for(f_i = 0; f_i < PYDAW_MAX_WAV_POOL_ITEM_COUNT; ++f_i){
+    for(f_i = 0; f_i < MAX_WAV_POOL_ITEM_COUNT; ++f_i){
         f_result->items[f_i].uid = -1;
     }
     return f_result;
@@ -454,7 +454,7 @@ void v_wav_pool_add_items(t_wav_pool* a_wav_pool, char * a_file_path)
     a_wav_pool->count = 0;
     t_2d_char_array * f_arr = g_get_2d_array_from_file(
         a_file_path,
-        PYDAW_LARGE_STRING
+        LARGE_STRING
     );
     while(1){
         v_iterate_2d_char_array(f_arr);
@@ -547,14 +547,14 @@ t_audio_items * g_audio_items_get(int a_sr){
 
     int f_i, f_i2;
 
-    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i){
+    for(f_i = 0; f_i < MAX_AUDIO_ITEM_COUNT; ++f_i){
         f_result->items[f_i] = 0; //g_audio_item_get((MKFLT)(a_sr));
     }
 
     for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i){
         f_result->index_counts[f_i] = 0;
 
-        for(f_i2 = 0; f_i2 < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i2){
+        for(f_i2 = 0; f_i2 < MAX_AUDIO_ITEM_COUNT; ++f_i2){
             f_result->indexes[f_i][f_i2].item_num = 0;
             f_result->indexes[f_i][f_i2].send_num = 0;
         }
@@ -627,7 +627,7 @@ t_audio_item * g_audio_item_load_single(MKFLT a_sr,
     f_result->sample_start_offset =
         (int)((f_result->sample_start *
         ((MKFLT)f_result->wav_pool_item->length))) +
-        PYDAW_AUDIO_ITEM_PADDING_DIV2;
+        AUDIO_ITEM_PADDING_DIV2;
 
     v_iterate_2d_char_array(f_current_string);
     MKFLT f_sample_end = atof(f_current_string->current_str) * 0.001f;
@@ -720,24 +720,24 @@ t_audio_item * g_audio_item_load_single(MKFLT a_sr,
     v_iterate_2d_char_array(f_current_string);
     f_result->sidechain[2] = atoi(f_current_string->current_str);
 
-    if(f_result->sample_start_offset < PYDAW_AUDIO_ITEM_PADDING_DIV2){
+    if(f_result->sample_start_offset < AUDIO_ITEM_PADDING_DIV2){
         printf(
-            "f_result->sample_start_offset <= PYDAW_AUDIO_ITEM_PADDING_DIV2"
+            "f_result->sample_start_offset <= AUDIO_ITEM_PADDING_DIV2"
             " %i %i\n",
             f_result->sample_start_offset,
-            PYDAW_AUDIO_ITEM_PADDING_DIV2
+            AUDIO_ITEM_PADDING_DIV2
         );
-        f_result->sample_start_offset = PYDAW_AUDIO_ITEM_PADDING_DIV2;
+        f_result->sample_start_offset = AUDIO_ITEM_PADDING_DIV2;
     }
 
-    if(f_result->sample_end_offset < PYDAW_AUDIO_ITEM_PADDING_DIV2){
+    if(f_result->sample_end_offset < AUDIO_ITEM_PADDING_DIV2){
         printf(
-            "f_result->sample_end_offset <= PYDAW_AUDIO_ITEM_PADDING_DIV2"
+            "f_result->sample_end_offset <= AUDIO_ITEM_PADDING_DIV2"
             " %i %i\n",
             f_result->sample_end_offset,
-            PYDAW_AUDIO_ITEM_PADDING_DIV2
+            AUDIO_ITEM_PADDING_DIV2
         );
-        f_result->sample_end_offset = PYDAW_AUDIO_ITEM_PADDING_DIV2;
+        f_result->sample_end_offset = AUDIO_ITEM_PADDING_DIV2;
     }
 
     if(f_result->sample_start_offset > f_result->wav_pool_item->length){
@@ -774,7 +774,7 @@ t_audio_item * g_audio_item_load_single(MKFLT a_sr,
     f_result->sample_fade_in_end =
         f_result->sample_start_offset +
         ((int)((MKFLT)(f_result->sample_fade_in_end) *
-        f_result->sample_fade_in)) + PYDAW_AUDIO_ITEM_PADDING_DIV2;
+        f_result->sample_fade_in)) + AUDIO_ITEM_PADDING_DIV2;
 
     // Anything less than this will use a linear fade
     int max_linear = f_result->wav_pool_item->sample_rate / 10;
@@ -791,10 +791,10 @@ t_audio_item * g_audio_item_load_single(MKFLT a_sr,
     f_result->sample_fade_out_start =
         f_result->sample_start_offset +
         ((int)((MKFLT)(f_result->sample_fade_out_start) *
-        f_result->sample_fade_out)) + PYDAW_AUDIO_ITEM_PADDING_DIV2;
+        f_result->sample_fade_out)) + AUDIO_ITEM_PADDING_DIV2;
 
     int f_fade_diff = (f_result->sample_fade_in_end -
-        f_result->sample_start_offset - (PYDAW_AUDIO_ITEM_PADDING_DIV2));
+        f_result->sample_start_offset - (AUDIO_ITEM_PADDING_DIV2));
 
     if(f_fade_diff > 0){
         f_result->sample_fade_in_divisor = 1.0f / (MKFLT)f_fade_diff;
@@ -894,7 +894,7 @@ void v_audio_item_set_fade_vol(
         ){
             self->fade_vols[a_send_num] =
                 ((MKFLT)(self->sample_read_heads[a_send_num].whole_number) -
-                self->sample_fade_in_end - PYDAW_AUDIO_ITEM_PADDING_DIV2)
+                self->sample_fade_in_end - AUDIO_ITEM_PADDING_DIV2)
                 * self->sample_fade_in_divisor;
 
             if(self->is_linear_fade_in){
@@ -940,7 +940,7 @@ void v_audio_item_set_fade_vol(
         ){
             self->fade_vols[a_send_num] =
                 ((MKFLT)(self->sample_fade_in_end -
-                read_head->whole_number - PYDAW_AUDIO_ITEM_PADDING_DIV2))
+                read_head->whole_number - AUDIO_ITEM_PADDING_DIV2))
                 * self->sample_fade_in_divisor;
 
             if(self->is_linear_fade_in){
@@ -989,7 +989,7 @@ void v_audio_item_set_fade_vol(
 
 void v_audio_items_free(t_audio_items *a_audio_items){
     int f_i;
-    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i){
+    for(f_i = 0; f_i < MAX_AUDIO_ITEM_COUNT; ++f_i){
         v_audio_item_free(a_audio_items->items[f_i]);
         a_audio_items->items[f_i] = NULL;
     }
@@ -999,5 +999,5 @@ void v_audio_items_free(t_audio_items *a_audio_items){
 
 
 
-#endif	/* PYDAW_AUDIO_TRACKS_H */
+#endif	/* AUDIO_TRACKS_H */
 

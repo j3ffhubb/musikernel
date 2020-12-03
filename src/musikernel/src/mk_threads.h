@@ -113,7 +113,7 @@ void v_activate(
 
     v_open_project(a_project_path, 1);
 
-    char * f_host_str = (char*)malloc(sizeof(char) * PYDAW_TINY_STRING);
+    char * f_host_str = (char*)malloc(sizeof(char) * TINY_STRING);
     get_file_setting(f_host_str, "host", "0");
     int f_host = atoi(f_host_str);
     printf("Last host:  %i\n", f_host);
@@ -144,7 +144,7 @@ void v_destructor()
     musikernel->audio_recording_quit_notifier = 1;
     pthread_mutex_unlock(&musikernel->audio_inputs_mutex);
 
-    for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i)
+    for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i)
     {
         if(musikernel->audio_inputs[f_i].sndfile)
         {
@@ -187,19 +187,19 @@ void * v_osc_send_thread(void* a_arg)
     t_osc_send_data f_send_data;
     int f_i = 0;
 
-    while(f_i < PYDAW_OSC_SEND_QUEUE_SIZE)
+    while(f_i < OSC_SEND_QUEUE_SIZE)
     {
         hpalloc((void**)&f_send_data.osc_queue_vals[f_i],
-            sizeof(char) * PYDAW_OSC_MAX_MESSAGE_SIZE);
+            sizeof(char) * OSC_MAX_MESSAGE_SIZE);
         ++f_i;
     }
 
     hpalloc((void**)&f_send_data.f_tmp1,
-        sizeof(char) * PYDAW_OSC_MAX_MESSAGE_SIZE);
+        sizeof(char) * OSC_MAX_MESSAGE_SIZE);
     hpalloc((void**)&f_send_data.f_tmp2,
-        sizeof(char) * PYDAW_OSC_MAX_MESSAGE_SIZE);
+        sizeof(char) * OSC_MAX_MESSAGE_SIZE);
     hpalloc((void**)&f_send_data.f_msg,
-        sizeof(char) * PYDAW_OSC_MAX_MESSAGE_SIZE);
+        sizeof(char) * OSC_MAX_MESSAGE_SIZE);
 
     f_send_data.f_tmp1[0] = '\0';
     f_send_data.f_tmp2[0] = '\0';

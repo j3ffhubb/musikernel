@@ -112,12 +112,12 @@ static void v_xfade_process_midi_event(
     t_xfade * plugin_data, t_seq_event * a_event)
 {
 
-    if (a_event->type == PYDAW_EVENT_CONTROLLER)
+    if (a_event->type == EVENT_CONTROLLER)
     {
         assert(a_event->param >= 1 && a_event->param < 128);
 
         plugin_data->midi_event_types[plugin_data->midi_event_count] =
-                PYDAW_EVENT_CONTROLLER;
+                EVENT_CONTROLLER;
         plugin_data->midi_event_ticks[plugin_data->midi_event_count] =
                 a_event->tick;
         plugin_data->midi_event_ports[plugin_data->midi_event_count] =
@@ -177,7 +177,7 @@ static void v_xfade_run(
             plugin_data->midi_event_ticks[midi_event_pos] == f_i)
         {
             if(plugin_data->midi_event_types[midi_event_pos] ==
-                    PYDAW_EVENT_CONTROLLER)
+                    EVENT_CONTROLLER)
             {
                 v_cc_map_translate(
                     &plugin_data->cc_map, plugin_data->descriptor,

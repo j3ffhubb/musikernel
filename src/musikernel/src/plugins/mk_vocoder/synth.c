@@ -108,12 +108,12 @@ static void v_mk_vocoder_process_midi_event(
     t_mk_vocoder * plugin_data, t_seq_event * a_event)
 {
 
-    if (a_event->type == PYDAW_EVENT_CONTROLLER)
+    if (a_event->type == EVENT_CONTROLLER)
     {
         assert(a_event->param >= 1 && a_event->param < 128);
 
         v_plugin_event_queue_add(&plugin_data->midi_queue,
-            PYDAW_EVENT_CONTROLLER, a_event->tick,
+            EVENT_CONTROLLER, a_event->tick,
             a_event->value, a_event->param);
     }
 }
@@ -178,7 +178,7 @@ static void v_mk_vocoder_run(
                 break;
             }
 
-            if(f_midi_item->type == PYDAW_EVENT_CONTROLLER)
+            if(f_midi_item->type == EVENT_CONTROLLER)
             {
                 v_cc_map_translate(
                     &plugin_data->cc_map, plugin_data->descriptor,

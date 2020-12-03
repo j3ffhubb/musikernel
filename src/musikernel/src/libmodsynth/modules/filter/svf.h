@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_SVF_H
-#define	PYDAW_SVF_H
+#ifndef SVF_H
+#define	SVF_H
 
 #ifdef	__cplusplus
 extern "C" {
@@ -512,4 +512,4 @@ t_state_variable_filter * g_svf_get(MKFLT a_sample_rate)
 }
 #endif
 
-#endif	/* PYDAW_SVF_H */
+#endif	/* SVF_H */

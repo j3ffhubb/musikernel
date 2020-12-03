@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_GLITCH_H
-#define	PYDAW_GLITCH_H
+#ifndef GLITCH_H
+#define	GLITCH_H
 
 #include "../signal_routing/audio_xfade.h"
 #include "../../lib/pitch_core.h"
@@ -149,5 +149,5 @@ void v_glc_glitch_run(t_glc_glitch* a_glc, MKFLT a_input0, MKFLT a_input1)
 }
 #endif
 
-#endif	/* PYDAW_GLITCH_H */
+#endif	/* GLITCH_H */
 

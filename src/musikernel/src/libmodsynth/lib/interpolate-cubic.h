@@ -131,7 +131,7 @@ inline MKFLT f_cubic_interpolate_ptr(MKFLT * a_table, MKFLT a_ptr)
     int int_pos_minus1 = (int_pos) - 1;
     int int_pos_minus2 = (int_pos) - 2;
 
-#ifdef PYDAW_NO_HARDWARE
+#ifdef NO_HARDWARE
     // Check this when run with no hardware, but otherwise save the CPU.
     // Anything sending a position to this should already know that the
     // position is valid.

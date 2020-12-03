@@ -11,8 +11,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PYDAW_AUDIO_INPUTS_H
-#define	PYDAW_AUDIO_INPUTS_H
+#ifndef AUDIO_INPUTS_H
+#define	AUDIO_INPUTS_H
 
 #ifdef	__cplusplus
 extern "C" {
@@ -24,7 +24,7 @@ extern "C" {
 #include "files.h"
 
 //1 megabyte interleaved buffer per audio input
-#define PYDAW_AUDIO_INPUT_REC_BUFFER_SIZE (1024 * 1024)
+#define AUDIO_INPUT_REC_BUFFER_SIZE (1024 * 1024)
 
 typedef struct
 {
@@ -37,7 +37,7 @@ typedef struct
     MKFLT vol, vol_linear;
     SF_INFO sf_info;
     SNDFILE * sndfile;
-    MKFLT rec_buffers[2][PYDAW_AUDIO_INPUT_REC_BUFFER_SIZE]
+    MKFLT rec_buffers[2][AUDIO_INPUT_REC_BUFFER_SIZE]
         __attribute__((aligned(16)));
     int buffer_iterator[2];
     int current_buffer;
@@ -62,7 +62,7 @@ void g_pyaudio_input_init(t_pyaudio_input * f_result, MKFLT a_sr)
 
     register int f_i;
 
-    for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_REC_BUFFER_SIZE; ++f_i)
+    for(f_i = 0; f_i < AUDIO_INPUT_REC_BUFFER_SIZE; ++f_i)
     {
         f_result->rec_buffers[0][f_i] = 0.0f;
         f_result->rec_buffers[1][f_i] = 0.0f;
@@ -115,5 +115,5 @@ void v_audio_input_record_set(
 }
 #endif
 
-#endif	/* PYDAW_AUDIO_INPUTS_H */
+#endif	/* AUDIO_INPUTS_H */
 

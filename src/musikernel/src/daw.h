@@ -192,7 +192,7 @@ typedef struct
 
     int is_soloed;
 
-    int audio_glue_indexes[PYDAW_MAX_AUDIO_ITEM_COUNT];
+    int audio_glue_indexes[MAX_AUDIO_ITEM_COUNT];
 
     t_dn_midi_routing_list midi_routing;
 
@@ -285,7 +285,7 @@ void v_dn_reset_audio_item_read_heads(
     t_audio_item * f_audio_item;
     MKFLT f_tempo = self->ts[0].tempo;
 
-    for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i){
+    for(f_i = 0; f_i < MAX_AUDIO_ITEM_COUNT; ++f_i){
         if(f_audio_items->items[f_i]){
             f_audio_item = f_audio_items->items[f_i];
             double f_start_beat = f_audio_item->start_beat + a_start_offset;
@@ -882,7 +882,7 @@ void v_dn_process_track(t_daw * self, int a_global_track_num,
     }
 
     int f_is_recording = 0;
-    if(a_ts->playback_mode == PYDAW_PLAYBACK_MODE_REC &&
+    if(a_ts->playback_mode == PLAYBACK_MODE_REC &&
        f_track->midi_device)
     {
         f_is_recording = 1;
@@ -897,14 +897,14 @@ void v_dn_process_track(t_daw * self, int a_global_track_num,
             v_audio_input_run(f_i, f_track->buffers, f_track->sc_buffers,
                 a_ts->input_buffer, a_ts->sample_count,
                 &f_track->sc_buffers_dirty);
-            if(a_ts->playback_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(a_ts->playback_mode == PLAYBACK_MODE_REC)
             {
                 f_is_recording = 1;
             }
         }
     }
 
-    if(a_ts->playback_mode == PYDAW_PLAYBACK_MODE_PLAY || !f_is_recording)
+    if(a_ts->playback_mode == PLAYBACK_MODE_PLAY || !f_is_recording)
     {
         for(f_i = 0; f_i < f_track->splitter.count; ++f_i)
         {
@@ -1065,7 +1065,7 @@ inline void v_dn_process_atm(
 
     f_plugin->atm_count = 0;
 
-    if(a_ts->playback_mode == PYDAW_PLAYBACK_MODE_OFF)
+    if(a_ts->playback_mode == PLAYBACK_MODE_OFF)
     {
         return;
     }
@@ -1211,7 +1211,7 @@ void v_dn_process_midi(t_daw * self, t_dn_item_ref * a_item_ref,
                 (f_adjusted_start < f_track_next_period_beats) &&
                 (f_adjusted_start < a_item_ref->end))
             {
-                if(f_event->type == PYDAW_EVENT_NOTEON)
+                if(f_event->type == EVENT_NOTEON)
                 {
                     int f_note_sample_offset = 0;
                     double f_note_start_diff =
@@ -1256,7 +1256,7 @@ void v_dn_process_midi(t_daw * self, t_dn_item_ref * a_item_ref,
                         a_current_sample + ((int)(f_event->length *
                         a_ts->samples_per_beat));
                 }
-                else if(f_event->type == PYDAW_EVENT_CONTROLLER)
+                else if(f_event->type == EVENT_CONTROLLER)
                 {
                     int controller = f_event->param;
 
@@ -1284,7 +1284,7 @@ void v_dn_process_midi(t_daw * self, t_dn_item_ref * a_item_ref,
 
                     ++f_track->period_event_index;
                 }
-                else if(f_event->type == PYDAW_EVENT_PITCHBEND)
+                else if(f_event->type == EVENT_PITCHBEND)
                 {
                     int f_note_sample_offset = 0;
                     double f_note_start_diff = ((f_adjusted_start) -
@@ -1329,7 +1329,7 @@ void v_dn_process_note_offs(t_daw * self, int f_i,
     register int f_i2 = 0;
     long f_note_off;
 
-    while(f_i2 < PYDAW_MIDI_NOTE_COUNT)
+    while(f_i2 < MIDI_NOTE_COUNT)
     {
         f_note_off = f_track->note_offs[f_i2];
         if(f_note_off >= f_current_sample &&
@@ -1388,9 +1388,9 @@ void v_dn_process_external_midi(t_daw * self,
             events[f_i2].tick = sample_count - 1;
         }
 
-        if(events[f_i2].type == PYDAW_EVENT_NOTEON)
+        if(events[f_i2].type == EVENT_NOTEON)
         {
-            if(f_playback_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(f_playback_mode == PLAYBACK_MODE_REC)
             {
                 MKFLT f_beat = a_ts->ml_current_beat +
                     f_samples_to_beat_count(events[f_i2].tick,
@@ -1407,9 +1407,9 @@ void v_dn_process_external_midi(t_daw * self,
             v_queue_osc_message("ne", f_osc_msg);
 
         }
-        else if(events[f_i2].type == PYDAW_EVENT_NOTEOFF)
+        else if(events[f_i2].type == EVENT_NOTEOFF)
         {
-            if(f_playback_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(f_playback_mode == PLAYBACK_MODE_REC)
             {
                 MKFLT f_beat = a_ts->ml_current_beat +
                     f_samples_to_beat_count(events[f_i2].tick,
@@ -1424,9 +1424,9 @@ void v_dn_process_external_midi(t_daw * self,
             sprintf(f_osc_msg, "0|%i", events[f_i2].note);
             v_queue_osc_message("ne", f_osc_msg);
         }
-        else if(events[f_i2].type == PYDAW_EVENT_PITCHBEND)
+        else if(events[f_i2].type == EVENT_PITCHBEND)
         {
-            if(f_playback_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(f_playback_mode == PLAYBACK_MODE_REC)
             {
                 MKFLT f_beat = a_ts->ml_current_beat +
                     f_samples_to_beat_count(events[f_i2].tick,
@@ -1438,7 +1438,7 @@ void v_dn_process_external_midi(t_daw * self,
                 v_queue_osc_message("mrec", f_osc_msg);
             }
         }
-        else if(events[f_i2].type == PYDAW_EVENT_CONTROLLER)
+        else if(events[f_i2].type == EVENT_CONTROLLER)
         {
             int controller = events[f_i2].param;
 
@@ -1456,7 +1456,7 @@ void v_dn_process_external_midi(t_daw * self,
                 * (self->playback_inc))) * 4.0f;*/
             v_set_control_from_cc(&events[f_i2], a_track);
 
-            if(f_playback_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(f_playback_mode == PLAYBACK_MODE_REC)
             {
                 MKFLT f_beat =
                     a_ts->ml_current_beat +
@@ -1508,11 +1508,11 @@ inline void v_dn_run_engine(int a_sample_count,
     int f_period, sample_count;
     MKFLT * output[2];
 
-    if(musikernel->playback_mode != PYDAW_PLAYBACK_MODE_OFF)
+    if(musikernel->playback_mode != PLAYBACK_MODE_OFF)
     {
         v_mk_seq_event_list_set(&self->en_song->regions->events,
             &self->seq_event_result, a_output, a_input_buffers,
-            PYDAW_AUDIO_INPUT_TRACK_COUNT,
+            AUDIO_INPUT_TRACK_COUNT,
             a_sample_count, self->ts[0].current_sample, self->loop_mode);
     }
     else
@@ -1522,7 +1522,7 @@ inline void v_dn_run_engine(int a_sample_count,
         f_seq_period->is_looping = 0;
         v_mk_seq_event_result_set_default(&self->seq_event_result,
             &self->en_song->regions->events, a_output, a_input_buffers,
-            PYDAW_AUDIO_INPUT_TRACK_COUNT, a_sample_count,
+            AUDIO_INPUT_TRACK_COUNT, a_sample_count,
             self->ts[0].current_sample);
     }
 
@@ -1674,7 +1674,7 @@ void v_dn_audio_items_run(
             continue;
         }
 
-        if(f_playback_mode == PYDAW_PLAYBACK_MODE_OFF &&
+        if(f_playback_mode == PLAYBACK_MODE_OFF &&
            f_audio_item->adsrs[f_send_num].stage < ADSR_STAGE_RELEASE)
         {
             v_adsr_release(&f_audio_item->adsrs[f_send_num]);
@@ -1691,7 +1691,7 @@ void v_dn_audio_items_run(
 
         register int f_i2 = 0;
 
-        if(f_playback_mode != PYDAW_PLAYBACK_MODE_OFF &&
+        if(f_playback_mode != PLAYBACK_MODE_OFF &&
            f_audio_start >= a_ts->ml_current_beat &&
            f_audio_start < a_ts->ml_next_beat &&
            f_audio_start < a_item_ref->end)
@@ -1790,7 +1790,7 @@ void v_dn_audio_items_run(
 
                     assert(
                         f_audio_item->sample_read_heads[f_send_num].whole_number
-                        >= PYDAW_AUDIO_ITEM_PADDING_DIV2);
+                        >= AUDIO_ITEM_PADDING_DIV2);
 
                     MKFLT f_tmp_sample0 = f_cubic_interpolate_ptr_ifh(
                         f_audio_item->wav_pool_item->samples[0],
@@ -1856,7 +1856,7 @@ void v_dn_audio_items_run(
                         f_audio_item->ratio);
 
                     if(f_audio_item->sample_read_heads[f_send_num].whole_number
-                        < PYDAW_AUDIO_ITEM_PADDING_DIV2)
+                        < AUDIO_ITEM_PADDING_DIV2)
                     {
                         f_audio_item->adsrs[f_send_num].stage = ADSR_STAGE_OFF;
                     }
@@ -1937,7 +1937,7 @@ void v_dn_open_tracks()
     if(i_file_exists(f_file_name))
     {
         t_2d_char_array * f_2d_array = g_get_2d_array_from_file(f_file_name,
-                PYDAW_LARGE_STRING);
+                LARGE_STRING);
 
         while(1)
         {
@@ -2056,7 +2056,7 @@ t_dn_atm_region * g_dn_atm_region_get(t_daw * self)
         }
 
         t_2d_char_array * f_current_string = g_get_2d_array_from_file(
-            f_file, PYDAW_XLARGE_STRING); //TODO:  1MB big enough???
+            f_file, XLARGE_STRING); //TODO:  1MB big enough???
 
         int f_pos = 0;
         /* Port position in the array, since port num does not map
@@ -2234,12 +2234,12 @@ t_dn_region * g_dn_region_get(t_daw* self)
     }
 
 
-    char f_full_path[PYDAW_TINY_STRING];
+    char f_full_path[TINY_STRING];
     sprintf(f_full_path, "%s%ssequencer.txt", self->project_folder, PATH_SEP);
     //sprintf(f_full_path, "%s%i", self->region_folder, a_uid);
 
     t_2d_char_array * f_current_string =
-        g_get_2d_array_from_file(f_full_path, PYDAW_LARGE_STRING);
+        g_get_2d_array_from_file(f_full_path, LARGE_STRING);
 
     f_i = 0;
     int f_ev_pos = 0;
@@ -2387,7 +2387,7 @@ void g_dn_item_get(t_daw* self, int a_uid)
     sprintf(f_full_path, "%s%i", self->item_folder, a_uid);
 
     t_2d_char_array * f_current_string = g_get_2d_array_from_file(f_full_path,
-            PYDAW_LARGE_STRING);
+            LARGE_STRING);
 
     int f_event_pos = 0;
 
@@ -2576,7 +2576,7 @@ t_daw * g_daw_get()
     f_result->ts[0].playback_mode = 0;
     f_result->ts[0].suppress_new_audio_items = 0;
     f_result->ts[0].input_buffer = NULL;
-    f_result->ts[0].input_count = PYDAW_AUDIO_INPUT_TRACK_COUNT;
+    f_result->ts[0].input_count = AUDIO_INPUT_TRACK_COUNT;
 
     int f_i;
 
@@ -2585,10 +2585,10 @@ t_daw * g_daw_get()
         clalloc((void**)&f_result->ts[f_i].input_index,
             sizeof(int) * MAX_AUDIO_INPUT_COUNT);
         //MAX_AUDIO_INPUT_COUNT is done for padding instead of
-        //PYDAW_AUDIO_INPUT_TRACK_COUNT
+        //AUDIO_INPUT_TRACK_COUNT
     }
 
-    assert(PYDAW_AUDIO_INPUT_TRACK_COUNT < MAX_AUDIO_INPUT_COUNT);
+    assert(AUDIO_INPUT_TRACK_COUNT < MAX_AUDIO_INPUT_COUNT);
 
     g_seq_event_result_init(&f_result->seq_event_result);
 
@@ -2607,7 +2607,7 @@ t_daw * g_daw_get()
 
     f_i = 0;
 
-    while(f_i < PYDAW_MAX_AUDIO_ITEM_COUNT)
+    while(f_i < MAX_AUDIO_ITEM_COUNT)
     {
         f_result->audio_glue_indexes[f_i] = 0;
         ++f_i;
@@ -2686,7 +2686,7 @@ void v_dn_set_playback_mode(
                 pthread_spin_unlock(&musikernel->main_lock);
             }
 
-            if(f_old_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(f_old_mode == PLAYBACK_MODE_REC)
             {
                 v_stop_record_audio();
             }
@@ -2713,7 +2713,7 @@ void v_dn_set_playback_mode(
             break;
         }
         case 2:  //record
-            if(musikernel->playback_mode == PYDAW_PLAYBACK_MODE_REC)
+            if(musikernel->playback_mode == PLAYBACK_MODE_REC)
             {
                 return;
             }
@@ -2856,7 +2856,7 @@ void v_dn_offline_render(
     int f_old_loop_mode = self->loop_mode;
     v_dn_set_loop_mode(self, DN_LOOP_MODE_OFF);
 
-    v_dn_set_playback_mode(self, PYDAW_PLAYBACK_MODE_PLAY, a_start_beat, 0);
+    v_dn_set_playback_mode(self, PLAYBACK_MODE_PLAY, a_start_beat, 0);
 
     printf("\nOpening SNDFILE with sample rate %i\n", (int)f_sample_rate);
 
@@ -2961,7 +2961,7 @@ void v_dn_offline_render(
 
 #endif
 
-    v_dn_set_playback_mode(self, PYDAW_PLAYBACK_MODE_OFF, a_start_beat, 0);
+    v_dn_set_playback_mode(self, PLAYBACK_MODE_OFF, a_start_beat, 0);
     v_dn_set_loop_mode(self, f_old_loop_mode);
 
     if(a_stem)
@@ -3064,7 +3064,7 @@ t_dn_routing_graph * g_dn_routing_graph_get(t_daw * self)
 
     if(i_file_exists(f_tmp)){
         t_2d_char_array * f_2d_array = g_get_2d_array_from_file(
-        f_tmp, PYDAW_LARGE_STRING);
+        f_tmp, LARGE_STRING);
         while(1){
             v_iterate_2d_char_array(f_2d_array);
             if(f_2d_array->eof){
@@ -3191,7 +3191,7 @@ void v_dn_set_midi_devices()
     }
 
     t_2d_char_array * f_current_string =
-        g_get_2d_array_from_file(f_path, PYDAW_LARGE_STRING);
+        g_get_2d_array_from_file(f_path, LARGE_STRING);
 
     for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i)
     {
@@ -3233,7 +3233,7 @@ void v_dn_update_audio_inputs()
     pthread_spin_lock(&musikernel->main_lock);
 
     int f_i;
-    for(f_i = 0; f_i < PYDAW_AUDIO_INPUT_TRACK_COUNT; ++f_i)
+    for(f_i = 0; f_i < AUDIO_INPUT_TRACK_COUNT; ++f_i)
     {
         daw->ts[0].input_index[f_i] =
             musikernel->audio_inputs[f_i].output_track;
@@ -3251,7 +3251,7 @@ void v_dn_configure(const char* a_key, const char* a_value)
     if(!strcmp(a_key, DN_CONFIGURE_KEY_PER_AUDIO_ITEM_FX))
     {
         t_1d_char_array * f_arr = c_split_str(a_value, '|', 4,
-                PYDAW_SMALL_STRING);
+                SMALL_STRING);
         int f_item_index = atoi(f_arr->array[0]);
         int f_audio_item_index = atoi(f_arr->array[1]);
         int f_port_num = atoi(f_arr->array[2]);
@@ -3264,7 +3264,7 @@ void v_dn_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, DN_CONFIGURE_KEY_DN_PLAYBACK))
     {
         t_1d_char_array * f_arr = c_split_str(a_value, '|', 2,
-                PYDAW_SMALL_STRING);
+                SMALL_STRING);
         int f_mode = atoi(f_arr->array[0]);
         assert(f_mode >= 0 && f_mode <= 2);
         double f_beat = atof(f_arr->array[1]);
@@ -3343,7 +3343,7 @@ void v_dn_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, DN_CONFIGURE_KEY_SOLO)) //Set track solo
     {
         t_1d_char_array * f_val_arr = c_split_str(a_value, '|', 2,
-                PYDAW_TINY_STRING);
+                TINY_STRING);
         int f_track_num = atoi(f_val_arr->array[0]);
         int f_mode = atoi(f_val_arr->array[1]);
         assert(f_mode == 0 || f_mode == 1);
@@ -3361,7 +3361,7 @@ void v_dn_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, DN_CONFIGURE_KEY_MUTE)) //Set track mute
     {
         t_1d_char_array * f_val_arr = c_split_str(a_value, '|', 2,
-                PYDAW_TINY_STRING);
+                TINY_STRING);
         int f_track_num = atoi(f_val_arr->array[0]);
         int f_mode = atoi(f_val_arr->array[1]);
         assert(f_mode == 0 || f_mode == 1);
@@ -3376,7 +3376,7 @@ void v_dn_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, DN_CONFIGURE_KEY_PLUGIN_INDEX))
     {
         t_1d_char_array * f_val_arr = c_split_str(a_value, '|', 5,
-                PYDAW_TINY_STRING);
+                TINY_STRING);
         int f_track_num = atoi(f_val_arr->array[0]);
         int f_index = atoi(f_val_arr->array[1]);
         int f_plugin_index = atoi(f_val_arr->array[2]);
