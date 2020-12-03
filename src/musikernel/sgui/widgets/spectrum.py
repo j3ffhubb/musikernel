@@ -3,7 +3,7 @@ from sgui.lib import util
 from sgui.sgqt import *
 
 
-class pydaw_spectrum(QGraphicsPathItem):
+class spectrum(QGraphicsPathItem):
     def __init__(self, a_height, a_width):
         self.spectrum_height = float(a_height)
         self.spectrum_width = float(a_width)
@@ -21,12 +21,12 @@ class pydaw_spectrum(QGraphicsPathItem):
         f_nyquist = float(util.NYQUIST_FREQ)
         f_i = f_low
         while f_i < f_high:
-            f_hz = util.pydaw_pitch_to_hz(f_i) - f_fft_low
+            f_hz = util.pitch_to_hz(f_i) - f_fft_low
             f_pos = int((f_hz / f_nyquist) * len(self.values))
             f_val = float(self.values[f_pos])
-            f_db = util.pydaw_lin_to_db(f_val) - 64.0
+            f_db = util.lin_to_db(f_val) - 64.0
             f_db += ((f_i - f_low) / 12.0) * 3.0
-            f_db = util.pydaw_clip_value(f_db, -70.0, 0.0)
+            f_db = util.clip_value(f_db, -70.0, 0.0)
             f_val = 1.0 - ((f_db + 70.0) / 70.0)
             f_x = f_width_per_point * (f_i - f_low)
             f_y = f_val * self.spectrum_height

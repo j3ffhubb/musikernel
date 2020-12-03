@@ -321,7 +321,7 @@ static PYFX_Handle g_rayv2_instantiate(PYFX_Descriptor * descriptor,
     //initialize all monophonic modules
     plugin_data->mono_modules = v_rayv2_mono_init(plugin_data->fs);
 
-    plugin_data->port_table = g_pydaw_get_port_table(
+    plugin_data->port_table = g_get_port_table(
         (void**)plugin_data, descriptor);
     plugin_data->descriptor = descriptor;
 
@@ -335,7 +335,7 @@ static void v_rayv2_load(PYFX_Handle instance,
         PYFX_Descriptor * Descriptor, char * a_file_path)
 {
     t_rayv2 *plugin_data = (t_rayv2*)instance;
-    pydaw_generic_file_loader(instance, Descriptor,
+    generic_file_loader(instance, Descriptor,
         a_file_path, plugin_data->port_table, &plugin_data->cc_map);
 }
 
@@ -347,7 +347,7 @@ static void v_rayv2_set_port_value(PYFX_Handle Instance,
 }
 
 static void v_rayv2_process_midi_event(
-    t_rayv2 * plugin_data, t_pydaw_seq_event * a_event, int f_poly_mode)
+    t_rayv2 * plugin_data, t_seq_event * a_event, int f_poly_mode)
 {
     int f_min_note = (int)*plugin_data->min_note;
     int f_max_note = (int)*plugin_data->max_note;
@@ -534,7 +534,7 @@ static void v_run_rayv2(
 {
     t_rayv2 *plugin_data = (t_rayv2 *) instance;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
+    t_seq_event **events = (t_seq_event**)midi_events->data;
     int event_count = midi_events->len;
 
     v_plugin_event_queue_reset(&plugin_data->midi_queue);
@@ -559,10 +559,10 @@ static void v_run_rayv2(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    t_pydaw_seq_event * ev_tmp;
+    t_seq_event * ev_tmp;
     for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
-        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
+        ev_tmp = (t_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
             &plugin_data->atm_queue, ev_tmp->type,
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
@@ -785,62 +785,62 @@ static void v_run_rayv2_voice(t_rayv2 *plugin_data,
 
 PYFX_Descriptor *rayv2_PYFX_descriptor()
 {
-    PYFX_Descriptor *f_result = pydaw_get_pyfx_descriptor(RAYV2_COUNT);
+    PYFX_Descriptor *f_result = get_pyfx_descriptor(RAYV2_COUNT);
 
-    pydaw_set_pyfx_port(f_result, RAYV2_ATTACK, 10.0f, 0.0f, 200.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_DECAY, 10.0f, 10.0f, 200.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_SUSTAIN, 0.0f, -60.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_RELEASE, 50.0f, 10.0f, 400.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_TIMBRE, 124.0f, 20.0f, 124.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_RES, -120.0f, -300.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_DIST, 15.0f, 0.0f, 48.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_FILTER_ATTACK, 10.0f, 0.0f, 200.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_FILTER_DECAY, 50.0f, 10.0f, 200.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_FILTER_SUSTAIN, 100.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_FILTER_RELEASE, 50.0f, 10.0f, 400.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_NOISE_AMP, -30.0f, -60.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_FILTER_ENV_AMT, 0.0f, -100.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_DIST_WET, 0.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC1_TYPE, 1.0f, 0.0f, 7.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC1_PITCH, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC1_TUNE, 0.0f, -100.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC1_VOLUME, -6.0f, -30.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC2_TYPE, 0.0f, 0.0f, 7.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC2_PITCH, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC2_TUNE, 0.0f, -100.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC2_VOLUME, -6.0f, -30.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_MASTER_VOLUME, -6.0f, -30.0f, 12.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_UNISON_VOICES1, 1.0f, 1.0f, 7.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_UNISON_VOICES2, 1.0f, 1.0f, 7.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_UNISON_SPREAD1, 50.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_UNISON_SPREAD2, 50.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_MASTER_GLIDE, 0.0f,  0.0f, 200.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_MASTER_PITCHBEND_AMT, 18.0f, 0.0f,  36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_PITCH_ENV_AMT, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_PITCH_ENV_TIME, 100.0f, 1.0f, 600.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_LFO_FREQ, 200.0f, 10.0f, 1600.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_LFO_TYPE, 0.0f, 0.0f, 2.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_LFO_AMP, 0.0f, -24.0f, 24.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_LFO_PITCH, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_LFO_FILTER, 0.0f, -48.0f, 48.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC_HARD_SYNC, 0.0f, 0.0f, 1.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_RAMP_CURVE, 50.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_FILTER_KEYTRK, 0.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_MONO_MODE, 0.0f, 0.0f, 3.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_LFO_PHASE, 0.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_LFO_PITCH_FINE, 0.0f, -100.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_ADSR_PREFX, 0.0f, 0.0f, 1.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_MIN_NOTE, 0.0f, 0.0f, 120.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_MAX_NOTE, 120.0f, 0.0f, 120.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_MASTER_PITCH, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_NOISE_TYPE, 0.0f, 0.0f, 2.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_FILTER_TYPE, 0.0f, 0.0f, 8.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_FILTER_VELOCITY, 0.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_DIST_OUTGAIN, 0.0f, -1800.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC1_PB, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_OSC2_PB, 0.0f, -36.0f, 36.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_DIST_TYPE, 0.0f, 0.0f, 2.0f);
-    pydaw_set_pyfx_port(f_result, RAYV2_ADSR_LIN_MAIN, 1.0f, 0.0f, 1.0f);
+    set_pyfx_port(f_result, RAYV2_ATTACK, 10.0f, 0.0f, 200.0f);
+    set_pyfx_port(f_result, RAYV2_DECAY, 10.0f, 10.0f, 200.0f);
+    set_pyfx_port(f_result, RAYV2_SUSTAIN, 0.0f, -60.0f, 0.0f);
+    set_pyfx_port(f_result, RAYV2_RELEASE, 50.0f, 10.0f, 400.0f);
+    set_pyfx_port(f_result, RAYV2_TIMBRE, 124.0f, 20.0f, 124.0f);
+    set_pyfx_port(f_result, RAYV2_RES, -120.0f, -300.0f, 0.0f);
+    set_pyfx_port(f_result, RAYV2_DIST, 15.0f, 0.0f, 48.0f);
+    set_pyfx_port(f_result, RAYV2_FILTER_ATTACK, 10.0f, 0.0f, 200.0f);
+    set_pyfx_port(f_result, RAYV2_FILTER_DECAY, 50.0f, 10.0f, 200.0f);
+    set_pyfx_port(f_result, RAYV2_FILTER_SUSTAIN, 100.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_FILTER_RELEASE, 50.0f, 10.0f, 400.0f);
+    set_pyfx_port(f_result, RAYV2_NOISE_AMP, -30.0f, -60.0f, 0.0f);
+    set_pyfx_port(f_result, RAYV2_FILTER_ENV_AMT, 0.0f, -100.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_DIST_WET, 0.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_OSC1_TYPE, 1.0f, 0.0f, 7.0f);
+    set_pyfx_port(f_result, RAYV2_OSC1_PITCH, 0.0f, -36.0f, 36.0f);
+    set_pyfx_port(f_result, RAYV2_OSC1_TUNE, 0.0f, -100.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_OSC1_VOLUME, -6.0f, -30.0f, 0.0f);
+    set_pyfx_port(f_result, RAYV2_OSC2_TYPE, 0.0f, 0.0f, 7.0f);
+    set_pyfx_port(f_result, RAYV2_OSC2_PITCH, 0.0f, -36.0f, 36.0f);
+    set_pyfx_port(f_result, RAYV2_OSC2_TUNE, 0.0f, -100.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_OSC2_VOLUME, -6.0f, -30.0f, 0.0f);
+    set_pyfx_port(f_result, RAYV2_MASTER_VOLUME, -6.0f, -30.0f, 12.0f);
+    set_pyfx_port(f_result, RAYV2_UNISON_VOICES1, 1.0f, 1.0f, 7.0f);
+    set_pyfx_port(f_result, RAYV2_UNISON_VOICES2, 1.0f, 1.0f, 7.0f);
+    set_pyfx_port(f_result, RAYV2_UNISON_SPREAD1, 50.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_UNISON_SPREAD2, 50.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_MASTER_GLIDE, 0.0f,  0.0f, 200.0f);
+    set_pyfx_port(f_result, RAYV2_MASTER_PITCHBEND_AMT, 18.0f, 0.0f,  36.0f);
+    set_pyfx_port(f_result, RAYV2_PITCH_ENV_AMT, 0.0f, -36.0f, 36.0f);
+    set_pyfx_port(f_result, RAYV2_PITCH_ENV_TIME, 100.0f, 1.0f, 600.0f);
+    set_pyfx_port(f_result, RAYV2_LFO_FREQ, 200.0f, 10.0f, 1600.0f);
+    set_pyfx_port(f_result, RAYV2_LFO_TYPE, 0.0f, 0.0f, 2.0f);
+    set_pyfx_port(f_result, RAYV2_LFO_AMP, 0.0f, -24.0f, 24.0f);
+    set_pyfx_port(f_result, RAYV2_LFO_PITCH, 0.0f, -36.0f, 36.0f);
+    set_pyfx_port(f_result, RAYV2_LFO_FILTER, 0.0f, -48.0f, 48.0f);
+    set_pyfx_port(f_result, RAYV2_OSC_HARD_SYNC, 0.0f, 0.0f, 1.0f);
+    set_pyfx_port(f_result, RAYV2_RAMP_CURVE, 50.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_FILTER_KEYTRK, 0.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_MONO_MODE, 0.0f, 0.0f, 3.0f);
+    set_pyfx_port(f_result, RAYV2_LFO_PHASE, 0.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_LFO_PITCH_FINE, 0.0f, -100.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_ADSR_PREFX, 0.0f, 0.0f, 1.0f);
+    set_pyfx_port(f_result, RAYV2_MIN_NOTE, 0.0f, 0.0f, 120.0f);
+    set_pyfx_port(f_result, RAYV2_MAX_NOTE, 120.0f, 0.0f, 120.0f);
+    set_pyfx_port(f_result, RAYV2_MASTER_PITCH, 0.0f, -36.0f, 36.0f);
+    set_pyfx_port(f_result, RAYV2_NOISE_TYPE, 0.0f, 0.0f, 2.0f);
+    set_pyfx_port(f_result, RAYV2_FILTER_TYPE, 0.0f, 0.0f, 8.0f);
+    set_pyfx_port(f_result, RAYV2_FILTER_VELOCITY, 0.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, RAYV2_DIST_OUTGAIN, 0.0f, -1800.0f, 0.0f);
+    set_pyfx_port(f_result, RAYV2_OSC1_PB, 0.0f, -36.0f, 36.0f);
+    set_pyfx_port(f_result, RAYV2_OSC2_PB, 0.0f, -36.0f, 36.0f);
+    set_pyfx_port(f_result, RAYV2_DIST_TYPE, 0.0f, 0.0f, 2.0f);
+    set_pyfx_port(f_result, RAYV2_ADSR_LIN_MAIN, 1.0f, 0.0f, 1.0f);
 
 
     f_result->cleanup = v_cleanup_rayv2;

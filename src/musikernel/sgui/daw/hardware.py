@@ -36,7 +36,7 @@ class MidiDevice:
         ):
             return
         track_index = self.track_combobox.currentIndex()
-        shared.PROJECT.IPC.pydaw_midi_device(
+        shared.PROJECT.IPC.midi_device(
             self.record_checkbox.isChecked(), self.index,
             track_index)
         if track_index:  # not master

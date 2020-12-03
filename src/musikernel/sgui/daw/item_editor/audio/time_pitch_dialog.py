@@ -263,7 +263,7 @@ class TimePitchDialogWidget:
                 self.widget, _("Error"), _("No items selected"))
         else:
             if f_was_stretching:
-#                f_current_region_length = pydaw_get_current_region_length()
+#                f_current_region_length = get_current_region_length()
 #                f_global_tempo = float(TRANSPORT.tempo_spinbox.value())
                 glbl.PROJECT.save_stretch_dicts()
                 for f_stretch_item, f_audio_item in f_stretched_items:

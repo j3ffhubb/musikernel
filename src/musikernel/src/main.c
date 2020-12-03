@@ -113,7 +113,7 @@ int daw_main(int argc, char** argv);
 void print_help();
 int main(int argc, char** argv);
 int main_loop(int argc, char **argv);
-inline void v_pydaw_run_main_loop(
+inline void v_run_main_loop(
     int sample_count,
     MKFLT **output,
     MKFLT *a_input_buffers
@@ -128,12 +128,12 @@ void signalHandler(int sig)
 }
 
 
-inline void v_pydaw_run(MKFLT ** buffers, MKFLT * a_input, int sample_count)
+inline void v_run(MKFLT ** buffers, MKFLT * a_input, int sample_count)
 {
     pthread_spin_lock(&musikernel->main_lock);
 
     if(likely(!musikernel->is_offline_rendering)){
-        v_pydaw_run_main_loop(sample_count, buffers, a_input);
+        v_run_main_loop(sample_count, buffers, a_input);
     } else {
         /*Clear the output buffer*/
         int f_i;
@@ -147,7 +147,7 @@ inline void v_pydaw_run(MKFLT ** buffers, MKFLT * a_input, int sample_count)
     pthread_spin_unlock(&musikernel->main_lock);
 }
 
-inline void v_pydaw_run_main_loop(int sample_count,
+inline void v_run_main_loop(int sample_count,
         MKFLT ** a_buffers, PYFX_Data *a_input_buffers)
 {
     musikernel->current_host->run(sample_count, a_buffers, a_input_buffers);
@@ -155,7 +155,7 @@ inline void v_pydaw_run_main_loop(int sample_count,
     if(unlikely(musikernel->is_previewing))
     {
         register int f_i;
-        t_pydaw_audio_item * f_audio_item = musikernel->preview_audio_item;
+        t_audio_item * f_audio_item = musikernel->preview_audio_item;
         t_wav_pool_item * f_wav_item = musikernel->preview_wav_item;
         for(f_i = 0; f_i < sample_count; ++f_i)
         {
@@ -260,7 +260,7 @@ static int portaudioCallback(
         THREAD_AFFINITY_SET = 1;
     }
 
-    v_pydaw_run(pluginOutputBuffers, in, framesPerBuffer);
+    v_run(pluginOutputBuffers, in, framesPerBuffer);
 
     return paContinue;
 }
@@ -377,11 +377,11 @@ int daw_main(int argc, char** argv)
     MKFLT** f_output;
     hpalloc((void**)&f_output, sizeof(MKFLT*) * 2);
 
-    v_pydaw_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 0);
+    v_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 0);
 
     /*
     PYDAW_AUDIO_INPUT_TRACK_COUNT = 2;
-    v_pydaw_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 1);
+    v_activate(f_thread_count, 0, f_project_dir, f_sample_rate, NULL, 1);
     v_wn_test();
     */
 
@@ -407,7 +407,7 @@ int daw_main(int argc, char** argv)
     v_dn_offline_render(daw, f_start_beat,
         f_end_beat, f_output_file, f_create_file, f_stem_render);
 
-    v_pydaw_destructor();
+    v_destructor();
 
     return 0;
 }
@@ -610,7 +610,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     }
 
     while(1){
-        if(i_pydaw_file_exists(f_device_file_path)){
+        if(i_file_exists(f_device_file_path)){
             printf("device.txt exists\n");
             t_2d_char_array * f_current_string = g_get_2d_array_from_file(
                     f_device_file_path, PYDAW_LARGE_STRING);
@@ -733,7 +733,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
                 }
                 else if(!strcmp(f_key_char, "audioOutputs"))
                 {
-                    t_pydaw_line_split * f_line = g_split_line(
+                    t_line_split * f_line = g_split_line(
                         '|', f_value_char);
                     if(f_line->count != 3)
                     {
@@ -892,10 +892,10 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     free(f_value_char);
 
 #ifdef NO_MIDI
-    v_pydaw_activate(f_thread_count, f_thread_affinity, argv[2],
+    v_activate(f_thread_count, f_thread_affinity, argv[2],
         sample_rate, NULL, 1);
 #else
-    v_pydaw_activate(f_thread_count, f_thread_affinity, argv[2],
+    v_activate(f_thread_count, f_thread_affinity, argv[2],
         sample_rate, &MIDI_DEVICES, 1);
 #endif
 
@@ -1004,7 +1004,7 @@ NO_OPTIMIZATION int main_loop(int argc, char **argv)
     }
 #endif
 
-    v_pydaw_destructor();
+    v_destructor();
 
 #if defined(__linux__) && !defined(MK_DLL)
 
@@ -1061,12 +1061,6 @@ int v_configure(const char * path, const char * key, const char * value)
 }
 
 #ifdef WITH_LIBLO
-
-void osc_error(int num, const char *msg, const char *path)
-{
-    printf("liblo server error %d in path %s: %s\n", num, path, msg);
-}
-
 
 int osc_debug_handler(const char *path, const char *types, lo_arg **argv,
                       int argc, void *data, void *user_data)

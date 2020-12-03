@@ -29,9 +29,9 @@ more tracks to the sidechain input of this track, then use the fader to
 crossfade between them.
 """)
 
-class xfade_plugin_ui(pydaw_abstract_plugin_ui):
+class xfade_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "XFADE"
         self.is_instrument = False
         self.layout.setSizeConstraint(QLayout.SetFixedSize)
@@ -42,14 +42,14 @@ class xfade_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.volume_gridlayout = QGridLayout()
         self.hlayout.addLayout(self.volume_gridlayout)
-        self.volume_slider = pydaw_slider_control(
+        self.volume_slider = slider_control(
             QtCore.Qt.Horizontal, "X-Fade", XFADE_SLIDER,
             self.plugin_rel_callback, self.plugin_val_callback,
             -100, 100, 0, KC_DECIMAL, self.port_dict)
         self.volume_slider.add_to_grid_layout(self.volume_gridlayout, 0)
         self.volume_slider.control.setMinimumWidth(300)
         self.volume_slider.value_label.setMinimumWidth(60)
-        self.midpoint_knob = pydaw_knob_control(
+        self.midpoint_knob = knob_control(
             f_knob_size, _("Mid-Point"), XFADE_MIDPOINT,
             self.plugin_rel_callback, self.plugin_val_callback,
             -600, 0, -300, KC_DECIMAL, self.port_dict, None)
@@ -62,9 +62,9 @@ class xfade_plugin_ui(pydaw_abstract_plugin_ui):
         self.set_midi_learn(XFADE_PORT_MAP)
 
     def raise_widget(self):
-        pydaw_abstract_plugin_ui.raise_widget(self)
+        abstract_plugin_ui.raise_widget(self)
 
     def ui_message(self, a_name, a_value):
-        pydaw_abstract_plugin_ui.ui_message(a_name, a_value)
+        abstract_plugin_ui.ui_message(a_name, a_value)
 
 

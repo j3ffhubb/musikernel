@@ -1,19 +1,19 @@
 from . import _shared
-from .region_marker import pydaw_loop_marker
-from .seq_item import pydaw_sequencer_item
-from .tempo_marker import pydaw_tempo_marker
+from .region_marker import loop_marker
+from .seq_item import sequencer_item
+from .tempo_marker import tempo_marker
 from sgui.glbl.mk_project import *
 from sgui.lib.util import *
 from sgui.lib.translate import _
 from sgui.sgqt import *
 
 
-class pydaw_sequencer:
+class sequencer:
     def __init__(self):
         self.items = []
         self.markers = {}
         self.loop_marker = None
-        self.set_marker(pydaw_tempo_marker(0, 128.0, 4, 4))
+        self.set_marker(tempo_marker(0, 128.0, 4, 4))
 
     def set_marker(self, a_marker):
         self.markers[(a_marker.beat, a_marker.type)] = a_marker
@@ -205,15 +205,15 @@ class pydaw_sequencer:
                 f_result.append("C|{}|{}".format(f_i, len(f_items)))
                 for f_item in f_items:
                     f_result.append(str(f_item))
-        f_result.append(pydaw_terminating_char)
+        f_result.append(terminating_char)
         return "\n".join(f_result)
 
     @staticmethod
     def from_str(a_str):
-        f_result = pydaw_sequencer()
+        f_result = sequencer()
         f_arr = a_str.split("\n")
         for f_line in f_arr:
-            if f_line == pydaw_terminating_char:
+            if f_line == terminating_char:
                 break
             else:
                 f_item_arr = f_line.split("|")
@@ -221,13 +221,13 @@ class pydaw_sequencer:
                     f_type = int(f_item_arr[1])
                     if f_type == 1:
                         f_result.set_loop_marker(
-                            pydaw_loop_marker(*f_item_arr[2:]))
+                            loop_marker(*f_item_arr[2:]))
                     elif f_type == 2:
                         f_result.set_marker(
-                            pydaw_tempo_marker(*f_item_arr[2:]))
+                            tempo_marker(*f_item_arr[2:]))
                     elif f_type == 3:
                         f_result.set_marker(
-                            _shared.pydaw_sequencer_marker(
+                            _shared.sequencer_marker(
                                 *f_item_arr[2:]
                             )
                         )
@@ -239,7 +239,7 @@ class pydaw_sequencer:
                 if f_item_arr[0] == "C":
                     continue
                 f_result.add_item(
-                    pydaw_sequencer_item(*f_item_arr, modified=False))
+                    sequencer_item(*f_item_arr, modified=False))
         f_result.items.sort()
         return f_result
 

@@ -312,7 +312,7 @@ def reset_end():
 def move_to_item_end():
     f_list = shared.AUDIO_SEQ.get_selected()
     if f_list:
-        f_current_region_length = pydaw_get_current_region_length()
+        f_current_region_length = get_current_region_length()
         f_global_tempo = shared.CURRENT_REGION.get_tempo_at_pos(
             shared.CURRENT_ITEM_REF.start_beat,
         )
@@ -395,7 +395,7 @@ def timestretch_items(a_list):
             f_audio_item.audio_item.uid,
         )
         f_audio_item.audio_item.clip_at_region_end(
-            pydaw_get_current_region_length(),
+            get_current_region_length(),
             shared.CURRENT_REGION.get_tempo_at_pos(
                 shared.CURRENT_ITEM_REF.start_beat,
             ),

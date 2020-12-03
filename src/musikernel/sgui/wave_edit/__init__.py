@@ -50,29 +50,29 @@ class WaveNextOsc(glbl.AbstractIPC):
              a_configure_path="/musikernel/wave_edit"):
         glbl.AbstractIPC.__init__(self, a_with_audio, a_configure_path)
 
-    def pydaw_wn_playback(self, a_mode):
+    def wn_playback(self, a_mode):
         self.send_configure("wnp", str(a_mode))
 
-    def pydaw_set_plugin(
+    def set_plugin(
     self, a_track_num, a_index, a_plugin_index, a_uid, a_on):
         self.send_configure(
             "pi", "|".join(str(x) for x in
             (a_track_num, a_index, a_plugin_index,
              a_uid, bool_to_int(a_on))))
 
-    def pydaw_save_tracks(self):
+    def save_tracks(self):
         self.send_configure("st", "")
 
-    def pydaw_we_export(self, a_file_name):
+    def we_export(self, a_file_name):
         self.send_configure("wex", "{}".format(a_file_name))
 
-    def pydaw_ab_open(self, a_uid):
+    def ab_open(self, a_uid):
         self.send_configure("abo", str(a_uid))
 
-    def pydaw_we_set(self, a_val):
+    def we_set(self, a_val):
         self.send_configure("we", str(a_val))
 
-    def pydaw_panic(self):
+    def panic(self):
         self.send_configure("panic", "")
 
     def save_audio_inputs(self):
@@ -80,10 +80,10 @@ class WaveNextOsc(glbl.AbstractIPC):
 
 wave_edit_folder = os.path.join("projects", "wave_edit")
 wave_edit_folder_tracks = os.path.join(wave_edit_folder, "tracks")
-pydaw_file_wave_editor_bookmarks = os.path.join(
+file_wave_editor_bookmarks = os.path.join(
     wave_edit_folder, "bookmarks.txt")
-pydaw_file_notes = os.path.join(wave_edit_folder, "notes.txt")
-pydaw_file_pyinput = os.path.join(wave_edit_folder, "input.txt")
+file_notes = os.path.join(wave_edit_folder, "notes.txt")
+file_pyinput = os.path.join(wave_edit_folder, "input.txt")
 
 
 class WaveNextProject(glbl.AbstractProject):
@@ -106,11 +106,11 @@ class WaveNextProject(glbl.AbstractProject):
             self.project_folder, wave_edit_folder_tracks)
         #files
         self.pynotes_file = os.path.join(
-            self.project_folder, pydaw_file_notes)
+            self.project_folder, file_notes)
         self.pywebm_file = os.path.join(
-            self.project_folder, pydaw_file_wave_editor_bookmarks)
+            self.project_folder, file_wave_editor_bookmarks)
         self.audio_inputs_file = os.path.join(
-            self.project_folder, pydaw_file_pyinput)
+            self.project_folder, file_pyinput)
 
         self.project_folders = [
             self.project_folder, self.track_pool_folder,]
@@ -123,7 +123,7 @@ class WaveNextProject(glbl.AbstractProject):
             self.new_project(a_project_file)
 
 #        if a_notify_osc:
-#            self.IPC.pydaw_open_song(self.project_folder)
+#            self.IPC.open_song(self.project_folder)
 
     def new_project(self, a_project_file, a_notify_osc=True):
         self.set_project_folders(a_project_file)
@@ -133,38 +133,38 @@ class WaveNextProject(glbl.AbstractProject):
             if not os.path.isdir(project_dir):
                 os.makedirs(project_dir)
 
-        plugins = glbl.pydaw_track_plugins()
+        plugins = glbl.track_plugins()
         for i2 in range(TOTAL_FX_COUNT):
-            plugins.plugins.append(glbl.pydaw_track_plugin(i2, 0, -1))
+            plugins.plugins.append(glbl.track_plugin(i2, 0, -1))
         self.save_track_plugins(0, plugins)
 
 #        self.commit("Created project")
 #        if a_notify_osc:
-#            self.IPC.pydaw_open_song(self.project_folder)
+#            self.IPC.open_song(self.project_folder)
 
     def get_notes(self):
         if os.path.isfile(self.pynotes_file):
-            return pydaw_read_file_text(self.pynotes_file)
+            return read_file_text(self.pynotes_file)
         else:
             return ""
 
     def write_notes(self, a_text):
-        pydaw_write_file_text(self.pynotes_file, a_text)
+        write_file_text(self.pynotes_file, a_text)
 
     def set_we_bm(self, a_file_list):
         f_list = [x for x in sorted(a_file_list) if len(x) < 1000]
-        pydaw_write_file_text(self.pywebm_file, "\n".join(f_list))
+        write_file_text(self.pywebm_file, "\n".join(f_list))
 
     def get_we_bm(self):
         if os.path.exists(self.pywebm_file):
-            f_list = pydaw_read_file_text(self.pywebm_file).split("\n")
+            f_list = read_file_text(self.pywebm_file).split("\n")
             return [x for x in f_list if x]
         else:
             return []
 
     def save_audio_inputs(self, a_tracks):
         if not self.suppress_updates:
-            self.save_file("", pydaw_file_pyinput, str(a_tracks))
+            self.save_file("", file_pyinput, str(a_tracks))
 
     def get_audio_inputs(self):
         if os.path.isfile(self.audio_inputs_file):
@@ -363,7 +363,7 @@ class TransportWidget(glbl.AbstractTransport):
 
     def on_panic(self):
         pass
-        #PROJECT.IPC.pydaw_panic()
+        #PROJECT.IPC.panic()
 
     def set_time(self, f_text):
         #f_text = "{}:{}.{}".format(f_minutes, str(f_seconds).zfill(2), f_frac)
@@ -373,11 +373,11 @@ class TransportWidget(glbl.AbstractTransport):
         if not WAVE_EDITOR.current_file:
             return False
         WAVE_EDITOR.on_play()
-        PROJECT.IPC.pydaw_wn_playback(1)
+        PROJECT.IPC.wn_playback(1)
         return True
 
     def on_stop(self):
-        PROJECT.IPC.pydaw_wn_playback(0)
+        PROJECT.IPC.wn_playback(0)
         WAVE_EDITOR.on_stop()
         self.playback_menu_button.setEnabled(True)
         if glbl.IS_RECORDING:
@@ -393,7 +393,7 @@ class TransportWidget(glbl.AbstractTransport):
                 "to open the Menu->File->HardwareSettings in the \n"
                 "transport and set the number of audio inputs to 1 or more"))
             return False
-        PROJECT.IPC.pydaw_wn_playback(2)
+        PROJECT.IPC.wn_playback(2)
         self.playback_menu_button.setEnabled(False)
         return True
 
@@ -481,17 +481,17 @@ class TransportWidget(glbl.AbstractTransport):
     def set_tooltips(self, a_enabled):
         pass
 
-class pydaw_audio_item(MkAudioItem):
+class audio_item(MkAudioItem):
     def clone(self):
-        return pydaw_audio_item.from_arr(str(self).strip("\n").split("|"))
+        return audio_item.from_arr(str(self).strip("\n").split("|"))
 
     @staticmethod
     def from_str(f_str):
-        return pydaw_audio_item.from_arr(f_str.split("|"))
+        return audio_item.from_arr(f_str.split("|"))
 
     @staticmethod
     def from_arr(a_arr):
-        f_result = pydaw_audio_item(*a_arr)
+        f_result = audio_item(*a_arr)
         return f_result
 
 class MainWindow(QScrollArea):
@@ -623,7 +623,7 @@ def global_update_peak_meters(a_val):
             LOG.warning("{} not in ALL_PEAK_METERS".format(f_index))
 
 
-class pydaw_wave_editor_widget:
+class wave_editor_widget:
     def __init__(self):
         self.file_name = None
         self.widget = QWidget()
@@ -737,7 +737,7 @@ class pydaw_wave_editor_widget:
             QSpacerItem(1, 1, vPolicy=QSizePolicy.Expanding))
         self.edit_hlayout.addItem(
             QSpacerItem(1, 1, QSizePolicy.Expanding))
-        self.sample_graph = pydaw_audio_item_viewer_widget(
+        self.sample_graph = audio_item_viewer_widget(
             self.marker_callback, self.marker_callback,
             self.marker_callback, self.marker_callback)
         self.hlayout = QHBoxLayout()
@@ -772,7 +772,7 @@ class pydaw_wave_editor_widget:
             self.fade_in_start, self.fade_out_end)
 
     def save_callback(self):
-        f_result = glbl.pydaw_track_plugins()
+        f_result = glbl.track_plugins()
         f_result.plugins = [x.get_value() for x in self.plugins]
         PROJECT.save_track_plugins(self.track_number, f_result)
 
@@ -905,11 +905,11 @@ class pydaw_wave_editor_widget:
             self.last_offline_dir = os.path.dirname(f_file)
 
             if f_algo == 0:
-                f_proc = util.pydaw_rubberband(
+                f_proc = util.rubberband(
                     f_path, f_file, f_stretch, f_pitch, f_crispness,
                     f_preserve_formants)
             elif f_algo == 1:
-                f_proc = util.pydaw_sbsms(
+                f_proc = util.sbsms(
                     f_path, f_file, f_stretch, f_pitch)
 
             f_proc.wait()
@@ -995,7 +995,7 @@ class pydaw_wave_editor_widget:
                 self.copy_to_clipboard_checked = False
 
             f_file_name = str(f_name.text())
-            PROJECT.IPC.pydaw_we_export(f_file_name)
+            PROJECT.IPC.we_export(f_file_name)
             self.last_offline_dir = os.path.dirname(f_file_name)
             self.open_exported = f_open_exported.isChecked()
             f_window.close()
@@ -1086,10 +1086,10 @@ class pydaw_wave_editor_widget:
     def on_preview(self):
         f_list = self.file_browser.files_selected()
         if f_list:
-            glbl.IPC.pydaw_preview_audio(f_list[0])
+            glbl.IPC.preview_audio(f_list[0])
 
     def on_stop_preview(self):
-        glbl.IPC.pydaw_stop_preview()
+        glbl.IPC.stop_preview()
 
     def on_file_open(self):
         if glbl.IS_PLAYING:
@@ -1140,7 +1140,7 @@ class pydaw_wave_editor_widget:
             f_action = f_menu.addAction(f_path)
             f_action.file_name = f_path
         self.history_button.setMenu(f_menu)
-        PROJECT.IPC.pydaw_ab_open(
+        PROJECT.IPC.ab_open(
             glbl.PROJECT.get_wav_uid_by_name(a_file))
         self.marker_callback()
         glbl.APP.restoreOverrideCursor()
@@ -1150,13 +1150,13 @@ class pydaw_wave_editor_widget:
         f_start = self.sample_graph.start_marker.value
         f_end = self.sample_graph.end_marker.value
         f_diff = f_end - f_start
-        f_diff = pydaw_clip_value(f_diff, 0.1, 1000.0)
+        f_diff = clip_value(f_diff, 0.1, 1000.0)
         f_fade_in = ((self.sample_graph.fade_in_marker.value - f_start) /
             f_diff) * 1000.0
         f_fade_out = 1000.0 - (((f_end -
             self.sample_graph.fade_out_marker.value) / f_diff) * 1000.0)
 
-        return pydaw_audio_item(
+        return audio_item(
             a_uid, a_sample_start=f_start, a_sample_end=f_end,
             a_vol=self.vol_slider.value() * 0.1,
             a_fade_in=f_fade_in, a_fade_out=f_fade_out,
@@ -1170,7 +1170,7 @@ class pydaw_wave_editor_widget:
         f_start = self.sample_graph.start_marker.value
         f_end = self.sample_graph.end_marker.value
         f_diff = f_end - f_start
-        f_diff = pydaw_clip_value(f_diff, 0.1, 1000.0)
+        f_diff = clip_value(f_diff, 0.1, 1000.0)
         f_fade_in = (f_diff * (a_item.fade_in / 1000.0)) + f_start
         f_fade_out = (f_diff * (a_item.fade_out / 1000.0)) + f_start
         self.sample_graph.fade_in_marker.set_value(f_fade_in)
@@ -1184,7 +1184,7 @@ class pydaw_wave_editor_widget:
     def marker_callback(self, a_val=None):
         if self.callbacks_enabled:
             f_item = self.get_audio_item()
-            PROJECT.IPC.pydaw_we_set(
+            PROJECT.IPC.we_set(
                 "0|{}".format(f_item))
             f_start = self.sample_graph.start_marker.value
             self.set_time_label(f_start * 0.001, True)
@@ -1251,7 +1251,7 @@ def global_close_all():
 #Opens or creates a new project
 def global_open_project(a_project_file):
     global PROJECT, TRACK_NAMES, PLUGIN_RACK
-    PROJECT = WaveNextProject(global_pydaw_with_audio)
+    PROJECT = WaveNextProject(global_with_audio)
     PROJECT.suppress_updates = True
     PROJECT.open_project(a_project_file, False)
     WAVE_EDITOR.last_offline_dir = glbl.PROJECT.user_folder
@@ -1267,7 +1267,7 @@ def global_open_project(a_project_file):
 
 def global_new_project(a_project_file):
     global PROJECT, PLUGIN_RACK
-    PROJECT = WaveNextProject(global_pydaw_with_audio)
+    PROJECT = WaveNextProject(global_with_audio)
     PROJECT.new_project(a_project_file)
     WAVE_EDITOR.last_offline_dir = glbl.PROJECT.user_folder
     MAIN_WINDOW.last_offline_dir = glbl.PROJECT.user_folder
@@ -1291,7 +1291,7 @@ PROJECT = WaveNextProject(True)
 
 ALL_PEAK_METERS = {}
 
-WAVE_EDITOR = pydaw_wave_editor_widget()
+WAVE_EDITOR = wave_editor_widget()
 TRANSPORT = TransportWidget()
 MAIN_WINDOW = MainWindow()
 

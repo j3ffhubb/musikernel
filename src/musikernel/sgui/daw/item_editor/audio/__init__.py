@@ -22,7 +22,7 @@ def global_paif_val_callback(a_port, a_val):
         and
         _shared.CURRENT_AUDIO_ITEM_INDEX is not None
     ):
-        shared.PROJECT.IPC.pydaw_audio_per_item_fx(
+        shared.PROJECT.IPC.audio_per_item_fx(
             shared.CURRENT_ITEM.uid,
             _shared.CURRENT_AUDIO_ITEM_INDEX,
             a_port,
@@ -186,7 +186,7 @@ class AudioItemSeq(AbstractItemEditor):
 
     def resizeEvent(self, a_event):
         QGraphicsView.resizeEvent(self, a_event)
-        pydaw_set_audio_seq_zoom(self.h_zoom, self.v_zoom)
+        set_audio_seq_zoom(self.h_zoom, self.v_zoom)
         global_open_audio_items(a_reload=False)
 
     def sceneContextMenuEvent(self, a_event):
@@ -253,14 +253,14 @@ class AudioItemSeq(AbstractItemEditor):
             return
 
         f_beat_frac = f_x / shared.AUDIO_PX_PER_BEAT
-        f_beat_frac = pydaw_clip_min(f_beat_frac, 0.0)
+        f_beat_frac = clip_min(f_beat_frac, 0.0)
         print("f_beat_frac: {}".format(f_beat_frac))
         if shared.AUDIO_QUANTIZE:
             f_beat_frac = int(
                 f_beat_frac * shared.AUDIO_QUANTIZE_AMT) / shared.AUDIO_QUANTIZE_AMT
 
         f_lane_num = int((f_y - shared.AUDIO_RULER_HEIGHT) / shared.AUDIO_ITEM_HEIGHT)
-        f_lane_num = pydaw_clip_value(f_lane_num, 0, shared.AUDIO_ITEM_MAX_LANE)
+        f_lane_num = clip_value(f_lane_num, 0, shared.AUDIO_ITEM_MAX_LANE)
 
         f_items = shared.CURRENT_ITEM
 
@@ -303,7 +303,7 @@ class AudioItemSeq(AbstractItemEditor):
         self.update_zoom()
 
     def update_zoom(self):
-        pydaw_set_audio_seq_zoom(self.h_zoom, self.v_zoom)
+        set_audio_seq_zoom(self.h_zoom, self.v_zoom)
 
     def check_line_count(self):
         """ Check that there are not too many vertical
@@ -313,7 +313,7 @@ class AudioItemSeq(AbstractItemEditor):
         if f_num_count == 0:
             return
         f_num_visible_count = int(f_num_count /
-            pydaw_clip_min(self.h_zoom, 1))
+            clip_min(self.h_zoom, 1))
 
         if f_num_visible_count > 24:
             for f_line in self.beat_line_list:
@@ -426,7 +426,7 @@ class AudioItemSeqWidget(FileDragDropper):
     def __init__(self):
         FileDragDropper.__init__(self, util.is_audio_file)
 
-        self.modulex = widgets.pydaw_per_audio_item_fx_widget(
+        self.modulex = widgets.per_audio_item_fx_widget(
             global_paif_rel_callback,
             global_paif_val_callback,
         )
@@ -631,7 +631,7 @@ class AudioItemSeqWidget(FileDragDropper):
         shared.AUDIO_SEQ.set_v_zoom(float(a_val) * 0.1)
         global_open_audio_items(a_reload=False)
 
-def pydaw_set_audio_seq_zoom(a_horizontal, a_vertical):
+def set_audio_seq_zoom(a_horizontal, a_vertical):
     f_width = float(shared.AUDIO_SEQ.rect().width()) - \
         float(shared.AUDIO_SEQ.verticalScrollBar().width()) - 6.0
     f_region_length = shared.CURRENT_ITEM_LEN
@@ -640,5 +640,5 @@ def pydaw_set_audio_seq_zoom(a_horizontal, a_vertical):
 
     shared.AUDIO_PX_PER_BEAT = 100.0 * a_horizontal * f_region_scale
     shared.AUDIO_SEQ.px_per_beat = shared.AUDIO_PX_PER_BEAT
-    pydaw_set_audio_snap(shared.AUDIO_SNAP_VAL)
+    set_audio_snap(shared.AUDIO_SNAP_VAL)
     shared.AUDIO_ITEM_HEIGHT = 75.0 * a_vertical

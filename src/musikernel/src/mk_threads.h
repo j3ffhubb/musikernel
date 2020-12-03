@@ -35,15 +35,15 @@ extern "C" {
 
 int READY = 0;
 
-void * v_pydaw_worker_thread(void*);
-void v_pydaw_init_worker_threads(int, int, int);
+void * v_worker_thread(void*);
+void v_init_worker_threads(int, int, int);
 void v_open_project(const char*, int);
 
 #ifdef __cplusplus
 }
 #endif
 
-void v_pydaw_open_tracks()
+void v_open_tracks()
 {
     v_wn_open_tracks();
 }
@@ -73,7 +73,7 @@ void v_open_project(const char* a_project_folder, int a_first_load)
     sprintf(musikernel->audio_tmp_folder, "%s%saudio%sfiles%stmp%s",
         musikernel->project_folder, PATH_SEP, PATH_SEP, PATH_SEP, PATH_SEP);
 
-    if(a_first_load && i_pydaw_file_exists(musikernel->wav_pool_file))
+    if(a_first_load && i_file_exists(musikernel->wav_pool_file))
     {
         v_wav_pool_add_items(musikernel->wav_pool, musikernel->wav_pool_file);
     }
@@ -83,11 +83,11 @@ void v_open_project(const char* a_project_folder, int a_first_load)
 
 #ifdef __linux__
     clock_gettime(CLOCK_REALTIME, &f_finish);
-    v_pydaw_print_benchmark("v_open_project", f_start, f_finish);
+    v_print_benchmark("v_open_project", f_start, f_finish);
 #endif
 }
 
-void v_pydaw_activate(
+void v_activate(
     int a_thread_count,
     int a_set_thread_affinity,
     char* a_project_path,
@@ -103,7 +103,7 @@ void v_pydaw_activate(
     musikernel->hosts[MK_HOST_DAW].audio_inputs = v_dn_update_audio_inputs;
     musikernel->hosts[MK_HOST_DAW].mix = v_default_mix;
 
-    musikernel->hosts[MK_HOST_WAVENEXT].run = v_pydaw_run_wave_editor;
+    musikernel->hosts[MK_HOST_WAVENEXT].run = v_run_wave_editor;
     musikernel->hosts[MK_HOST_WAVENEXT].osc_send = v_wn_osc_send;
     musikernel->hosts[MK_HOST_WAVENEXT].audio_inputs = v_wn_update_audio_inputs;
     musikernel->hosts[MK_HOST_WAVENEXT].mix = v_default_mix;
@@ -119,9 +119,9 @@ void v_pydaw_activate(
     printf("Last host:  %i\n", f_host);
     free(f_host_str);
 
-    v_pydaw_set_host(f_host);
+    v_set_host(f_host);
 
-    v_pydaw_init_worker_threads(
+    v_init_worker_threads(
         a_thread_count,
         a_set_thread_affinity,
         a_aux_threads
@@ -134,7 +134,7 @@ void v_pydaw_activate(
     READY = 1;
 }
 
-void v_pydaw_destructor()
+void v_destructor()
 {
     int f_i;
 
@@ -182,7 +182,7 @@ void v_pydaw_destructor()
 }
 
 
-void * v_pydaw_osc_send_thread(void* a_arg)
+void * v_osc_send_thread(void* a_arg)
 {
     t_osc_send_data f_send_data;
     int f_i = 0;
@@ -262,9 +262,9 @@ NO_OPTIMIZATION void v_self_set_thread_affinity()
 #endif
 }
 
-void * v_pydaw_worker_thread(void* a_arg)
+void * v_worker_thread(void* a_arg)
 {
-    t_pydaw_thread_args * f_args = (t_pydaw_thread_args*)(a_arg);
+    t_thread_args * f_args = (t_thread_args*)(a_arg);
     t_mk_thread_storage * f_storage =
         &musikernel->thread_storage[f_args->thread_num];
     v_pre_fault_thread_stack(f_args->stack_size);
@@ -327,7 +327,7 @@ int getNumberOfCores() {
 #endif
 }
 
-void v_pydaw_init_worker_threads(
+void v_init_worker_threads(
     int a_thread_count,
     int a_set_thread_affinity,
     int a_aux_threads
@@ -412,8 +412,8 @@ void v_pydaw_init_worker_threads(
     for(f_i = 0; f_i < (musikernel->worker_thread_count); ++f_i)
     {
         musikernel->track_thread_quit_notifier[f_i] = 0;
-        t_pydaw_thread_args * f_args = (t_pydaw_thread_args*)malloc(
-            sizeof(t_pydaw_thread_args)
+        t_thread_args * f_args = (t_thread_args*)malloc(
+            sizeof(t_thread_args)
         );
         f_args->thread_num = f_i;
         f_args->stack_size = f_stack_size;
@@ -428,7 +428,7 @@ void v_pydaw_init_worker_threads(
         pthread_create(
             &musikernel->worker_threads[f_i],
             &threadAttr,
-            v_pydaw_worker_thread,
+            v_worker_thread,
             (void*)f_args
         );
 
@@ -477,14 +477,14 @@ void v_pydaw_init_worker_threads(
         pthread_create(
             &musikernel->audio_recording_thread,
             &auxThreadAttr,
-            v_pydaw_audio_recording_thread,
+            v_audio_recording_thread,
             NULL
         );
 
         pthread_create(
             &musikernel->osc_queue_thread,
             &auxThreadAttr,
-            v_pydaw_osc_send_thread,
+            v_osc_send_thread,
             (void*)musikernel
         );
         pthread_attr_destroy(&auxThreadAttr);

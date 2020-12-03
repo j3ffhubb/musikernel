@@ -217,7 +217,7 @@ class SequencerWidget:
 
     def hzoom_released(self, a_val=None):
         self.is_hzooming = False
-        _shared.pydaw_set_seq_snap()
+        _shared.set_seq_snap()
         self.open_region()
         self.scrollbar.setValue(
             (_shared.SEQUENCER_PX_PER_BEAT / self.old_px_per_beat) *
@@ -236,7 +236,7 @@ class SequencerWidget:
         self.last_hzoom = self.hzoom_slider.value()
         if self.last_hzoom < 3:
             _shared.DRAW_SEQUENCER_GRAPHS = False
-            f_length = pydaw_get_current_region_length()
+            f_length = get_current_region_length()
             f_width = shared.SEQUENCER.width()
             f_factor = {0:1, 1:2, 2:4}[self.last_hzoom]
             _shared.SEQUENCER_PX_PER_BEAT = (f_width / f_length) * f_factor
@@ -252,7 +252,7 @@ class SequencerWidget:
             self.set_hzoom_size()
 
     def set_snap(self, a_val=None):
-        _shared.pydaw_set_seq_snap(a_val)
+        _shared.set_seq_snap(a_val)
         shared.MAIN_WINDOW.tab_changed()
 
     def edit_mode_changed(self, a_value=None):

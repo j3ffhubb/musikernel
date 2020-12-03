@@ -1,5 +1,5 @@
 from . import _shared
-from .knob import pydaw_pixmap_knob
+from .knob import pixmap_knob
 from sgui import glbl
 from sgui.lib import util
 from sgui.lib.translate import _
@@ -94,13 +94,13 @@ class AbstractUiControl:
         elif self.val_conversion in (_shared.KC_INTEGER, _shared.KC_INT_PITCH, _shared.KC_MILLISECOND):
             retval = str(int(f_value))
         elif self.val_conversion == _shared.KC_PITCH:
-            f_val = int(util.pydaw_pitch_to_hz(f_value))
+            f_val = int(util.pitch_to_hz(f_value))
             if f_val >= 1000:
                 f_val = str(round(f_val * 0.001, 1)) + "k"
             retval = (str(f_val))
         elif self.val_conversion == _shared.KC_127_PITCH:
             f_val = (
-                int(util.pydaw_pitch_to_hz(
+                int(util.pitch_to_hz(
                 (f_value * 0.818897638) + 20.0)))
             if f_val >= 1000:
                 f_val = str(round(f_val * 0.001, 1)) + "k"
@@ -193,7 +193,7 @@ class AbstractUiControl:
                 f_result = round(math.sqrt(f_seconds_per_beat * f_frac) * 100)
             elif self.val_conversion == _shared.KC_MILLISECOND:
                 f_result = round(f_seconds_per_beat * f_frac * 1000)
-            f_result = util.pydaw_clip_value(
+            f_result = util.clip_value(
                 f_result, self.control.minimum(), self.control.maximum())
             self.control.setValue(f_result)
             LAST_TEMPO_COMBOBOX_INDEX = f_beat_frac_combobox.currentIndex()
@@ -228,7 +228,7 @@ class AbstractUiControl:
     def set_note_dialog(self):
         def ok_button_pressed():
             f_value = f_note_selector.get_value()
-            f_value = util.pydaw_clip_value(
+            f_value = util.clip_value(
                 f_value, self.control.minimum(), self.control.maximum())
             self.set_value(f_value)
             f_dialog.close()
@@ -236,7 +236,7 @@ class AbstractUiControl:
         f_dialog.setMinimumWidth(210)
         f_dialog.setWindowTitle(_("Set to Note"))
         f_vlayout = QVBoxLayout(f_dialog)
-        f_note_selector = pydaw_note_selector_widget(0, None, None)
+        f_note_selector = note_selector_widget(0, None, None)
         f_note_selector.set_value(self.get_value())
         f_vlayout.addWidget(f_note_selector.widget)
         f_ok_button = QPushButton(_("OK"))
@@ -252,7 +252,7 @@ class AbstractUiControl:
 
     def set_ratio_dialog(self):
         def ok_button_pressed():
-            f_value = util.pydaw_ratio_to_pitch(f_ratio_spinbox.value())
+            f_value = util.ratio_to_pitch(f_ratio_spinbox.value())
             if self.ratio_callback:
                 f_int = round(f_value)
                 self.set_value(f_int, True)
@@ -268,12 +268,12 @@ class AbstractUiControl:
         f_layout.addWidget(QLabel(_("Ratio:")), 0, 0)
         f_ratio_spinbox = QDoubleSpinBox()
 
-        f_min = util.pydaw_pitch_to_ratio(self.control.minimum())
-        f_max = util.pydaw_pitch_to_ratio(self.control.maximum())
+        f_min = util.pitch_to_ratio(self.control.minimum())
+        f_max = util.pitch_to_ratio(self.control.maximum())
         f_ratio_spinbox.setRange(f_min, round(f_max))
         f_ratio_spinbox.setDecimals(4)
         f_ratio_spinbox.setValue(
-            util.pydaw_pitch_to_ratio(self.get_value()))
+            util.pitch_to_ratio(self.get_value()))
         f_layout.addWidget(f_ratio_spinbox, 0, 1)
 
         f_ok_button = QPushButton(_("OK"))
@@ -313,11 +313,11 @@ class AbstractUiControl:
     def copy_automation(self):
         f_value = ((self.get_value() - self.control.minimum()) /
                   (self.control.maximum() - self.control.minimum())) * 127.0
-        glbl.CC_CLIPBOARD = util.pydaw_clip_value(f_value, 0.0, 127.0)
+        glbl.CC_CLIPBOARD = util.clip_value(f_value, 0.0, 127.0)
 
     def paste_automation(self):
         f_frac = glbl.CC_CLIPBOARD / 127.0
-        f_frac = util.pydaw_clip_value(f_frac, 0.0, 1.0)
+        f_frac = util.clip_value(f_frac, 0.0, 1.0)
         f_min = self.control.minimum()
         f_max = self.control.maximum()
         f_value = round(((f_max - f_min) * f_frac) + f_min)
@@ -455,7 +455,7 @@ class AbstractUiControl:
         f_menu.exec_(QCursor.pos())
 
 
-class pydaw_null_control:
+class null_control:
     """ For controls with no visual representation,
         ie: controls that share a UI widget
         depending on selected index, so that they can participate
@@ -510,7 +510,7 @@ class pydaw_null_control:
     def set_midi_learn(self, a_ignored, a_ignored2):
         pass
 
-class pydaw_knob_control(AbstractUiControl):
+class knob_control(AbstractUiControl):
     def __init__(
         self,
         a_size,
@@ -529,7 +529,7 @@ class pydaw_knob_control(AbstractUiControl):
             self, a_label, a_port_num, a_rel_callback,
             a_val_callback, a_val_conversion, a_port_dict, a_preset_mgr,
             a_default_val)
-        self.control = pydaw_pixmap_knob(a_size, a_min_val, a_max_val)
+        self.control = pixmap_knob(a_size, a_min_val, a_max_val)
         self.control.valueChanged.connect(self.control_value_changed)
         self.control.sliderReleased.connect(self.control_released)
         self.control.contextMenuEvent = self.contextMenuEvent
@@ -539,7 +539,7 @@ class pydaw_knob_control(AbstractUiControl):
         self.set_value(a_default_val)
 
 
-class pydaw_slider_control(AbstractUiControl):
+class slider_control(AbstractUiControl):
     def __init__(self, a_orientation, a_label, a_port_num, a_rel_callback,
                  a_val_callback, a_min_val, a_max_val,
                  a_default_val, a_val_conversion=_shared.KC_NONE, a_port_dict=None,
@@ -558,7 +558,7 @@ class pydaw_slider_control(AbstractUiControl):
         self.set_value(a_default_val)
 
 
-class pydaw_spinbox_control(AbstractUiControl):
+class spinbox_control(AbstractUiControl):
     def __init__(self, a_label, a_port_num, a_rel_callback,
                  a_val_callback, a_min_val, a_max_val,
                  a_default_val, a_val_conversion=_shared.KC_NONE,
@@ -577,7 +577,7 @@ class pydaw_spinbox_control(AbstractUiControl):
         self.set_value(a_default_val)
 
 
-class pydaw_doublespinbox_control(AbstractUiControl):
+class doublespinbox_control(AbstractUiControl):
     def __init__(
         self,
         a_label,
@@ -605,7 +605,7 @@ class pydaw_doublespinbox_control(AbstractUiControl):
         self.set_value(a_default_val)
 
 
-class pydaw_checkbox_control(AbstractUiControl):
+class checkbox_control(AbstractUiControl):
     def __init__(self, a_label, a_port_num, a_rel_callback, a_val_callback,
                  a_port_dict=None, a_preset_mgr=None, a_default=0):
         AbstractUiControl.__init__(
@@ -647,7 +647,7 @@ class pydaw_checkbox_control(AbstractUiControl):
             return 0
 
 
-class pydaw_combobox_control(AbstractUiControl):
+class combobox_control(AbstractUiControl):
     def __init__(self, a_size, a_label, a_port_num,
                  a_rel_callback, a_val_callback,
                  a_items_list=[], a_port_dict=None, a_default_index=None,

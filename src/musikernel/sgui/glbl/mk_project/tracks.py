@@ -3,7 +3,7 @@ from sgui.lib.util import *
 from sgui.sgqt import *
 
 
-class pydaw_tracks:
+class tracks:
     def __init__(self):
         self.tracks = {}
 
@@ -29,23 +29,23 @@ class pydaw_tracks:
             str(self.tracks[k])
             for k in sorted(self.tracks)
         )
-        f_result += pydaw_terminating_char
+        f_result += terminating_char
         return f_result
 
     @staticmethod
     def from_str(a_str):
-        f_result = pydaw_tracks()
+        f_result = tracks()
         f_arr = a_str.split("\n")
         for f_line in f_arr:
-            if f_line != pydaw_terminating_char:
+            if f_line != terminating_char:
                 f_line_arr = f_line.split("|")
                 f_result.add_track(
                     f_line_arr[0],
-                    pydaw_track(*f_line_arr)
+                    track(*f_line_arr)
                 )
         return f_result
 
-class pydaw_track:
+class track:
     def __init__(
         self,
         a_track_uid=-1,

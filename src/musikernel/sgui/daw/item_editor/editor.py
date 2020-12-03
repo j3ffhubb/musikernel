@@ -168,8 +168,8 @@ class ItemListViewer:
 
     def set_snap(self, a_val=None):
         f_index = self.snap_combobox.currentIndex()
-        pydaw_set_piano_roll_quantize(f_index)
-        pydaw_set_audio_snap(f_index)
+        set_piano_roll_quantize(f_index)
+        set_audio_snap(f_index)
         if shared.CURRENT_ITEM:
             shared.PIANO_ROLL_EDITOR.set_selected_strings()
             global_open_items()
@@ -307,7 +307,7 @@ class ItemListViewer:
             global_open_audio_items()
         else:
             if f_index == 1:
-                pydaw_set_piano_roll_quantize()
+                set_piano_roll_quantize()
             elif f_index == 4:
                 shared.ITEM_EDITOR.open_item_list()
             if f_index < len(f_list):

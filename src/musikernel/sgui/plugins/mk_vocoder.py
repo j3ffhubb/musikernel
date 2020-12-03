@@ -32,9 +32,9 @@ and route the modulator signal to the track's
 sidechain input.""")
 
 
-class mk_vocoder_plugin_ui(pydaw_abstract_plugin_ui):
+class mk_vocoder_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "MK Vocoder"
         self.is_instrument = False
         self.layout.setSizeConstraint(QLayout.SetFixedSize)
@@ -46,19 +46,19 @@ class mk_vocoder_plugin_ui(pydaw_abstract_plugin_ui):
         self.groupbox_gridlayout = QGridLayout()
         self.hlayout.addLayout(self.groupbox_gridlayout)
 
-        self.wet_knob = pydaw_knob_control(
+        self.wet_knob = knob_control(
             f_knob_size, _("Wet"), MK_VOCODER_WET,
             self.plugin_rel_callback, self.plugin_val_callback,
             -500, 0, 0, KC_TENTH, self.port_dict)
         self.wet_knob.add_to_grid_layout(self.groupbox_gridlayout, 3)
 
-        self.modulator_knob = pydaw_knob_control(
+        self.modulator_knob = knob_control(
             f_knob_size, _("Modulator"), MK_VOCODER_MODULATOR,
             self.plugin_rel_callback, self.plugin_val_callback,
             -500, 0, -500, KC_TENTH, self.port_dict)
         self.modulator_knob.add_to_grid_layout(self.groupbox_gridlayout, 9)
 
-        self.carrier_knob = pydaw_knob_control(
+        self.carrier_knob = knob_control(
             f_knob_size, _("Carrier"), MK_VOCODER_CARRIER,
             self.plugin_rel_callback, self.plugin_val_callback,
             -500, 0, -500, KC_TENTH, self.port_dict)
@@ -70,9 +70,9 @@ class mk_vocoder_plugin_ui(pydaw_abstract_plugin_ui):
         self.set_midi_learn(MK_VOCODER_PORT_MAP)
 
     def raise_widget(self):
-        pydaw_abstract_plugin_ui.raise_widget(self)
+        abstract_plugin_ui.raise_widget(self)
 
     def ui_message(self, a_name, a_value):
-        pydaw_abstract_plugin_ui.ui_message(a_name, a_value)
+        abstract_plugin_ui.ui_message(a_name, a_value)
 
 

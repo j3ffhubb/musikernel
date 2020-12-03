@@ -4,7 +4,7 @@ from sgui.lib.translate import _
 from sgui.sgqt import *
 
 
-class pydaw_lfo_widget:
+class lfo_widget:
     def __init__(
         self,
         a_size,
@@ -22,7 +22,7 @@ class pydaw_lfo_widget:
         self.groupbox.setObjectName("plugin_groupbox")
         self.layout = QGridLayout(self.groupbox)
         self.layout.setContentsMargins(3, 3, 3, 3)
-        self.freq_knob = pydaw_knob_control(
+        self.freq_knob = knob_control(
             a_size,
             _("Freq"),
             a_freq_port,
@@ -36,13 +36,13 @@ class pydaw_lfo_widget:
             a_preset_mgr,
         )
         self.freq_knob.add_to_grid_layout(self.layout, 0)
-        self.type_combobox = pydaw_combobox_control(
+        self.type_combobox = combobox_control(
             120, _("Type"), a_type_port, a_rel_callback, a_val_callback,
             a_type_list, a_port_dict, 0, a_preset_mgr=a_preset_mgr)
         self.layout.addWidget(self.type_combobox.name_label, 0, 1)
         self.layout.addWidget(self.type_combobox.control, 1, 1)
         if a_phase_port:
-            self.phase_knob = pydaw_knob_control(
+            self.phase_knob = knob_control(
                 a_size, _("Phase"), a_phase_port,
                 a_rel_callback, a_val_callback,
                 0, 100, 0, _shared.KC_DECIMAL, a_port_dict, a_preset_mgr)

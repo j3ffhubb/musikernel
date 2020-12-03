@@ -93,7 +93,7 @@ def on_auto_unlink_unique():
         f_new_uid = old_new_map[k]
         f_takes.add_item(v.item_uid, f_new_uid)
         v.uid = f_new_uid
-        f_item_ref = pydaw_sequencer_item(
+        f_item_ref = sequencer_item(
             v.track_num,
             v.start_beat,
             v.length_beats,
@@ -167,7 +167,7 @@ def on_unlink_item():
 
     def on_name_changed():
         f_new_lineedit.setText(
-            pydaw_remove_bad_chars(f_new_lineedit.text()))
+            remove_bad_chars(f_new_lineedit.text()))
 
     f_window = QDialog(shared.MAIN_WINDOW)
     f_window.setWindowTitle(_("Copy and unlink item..."))
@@ -223,7 +223,7 @@ def on_rename_items():
 
     def on_name_changed():
         f_new_lineedit.setText(
-            pydaw_remove_bad_chars(f_new_lineedit.text()))
+            remove_bad_chars(f_new_lineedit.text()))
 
     f_window = QDialog(shared.MAIN_WINDOW)
     f_window.setWindowTitle(_("Rename selected items..."))

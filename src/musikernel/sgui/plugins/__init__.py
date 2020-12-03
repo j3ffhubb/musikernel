@@ -42,7 +42,7 @@ from sgui.plugins import mk_limiter
 
 from sgui.sgqt import *
 
-from sgui.lib.util import pydaw_clip_value
+from sgui.lib.util import clip_value
 
 PLUGIN_INSTRUMENT_COUNT = 3  # For inserting the split line into the menu
 
@@ -156,27 +156,27 @@ PORTMAP_DICT = {
 def get_plugin_uid_by_name(a_name):
     return PLUGIN_UIDS[str(a_name)]
 
-class pydaw_controller_map_item:
+class controller_map_item:
     def __init__(self, a_name, a_port):
         self.name = str(a_name)
         self.port = int(a_port)
 
-def pydaw_load_controller_maps():
+def load_controller_maps():
     for k, v in PORTMAP_DICT.items():
         for k2, v2 in v.items():
-            f_map = pydaw_controller_map_item(k2, v2)
+            f_map = controller_map_item(k2, v2)
             CONTROLLER_PORT_NAME_DICT[k][k2] = f_map
             CONTROLLER_PORT_NUM_DICT[k][int(v2)] = f_map
             CC_NAMES[k].append(k2)
         CC_NAMES[k].sort()
 
-pydaw_load_controller_maps()
+load_controller_maps()
 
-def pydaw_center_widget_on_screen(a_widget):
+def center_widget_on_screen(a_widget):
     f_desktop_center = QApplication.desktop().screen().rect().center()
     f_widget_center = a_widget.rect().center()
-    f_x = pydaw_clip_value(f_desktop_center.x() - f_widget_center.x(), 0, 300)
-    f_y = pydaw_clip_value(f_desktop_center.y() - f_widget_center.y(), 0, 200)
+    f_x = clip_value(f_desktop_center.x() - f_widget_center.x(), 0, 300)
+    f_y = clip_value(f_desktop_center.y() - f_widget_center.y(), 0, 200)
     a_widget.move(f_x, f_y)
 
 class MkPluginUiDict:
@@ -187,13 +187,13 @@ class MkPluginUiDict:
         """
         self.ui_dict = {}
         self.midi_learn_control = None
-        self.ctrl_update_callback = a_ipc.pydaw_update_plugin_control
+        self.ctrl_update_callback = a_ipc.update_plugin_control
         self.project = a_project
         self.plugin_pool_dir = a_project.plugin_pool_folder
         self.stylesheet = a_stylesheet
-        self.configure_callback = a_ipc.pydaw_configure_plugin
-        self.midi_learn_osc_callback = a_ipc.pydaw_midi_learn
-        self.load_cc_map_callback = a_ipc.pydaw_load_cc_map
+        self.configure_callback = a_ipc.configure_plugin
+        self.midi_learn_osc_callback = a_ipc.midi_learn
+        self.load_cc_map_callback = a_ipc.load_cc_map
 
     def __contains__(self, a_plugin_uid):
         return a_plugin_uid in self.ui_dict
@@ -209,7 +209,7 @@ class MkPluginUiDict:
                 self.stylesheet, self.configure_callback, self.plugin_pool_dir,
                 self.midi_learn_callback, self.load_cc_map_callback,
                 a_is_mixer)
-            pydaw_center_widget_on_screen(f_plugin.widget)
+            center_widget_on_screen(f_plugin.widget)
             self.ui_dict[a_plugin_uid] = f_plugin
             return f_plugin
         else:
@@ -336,7 +336,7 @@ class AbstractPluginSettings:
             self.layout.addWidget(self.power_checkbox)
 
     def clear(self):
-        self.set_value(glbl.pydaw_track_plugin(self.index, 0, -1))
+        self.set_value(glbl.track_plugin(self.index, 0, -1))
         self.on_plugin_change()
 
     def copy(self):
@@ -366,7 +366,7 @@ class AbstractPluginSettings:
     def set_value(self, a_val):
         """ Set the plugin for this track and plugin index
 
-            @a_val:  A glbl.pydaw_track_plugin
+            @a_val:  A glbl.track_plugin
         """
         self.suppress_osc = True
 
@@ -385,7 +385,7 @@ class AbstractPluginSettings:
         self.suppress_osc = False
 
     def get_value(self):
-        return glbl.pydaw_track_plugin(
+        return glbl.track_plugin(
             self.index, get_plugin_uid_by_name(
                 self.plugin_combobox.currentText()),
             self.plugin_uid,
@@ -628,7 +628,7 @@ class PluginRack:
         self.PROJECT = a_project
         self.plugins = [
             a_type(
-                self.PROJECT.IPC.pydaw_set_plugin, x, a_track_number,
+                self.PROJECT.IPC.set_plugin, x, a_track_number,
                 self.save_callback)
             for x in range(PLUGINS_PER_TRACK)]
         self.widget = QWidget()
@@ -754,7 +754,7 @@ class MixerChannel:
 
     def add_plugin(self, a_index):
         plugin = PluginSettingsMixer(
-            self.PROJECT.IPC.pydaw_set_plugin, a_index,
+            self.PROJECT.IPC.set_plugin, a_index,
             self.track_number, self.save_callback)
         self.sends[a_index] = plugin
         self.outputs[a_index] = -1
@@ -782,7 +782,7 @@ class MixerChannel:
                                 track_number] node:
                             {send_index: TrackSend, ...}
             @a_plugin_dict: A dictionary of {track_index:
-                            {plugin_index: glbl.pydaw_track_plugin}}
+                            {plugin_index: glbl.track_plugin}}
         """
         self.outputs = {
             k: v.output
@@ -835,7 +835,7 @@ class MixerWidget:
 
             @a_graph:   A RoutingGraph
             @a_plugins: A dict of {track_index:
-                        {plugin_index:glbl.pydaw_track_plugin, ...}, ...}
+                        {plugin_index:glbl.track_plugin, ...}, ...}
         """
         self.widget.setUpdatesEnabled(False)
         for i in range(1, len(self.tracks)):

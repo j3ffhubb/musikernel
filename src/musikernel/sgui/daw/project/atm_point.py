@@ -20,7 +20,7 @@ class DawAtmPoint:
         self.curve = float(a_curve)
 
     def set_val(self, a_val):
-        self.cc_val = pydaw_clip_value(float(a_val), 0.0, 127.0, True)
+        self.cc_val = clip_value(float(a_val), 0.0, 127.0, True)
 
     def __lt__(self, other):
         return self.beat < other.beat

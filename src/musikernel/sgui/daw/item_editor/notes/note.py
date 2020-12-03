@@ -79,7 +79,7 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
 
     def set_brush(self):
         f_val = (1.0 - (self.note_item.velocity / 127.0)) * 9.0
-        f_val = util.pydaw_clip_value(f_val, 0.0, 9.0)
+        f_val = util.clip_value(f_val, 0.0, 9.0)
         f_int = int(f_val)
         f_frac = f_val - f_int
         f_vals = []
@@ -88,8 +88,8 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
                 PIANO_NOTE_GRADIENT_TUPLE[f_int][f_i]) * f_frac) +
                 PIANO_NOTE_GRADIENT_TUPLE[f_int][f_i])
             f_vals.append(int(f_val))
-        f_vals_m1 = pydaw_rgb_minus(f_vals, 90)
-        f_vals_m2 = pydaw_rgb_minus(f_vals, 120)
+        f_vals_m1 = rgb_minus(f_vals, 90)
+        f_vals_m2 = rgb_minus(f_vals, 120)
         f_gradient = QLinearGradient(0.0, 0.0, 0.0, self.note_height)
         f_gradient.setColorAt(0.0, QColor(*f_vals_m1))
         f_gradient.setColorAt(0.4, QColor(*f_vals))
@@ -227,7 +227,7 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
                     if f_adjusted_width == 0.0:
                         f_adjusted_width = shared.PIANO_ROLL_SNAP_VALUE
                 else:
-                    f_adjusted_width = pydaw_clip_min(
+                    f_adjusted_width = clip_min(
                         f_pos_x,
                         shared.PIANO_ROLL_MIN_NOTE_LENGTH,
                     )
@@ -236,7 +236,7 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
                 f_item.setPos(f_item.resize_pos.x(), f_item.resize_pos.y())
                 QCursor.setPos(QCursor.pos().x(), self.mouse_y_pos)
             elif self.is_velocity_dragging:
-                f_new_vel = util.pydaw_clip_value(
+                f_new_vel = util.clip_value(
                     f_val + f_item.orig_value, 1, 127)
                 f_new_vel = int(f_new_vel)
                 f_item.note_item.velocity = f_new_vel
@@ -259,7 +259,7 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
                         f_new_vel = util.linear_interpolate(
                             0.3 * f_val, f_val, f_frac)
                     f_new_vel += f_item.orig_value
-                f_new_vel = util.pydaw_clip_value(f_new_vel, 1, 127)
+                f_new_vel = util.clip_value(f_new_vel, 1, 127)
                 f_new_vel = int(f_new_vel)
                 f_item.note_item.velocity = f_new_vel
                 f_item.note_text.setText(str(f_new_vel))
@@ -312,8 +312,8 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
                 if shared.PIANO_ROLL_SNAP and \
                 f_new_note_length < shared.PIANO_ROLL_SNAP_BEATS:
                     f_new_note_length = shared.PIANO_ROLL_SNAP_BEATS
-                elif f_new_note_length < pydaw_min_note_length:
-                    f_new_note_length = pydaw_min_note_length
+                elif f_new_note_length < min_note_length:
+                    f_new_note_length = min_note_length
                 f_item.note_item.set_length(f_new_note_length)
             elif self.is_velocity_dragging or self.is_velocity_curving:
                 pass
@@ -322,7 +322,7 @@ class PianoRollNoteItem(widgets.QGraphicsRectItemNDL):
                     shared.PIANO_KEYS_WIDTH) * shared.CURRENT_ITEM_LEN * f_recip
                 f_new_note_num = self.y_pos_to_note(f_pos_y)
                 if self.is_copying:
-                    f_new_note = mk_project.pydaw_note(
+                    f_new_note = mk_project.note(
                         f_new_note_start, f_item.note_item.length,
                         f_new_note_num, f_item.note_item.velocity)
                     shared.CURRENT_ITEM.add_note(f_new_note, False)

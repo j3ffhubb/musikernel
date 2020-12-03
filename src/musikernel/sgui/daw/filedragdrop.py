@@ -22,7 +22,7 @@ class FileDragDropper(widgets.AbstractFileBrowserWidget):
     def on_preview(self):
         f_list = self.list_file.selectedItems()
         if f_list:
-            glbl.IPC.pydaw_preview_audio(
+            glbl.IPC.preview_audio(
                 os.path.join(
                     *(
                         str(x) for x in (
@@ -34,7 +34,7 @@ class FileDragDropper(widgets.AbstractFileBrowserWidget):
             )
 
     def on_stop_preview(self):
-        glbl.IPC.pydaw_stop_preview()
+        glbl.IPC.stop_preview()
 
     def file_mouse_press_event(self, a_event):
         QListWidget.mousePressEvent(self.list_file, a_event)

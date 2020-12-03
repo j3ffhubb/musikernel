@@ -178,13 +178,13 @@ class AutomationEditor(AbstractItemEditor):
             f_pos_x = a_event.scenePos().x() - AUTOMATION_POINT_RADIUS
             f_pos_y = a_event.scenePos().y() - AUTOMATION_POINT_RADIUS
             f_cc_start = (f_pos_x - AUTOMATION_MIN_HEIGHT) / self.px_per_beat
-            f_cc_start = pydaw_clip_min(f_cc_start, 0.0)
+            f_cc_start = clip_min(f_cc_start, 0.0)
             if self.is_cc:
                 f_cc_val = int(127.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
                     self.viewer_height) * 127.0))
-                f_cc_val = pydaw_clip_value(f_cc_val, 0, 127)
+                f_cc_val = clip_value(f_cc_val, 0, 127)
                 shared.ITEM_EDITOR.add_cc(
-                    mk_project.pydaw_cc(
+                    mk_project.cc(
                         f_cc_start,
                         self.cc_num,
                         f_cc_val,
@@ -193,9 +193,9 @@ class AutomationEditor(AbstractItemEditor):
             else:
                 f_cc_val = 1.0 - (((f_pos_y - AUTOMATION_MIN_HEIGHT) /
                     self.viewer_height) * 2.0)
-                f_cc_val = pydaw_clip_value(f_cc_val, -1.0, 1.0)
+                f_cc_val = clip_value(f_cc_val, -1.0, 1.0)
                 shared.ITEM_EDITOR.add_pb(
-                    mk_project.pydaw_pitchbend(
+                    mk_project.pitchbend(
                         f_cc_start,
                         f_cc_val,
                     )
@@ -342,7 +342,7 @@ class AutomationEditor(AbstractItemEditor):
         self.update()
 
     def draw_point(self, a_cc, a_select=True):
-        """ a_cc is an instance of the mk_project.pydaw_cc class"""
+        """ a_cc is an instance of the mk_project.cc class"""
         f_time = self.axis_size + (a_cc.start * self.px_per_beat)
         if self.is_cc:
             f_value = self.axis_size +  self.viewer_height / 127.0 * (127.0 -
@@ -493,7 +493,7 @@ class AutomationEditorWidget:
             return
 
         def ok_handler():
-            f_cc = mk_project.pydaw_cc(
+            f_cc = mk_project.cc(
                 f_pos_spinbox.value() - 1.0,
                 self.automation_viewer.cc_num,
                 f_value_spinbox.value(),
@@ -562,10 +562,10 @@ class AutomationEditorWidget:
             return
 
         def ok_handler():
-            f_value = pydaw_clip_value(
+            f_value = clip_value(
                 f_epb_spinbox.value() / f_ipb_spinbox.value(),
                 -1.0, 1.0, a_round=True)
-            f_pb = mk_project.pydaw_pitchbend(
+            f_pb = mk_project.pitchbend(
                 f_pos_spinbox.value() - 1.0,
                 f_value,
             )
@@ -695,7 +695,7 @@ class AutomationItem(QGraphicsEllipseItem):
                 f_pos_x = f_point.pos().x()
                 f_cc_start = (f_pos_x -
                     AUTOMATION_MIN_HEIGHT) / self.parent_view.px_per_beat
-                f_cc_start = pydaw_clip_min(f_cc_start, 0.0)
+                f_cc_start = clip_min(f_cc_start, 0.0)
                 f_cc_start = round(f_cc_start, 6)
                 if self.is_cc:
                     shared.CURRENT_ITEM.ccs.remove(f_point.cc_item)

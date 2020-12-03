@@ -1,6 +1,6 @@
 from . import _shared
 from .control import *
-from .spectrum import pydaw_spectrum
+from .spectrum import spectrum
 from sgui.lib import util
 from sgui.lib.translate import _
 from sgui.sgqt import *
@@ -22,9 +22,9 @@ class eq_item(QGraphicsEllipseItem):
     def mouseMoveEvent(self, a_event):
         QGraphicsEllipseItem.mouseMoveEvent(self, a_event)
         f_pos = self.pos()
-        f_pos_x = util.pydaw_clip_value(
+        f_pos_x = util.clip_value(
             f_pos.x(), -_shared.EQ_POINT_RADIUS, _shared.EQ_WIDTH)
-        f_pos_y = util.pydaw_clip_value(
+        f_pos_y = util.clip_value(
             f_pos.y(), -_shared.EQ_POINT_RADIUS, _shared.EQ_HEIGHT)
 
         if f_pos_x != f_pos.x() or f_pos_y != f_pos.y():
@@ -58,11 +58,11 @@ class eq_item(QGraphicsEllipseItem):
             (
                 (f_pos.x() + _shared.EQ_POINT_RADIUS) / _shared.EQ_WIDTH
             ) * _shared.EQ_HIGH_PITCH) + _shared.EQ_LOW_PITCH
-        f_freq = util.pydaw_clip_value(
+        f_freq = util.clip_value(
             f_freq, _shared.EQ_LOW_PITCH, _shared.EQ_HIGH_PITCH)
         f_gain = ((1.0 - ((f_pos.y() + _shared.EQ_POINT_RADIUS) /
             _shared.EQ_HEIGHT)) * 480.0) - 240.0
-        f_gain = util.pydaw_clip_value(f_gain, -240.0, 240.0)
+        f_gain = util.clip_value(f_gain, -240.0, 240.0)
         return round(f_freq, 2), round(f_gain, 1)
 
     def __lt__(self, other):
@@ -128,7 +128,7 @@ class eq_viewer(QGraphicsView):
         f_label_pos = 0.0
 
         self.scene.clear()
-        self.spectrum = pydaw_spectrum(_shared.EQ_HEIGHT, _shared.EQ_WIDTH)
+        self.spectrum = spectrum(_shared.EQ_HEIGHT, _shared.EQ_WIDTH)
         self.scene.addItem(self.spectrum)
 
         f_y_pos = 0.0
@@ -185,7 +185,7 @@ class eq_viewer(QGraphicsView):
         f_label_inc = _shared.EQ_WIDTH / (_shared.EQ_HIGH_PITCH / f_pitch_inc)
 
         for i in range(7):
-            f_hz = int(util.pydaw_pitch_to_hz(f_pitch))
+            f_hz = int(util.pitch_to_hz(f_pitch))
             if f_hz > 950:
                 f_hz = round(f_hz, -1)
                 f_hz = "{}khz".format(round(f_hz / 1000, 1))
@@ -238,7 +238,7 @@ class eq_widget:
         self.groupbox.setObjectName("plugin_groupbox")
         self.layout = QGridLayout(self.groupbox)
 
-        self.freq_knob = pydaw_knob_control(
+        self.freq_knob = knob_control(
             a_size,
             "Freq",
             a_freq_port,
@@ -253,13 +253,13 @@ class eq_widget:
         )
         self.freq_knob.add_to_grid_layout(self.layout, 0)
 
-        self.res_knob = pydaw_knob_control(
+        self.res_knob = knob_control(
             a_size, "BW", a_res_port, a_rel_callback,
             a_val_callback, 100.0, 600.0, 300.0, _shared.KC_DECIMAL,
             a_port_dict, a_preset_mgr)
         self.res_knob.add_to_grid_layout(self.layout, 1)
 
-        self.gain_knob = pydaw_knob_control(
+        self.gain_knob = knob_control(
             a_size, _("Gain"), a_gain_port, a_rel_callback,
             a_val_callback, -240.0, 240.0, 0.0, _shared.KC_TENTH,
             a_port_dict, a_preset_mgr)
@@ -397,7 +397,7 @@ class eq6_widget:
         f_hz_list, f_db_list, f_bw_list = EQ6_FORMANTS[f_key]
         for f_eq, f_hz, f_db, f_bw in zip(
         self.eqs, f_hz_list, f_db_list, f_bw_list):
-            f_pitch = util.pydaw_hz_to_pitch(f_hz)
+            f_pitch = util.hz_to_pitch(f_hz)
             f_eq.freq_knob.set_value(f_pitch, True)
             f_bw_adjusted = f_bw + 60
             f_eq.res_knob.set_value(f_bw_adjusted, True)

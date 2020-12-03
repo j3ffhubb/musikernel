@@ -79,7 +79,7 @@ void g_pyaudio_input_init(t_pyaudio_input * f_result, MKFLT a_sr)
     f_result->vol_linear = 1.0f;
 }
 
-void v_pydaw_audio_input_record_set(
+void v_audio_input_record_set(
         t_pyaudio_input * self, char * a_file_out)
 {
     if(self->sndfile)
@@ -88,7 +88,7 @@ void v_pydaw_audio_input_record_set(
         self->sndfile = NULL;
     }
 
-    if(i_pydaw_file_exists(a_file_out))
+    if(i_file_exists(a_file_out))
     {
         remove(a_file_out);
     }

@@ -82,13 +82,13 @@ MODULEX_PORT_MAP = {
 
 
 
-class modulex_plugin_ui(pydaw_abstract_plugin_ui):
+class modulex_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "MODULEX"
         self.is_instrument = False
 
-        self.preset_manager = pydaw_preset_manager_widget(
+        self.preset_manager = preset_manager_widget(
             self.get_plugin_name())
         self.presets_hlayout = QHBoxLayout()
         self.presets_hlayout.addWidget(self.preset_manager.group_box)
@@ -110,7 +110,7 @@ class modulex_plugin_ui(pydaw_abstract_plugin_ui):
         f_column = 0
         f_row = 0
         for f_i in range(8):
-            f_effect = pydaw_modulex_single(
+            f_effect = modulex_single(
                 "FX{}".format(f_i), f_port,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 self.port_dict, self.preset_manager, a_knob_size=f_knob_size)

@@ -85,7 +85,7 @@ static PYFX_Handle g_xfade_instantiate(PYFX_Descriptor * descriptor,
     plugin_data->mono_modules =
             v_xfade_mono_init(plugin_data->fs, plugin_data->plugin_uid);
 
-    plugin_data->port_table = g_pydaw_get_port_table(
+    plugin_data->port_table = g_get_port_table(
         (void**)plugin_data, descriptor);
 
     v_cc_map_init(&plugin_data->cc_map);
@@ -97,7 +97,7 @@ static void v_xfade_load(PYFX_Handle instance,
         PYFX_Descriptor * Descriptor, char * a_file_path)
 {
     t_xfade *plugin_data = (t_xfade*)instance;
-    pydaw_generic_file_loader(instance, Descriptor,
+    generic_file_loader(instance, Descriptor,
         a_file_path, plugin_data->port_table, &plugin_data->cc_map);
 }
 
@@ -109,7 +109,7 @@ static void v_xfade_set_port_value(PYFX_Handle Instance,
 }
 
 static void v_xfade_process_midi_event(
-    t_xfade * plugin_data, t_pydaw_seq_event * a_event)
+    t_xfade * plugin_data, t_seq_event * a_event)
 {
 
     if (a_event->type == PYDAW_EVENT_CONTROLLER)
@@ -142,15 +142,15 @@ static void v_xfade_process_midi(
     for(f_i = 0; f_i < events->len; ++f_i)
     {
         v_xfade_process_midi_event(
-            plugin_data, (t_pydaw_seq_event*)events->data[f_i]);
+            plugin_data, (t_seq_event*)events->data[f_i]);
     }
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    t_pydaw_seq_event * ev_tmp;
+    t_seq_event * ev_tmp;
     for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
-        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
+        ev_tmp = (t_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
             &plugin_data->atm_queue, ev_tmp->type,
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
@@ -215,10 +215,10 @@ static void v_xfade_run(
 
 PYFX_Descriptor *xfade_PYFX_descriptor()
 {
-    PYFX_Descriptor *f_result = pydaw_get_pyfx_descriptor(XFADE_COUNT);
+    PYFX_Descriptor *f_result = get_pyfx_descriptor(XFADE_COUNT);
 
-    pydaw_set_pyfx_port(f_result, XFADE_SLIDER, 0.0f, -100.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, XFADE_MIDPOINT, -300.0f, -600.0f, 0.0f);
+    set_pyfx_port(f_result, XFADE_SLIDER, 0.0f, -100.0f, 100.0f);
+    set_pyfx_port(f_result, XFADE_MIDPOINT, -300.0f, -600.0f, 0.0f);
 
     f_result->cleanup = v_xfade_cleanup;
     f_result->connect_port = v_xfade_connect_port;

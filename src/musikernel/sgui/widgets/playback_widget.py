@@ -1,7 +1,7 @@
 from sgui import glbl
 from sgui.sgqt import *
 
-class pydaw_playback_widget:
+class playback_widget:
     def __init__(self):
         self.play_button = QRadioButton()
         self.play_button.setObjectName("play_button")

@@ -6,7 +6,7 @@ from sgui.sgqt import *
 
 ADSR_CLIPBOARD = {}
 
-class pydaw_adsr_widget:
+class adsr_widget:
     def __init__(
         self,
         a_size,
@@ -36,7 +36,7 @@ class pydaw_adsr_widget:
         self.layout.setContentsMargins(3, 3, 3, 3)
 
         if a_delay_port is not None:
-            self.delay_knob = pydaw_knob_control(
+            self.delay_knob = knob_control(
                 a_size,
                 _("Delay"),
                 a_delay_port,
@@ -51,7 +51,7 @@ class pydaw_adsr_widget:
             )
             self.delay_knob.add_to_grid_layout(self.layout, 0)
             self.clipboard_dict["delay"] = self.delay_knob
-        self.attack_knob = pydaw_knob_control(
+        self.attack_knob = knob_control(
             a_size,
             _("Attack"),
             a_attack_port,
@@ -65,7 +65,7 @@ class pydaw_adsr_widget:
             a_preset_mgr,
         )
         if a_hold_port is not None:
-            self.hold_knob = pydaw_knob_control(
+            self.hold_knob = knob_control(
                 a_size,
                 _("Hold"),
                 a_hold_port,
@@ -80,7 +80,7 @@ class pydaw_adsr_widget:
             )
             self.hold_knob.add_to_grid_layout(self.layout, 3)
             self.clipboard_dict["hold"] = self.hold_knob
-        self.decay_knob = pydaw_knob_control(
+        self.decay_knob = knob_control(
             a_size,
             _("Decay"),
             a_decay_port,
@@ -94,7 +94,7 @@ class pydaw_adsr_widget:
             a_preset_mgr,
         )
         if a_sustain_in_db:
-            self.sustain_knob = pydaw_knob_control(
+            self.sustain_knob = knob_control(
                 a_size,
                 _("Sustain"),
                 a_sustain_port,
@@ -109,7 +109,7 @@ class pydaw_adsr_widget:
             )
             self.clipboard_dict["sustain_db"] = self.sustain_knob
         else:
-            self.sustain_knob = pydaw_knob_control(
+            self.sustain_knob = knob_control(
                 a_size,
                 _("Sustain"),
                 a_sustain_port,
@@ -123,7 +123,7 @@ class pydaw_adsr_widget:
                 a_preset_mgr,
             )
             self.clipboard_dict["sustain"] = self.sustain_knob
-        self.release_knob = pydaw_knob_control(
+        self.release_knob = knob_control(
             a_size,
             _("Release"),
             a_release_port,
@@ -144,7 +144,7 @@ class pydaw_adsr_widget:
         self.clipboard_dict["decay"] = self.decay_knob
         self.clipboard_dict["release"] = self.release_knob
         if a_prefx_port is not None:
-            self.prefx_checkbox = pydaw_checkbox_control(
+            self.prefx_checkbox = checkbox_control(
                 "PreFX",
                 a_prefx_port,
                 a_rel_callback,
@@ -155,7 +155,7 @@ class pydaw_adsr_widget:
             self.prefx_checkbox.add_to_grid_layout(self.layout, 10)
         if a_lin_port is not None:
             assert a_lin_default in (0, 1)
-            self.lin_checkbox = pydaw_checkbox_control(
+            self.lin_checkbox = checkbox_control(
                 "Lin.", a_lin_port, a_rel_callback, a_val_callback,
                 a_port_dict, a_preset_mgr, a_lin_default)
             self.lin_checkbox.control.setToolTip(

@@ -231,7 +231,7 @@ class SeqTrack:
 
     def on_solo(self, value):
         if not self.suppress_osc:
-            shared.PROJECT.IPC.pydaw_set_solo(
+            shared.PROJECT.IPC.set_solo(
                 self.track_number, self.solo_checkbox.isChecked())
             shared.PROJECT.save_tracks(shared.TRACK_PANEL.get_tracks())
             shared.PROJECT.commit(_("Set solo for track {} to {}").format(
@@ -239,14 +239,14 @@ class SeqTrack:
 
     def on_mute(self, value):
         if not self.suppress_osc:
-            shared.PROJECT.IPC.pydaw_set_mute(
+            shared.PROJECT.IPC.set_mute(
                 self.track_number, self.mute_checkbox.isChecked())
             shared.PROJECT.save_tracks(shared.TRACK_PANEL.get_tracks())
             shared.PROJECT.commit(_("Set mute for track {} to {}").format(
                 self.track_number, self.mute_checkbox.isChecked()))
 
     def on_name_changed(self):
-        f_name = pydaw_remove_bad_chars(self.track_name_lineedit.text())
+        f_name = remove_bad_chars(self.track_name_lineedit.text())
         self.track_name_lineedit.setText(f_name)
         global_update_track_comboboxes(self.track_number, f_name)
         f_tracks = shared.PROJECT.get_tracks()
@@ -291,7 +291,7 @@ class SeqTrack:
         self.suppress_osc = False
 
     def get_track(self):
-        return pydaw_track(
+        return track(
             self.track_number, self.solo_checkbox.isChecked(),
             self.mute_checkbox.isChecked(),
             self.track_number, self.track_name_lineedit.text())
@@ -387,7 +387,7 @@ class TrackPanel:
         self.update_plugin_track_map()
 
     def get_tracks(self):
-        f_result = pydaw_tracks()
+        f_result = tracks()
         for k, v in self.tracks.items():
             f_result.add_track(k, v.get_track())
         return f_result

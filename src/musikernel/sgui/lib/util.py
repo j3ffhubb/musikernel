@@ -77,10 +77,10 @@ def show_generic_exception(a_ex):
 PYTHON_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 MKENGINE_DIR = os.path.abspath(os.path.join(PYTHON_DIR, "..", "mkengine"))
 
-pydaw_terminating_char = "\\"
+terminating_char = "\\"
 
 MAJOR_VERSION = "musikernel3"
-global_pydaw_file_type_string = 'MusiKernel Project (default.{})'.format(
+global_file_type_string = 'MusiKernel Project (default.{})'.format(
     MAJOR_VERSION)
 global_euphoria_file_type_string = 'Euphoria Sample File (*.u4ia4)'
 global_euphoria_file_type_ext = '.u4ia4'
@@ -102,9 +102,9 @@ CRISPNESS_SETTINGS = [
     "4", "5 (normal)", "6 (sharp, drums)"]
 
 BIN_PATH = None
-global_pydaw_is_sandboxed = False
+global_is_sandboxed = False
 
-global_pydaw_with_audio = True
+global_with_audio = True
 
 CPU_COUNT = multiprocessing.cpu_count()
 if CPU_COUNT < 1:
@@ -172,7 +172,7 @@ class EngineLibThread(QtCore.QThread):
 PROJECT_DIR = None
 
 def run_musikernel():
-    f_bin = pydaw_which(MAJOR_VERSION)
+    f_bin = which(MAJOR_VERSION)
     subprocess.Popen([f_bin])
 
 def start_engine_lib(a_project_dir):
@@ -186,7 +186,7 @@ def engine_lib_configure(a_path, a_key, a_val):
         a_path.encode("ascii"), a_key.encode("ascii"), a_val.encode("ascii"))
 
 
-def pydaw_set_bin_path():
+def set_bin_path():
     global BIN_PATH
     BIN_PATH = os.path.join(
         INSTALL_PREFIX, "bin",
@@ -197,7 +197,7 @@ def check_for_rw_perms(a_parent, a_file):
         QMessageBox.warning(
             a_parent, "Error",
             "You do not have read+write permissions to "
-            "{}".format(global_pydaw_home))
+            "{}".format(global_home))
         return False
     else:
         return True
@@ -216,7 +216,7 @@ def check_for_empty_directory(a_parent, a_dir):
 
 def new_project(a_parent=None):
     try:
-        f_last_dir = global_pydaw_home
+        f_last_dir = global_home
         while True:
             f_file = QFileDialog.getExistingDirectory(
                 a_parent,
@@ -244,7 +244,7 @@ def open_project(a_parent=None):
             parent=a_parent,
             caption='Open Project',
             directory=global_default_project_folder,
-            filter=global_pydaw_file_type_string,
+            filter=global_file_type_string,
             options=QFileDialog.DontUseNativeDialog,
         )
         if f_file is None:
@@ -272,7 +272,7 @@ PROJECT_HISTORY_SCRIPT = os.path.join(
     "project_recover.py",
 )
 
-pydaw_bad_chars = ["|", "\\", "~", "."]
+bad_chars = ["|", "\\", "~", "."]
 
 def pi_path(a_file):
     "Platform independent path"
@@ -280,7 +280,7 @@ def pi_path(a_file):
     return a_file.replace("\\", "/") if IS_WINDOWS else a_file
 
 
-def pydaw_which(a_file):
+def which(a_file):
     """ Python equivalent of the UNIX "which" command """
     f_path_arr = os.getenv("PATH").split(";" if IS_WINDOWS else ":")
     if IS_WINDOWS and BIN_DIR not in f_path_arr:
@@ -305,17 +305,17 @@ def get_unix_timestamp(a_dt):
         return int(a_dt.strftime("%s"))
 
 
-def pydaw_remove_bad_chars(a_str):
+def remove_bad_chars(a_str):
     """ Remove any characters that have special meaning to MusiKernel """
     f_str = str(a_str)
-    for f_char in pydaw_bad_chars:
+    for f_char in bad_chars:
         f_str = f_str.replace(f_char, "")
     return f_str
 
 
-def pydaw_str_has_bad_chars(a_str):
+def str_has_bad_chars(a_str):
     f_str = str(a_str)
-    for f_char in pydaw_bad_chars:
+    for f_char in bad_chars:
         if f_char in f_str:
             return False
     return True
@@ -416,7 +416,7 @@ def scale_sizes(a_width_from, a_height_from, a_width_to, a_height_to):
     return (f_x, f_y)
 
 
-def pydaw_beats_to_index(a_beat, a_divisor=4.0):
+def beats_to_index(a_beat, a_divisor=4.0):
     f_index = int(a_beat / a_divisor)
     f_start = a_beat - (float(f_index) * a_divisor)
     return f_index, round(f_start, 6)
@@ -427,13 +427,13 @@ int_to_note_array = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#',
 TERMINAL = None
 
 for _terminal in ("x-terminal-emulator", "gnome-terminal", "konsole"):
-    if pydaw_which(_terminal):
+    if which(_terminal):
         TERMINAL = _terminal
         break
 
 PYTHON3 = sys.executable
 
-pydaw_rubberband_util = pydaw_which("rubberband")
+rubberband_util = which("rubberband")
 
 paulstretch_util = os.path.join(
     INSTALL_PREFIX,
@@ -446,14 +446,14 @@ paulstretch_util = os.path.join(
 )
 
 if IS_WINDOWS:
-    pydaw_sbsms_util = os.path.join(
+    sbsms_util = os.path.join(
         INSTALL_PREFIX,
         "sgui",
         "mkengine",
         "sbsms.exe",
     )
 else:
-    pydaw_sbsms_util = os.path.join(
+    sbsms_util = os.path.join(
         INSTALL_PREFIX,
         "lib",
         MAJOR_VERSION,
@@ -462,11 +462,11 @@ else:
         "sbsms",
     )
 
-def pydaw_rubberband(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift,
+def rubberband(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift,
                      a_crispness, a_preserve_formants=False):
     if a_preserve_formants:
         f_cmd = [
-            pydaw_rubberband_util,
+            rubberband_util,
             "-F",
             "-c",
             str(a_crispness),
@@ -481,7 +481,7 @@ def pydaw_rubberband(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift,
         ]
     else:
         f_cmd = [
-            pydaw_rubberband_util,
+            rubberband_util,
             "-c",
             str(a_crispness),
             "-t",
@@ -497,9 +497,9 @@ def pydaw_rubberband(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift,
     f_proc = subprocess.Popen(f_cmd)
     return f_proc
 
-def pydaw_sbsms(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift):
+def sbsms(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift):
     f_cmd = [
-        pydaw_sbsms_util,
+        sbsms_util,
         a_src_path,
         a_dest_path,
         str(1.0 / a_timestretch_amt),
@@ -510,7 +510,7 @@ def pydaw_sbsms(a_src_path, a_dest_path, a_timestretch_amt, a_pitch_shift):
     f_proc = subprocess.Popen(f_cmd)
     return f_proc
 
-def pydaw_clip_value(a_val, a_min, a_max, a_round=False):
+def clip_value(a_val, a_min, a_max, a_round=False):
     if a_val < a_min:
         f_result = a_min
     elif a_val > a_max:
@@ -521,27 +521,27 @@ def pydaw_clip_value(a_val, a_min, a_max, a_round=False):
         f_result = round(f_result, 6)
     return f_result
 
-def pydaw_clip_min(a_val, a_min):
+def clip_min(a_val, a_min):
     if a_val < a_min:
         return a_min
     else:
         return a_val
 
-def pydaw_clip_max(a_val, a_max):
+def clip_max(a_val, a_max):
     if a_val > a_max:
         return a_max
     else:
         return a_val
 
-def pydaw_read_file_text(a_file):
+def read_file_text(a_file):
     with open(pi_path(a_file)) as f_handle:
         return f_handle.read()
 
-def pydaw_write_file_text(a_file, a_text):
+def write_file_text(a_file, a_text):
     with open(pi_path(a_file), "w", newline="\n") as f_handle:
         f_handle.write(str(a_text))
 
-def pydaw_gen_uid():
+def gen_uid():
     """Generated an integer uid.  Adding together multiple random
         numbers gives a far less uniform distribution of
         numbers, more of a natural white noise kind of sample graph
@@ -617,24 +617,24 @@ def time_quantize_round(a_input):
     else:
         return round(a_input, 6)
 
-def pydaw_pitch_to_hz(a_pitch):
+def pitch_to_hz(a_pitch):
     return (440.0 * pow(2.0, (float(a_pitch) - 57.0) * 0.0833333))
 
-def pydaw_hz_to_pitch(a_hz):
+def hz_to_pitch(a_hz):
     return ((12.0 * log(float(a_hz) * (1.0 / 440.0), 2.0)) + 57.0)
 
-def pydaw_pitch_to_ratio(a_pitch):
-    return (1.0 / pydaw_pitch_to_hz(0.0)) * pydaw_pitch_to_hz(float(a_pitch))
+def pitch_to_ratio(a_pitch):
+    return (1.0 / pitch_to_hz(0.0)) * pitch_to_hz(float(a_pitch))
 
-def pydaw_ratio_to_pitch(a_ratio):
-    f_base = (pydaw_pitch_to_hz(0.0))
+def ratio_to_pitch(a_ratio):
+    f_base = (pitch_to_hz(0.0))
     f_hz = f_base * a_ratio
-    return pydaw_hz_to_pitch(f_hz)
+    return hz_to_pitch(f_hz)
 
-def pydaw_db_to_lin(a_value):
+def db_to_lin(a_value):
     return pow(10.0, (0.05 * float(a_value)))
 
-def pydaw_lin_to_db(a_value):
+def lin_to_db(a_value):
     if a_value >= 0.001:
         return log(float(a_value), 10.0) * 20.0
     else:
@@ -674,12 +674,12 @@ class OnePoleLP:
 
 
 def cubic_interpolate(a_arr, a_pos):
-    f_int_pos = pydaw_clip_value(int(a_pos), 0, a_arr.shape[0] - 1)
+    f_int_pos = clip_value(int(a_pos), 0, a_arr.shape[0] - 1)
     f_mu = a_pos - float(f_int_pos)
     f_mu2 = f_mu * f_mu
-    f_int_pos_plus1 = pydaw_clip_value(f_int_pos + 1, 0, a_arr.shape[0] - 1)
-    f_int_pos_minus1 = pydaw_clip_value(f_int_pos - 1, 0, a_arr.shape[0] - 1)
-    f_int_pos_minus2 = pydaw_clip_value(f_int_pos - 2, 0, a_arr.shape[0] - 1)
+    f_int_pos_plus1 = clip_value(f_int_pos + 1, 0, a_arr.shape[0] - 1)
+    f_int_pos_minus1 = clip_value(f_int_pos - 1, 0, a_arr.shape[0] - 1)
+    f_int_pos_minus2 = clip_value(f_int_pos - 2, 0, a_arr.shape[0] - 1)
 
     f_a0 = (a_arr[f_int_pos_plus1] - a_arr[f_int_pos] -
         a_arr[f_int_pos_minus2] + a_arr[f_int_pos_minus1])
@@ -715,7 +715,7 @@ def window_rms(a_arr, a_window_size):
   window = numpy.ones(a_window_size) / float(a_window_size)
   return numpy.sqrt(numpy.convolve(a2, window, 'valid'))
 
-def pydaw_wait_for_finished_file(a_file):
+def wait_for_finished_file(a_file):
     """ Wait until a_file exists, then delete it and return.  It should
     already have the .finished extension"""
     while True:
@@ -724,18 +724,18 @@ def pydaw_wait_for_finished_file(a_file):
                 os.remove(a_file)
                 break
             except:
-                LOG.error("pydaw_wait_for_finished_file:  Exception "
+                LOG.error("wait_for_finished_file:  Exception "
                     "when deleting {}".format(a_file))
         else:
             time.sleep(0.1)
 
-def pydaw_get_wait_file_path(a_file):
+def get_wait_file_path(a_file):
     f_wait_file = "{}.finished".format(a_file)
     if os.path.isfile(f_wait_file):
         os.remove(f_wait_file)
     return f_wait_file
 
-def pydaw_seconds_to_time_str(a_seconds, a_sections=1):
+def seconds_to_time_str(a_seconds, a_sections=1):
     f_seconds = float(a_seconds)
     f_inc = f_seconds / a_sections
     if f_seconds > 3600.0:  # 60 * 60
@@ -762,13 +762,13 @@ global_show_create_folder_error = False
 global_is_live_mode = False
 global_home = os.path.expanduser("~")
 
-global_pydaw_home = os.path.join(global_home, MAJOR_VERSION)
-global_default_project_folder = global_pydaw_home
+global_home = os.path.join(global_home, MAJOR_VERSION)
+global_default_project_folder = global_home
 
-CONFIG_DIR = os.path.join(global_pydaw_home, "config")
+CONFIG_DIR = os.path.join(global_home, "config")
 PRESET_DIR = os.path.join(CONFIG_DIR, "preset")
 
-for _f_dir in (global_pydaw_home, CONFIG_DIR, PRESET_DIR):
+for _f_dir in (global_home, CONFIG_DIR, PRESET_DIR):
     if not os.path.isdir(_f_dir):
         os.makedirs(_f_dir)
 
@@ -792,29 +792,29 @@ def set_file_setting(a_name, a_val):
 USE_HUGEPAGES = 0
 
 global_device_val_dict = {}
-global_pydaw_device_config = os.path.join(CONFIG_DIR, "device.txt")
+global_device_config = os.path.join(CONFIG_DIR, "device.txt")
 
 MIDI_IN_DEVICES = []
 
 SAMPLE_RATE = None
 NYQUIST_FREQ = None
 
-def pydaw_delete_device_config():
+def delete_device_config():
     global global_device_val_dict
     global_device_val_dict = {}
-    if os.path.exists(global_pydaw_device_config):
-        os.remove(global_pydaw_device_config)
+    if os.path.exists(global_device_config):
+        os.remove(global_device_config)
 
-def pydaw_read_device_config():
+def read_device_config():
     global BIN_PATH, global_device_val_dict, MIDI_IN_DEVICES, IS_ENGINE_LIB
-    global global_pydaw_is_sandboxed, global_pydaw_with_audio, USE_HUGEPAGES
+    global global_is_sandboxed, global_with_audio, USE_HUGEPAGES
 
     global_device_val_dict = {}
     MIDI_IN_DEVICES = []
 
     try:
-        if os.path.isfile(global_pydaw_device_config):
-            f_file_text = pydaw_read_file_text(global_pydaw_device_config)
+        if os.path.isfile(global_device_config):
+            f_file_text = read_file_text(global_device_config)
             for f_line in f_file_text.split("\n"):
                 if f_line.strip() == "\\":
                     break
@@ -825,9 +825,9 @@ def pydaw_read_device_config():
                     else:
                         global_device_val_dict[f_key] = f_val
             MIDI_IN_DEVICES.sort()
-            pydaw_set_bin_path()
-            global_pydaw_is_sandboxed = False
-            global_pydaw_with_audio = True
+            set_bin_path()
+            global_is_sandboxed = False
+            global_with_audio = True
 
             if "hugePages" in global_device_val_dict and \
             int(global_device_val_dict["hugePages"]) == 1:
@@ -836,7 +836,7 @@ def pydaw_read_device_config():
             f_selinux = False
             if IS_LINUX:
                 try:
-                    if pydaw_which("getenforce") and subprocess.check_output(
+                    if which("getenforce") and subprocess.check_output(
                     "getenforce").strip().lower() == b"enforcing":
                         f_selinux = True
                 except Exception as ex:
@@ -863,14 +863,14 @@ def pydaw_read_device_config():
                         BIN_PATH = os.path.join(
                             INSTALL_PREFIX, "bin",
                             MAJOR_VERSION)
-                        global_pydaw_is_sandboxed = True
+                        global_is_sandboxed = True
                 elif int(global_device_val_dict["audioEngine"]) == 3 or \
                 int(global_device_val_dict["audioEngine"]) == 4 or \
                 int(global_device_val_dict["audioEngine"]) == 5 or \
                 int(global_device_val_dict["audioEngine"]) == 7:
                     BIN_PATH += "-dbg"
                 elif int(global_device_val_dict["audioEngine"]) == 6:
-                    global_pydaw_with_audio = False
+                    global_with_audio = False
                     BIN_PATH = None
                 elif int(global_device_val_dict["audioEngine"]) == 8:
                     IS_ENGINE_LIB = True
@@ -884,7 +884,7 @@ def pydaw_read_device_config():
 
     LOG.info("BIN_PATH == {}".format(BIN_PATH))
 
-pydaw_read_device_config()
+read_device_config()
 
 BOOKMARKS_FILE = os.path.join(CONFIG_DIR, "file_browser_bookmarks.txt")
 
@@ -892,7 +892,7 @@ def global_get_file_bookmarks():
     try:
         f_result = {}
         if os.path.isfile(BOOKMARKS_FILE):
-            f_text = pydaw_read_file_text(BOOKMARKS_FILE)
+            f_text = read_file_text(BOOKMARKS_FILE)
             f_arr = f_text.split("\n")
             for f_line in f_arr:
                 f_line_arr = f_line.split("|||", 2)
@@ -918,7 +918,7 @@ def global_write_file_bookmarks(a_dict):
         for k2 in sorted(v.keys()):
             v2 = v[k2]
             f_result.append("{}|||{}|||{}".format(k2, k, v2))
-    pydaw_write_file_text(BOOKMARKS_FILE, "\n".join(f_result))
+    write_file_text(BOOKMARKS_FILE, "\n".join(f_result))
 
 def global_add_file_bookmark(a_name, a_folder, a_category):
     f_dict = global_get_file_bookmarks()
@@ -969,7 +969,7 @@ class sfz_file:
         self.path = str(a_file_path)
         if not os.path.exists(self.path):
             raise sfz_exception("{} does not exist.".format(self.path))
-        f_file_text = pydaw_read_file_text(self.path)
+        f_file_text = read_file_text(self.path)
         # In the wild, people can and often do put tags and opcodes on the same
         # line, move all tags and opcodes to their own line
         f_file_text = f_file_text.replace("<", "\n<")
@@ -1086,19 +1086,19 @@ COLOR_PALETTE = {
 }
 
 
-def pydaw_rgb_minus(a_rgb, a_amt):
+def rgb_minus(a_rgb, a_amt):
     f_result = []
     for f_color in a_rgb:
-        f_result.append(pydaw_clip_min(f_color - a_amt, 0))
+        f_result.append(clip_min(f_color - a_amt, 0))
     return f_result
 
-def pydaw_rgb_plus(a_rgb, a_amt):
+def rgb_plus(a_rgb, a_amt):
     f_result = []
     for f_color in a_rgb:
-        f_result.append(pydaw_clip_max(f_color + a_amt, 255))
+        f_result.append(clip_max(f_color + a_amt, 255))
     return f_result
 
-class pydaw_name_uid_dict:
+class name_uid_dict:
     def gen_file_name_uid(self):
         while self.high_uid in self.name_lookup:
             self.high_uid += 1
@@ -1162,10 +1162,10 @@ class pydaw_name_uid_dict:
 
     @staticmethod
     def from_str(a_str):
-        f_result = pydaw_name_uid_dict()
+        f_result = name_uid_dict()
         f_lines = a_str.split("\n")
         for f_line in f_lines:
-            if f_line == pydaw_terminating_char:
+            if f_line == terminating_char:
                 break
             f_arr = f_line.split("|", 1)
             f_uid = int(f_arr[0])
@@ -1178,7 +1178,7 @@ class pydaw_name_uid_dict:
         for k in sorted(self.name_lookup.keys()):
             v = self.name_lookup[k]
             f_result.append("|".join((str(k), pi_path(v))))
-        f_result.append(pydaw_terminating_char)
+        f_result.append(terminating_char)
         return "\n".join(f_result)
 
     def __len__(self):

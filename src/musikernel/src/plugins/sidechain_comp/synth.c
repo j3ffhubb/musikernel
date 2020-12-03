@@ -107,7 +107,7 @@ static PYFX_Handle g_scc_instantiate(PYFX_Descriptor * descriptor,
 
     plugin_data->mono_modules = v_scc_mono_init(s_rate, a_plugin_uid);
 
-    plugin_data->port_table = g_pydaw_get_port_table(
+    plugin_data->port_table = g_get_port_table(
         (void**)plugin_data, descriptor);
 
     v_cc_map_init(&plugin_data->cc_map);
@@ -119,7 +119,7 @@ static void v_scc_load(PYFX_Handle instance,
         PYFX_Descriptor * Descriptor, char * a_file_path)
 {
     t_scc *plugin_data = (t_scc*)instance;
-    pydaw_generic_file_loader(instance, Descriptor,
+    generic_file_loader(instance, Descriptor,
         a_file_path, plugin_data->port_table, &plugin_data->cc_map);
 }
 
@@ -131,7 +131,7 @@ static void v_scc_set_port_value(PYFX_Handle Instance,
 }
 
 static void v_scc_process_midi_event(
-    t_scc * plugin_data, t_pydaw_seq_event * a_event)
+    t_scc * plugin_data, t_seq_event * a_event)
 {
     if (a_event->type == PYDAW_EVENT_CONTROLLER)
     {
@@ -156,7 +156,7 @@ static void v_scc_run(
 {
     t_scc *plugin_data = (t_scc*)instance;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
+    t_seq_event **events = (t_seq_event**)midi_events->data;
     int event_count = midi_events->len;
 
     t_scc_sidechain_comp * f_cmp = &plugin_data->mono_modules->sidechain_comp;
@@ -172,10 +172,10 @@ static void v_scc_run(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    t_pydaw_seq_event * ev_tmp;
+    t_seq_event * ev_tmp;
     for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
-        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
+        ev_tmp = (t_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
             &plugin_data->atm_queue, ev_tmp->type,
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
@@ -231,14 +231,14 @@ static void v_scc_run(
 
 PYFX_Descriptor *scc_PYFX_descriptor()
 {
-    PYFX_Descriptor *f_result = pydaw_get_pyfx_descriptor(SCC_COUNT);
+    PYFX_Descriptor *f_result = get_pyfx_descriptor(SCC_COUNT);
 
-    pydaw_set_pyfx_port(f_result, SCC_THRESHOLD, -24.0f, -36.0f, -6.0f);
-    pydaw_set_pyfx_port(f_result, SCC_RATIO, 20.0f, 1.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, SCC_ATTACK, 20.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, SCC_RELEASE, 50.0f, 20.0f, 300.0f);
-    pydaw_set_pyfx_port(f_result, SCC_WET, 100.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, SCC_UI_MSG_ENABLED, 0.0f, 0.0f, 1.0f);
+    set_pyfx_port(f_result, SCC_THRESHOLD, -24.0f, -36.0f, -6.0f);
+    set_pyfx_port(f_result, SCC_RATIO, 20.0f, 1.0f, 100.0f);
+    set_pyfx_port(f_result, SCC_ATTACK, 20.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, SCC_RELEASE, 50.0f, 20.0f, 300.0f);
+    set_pyfx_port(f_result, SCC_WET, 100.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, SCC_UI_MSG_ENABLED, 0.0f, 0.0f, 1.0f);
 
     f_result->cleanup = v_scc_cleanup;
     f_result->connect_port = v_scc_connect_port;

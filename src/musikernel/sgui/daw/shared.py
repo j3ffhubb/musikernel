@@ -113,7 +113,7 @@ TAB_MIXER = 4
 TAB_NOTES = 5
 
 REGION_EDITOR_TRACK_HEIGHT = 64
-PROJECT = DawProject(util.global_pydaw_with_audio)
+PROJECT = DawProject(util.global_with_audio)
 TRACK_NAMES = [
     "Master" if x == 0 else "track{}".format(x)
     for x in range(TRACK_COUNT_ALL)
@@ -176,7 +176,7 @@ MAIN_WINDOW = None
 MIDI_EDITORS = None
 
 
-def pydaw_get_current_region_length():
+def get_current_region_length():
     return CURRENT_REGION.get_length() if CURRENT_REGION else 32
 
 def global_update_hidden_rows(a_val=None):
@@ -195,7 +195,7 @@ def global_update_hidden_rows(a_val=None):
 def global_set_midi_zoom(a_val):
     global MIDI_SCALE
     MIDI_SCALE = a_val
-    pydaw_set_piano_roll_quantize()
+    set_piano_roll_quantize()
 
 
 def global_open_items(a_items=None, a_reset_scrollbar=False, a_new_ref=None):
@@ -226,7 +226,7 @@ def global_open_items(a_items=None, a_reset_scrollbar=False, a_new_ref=None):
             CURRENT_ITEM_NAME = a_items
         ITEM_EDITOR.enabled = True
         PIANO_ROLL_EDITOR.selected_note_strings = []
-        pydaw_set_piano_roll_quantize()
+        set_piano_roll_quantize()
         if a_reset_scrollbar:
             for f_editor in MIDI_EDITORS:
                 f_editor.horizontalScrollBar().setSliderPosition(0)
@@ -275,7 +275,7 @@ def open_last():
 #Opens or creates a new project
 def global_open_project(a_project_file):
     global PROJECT, TRACK_NAMES, TRACK_COLORS
-    PROJECT = DawProject(util.global_pydaw_with_audio)
+    PROJECT = DawProject(util.global_with_audio)
     PROJECT.suppress_updates = True
     PROJECT.open_project(a_project_file, False)
     TRACK_COLORS = PROJECT.get_track_colors()
@@ -302,7 +302,7 @@ def global_open_project(a_project_file):
 
 def global_new_project(a_project_file):
     global PROJECT, TRACK_COLORS
-    PROJECT = DawProject(util.global_pydaw_with_audio)
+    PROJECT = DawProject(util.global_with_audio)
     PROJECT.new_project(a_project_file)
     TRACK_COLORS = PROJECT.get_track_colors()
     global_update_track_comboboxes()
@@ -316,7 +316,7 @@ def global_new_project(a_project_file):
     MIXER_WIDGET.set_project(PROJECT)
     PIANO_ROLL_EDITOR.default_vposition()
 
-def pydaw_seconds_to_beats(a_seconds):
+def seconds_to_beats(a_seconds):
     '''converts seconds to regions'''
     return a_seconds * (CURRENT_REGION.get_tempo_at_pos(
         CURRENT_ITEM_REF.start_beat) / 60.0)
@@ -369,7 +369,7 @@ def global_ui_refresh_callback(a_restore_all=False):
     TRACK_PANEL.open_tracks()
     SEQ_WIDGET.open_region()
     MAIN_WINDOW.tab_changed()
-    PROJECT.IPC.pydaw_open_song(PROJECT.project_folder, a_restore_all)
+    PROJECT.IPC.open_song(PROJECT.project_folder, a_restore_all)
 
 
 def on_ready():
@@ -430,7 +430,7 @@ def global_open_mixer():
         {f_i:x for f_i, x in zip(
         range(len(TRACK_NAMES)), TRACK_NAMES)})
 
-def pydaw_set_piano_roll_quantize(a_index=None):
+def set_piano_roll_quantize(a_index=None):
     global PIANO_ROLL_SNAP, PIANO_ROLL_SNAP_VALUE, PIANO_ROLL_SNAP_DIVISOR, \
         PIANO_ROLL_SNAP_BEATS, LAST_NOTE_RESIZE, PIANO_ROLL_QUANTIZE_INDEX, \
         PIANO_ROLL_MIN_NOTE_LENGTH, PIANO_ROLL_GRID_WIDTH
@@ -453,7 +453,7 @@ def pydaw_set_piano_roll_quantize(a_index=None):
     PIANO_ROLL_SNAP_DIVISOR = ITEM_SNAP_DIVISORS[PIANO_ROLL_QUANTIZE_INDEX]
 
     PIANO_ROLL_SNAP_BEATS = 1.0 / PIANO_ROLL_SNAP_DIVISOR
-    LAST_NOTE_RESIZE = util.pydaw_clip_min(
+    LAST_NOTE_RESIZE = util.clip_min(
         LAST_NOTE_RESIZE,
         PIANO_ROLL_SNAP_BEATS,
     )
@@ -520,7 +520,7 @@ def global_open_audio_items(
         AUDIO_SEQ.update()
         AUDIO_SEQ.horizontalScrollBar().setMinimum(0)
 
-def pydaw_set_audio_snap(a_val):
+def set_audio_snap(a_val):
     global AUDIO_QUANTIZE, AUDIO_QUANTIZE_PX, AUDIO_QUANTIZE_AMT, \
         AUDIO_SNAP_VAL, AUDIO_LINES_ENABLED, AUDIO_SNAP_RANGE
 
@@ -586,10 +586,10 @@ __all__ = [
     'global_update_track_comboboxes',
     'on_ready',
     'open_last',
-    'pydaw_get_current_region_length',
-    'pydaw_seconds_to_beats',
-    'pydaw_set_audio_snap',
-    'pydaw_set_piano_roll_quantize',
+    'get_current_region_length',
+    'seconds_to_beats',
+    'set_audio_snap',
+    'set_piano_roll_quantize',
     'routing_graph_toggle_callback',
     'set_tooltips_enabled',
 ]

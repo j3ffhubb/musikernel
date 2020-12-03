@@ -49,14 +49,14 @@ f_list.append([300, 870, 2240]) #"oo"
 f_list.append([520, 1190, 2390]) #"uh"
 f_list.append([440, 1020, 2240]) #"u"
 
-def pydaw_hz_to_pitch(a_hz):
+def hz_to_pitch(a_hz):
     return ((12.0 * log(a_hz * (1.0/440.0), 2.0)) + 57.0)
 
 print("static MKFLT f_formant_pitches[3][" + str(len(f_list)) + "] =\n{")
 for i in range(3):
     f_print = "    {"
     for f_item in f_list:
-        f_print += str(pydaw_hz_to_pitch(f_item[i]))
+        f_print += str(hz_to_pitch(f_item[i]))
         f_print += ", "
     print(f_print + "},")
 print "};"
@@ -166,7 +166,7 @@ void v_for_formant_filter_run(t_for_formant_filter* a_for, MKFLT a_input0, MKFLT
 }
 
 
-static __thread MKFLT pydaw_growl_table[25][3][5]
+static __thread MKFLT growl_table[25][3][5]
 __attribute__((aligned(CACHE_LINE_SIZE))) =
 {
     {{67.35f, 73.633f, 89.038f, 92.901f, 98.902f}, {1.0f, 0.631f, 0.1f, 0.016f, 0.001f}, {-0.75, -0.556, -0.167, -0.077, 0.0}}, //alto a
@@ -271,16 +271,16 @@ void v_grw_growl_filter_set(t_grw_growl_filter* a_grw, MKFLT a_pos,
         {
             f_filter = &a_grw->bands[iter].filter;
             v_svf2_set_cutoff_base(f_filter,
-                f_linear_interpolate(pydaw_growl_table[f_pos][0][(iter)],
-                pydaw_growl_table[f_pos_plus_one][0][(iter)],
+                f_linear_interpolate(growl_table[f_pos][0][(iter)],
+                growl_table[f_pos_plus_one][0][(iter)],
                 f_pos_frac) + 12.0f);
             v_svf2_set_res(f_filter,
-                f_linear_interpolate(pydaw_growl_table[f_pos][2][(iter)],
-                    pydaw_growl_table[f_pos_plus_one][2][(iter)], f_pos_frac));
+                f_linear_interpolate(growl_table[f_pos][2][(iter)],
+                    growl_table[f_pos_plus_one][2][(iter)], f_pos_frac));
             v_svf2_set_cutoff(f_filter);
             a_grw->bands[iter].amp =
-                f_linear_interpolate(pydaw_growl_table[f_pos][1][(iter)],
-                pydaw_growl_table[f_pos_plus_one][1][(iter)], f_pos_frac);
+                f_linear_interpolate(growl_table[f_pos][1][(iter)],
+                growl_table[f_pos_plus_one][1][(iter)], f_pos_frac);
         }
     }
 

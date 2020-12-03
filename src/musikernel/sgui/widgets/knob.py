@@ -43,7 +43,7 @@ DEFAULT_KNOB_FG_PIXMAP_CACHE = PixmapKnobCache(
 DEFAULT_KNOB_BG_PIXMAP_CACHE = PixmapKnobCache(
     os.path.join(theme.STYLESHEET_DIR, "knob-bg.png"))
 
-class pydaw_pixmap_knob(QDial):
+class pixmap_knob(QDial):
     def __init__(
         self,
         a_size,
@@ -129,7 +129,7 @@ class pydaw_pixmap_knob(QDial):
             f_diff_y = self.orig_y - f_y
             f_val = ((f_diff_y * self.val_step) +
                 (f_diff_x * self.val_step_small)) + self.orig_value
-        f_val = util.pydaw_clip_value(
+        f_val = util.clip_value(
             f_val, self.minimum(), self.maximum())
         f_val = int(f_val)
         if f_val != self.value():

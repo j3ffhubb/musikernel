@@ -144,7 +144,7 @@ static PYFX_Handle g_modulex_instantiate(PYFX_Descriptor * descriptor,
 
     plugin_data->is_on = 0;
 
-    plugin_data->port_table = g_pydaw_get_port_table(
+    plugin_data->port_table = g_get_port_table(
         (void**)plugin_data, descriptor);
 
     v_cc_map_init(&plugin_data->cc_map);
@@ -156,7 +156,7 @@ static void v_modulex_load(PYFX_Handle instance,
         PYFX_Descriptor * Descriptor, char * a_file_path)
 {
     t_modulex *plugin_data = (t_modulex*)instance;
-    pydaw_generic_file_loader(instance, Descriptor,
+    generic_file_loader(instance, Descriptor,
         a_file_path, plugin_data->port_table, &plugin_data->cc_map);
 }
 
@@ -186,7 +186,7 @@ static void v_modulex_check_if_on(t_modulex *plugin_data)
 }
 
 static void v_modulex_process_midi_event(
-    t_modulex * plugin_data, t_pydaw_seq_event * a_event)
+    t_modulex * plugin_data, t_seq_event * a_event)
 {
     if (a_event->type == PYDAW_EVENT_CONTROLLER)
     {
@@ -227,7 +227,7 @@ static void v_modulex_run(
     t_modulex *plugin_data = (t_modulex*)instance;
     t_mf3_multi * f_fx;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
+    t_seq_event **events = (t_seq_event**)midi_events->data;
     int event_count = midi_events->len;
 
     int event_pos;
@@ -243,10 +243,10 @@ static void v_modulex_run(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    t_pydaw_seq_event * ev_tmp;
+    t_seq_event * ev_tmp;
     for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
-        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
+        ev_tmp = (t_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
             &plugin_data->atm_queue, ev_tmp->type,
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
@@ -339,40 +339,40 @@ static void v_modulex_run(
 
 PYFX_Descriptor *modulex_PYFX_descriptor()
 {
-    PYFX_Descriptor *f_result = pydaw_get_pyfx_descriptor(MODULEX_COUNT);
+    PYFX_Descriptor *f_result = get_pyfx_descriptor(MODULEX_COUNT);
 
-    pydaw_set_pyfx_port(f_result, MODULEX_FX0_KNOB0, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX0_KNOB1, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX0_KNOB2, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX0_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX1_KNOB0, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX1_KNOB1, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX1_KNOB2, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX1_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX2_KNOB0, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX2_KNOB1, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX2_KNOB2, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX2_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX3_KNOB0, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX3_KNOB1, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX3_KNOB2, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX3_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX4_KNOB0, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX4_KNOB1, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX4_KNOB2, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX4_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX5_KNOB0, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX5_KNOB1, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX5_KNOB2, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX5_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX6_KNOB0, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX6_KNOB1, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX6_KNOB2, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX6_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX7_KNOB0, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX7_KNOB1, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX7_KNOB2, 64.0f, 0.0f, 127.0f);
-    pydaw_set_pyfx_port(f_result, MODULEX_FX7_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
+    set_pyfx_port(f_result, MODULEX_FX0_KNOB0, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX0_KNOB1, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX0_KNOB2, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX0_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
+    set_pyfx_port(f_result, MODULEX_FX1_KNOB0, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX1_KNOB1, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX1_KNOB2, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX1_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
+    set_pyfx_port(f_result, MODULEX_FX2_KNOB0, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX2_KNOB1, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX2_KNOB2, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX2_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
+    set_pyfx_port(f_result, MODULEX_FX3_KNOB0, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX3_KNOB1, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX3_KNOB2, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX3_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
+    set_pyfx_port(f_result, MODULEX_FX4_KNOB0, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX4_KNOB1, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX4_KNOB2, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX4_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
+    set_pyfx_port(f_result, MODULEX_FX5_KNOB0, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX5_KNOB1, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX5_KNOB2, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX5_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
+    set_pyfx_port(f_result, MODULEX_FX6_KNOB0, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX6_KNOB1, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX6_KNOB2, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX6_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
+    set_pyfx_port(f_result, MODULEX_FX7_KNOB0, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX7_KNOB1, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX7_KNOB2, 64.0f, 0.0f, 127.0f);
+    set_pyfx_port(f_result, MODULEX_FX7_COMBOBOX, 0.0f, 0.0f, MULTIFX3KNOB_MAX_INDEX);
 
 
     f_result->cleanup = v_modulex_cleanup;

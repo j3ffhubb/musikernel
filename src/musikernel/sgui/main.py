@@ -81,58 +81,58 @@ class MkIpc(glbl.AbstractIPC):
             self.send_configure("exit", "")
             glbl.IPC_ENABLED = False
 
-    def pydaw_kill_engine(self):
+    def kill_engine(self):
         self.send_configure("abort", "")
 
-    def pydaw_master_vol(self, a_vol):
+    def master_vol(self, a_vol):
         self.send_configure("mvol", str(round(a_vol, 8)))
 
-    def pydaw_update_plugin_control(self, a_plugin_uid, a_port, a_val):
+    def update_plugin_control(self, a_plugin_uid, a_port, a_val):
         self.send_configure(
             "pc", "|".join(str(x) for x in (a_plugin_uid, a_port, a_val)))
 
-    def pydaw_configure_plugin(self, a_plugin_uid, a_key, a_message):
+    def configure_plugin(self, a_plugin_uid, a_key, a_message):
         self.send_configure(
             "co", "|".join(str(x) for x in (a_plugin_uid, a_key, a_message)))
 
-    def pydaw_midi_learn(self):
+    def midi_learn(self):
         self.send_configure("ml", "")
 
-    def pydaw_load_cc_map(self, a_plugin_uid, a_str):
+    def load_cc_map(self, a_plugin_uid, a_str):
         self.send_configure(
             "cm", "|".join(str(x) for x in (a_plugin_uid, a_str)))
 
-    def pydaw_add_to_wav_pool(self, a_file, a_uid):
+    def add_to_wav_pool(self, a_file, a_uid):
         path = os.path.join(glbl.PROJECT.samplegraph_folder, str(a_uid))
-        f_wait_file = pydaw_get_wait_file_path(path)
+        f_wait_file = get_wait_file_path(path)
         a_file = util.pi_path(a_file)
         self.send_configure("wp", "|".join(str(x) for x in (a_uid, a_file)))
-        pydaw_wait_for_finished_file(f_wait_file)
+        wait_for_finished_file(f_wait_file)
 
-    def pydaw_rate_env(self, a_in_file, a_out_file, a_start, a_end):
-        f_wait_file = pydaw_get_wait_file_path(a_out_file)
+    def rate_env(self, a_in_file, a_out_file, a_start, a_end):
+        f_wait_file = get_wait_file_path(a_out_file)
         self.send_configure(
             "renv", "{}\n{}\n{}|{}".format(a_in_file, a_out_file,
             a_start, a_end))
-        pydaw_wait_for_finished_file(f_wait_file)
+        wait_for_finished_file(f_wait_file)
 
-    def pydaw_pitch_env(self, a_in_file, a_out_file, a_start, a_end):
-        f_wait_file = pydaw_get_wait_file_path(a_out_file)
+    def pitch_env(self, a_in_file, a_out_file, a_start, a_end):
+        f_wait_file = get_wait_file_path(a_out_file)
         self.send_configure(
             "penv", "{}\n{}\n{}|{}".format(a_in_file, a_out_file,
             a_start, a_end))
-        pydaw_wait_for_finished_file(f_wait_file)
+        wait_for_finished_file(f_wait_file)
 
-    def pydaw_preview_audio(self, a_file):
+    def preview_audio(self, a_file):
         self.send_configure("preview", util.pi_path(a_file))
 
-    def pydaw_stop_preview(self):
+    def stop_preview(self):
         self.send_configure("spr", "")
 
-    def pydaw_set_host(self, a_index):
+    def set_host(self, a_index):
         self.send_configure("abs", str(a_index))
 
-    def pydaw_reload_wavpool_item(self, a_uid):
+    def reload_wavpool_item(self, a_uid):
         self.send_configure("wr", str(a_uid))
 
     def audio_input_volume(self, a_index, a_vol):
@@ -198,7 +198,7 @@ class TransportWidget:
         )
         self.grid_layout1.addWidget(self.host_combobox, 1, 55)
 
-        self.master_vol_knob = widgets.pydaw_pixmap_knob(60, -480, 0)
+        self.master_vol_knob = widgets.pixmap_knob(60, -480, 0)
         self.load_master_vol()
         self.hlayout1.addWidget(self.master_vol_knob)
         self.master_vol_knob.valueChanged.connect(self.master_vol_changed)
@@ -223,8 +223,8 @@ class TransportWidget:
         if a_val == 0:
             f_result = 1.0
         else:
-            f_result = util.pydaw_db_to_lin(float(a_val) * 0.1)
-        glbl.IPC.pydaw_master_vol(f_result)
+            f_result = util.db_to_lin(float(a_val) * 0.1)
+        glbl.IPC.master_vol(f_result)
 
     def set_time(self, a_text):
         self.time_label.setText(a_text)
@@ -553,7 +553,7 @@ class MkMainWindow(QMainWindow):
                 self.osc_timer.timeout.connect(self.osc_time_callback)
                 self.osc_timer.start(0)
 
-            if util.global_pydaw_with_audio:
+            if util.global_with_audio:
                 self.subprocess_timer = QtCore.QTimer(self)
                 self.subprocess_timer.timeout.connect(self.subprocess_monitor)
                 self.subprocess_timer.setSingleShot(False)
@@ -591,7 +591,7 @@ class MkMainWindow(QMainWindow):
         self.current_module = glbl.HOST_MODULES[a_index]
         self.current_window = self.host_windows[a_index]
         glbl.CURRENT_HOST = a_index
-        glbl.IPC.pydaw_set_host(a_index)
+        glbl.IPC.set_host(a_index)
 
     def show_offline_rendering_wait_window(self, a_file_name):
         f_file_name = "{}.finished".format(a_file_name)
@@ -810,7 +810,7 @@ class MkMainWindow(QMainWindow):
         if glbl.IS_PLAYING:
             return
         try:
-            f_last_dir = util.global_pydaw_home
+            f_last_dir = util.global_home
             while True:
                 f_new_file = QFileDialog.getExistingDirectory(
                     MAIN_WINDOW,
@@ -846,7 +846,7 @@ class MkMainWindow(QMainWindow):
             self.setUpdatesEnabled(False)
             if SPLASH_SCREEN:
                 SPLASH_SCREEN.close()
-            close_pydaw_engine()
+            close_engine()
             glbl.PLUGIN_UI_DICT.close_all_plugin_windows()
             if self.osc_server is not None:
                 self.osc_timer.stop()
@@ -894,18 +894,18 @@ class MkMainWindow(QMainWindow):
             event.accept()
 
     def on_change_audio_settings(self):
-        close_pydaw_engine()
+        close_engine()
         time.sleep(2.0)
         f_dialog = widgets.hardware_dialog(True)
         f_dialog.show_hardware_dialog()
         # Doesn't re-send the 'ready' message?
-        #open_pydaw_engine(PROJECT_FILE)
+        #open_engine(PROJECT_FILE)
         global RESPAWN
         RESPAWN = True
         self.prepare_to_quit()
 
     def on_kill_engine(self):
-        glbl.IPC.pydaw_kill_engine()
+        glbl.IPC.kill_engine()
 
     def on_open_theme(self):
         try:
@@ -923,9 +923,9 @@ class MkMainWindow(QMainWindow):
             )
             if f_file and str(f_file):
                 f_file = str(f_file)
-                f_style = pydaw_read_file_text(f_file)
+                f_style = read_file_text(f_file)
                 f_dir = os.path.dirname(f_file)
-                f_style = theme.pydaw_escape_stylesheet(f_style, f_dir)
+                f_style = theme.escape_stylesheet(f_style, f_dir)
                 util.set_file_setting("default-style", f_file)
                 QMessageBox.warning(
                     MAIN_WINDOW, _("Theme Applied..."),
@@ -939,7 +939,7 @@ class MkMainWindow(QMainWindow):
         f_window.setFixedSize(420, 150)
         f_layout = QVBoxLayout()
         f_window.setLayout(f_layout)
-        f_minor_version = pydaw_read_file_text(
+        f_minor_version = read_file_text(
             os.path.join(
                 util.INSTALL_PREFIX, "lib",
                 MAJOR_VERSION, "minor-version.txt"))
@@ -977,24 +977,24 @@ class MkMainWindow(QMainWindow):
             self.transport_splitter.setSizes([0, 9999])
 
     def mp3_converter_dialog(self):
-        if pydaw_which("avconv"):
+        if which("avconv"):
             f_enc = "avconv"
-        elif pydaw_which("ffmpeg"):
+        elif which("ffmpeg"):
             f_enc = "ffmpeg"
         else:
             f_enc = "avconv"
 
         f_lame = "lame"
         for f_app in (f_enc, f_lame):
-            if pydaw_which(f_app) is None:
+            if which(f_app) is None:
                 QMessageBox.warning(self, _("Error"),
                     mk_strings.avconv_error.format(f_app))
                 return
         self.audio_converter_dialog("lame", f_enc, "mp3")
 
     def ogg_converter_dialog(self):
-        if pydaw_which("oggenc") is None or \
-        pydaw_which("oggdec") is None:
+        if which("oggenc") is None or \
+        which("oggdec") is None:
             QMessageBox.warning(self, _("Error"),
                 _("Error, vorbis-tools are not installed"))
             return
@@ -1011,7 +1011,7 @@ class MkMainWindow(QMainWindow):
                 if a_enc == "oggenc":
                     f_quality = float(str(f_mp3_br_combobox.currentText()))
                     f_quality = (320.0 / f_quality) * 10.0
-                    f_quality = util.pydaw_clip_value(
+                    f_quality = util.clip_value(
                         f_quality, 3.0, 10.0)
                     f_cmd = [a_enc, "-q", str(f_quality),
                          "-o", f_output_file, f_input_file]
@@ -1236,11 +1236,11 @@ class MkMainWindow(QMainWindow):
         glbl.PLUGIN_UI_DICT.save_all_plugin_state()
         if self.current_module.CLOSE_ENGINE_ON_RENDER and \
         not util.IS_ENGINE_LIB:
-            close_pydaw_engine()
+            close_engine()
         self.current_window.on_offline_render()
         if self.current_module.CLOSE_ENGINE_ON_RENDER and \
         not util.IS_ENGINE_LIB:
-            open_pydaw_engine(PROJECT_FILE)
+            open_engine(PROJECT_FILE)
             glbl.IPC_ENABLED = True
 
     def on_undo(self):
@@ -1304,7 +1304,7 @@ def global_check_device():
         sys.exit(999)
 
 
-def close_pydaw_engine():
+def close_engine():
     """ Ask the engine to gracefully stop itself, then kill the process if it
     doesn't exit on it's own"""
     glbl.IPC.stop_server()
@@ -1319,7 +1319,7 @@ def close_pydaw_engine():
                 time.sleep(0.3)
         if not f_exited:
             try:
-                if util.global_pydaw_is_sandboxed:
+                if util.global_is_sandboxed:
                     LOG.warning("ENGINE_SUBPROCESS did not exit on it's own, "
                           "sending SIGTERM to helper script...")
                     ENGINE_SUBPROCESS.terminate()
@@ -1332,7 +1332,7 @@ def close_pydaw_engine():
                     "{}".format(ex))
         ENGINE_SUBPROCESS = None
 
-def kill_pydaw_engine():
+def kill_engine():
     """ Kill any zombie instances of the engine if they exist. Otherwise, the
     UI won't be able to control the engine"""
     if util.IS_ENGINE_LIB:
@@ -1340,7 +1340,7 @@ def kill_pydaw_engine():
     try:
         f_val = subprocess.check_output(['ps', '-ef'])
     except Exception as ex:
-        LOG.error("kill_pydaw_engine raised Exception during process search, "
+        LOG.error("kill_engine raised Exception during process search, "
               "assuming no zombie processes {}\n".format(ex))
         return
     f_engine_name = "{}-engine".format(MAJOR_VERSION)
@@ -1353,7 +1353,7 @@ def kill_pydaw_engine():
                 f_arr = f_line.split()
                 f_result.append(int(f_arr[1]))
             except Exception as ex:
-                LOG.error("kill_pydaw_engine Exception adding PID {}\n\t"
+                LOG.error("kill_engine Exception adding PID {}\n\t"
                     "{}".format(f_arr[1], ex))
 
     if len(f_result) > 0:
@@ -1374,16 +1374,16 @@ def kill_pydaw_engine():
                     f_result = subprocess.check_output(f_kill)
                     LOG.info(f_result)
                 except Exception as ex:
-                    LOG.error("kill_pydaw_engine : Exception: {}".format(ex))
+                    LOG.error("kill_engine : Exception: {}".format(ex))
             time.sleep(3.0)
 
-def open_pydaw_engine(a_project_path):
-    if not global_pydaw_with_audio:
+def open_engine(a_project_path):
+    if not global_with_audio:
         LOG.info(_("Not starting audio because of the audio engine setting, "
               "you can change this in File->HardwareSettings"))
         return
 
-    kill_pydaw_engine() #ensure no running instances of the engine
+    kill_engine() #ensure no running instances of the engine
     f_project_dir = os.path.dirname(a_project_path)
 
     if util.IS_ENGINE_LIB:
@@ -1393,7 +1393,7 @@ def open_pydaw_engine(a_project_path):
     f_pid = os.getpid()
     LOG.info(_("Starting audio engine with {}").format(a_project_path))
     global ENGINE_SUBPROCESS
-    if util.pydaw_which("pasuspender") is not None:
+    if util.which("pasuspender") is not None:
         f_pa_suspend = True
     else:
         f_pa_suspend = False
@@ -1402,11 +1402,11 @@ def open_pydaw_engine(a_project_path):
     and util.TERMINAL:
         f_sleep = "--sleep"
         if int(util.global_device_val_dict["audioEngine"]) == 4 and \
-        util.pydaw_which("gdb") is not None:
+        util.which("gdb") is not None:
             f_run_with = " gdb "
             f_sleep = ""
         elif int(util.global_device_val_dict["audioEngine"]) == 5 and \
-        util.pydaw_which("valgrind") is not None:
+        util.which("valgrind") is not None:
             f_run_with = " valgrind "
             f_sleep = ""
         else:
@@ -1442,16 +1442,16 @@ def open_pydaw_engine(a_project_path):
     LOG.info(f_cmd)
     ENGINE_SUBPROCESS = subprocess.Popen([f_cmd], shell=True)
 
-def reopen_pydaw_engine():
-    open_pydaw_engine(PROJECT_FILE)
+def reopen_engine():
+    open_engine(PROJECT_FILE)
     glbl.IPC_ENABLED = True
 
-glbl.close_pydaw_engine = close_pydaw_engine
-glbl.reopen_pydaw_engine = reopen_pydaw_engine
+glbl.close_engine = close_engine
+glbl.reopen_engine = reopen_engine
 
 def global_close_all():
     glbl.PLUGIN_UI_DICT.close_all_plugin_windows()
-    close_pydaw_engine()
+    close_engine()
     for f_module in glbl.HOST_MODULES:
         f_module.global_close_all()
 
@@ -1468,7 +1468,7 @@ PROJECT_FILE = None
 def global_open_project(a_project_file, a_wait=True):
     global PROJECT_FILE
     PROJECT_FILE = a_project_file
-    open_pydaw_engine(a_project_file)
+    open_engine(a_project_file)
     glbl.PROJECT = mk_project.MkProject()
     glbl.PROJECT.suppress_updates = True
     glbl.PROJECT.open_project(a_project_file, False)
@@ -1492,7 +1492,7 @@ def global_new_project(a_project_file, a_wait=True):
         glbl.PROJECT, glbl.IPC, MAIN_WINDOW.styleSheet())
     for f_module in glbl.HOST_MODULES:
         f_module.global_new_project(a_project_file)
-    open_pydaw_engine(a_project_file)
+    open_engine(a_project_file)
 
 def respawn():
     LOG.info("Spawning child UI process {}".format(sys.argv))
@@ -1541,16 +1541,16 @@ def main():
     MAIN_WINDOW.setup()
     glbl.APP.lastWindowClosed.connect(glbl.APP.quit)
 
-    if not os.access(global_pydaw_home, os.W_OK):
+    if not os.access(global_home, os.W_OK):
         QMessageBox.warning(
             MAIN_WINDOW.widget, _("Error"),
             _("You do not have read+write permissions to {}, please correct "
-            "this and restart MusiKernel".format(global_pydaw_home)))
+            "this and restart MusiKernel".format(global_home)))
         MAIN_WINDOW.prepare_to_quit()
 
     if not default_project_file:
         default_project_file = os.path.join(
-            global_pydaw_home, "default-project",
+            global_home, "default-project",
             "default.{}".format(MAJOR_VERSION))
         LOG.info("No default project using {}".format(default_project_file))
 
@@ -1577,7 +1577,7 @@ def main():
                 "persists or the project can't be recovered, you may "
                 "need to delete your settings and/or default project "
                 "in \n{}".format(
-                default_project_file, ex, util.global_pydaw_home)))
+                default_project_file, ex, util.global_home)))
             glbl.PROJECT.show_project_history()
             MAIN_WINDOW.prepare_to_quit()
     else:

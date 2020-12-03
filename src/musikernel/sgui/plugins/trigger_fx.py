@@ -39,9 +39,9 @@ TRIGGERFX_PORT_MAP = {
 
 
 
-class triggerfx_plugin_ui(pydaw_abstract_plugin_ui):
+class triggerfx_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "TRIGGERFX"
         self.is_instrument = False
 
@@ -57,23 +57,23 @@ class triggerfx_plugin_ui(pydaw_abstract_plugin_ui):
         self.gate_gridlayout = QGridLayout()
         self.delay_hlayout.addLayout(self.gate_gridlayout)
         self.delay_hlayout.addLayout
-        self.gate_on_checkbox = pydaw_checkbox_control(
+        self.gate_on_checkbox = checkbox_control(
             "On", TRIGGERFX_GATE_MODE,
             self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, a_preset_mgr=self.preset_manager)
         self.gate_on_checkbox.add_to_grid_layout(self.gate_gridlayout, 3)
-        self.gate_note_selector = pydaw_note_selector_widget(
+        self.gate_note_selector = note_selector_widget(
             TRIGGERFX_GATE_NOTE,
             self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, 120, self.preset_manager)
         self.gate_note_selector.add_to_grid_layout(self.gate_gridlayout, 6)
-        self.gate_wet_knob = pydaw_knob_control(
+        self.gate_wet_knob = knob_control(
             f_knob_size, _("Wet"), TRIGGERFX_GATE_WET,
             self.plugin_rel_callback, self.plugin_val_callback,
             0, 100, 0, KC_DECIMAL, self.port_dict, self.preset_manager)
         self.gate_wet_knob.add_to_grid_layout(self.gate_gridlayout, 9)
 
-        self.gate_pitch_knob = pydaw_knob_control(
+        self.gate_pitch_knob = knob_control(
             f_knob_size, _("Pitch"), TRIGGERFX_GATE_PITCH,
             self.plugin_rel_callback, self.plugin_val_callback,
             20, 120, 60, KC_PITCH, self.port_dict, self.preset_manager)
@@ -83,22 +83,22 @@ class triggerfx_plugin_ui(pydaw_abstract_plugin_ui):
         self.glitch_gridlayout = QGridLayout()
         self.delay_hlayout.addLayout(self.glitch_gridlayout)
 
-        self.glitch_on_checkbox = pydaw_checkbox_control(
+        self.glitch_on_checkbox = checkbox_control(
             "On", TRIGGERFX_GLITCH_ON,
             self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, a_preset_mgr=self.preset_manager)
         self.glitch_on_checkbox.add_to_grid_layout(self.glitch_gridlayout, 3)
-        self.glitch_note_selector = pydaw_note_selector_widget(
+        self.glitch_note_selector = note_selector_widget(
             TRIGGERFX_GLITCH_NOTE,
             self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, 119, self.preset_manager)
         self.glitch_note_selector.add_to_grid_layout(self.glitch_gridlayout, 6)
-        self.glitch_time_knob = pydaw_knob_control(
+        self.glitch_time_knob = knob_control(
             f_knob_size, _("Time"), TRIGGERFX_GLITCH_TIME,
             self.plugin_rel_callback, self.plugin_val_callback,
             1, 25, 10, KC_TIME_DECIMAL, self.port_dict, self.preset_manager)
         self.glitch_time_knob.add_to_grid_layout(self.glitch_gridlayout, 9)
-        self.glitch_pb_knob = pydaw_knob_control(
+        self.glitch_pb_knob = knob_control(
             f_knob_size, _("Pitchbend"), TRIGGERFX_GLITCH_PB,
             self.plugin_rel_callback, self.plugin_val_callback,
             0, 36, 0, KC_INTEGER, self.port_dict, self.preset_manager)

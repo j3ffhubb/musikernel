@@ -5,7 +5,7 @@ from sgui.lib.translate import _
 from sgui.sgqt import *
 
 
-class pydaw_tempo_marker(_shared.pydaw_abstract_marker):
+class tempo_marker(_shared.abstract_marker):
     def __init__(self, a_beat, a_tempo, a_tsig_num, a_tsig_den):
         self.type = 2
         self.beat = int(a_beat)
@@ -29,5 +29,5 @@ class pydaw_tempo_marker(_shared.pydaw_abstract_marker):
 
     @staticmethod
     def from_str(self, a_str):
-        return _shared.pydaw_sequencer_marker(*a_str.split("|"))
+        return _shared.sequencer_marker(*a_str.split("|"))
 

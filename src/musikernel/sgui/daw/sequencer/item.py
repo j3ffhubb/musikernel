@@ -323,7 +323,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             self.stretch_handle.setToolTip("")
 
     def clip_at_region_end(self):
-        f_current_region_length = pydaw_get_current_region_length()
+        f_current_region_length = get_current_region_length()
         f_max_x = f_current_region_length * _shared.SEQUENCER_PX_PER_BEAT
         f_pos_x = self.pos().x()
         f_end = f_pos_x + self.rect().width()
@@ -338,7 +338,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             self.audio_item.sample_end = \
                 ((self.rect().width() + self.length_px_start) /
                 self.length_orig) * 1000.0
-            self.audio_item.sample_end = util.pydaw_clip_value(
+            self.audio_item.sample_end = util.clip_value(
                 self.audio_item.sample_end, 1.0, 1000.0, True)
             self.draw()
             return True
@@ -419,7 +419,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
         a_event.setAccepted(True)
         QGraphicsRectItem.mousePressEvent(self.stretch_handle, a_event)
         f_max_region_pos = (_shared.SEQUENCER_PX_PER_BEAT *
-            pydaw_get_current_region_length())
+            get_current_region_length())
         for f_item in shared.SEQUENCER.audio_items:
             if f_item.isSelected() and \
             f_item.audio_item.time_stretch_mode >= 2:
@@ -616,7 +616,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             /
             shared.REGION_EDITOR_TRACK_HEIGHT
         )
-        f_lane_num = pydaw_clip_value(
+        f_lane_num = clip_value(
             f_lane_num,
             0,
             TRACK_COUNT_ALL,
@@ -627,7 +627,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
         return f_lane_num, f_y_pos
 
     def lane_number_to_y_pos(self, a_lane_num):
-        a_lane_num = util.pydaw_clip_value(
+        a_lane_num = util.clip_value(
             a_lane_num, 0, TRACK_COUNT_ALL)
         return (a_lane_num *
             shared.REGION_EDITOR_TRACK_HEIGHT) + _shared.REGION_EDITOR_HEADER_HEIGHT
@@ -674,7 +674,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             for f_item in shared.SEQUENCER.get_selected():
                 f_x = f_item.width_orig + f_event_diff + \
                     f_item.quantize_offset
-                f_x = pydaw_clip_min(f_x, shared.AUDIO_ITEM_HANDLE_SIZE)
+                f_x = clip_min(f_x, shared.AUDIO_ITEM_HANDLE_SIZE)
                 f_x = f_item.quantize(f_x)
                 f_x -= f_item.quantize_offset
                 f_item.length_handle.setPos(
@@ -684,10 +684,10 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             for f_item in shared.SEQUENCER.get_selected():
                 f_x = f_item.width_orig + f_event_diff + \
                     f_item.quantize_offset
-                f_x = pydaw_clip_value(
+                f_x = clip_value(
                     f_x, f_item.sample_start_offset_px,
                     f_item.length_handle.pos().x())
-                f_x = pydaw_clip_min(f_x, f_item.min_start)
+                f_x = clip_min(f_x, f_item.min_start)
                 if f_x > f_item.min_start:
                     f_x = f_item.quantize_start(f_x)
                     f_x -= f_item.quantize_offset
@@ -700,10 +700,10 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
                 f_item.audio_item.time_stretch_mode >= 2:
                     f_x = f_item.width_orig + f_event_diff + \
                         f_item.quantize_offset
-                    f_x = pydaw_clip_value(
+                    f_x = clip_value(
                         f_x, f_item.stretch_width_default * 0.1,
                         f_item.stretch_width_default * 200.0)
-                    f_x = pydaw_clip_max(f_x, f_item.max_stretch)
+                    f_x = clip_max(f_x, f_item.max_stretch)
                     f_x = f_item.quantize(f_x)
                     f_x -= f_item.quantize_offset
                     f_item.stretch_handle.setPos(
@@ -714,19 +714,19 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             QGraphicsRectItem.mouseMoveEvent(self, a_event)
             if _shared.SEQ_QUANTIZE:
                 f_max_x = (
-                    pydaw_get_current_region_length()
+                    get_current_region_length()
                     *
                     _shared.SEQUENCER_PX_PER_BEAT
                 ) - _shared.SEQUENCER_QUANTIZE_PX
             else:
-                f_max_x = (pydaw_get_current_region_length() *
+                f_max_x = (get_current_region_length() *
                     _shared.SEQUENCER_PX_PER_BEAT) - shared.AUDIO_ITEM_HANDLE_SIZE
             f_new_lane, f_ignored = self.y_pos_to_lane_number(
                 a_event.scenePos().y())
             f_lane_offset = f_new_lane - self.audio_item.track_num
             for f_item in shared.SEQUENCER.get_selected():
                 f_pos_x = f_item.pos().x()
-                f_pos_x = pydaw_clip_value(f_pos_x, 0.0, f_max_x)
+                f_pos_x = clip_value(f_pos_x, 0.0, f_max_x)
                 f_pos_y = self.lane_number_to_y_pos(
                     f_lane_offset + f_item.audio_item.track_num)
                 f_pos_x = f_item.quantize_scene(f_pos_x)
@@ -755,11 +755,11 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
             a_event.accept()
         for f_audio_item in shared.SEQUENCER.get_selected():
             f_item = f_audio_item.audio_item
-            f_pos_x = util.pydaw_clip_min(f_audio_item.pos().x(), 0.0)
+            f_pos_x = util.clip_min(f_audio_item.pos().x(), 0.0)
             if f_audio_item.is_resizing:
                 f_x = (f_audio_item.width_orig + f_event_diff +
                     f_audio_item.quantize_offset)
-                f_x = pydaw_clip_min(f_x, shared.AUDIO_ITEM_HANDLE_SIZE)
+                f_x = clip_min(f_x, shared.AUDIO_ITEM_HANDLE_SIZE)
                 f_x = f_audio_item.quantize(f_x)
                 f_x -= f_audio_item.quantize_offset
                 f_audio_item.setRect(
@@ -769,7 +769,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
                 f_did_change = True
             elif f_audio_item.is_start_resizing:
                 f_x = f_audio_item.start_handle.scenePos().x()
-                f_x = pydaw_clip_min(f_x, 0.0)
+                f_x = clip_min(f_x, 0.0)
                 f_x = self.quantize_all(f_x)
                 if f_x < f_audio_item.sample_start_offset_px:
                     f_x = f_audio_item.sample_start_offset_px
@@ -780,7 +780,7 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
                     (f_audio_item.start_handle_scene_max -
                     f_audio_item.start_handle_scene_min)) * \
                     f_item.length_beats
-                f_item.start_offset = pydaw_clip_min(
+                f_item.start_offset = clip_min(
                     f_item.start_offset, 0.0)
                 f_item.length_beats -= f_item.start_beat - f_old_start
             elif f_audio_item.is_stretching and \
@@ -788,10 +788,10 @@ class SequencerItem(widgets.QGraphicsRectItemNDL):
                 f_reset_selection = True
                 f_x = f_audio_item.width_orig + f_event_diff + \
                     f_audio_item.quantize_offset
-                f_x = pydaw_clip_value(
+                f_x = clip_value(
                     f_x, f_audio_item.stretch_width_default * 0.1,
                     f_audio_item.stretch_width_default * 200.0)
-                f_x = pydaw_clip_max(f_x, f_audio_item.max_stretch)
+                f_x = clip_max(f_x, f_audio_item.max_stretch)
                 f_x = f_audio_item.quantize(f_x)
                 f_x -= f_audio_item.quantize_offset
                 f_item.timestretch_amt = \

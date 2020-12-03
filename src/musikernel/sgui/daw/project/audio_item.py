@@ -78,11 +78,11 @@ def envelope_to_automation(self, a_is_cc, a_tempo):
         f_index = int(f_start / 4.0)
         f_start = f_start % 4.0
         if a_is_cc:
-            f_val = pydaw_clip_value(f_point * 127.0, 0.0, 127.0)
-            f_result.append((pydaw_cc(f_start, 0, f_val), f_index))
+            f_val = clip_value(f_point * 127.0, 0.0, 127.0)
+            f_result.append((cc(f_start, 0, f_val), f_index))
         else:
-            f_val = pydaw_clip_value(f_point, 0.0, 1.0)
-            f_result.append((pydaw_pitchbend(f_start, f_val), f_index))
+            f_val = clip_value(f_point, 0.0, 1.0)
+            f_result.append((pitchbend(f_start, f_val), f_index))
     return f_result
 
 def envelope_to_notes(self, a_tempo):
@@ -101,7 +101,7 @@ def envelope_to_notes(self, a_tempo):
     f_max = numpy.amax(f_arr)
     if f_max > 0.0:
         f_arr *= (1.0 / f_max)
-    f_thresh = pydaw_db_to_lin(-24.0)
+    f_thresh = db_to_lin(-24.0)
     f_has_been_less = False
 
     for f_point, f_pos in zip(f_arr, range(f_arr.shape[0])):
@@ -132,9 +132,9 @@ def envelope_to_notes(self, a_tempo):
     for f_pair in f_result:
         f_index = int(f_pair[0] / 4.0)
         f_start = f_pair[0] % 4.0
-        f_vel = pydaw_clip_value((f_pair[2] * 70.0) + 40.0, 1.0, 127.0)
+        f_vel = clip_value((f_pair[2] * 70.0) + 40.0, 1.0, 127.0)
         f_result2.append(
-            (str(pydaw_note(f_start, f_pair[1], 60, f_vel)), f_index))
+            (str(note(f_start, f_pair[1], 60, f_vel)), f_index))
     return f_result2
 
 

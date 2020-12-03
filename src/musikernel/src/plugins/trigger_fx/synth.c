@@ -118,7 +118,7 @@ static PYFX_Handle g_triggerfx_instantiate(PYFX_Descriptor * descriptor,
     plugin_data->mono_modules =
         v_triggerfx_mono_init(plugin_data->fs, plugin_data->plugin_uid);
 
-    plugin_data->port_table = g_pydaw_get_port_table(
+    plugin_data->port_table = g_get_port_table(
         (void**)plugin_data, descriptor);
 
     v_cc_map_init(&plugin_data->cc_map);
@@ -130,7 +130,7 @@ static void v_triggerfx_load(PYFX_Handle instance,
         PYFX_Descriptor * Descriptor, char * a_file_path)
 {
     t_triggerfx *plugin_data = (t_triggerfx*)instance;
-    pydaw_generic_file_loader(instance, Descriptor,
+    generic_file_loader(instance, Descriptor,
         a_file_path, plugin_data->port_table, &plugin_data->cc_map);
 }
 
@@ -165,7 +165,7 @@ static inline void v_triggerfx_run_glitch(t_triggerfx *plugin_data,
 }
 
 static void v_triggerfx_process_midi_event(
-    t_triggerfx * plugin_data, t_pydaw_seq_event * a_event)
+    t_triggerfx * plugin_data, t_seq_event * a_event)
 {
     int f_gate_note = (int)*plugin_data->gate_note;
     int f_glitch_note = (int)*plugin_data->glitch_note;
@@ -255,7 +255,7 @@ static void v_triggerfx_run(
 {
     t_triggerfx *plugin_data = (t_triggerfx*)instance;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
+    t_seq_event **events = (t_seq_event**)midi_events->data;
     int event_count = midi_events->len;
 
     int f_i = 0;
@@ -272,10 +272,10 @@ static void v_triggerfx_run(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    t_pydaw_seq_event * ev_tmp;
+    t_seq_event * ev_tmp;
     for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
-        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
+        ev_tmp = (t_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
             &plugin_data->atm_queue, ev_tmp->type,
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
@@ -381,17 +381,17 @@ static void v_triggerfx_run(
 
 PYFX_Descriptor *triggerfx_PYFX_descriptor()
 {
-    PYFX_Descriptor *f_result = pydaw_get_pyfx_descriptor(TRIGGERFX_COUNT);
+    PYFX_Descriptor *f_result = get_pyfx_descriptor(TRIGGERFX_COUNT);
 
-    pydaw_set_pyfx_port(f_result, TRIGGERFX_GATE_NOTE, 120.0f, 0.0f, 120.0f);
-    pydaw_set_pyfx_port(f_result, TRIGGERFX_GATE_MODE, 0.0f, 0.0f, 2.0f);
-    pydaw_set_pyfx_port(f_result, TRIGGERFX_GATE_WET, 0.0f, 0.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, TRIGGERFX_GATE_PITCH, 60.0f, 20.0f, 120.0f);
+    set_pyfx_port(f_result, TRIGGERFX_GATE_NOTE, 120.0f, 0.0f, 120.0f);
+    set_pyfx_port(f_result, TRIGGERFX_GATE_MODE, 0.0f, 0.0f, 2.0f);
+    set_pyfx_port(f_result, TRIGGERFX_GATE_WET, 0.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, TRIGGERFX_GATE_PITCH, 60.0f, 20.0f, 120.0f);
 
-    pydaw_set_pyfx_port(f_result, TRIGGERFX_GLITCH_ON, 0.0f, 0.0f, 1.0f);
-    pydaw_set_pyfx_port(f_result, TRIGGERFX_GLITCH_NOTE, 120.0f, 0.0f, 120.0f);
-    pydaw_set_pyfx_port(f_result, TRIGGERFX_GLITCH_TIME, 10.0f, 1.0f, 25.0f);
-    pydaw_set_pyfx_port(f_result, TRIGGERFX_GLITCH_PB, 0.0f, 0.0f, 36.0f);
+    set_pyfx_port(f_result, TRIGGERFX_GLITCH_ON, 0.0f, 0.0f, 1.0f);
+    set_pyfx_port(f_result, TRIGGERFX_GLITCH_NOTE, 120.0f, 0.0f, 120.0f);
+    set_pyfx_port(f_result, TRIGGERFX_GLITCH_TIME, 10.0f, 1.0f, 25.0f);
+    set_pyfx_port(f_result, TRIGGERFX_GLITCH_PB, 0.0f, 0.0f, 36.0f);
 
     f_result->cleanup = v_triggerfx_cleanup;
     f_result->connect_port = v_triggerfx_connect_port;

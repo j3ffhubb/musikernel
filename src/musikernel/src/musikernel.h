@@ -197,7 +197,7 @@ typedef struct
 {
     int thread_num;
     int stack_size;
-}t_pydaw_thread_args;
+}t_thread_args;
 
 typedef struct
 {
@@ -211,7 +211,7 @@ typedef struct
     int solo;
     int mute;
     int period_event_index;
-    t_pydaw_plugin * plugins[MAX_PLUGIN_TOTAL_COUNT];
+    t_plugin * plugins[MAX_PLUGIN_TOTAL_COUNT];
     int track_num;
     t_pkm_peak_meter * peak_meter;
     MKFLT ** buffers;
@@ -228,8 +228,8 @@ typedef struct
     char * osc_cursor_message;
     int * extern_midi_count;
     t_midi_device * midi_device;
-    t_pydaw_seq_event * extern_midi;
-    t_pydaw_seq_event event_buffer[PYDAW_MAX_EVENT_BUFFER_SIZE];
+    t_seq_event * extern_midi;
+    t_seq_event event_buffer[PYDAW_MAX_EVENT_BUFFER_SIZE];
     struct ShdsList * event_list;
 }t_pytrack;
 
@@ -271,7 +271,7 @@ typedef struct
     int is_offline_rendering;
     //set from the audio device buffer size every time the main loop is called.
     t_wav_pool_item * preview_wav_item;
-    t_pydaw_audio_item * preview_audio_item;
+    t_audio_item * preview_audio_item;
     MKFLT preview_start; //0.0f to 1.0f
     int is_previewing;  //Set this to self->ab_mode on playback
     MKFLT preview_amp_lin;
@@ -296,7 +296,7 @@ typedef struct
     pthread_spinlock_t ui_spinlock;
     t_midi_device_list * midi_devices;
     int midi_learn;
-    t_pydaw_plugin plugin_pool[MAX_PLUGIN_POOL_COUNT];
+    t_plugin plugin_pool[MAX_PLUGIN_POOL_COUNT];
     char * project_folder;
     char * audio_folder;
     char * audio_tmp_folder;
@@ -311,7 +311,7 @@ typedef struct
 {
     int output_track;
     int on;
-}t_pydaw_midi_routing;
+}t_midi_routing;
 
 #define ROUTE_TYPE_AUDIO 0
 #define ROUTE_TYPE_SIDECHAIN 1
@@ -329,17 +329,17 @@ typedef struct
 
 void g_musikernel_get(MKFLT, t_midi_device_list*);
 t_pytrack * g_pytrack_get(int, MKFLT);
-inline void v_pydaw_zero_buffer(MKFLT**, int);
-double v_pydaw_print_benchmark(char * a_message,
+inline void v_zero_buffer(MKFLT**, int);
+double v_print_benchmark(char * a_message,
         struct timespec a_start, struct timespec a_finish);
-void * v_pydaw_audio_recording_thread(void* a_arg);
+void * v_audio_recording_thread(void* a_arg);
 void v_queue_osc_message(char*, char*);
-void v_pydaw_set_plugin_index(t_pytrack*, int, int, int, int, int);
+void v_set_plugin_index(t_pytrack*, int, int, int, int, int);
 
 t_pytrack_routing * g_pytrack_routing_get();
 void v_pytrack_routing_set(t_pytrack_routing *, int, int);
 void v_pytrack_routing_free(t_pytrack_routing *);
-void v_pydaw_set_host(int);
+void v_set_host(int);
 
 void v_mk_set_tempo(t_mk_seq_event_list*, MKFLT);
 
@@ -419,7 +419,7 @@ void v_create_sample_graph(t_wav_pool_item * self)
     snprintf(str_buff, 2048, "%s/%i",
         musikernel->samplegraph_folder, self->uid);
 
-    if(i_pydaw_file_exists(str_buff))
+    if(i_file_exists(str_buff))
     {
         return;
     }
@@ -771,7 +771,7 @@ void v_sample_period_split(
     }
 }
 
-void pydaw_osc_error(int num, const char *msg, const char *path)
+void osc_error(int num, const char *msg, const char *path)
 {
     fprintf(
         stderr,
@@ -801,7 +801,7 @@ void g_musikernel_get(MKFLT a_sr, t_midi_device_list * a_midi_devices)
     musikernel->plugins_folder = (char*)malloc(sizeof(char) * 1024);
 
     musikernel->preview_wav_item = 0;
-    musikernel->preview_audio_item = g_pydaw_audio_item_get(a_sr);
+    musikernel->preview_audio_item = g_audio_item_get(a_sr);
     musikernel->preview_start = 0.0f;
     musikernel->preview_amp_lin = 1.0f;
     musikernel->is_previewing = 0;
@@ -837,7 +837,7 @@ void g_musikernel_get(MKFLT a_sr, t_midi_device_list * a_midi_devices)
     musikernel->osc_cursor_message = (char*)malloc(sizeof(char) * 1024);
 
 #ifdef WITH_LIBLO
-    musikernel->serverThread = lo_server_thread_new(NULL, pydaw_osc_error);
+    musikernel->serverThread = lo_server_thread_new(NULL, osc_error);
     musikernel->uiTarget = lo_address_new_from_url(
         "osc.udp://localhost:30321/"
     );
@@ -848,7 +848,7 @@ void g_musikernel_get(MKFLT a_sr, t_midi_device_list * a_midi_devices)
     }
 }
 
-void v_pydaw_set_control_from_atm(t_pydaw_seq_event *event,
+void v_set_control_from_atm(t_seq_event *event,
         int a_plugin_uid, t_pytrack * f_track)
 {
     if(!musikernel->is_offline_rendering)
@@ -860,8 +860,8 @@ void v_pydaw_set_control_from_atm(t_pydaw_seq_event *event,
     }
 }
 
-void v_pydaw_set_control_from_cc(
-    t_pydaw_seq_event* event,
+void v_set_control_from_cc(
+    t_seq_event* event,
     t_pytrack* f_track
 ){
     if(!musikernel->is_offline_rendering){
@@ -909,7 +909,7 @@ void v_queue_osc_message(
     }
 }
 
-void v_pydaw_set_host(int a_mode)
+void v_set_host(int a_mode)
 {
     int f_i;
 
@@ -948,7 +948,7 @@ void v_pydaw_set_host(int a_mode)
 }
 
 #ifdef WITH_LIBLO
-void v_pydaw_activate_osc_thread(lo_method_handler osc_message_handler)
+void v_activate_osc_thread(lo_method_handler osc_message_handler)
 {
     lo_server_thread_add_method(musikernel->serverThread, NULL, NULL,
             osc_message_handler, NULL);
@@ -959,7 +959,7 @@ void v_pydaw_activate_osc_thread(lo_method_handler osc_message_handler)
 #ifdef __linux__
 /* Create a clock_t with clock() when beginning some work,
  * and use this function to print the completion time*/
-inline double v_pydaw_print_benchmark(char * a_message,
+inline double v_print_benchmark(char * a_message,
     struct timespec f_start, struct timespec f_finish)
 {
     double elapsed;
@@ -972,7 +972,7 @@ inline double v_pydaw_print_benchmark(char * a_message,
 }
 #endif
 
-inline void v_pydaw_zero_buffer(MKFLT ** a_buffers, int a_count)
+inline void v_zero_buffer(MKFLT ** a_buffers, int a_count)
 {
     register int f_i2 = 0;
 
@@ -984,7 +984,7 @@ inline void v_pydaw_zero_buffer(MKFLT ** a_buffers, int a_count)
     }
 }
 
-void v_pydaw_open_track(
+void v_open_track(
     t_pytrack* a_track,
     char* a_tracks_folder,
     int a_index
@@ -993,7 +993,7 @@ void v_pydaw_open_track(
 
     sprintf(f_file_name, "%s%s%i", a_tracks_folder, PATH_SEP, a_index);
 
-    if(i_pydaw_file_exists(f_file_name)){
+    if(i_file_exists(f_file_name)){
         t_2d_char_array * f_2d_array = g_get_2d_array_from_file(
             f_file_name,
             PYDAW_LARGE_STRING
@@ -1019,7 +1019,7 @@ void v_pydaw_open_track(
                 v_iterate_2d_char_array(f_2d_array);
                 int f_power = atoi(f_2d_array->current_str);
 
-                v_pydaw_set_plugin_index(
+                v_set_plugin_index(
                     a_track,
                     f_index,
                     f_plugin_index,
@@ -1041,7 +1041,7 @@ void v_pydaw_open_track(
         int f_i;
         for(f_i = 0; f_i < MAX_PLUGIN_COUNT; ++f_i)
         {
-            v_pydaw_set_plugin_index(a_track, f_i, 0, -1, 0, 0);
+            v_set_plugin_index(a_track, f_i, 0, -1, 0, 0);
         }
     }
 }
@@ -1078,8 +1078,8 @@ t_pytrack * g_pytrack_get(int a_track_num, MKFLT a_sr)
         );
     }
 
-    v_pydaw_zero_buffer(f_result->buffers, FRAMES_PER_BUFFER);
-    v_pydaw_zero_buffer(f_result->sc_buffers, FRAMES_PER_BUFFER);
+    v_zero_buffer(f_result->buffers, FRAMES_PER_BUFFER);
+    v_zero_buffer(f_result->sc_buffers, FRAMES_PER_BUFFER);
 
     f_result->mute = 0;
     f_result->solo = 0;
@@ -1087,7 +1087,7 @@ t_pytrack * g_pytrack_get(int a_track_num, MKFLT a_sr)
     f_result->bus_counter = 0;
 
     for(f_i = 0; f_i < PYDAW_MAX_EVENT_BUFFER_SIZE; ++f_i){
-        v_pydaw_ev_clear(&f_result->event_buffer[f_i]);
+        v_ev_clear(&f_result->event_buffer[f_i]);
     }
 
     for(f_i = 0; f_i < MAX_PLUGIN_TOTAL_COUNT; ++f_i)
@@ -1114,7 +1114,7 @@ t_pytrack * g_pytrack_get(int a_track_num, MKFLT a_sr)
     return f_result;
 }
 
-void v_pydaw_set_preview_file(const char * a_file)
+void v_set_preview_file(const char * a_file)
 {
     t_wav_pool_item * f_result = g_wav_pool_item_get(
         0,
@@ -1151,7 +1151,7 @@ void v_pydaw_set_preview_file(const char * a_file)
         } else {
             printf(
                 "i_wav_pool_item_load(f_result) failed in "
-                "v_pydaw_set_preview_file\n"
+                "v_set_preview_file\n"
             );
         }
     } else {
@@ -1233,7 +1233,7 @@ void v_stop_record_audio()
 
             rename(f_file_name_old, f_file_name_new);
 
-            v_pydaw_audio_input_record_set(
+            v_audio_input_record_set(
                 &musikernel->audio_inputs[f_i],
                 f_file_name_old
             );
@@ -1245,7 +1245,7 @@ void v_stop_record_audio()
     printf("Finished stopping recording, shutdown is no longer inhibited.\n");
 }
 
-void * v_pydaw_audio_recording_thread(void* a_arg)
+void * v_audio_recording_thread(void* a_arg)
 {
     t_pyaudio_input * f_ai;
     int f_count;
@@ -1439,7 +1439,7 @@ void v_audio_input_run(
     }
 }
 
-void v_pydaw_update_audio_inputs(char * a_project_folder)
+void v_update_audio_inputs(char * a_project_folder)
 {
     char f_inputs_file[2048];
     char f_tmp_file_name[2048];
@@ -1447,7 +1447,7 @@ void v_pydaw_update_audio_inputs(char * a_project_folder)
     t_pyaudio_input * f_ai;
     sprintf(f_inputs_file, "%s%sinput.txt", a_project_folder, PATH_SEP);
 
-    if(a_project_folder && i_pydaw_file_exists(f_inputs_file))
+    if(a_project_folder && i_file_exists(f_inputs_file))
     {
         int f_i;
         t_2d_char_array * f_2d_array = g_get_2d_array_from_file(
@@ -1509,7 +1509,7 @@ void v_pydaw_update_audio_inputs(char * a_project_folder)
             sprintf(f_tmp_file_name, "%s%i",
                 musikernel->audio_tmp_folder, f_index);
 
-            v_pydaw_audio_input_record_set(f_ai, f_tmp_file_name);
+            v_audio_input_record_set(f_ai, f_tmp_file_name);
         }
 
         pthread_mutex_unlock(&musikernel->audio_inputs_mutex);
@@ -1535,7 +1535,7 @@ void v_pydaw_update_audio_inputs(char * a_project_folder)
             sprintf(f_tmp_file_name, "%s%i",
                 musikernel->audio_tmp_folder, f_i);
 
-            v_pydaw_audio_input_record_set(f_ai, f_tmp_file_name);
+            v_audio_input_record_set(f_ai, f_tmp_file_name);
         }
         pthread_mutex_unlock(&musikernel->audio_inputs_mutex);
     }
@@ -1546,7 +1546,7 @@ inline double f_bpm_to_seconds_per_beat(double a_tempo)
     return (60.0f / a_tempo);
 }
 
-inline double f_pydaw_samples_to_beat_count(int a_sample_count, double a_tempo,
+inline double f_samples_to_beat_count(int a_sample_count, double a_tempo,
         MKFLT a_sr)
 {
     double f_seconds_per_beat = f_bpm_to_seconds_per_beat(a_tempo);
@@ -1587,7 +1587,7 @@ void v_wait_for_threads()
 }
 
 void g_pynote_init(
-    t_pydaw_seq_event* f_result,
+    t_seq_event* f_result,
     int a_note,
     int a_vel,
     MKFLT a_start,
@@ -1600,16 +1600,16 @@ void g_pynote_init(
     f_result->velocity = a_vel;
 }
 
-t_pydaw_seq_event * g_pynote_get(int a_note, int a_vel,
+t_seq_event * g_pynote_get(int a_note, int a_vel,
         MKFLT a_start, MKFLT a_length)
 {
-    t_pydaw_seq_event * f_result =
-        (t_pydaw_seq_event*)malloc(sizeof(t_pydaw_seq_event));
+    t_seq_event * f_result =
+        (t_seq_event*)malloc(sizeof(t_seq_event));
     g_pynote_init(f_result, a_note, a_vel, a_start, a_length);
     return f_result;
 }
 
-void g_pycc_init(t_pydaw_seq_event * f_result, int a_cc_num,
+void g_pycc_init(t_seq_event * f_result, int a_cc_num,
     MKFLT a_cc_val, MKFLT a_start)
 {
     f_result->type = PYDAW_EVENT_CONTROLLER;
@@ -1618,15 +1618,15 @@ void g_pycc_init(t_pydaw_seq_event * f_result, int a_cc_num,
     f_result->start = a_start;
 }
 
-t_pydaw_seq_event * g_pycc_get(int a_cc_num, MKFLT a_cc_val, MKFLT a_start)
+t_seq_event * g_pycc_get(int a_cc_num, MKFLT a_cc_val, MKFLT a_start)
 {
-    t_pydaw_seq_event * f_result =
-        (t_pydaw_seq_event*)malloc(sizeof(t_pydaw_seq_event));
+    t_seq_event * f_result =
+        (t_seq_event*)malloc(sizeof(t_seq_event));
     g_pycc_init(f_result, a_cc_num, a_cc_val, a_start);
     return f_result;
 }
 
-void g_pypitchbend_init(t_pydaw_seq_event * f_result, MKFLT a_start,
+void g_pypitchbend_init(t_seq_event * f_result, MKFLT a_start,
     MKFLT a_value)
 {
     f_result->type = PYDAW_EVENT_PITCHBEND;
@@ -1634,10 +1634,10 @@ void g_pypitchbend_init(t_pydaw_seq_event * f_result, MKFLT a_start,
     f_result->value = a_value;
 }
 
-t_pydaw_seq_event * g_pypitchbend_get(MKFLT a_start, MKFLT a_value)
+t_seq_event * g_pypitchbend_get(MKFLT a_start, MKFLT a_value)
 {
-    t_pydaw_seq_event * f_result =
-        (t_pydaw_seq_event*)malloc(sizeof(t_pydaw_seq_event));
+    t_seq_event * f_result =
+        (t_seq_event*)malloc(sizeof(t_seq_event));
     g_pypitchbend_init(f_result, a_start, a_value);
     return f_result;
 }
@@ -1662,7 +1662,7 @@ void v_sample_period_set_atm_events(t_sample_period * self,
 
         self->atm_ticks[self->atm_tick_count].beat =
             self->start_beat +
-            f_pydaw_samples_to_beat_count(
+            f_samples_to_beat_count(
                 self->atm_ticks[self->atm_tick_count].sample + 1, // round up
                 a_event_list->tempo,
                 musikernel->thread_storage[0].sample_rate);
@@ -2001,7 +2001,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
         int f_port = atoi(f_val_arr->array[1]);
         MKFLT f_value = atof(f_val_arr->array[2]);
 
-        t_pydaw_plugin * f_instance;
+        t_plugin * f_instance;
         pthread_spin_lock(&musikernel->main_lock);
 
         f_instance = &musikernel->plugin_pool[f_plugin_uid];
@@ -2026,7 +2026,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
         char * f_key = f_val_arr->array[1];
         char * f_message = f_val_arr->array[2];
 
-        t_pydaw_plugin * f_instance = &musikernel->plugin_pool[f_plugin_uid];
+        t_plugin * f_instance = &musikernel->plugin_pool[f_plugin_uid];
 
         if(f_instance)
         {
@@ -2099,7 +2099,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
     }
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_PREVIEW_SAMPLE))
     {
-        v_pydaw_set_preview_file(a_value);
+        v_set_preview_file(a_value);
     }
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_STOP_PREVIEW))
     {
@@ -2127,7 +2127,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
         v_iterate_2d_char_array(f_arr);
         MKFLT f_end = atof(f_arr->current_str);
 
-        v_pydaw_rate_envelope(f_in_file, f_out_file, f_start, f_end);
+        v_rate_envelope(f_in_file, f_out_file, f_start, f_end);
 
         free(f_in_file);
         free(f_out_file);
@@ -2138,7 +2138,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_LOAD_AB_SET))
     {
         int f_mode = atoi(a_value);
-        v_pydaw_set_host(f_mode);
+        v_set_host(f_mode);
     }
     else if(!strcmp(a_key, MK_CONFIGURE_KEY_ENGINE))
     {
@@ -2165,7 +2165,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
         v_iterate_2d_char_array(f_arr);
         MKFLT f_end = atof(f_arr->current_str);
 
-        v_pydaw_pitch_envelope(f_in_file, f_out_file, f_start, f_end);
+        v_pitch_envelope(f_in_file, f_out_file, f_start, f_end);
 
         free(f_in_file);
         free(f_out_file);
@@ -2234,7 +2234,7 @@ void v_mk_configure(const char* a_key, const char* a_value)
 
 
 /*Function for passing to plugins that re-use the wav pool*/
-t_wav_pool_item * g_pydaw_wavpool_item_get(int a_uid)
+t_wav_pool_item * g_wavpool_item_get(int a_uid)
 {
     return g_wav_pool_get_item_by_uid(musikernel->wav_pool, a_uid);
 }
@@ -2243,12 +2243,12 @@ t_wav_pool_item * g_pydaw_wavpool_item_get(int a_uid)
 /* Disable the optimizer for this function because it causes a
  * SEGFAULT on ARM (which could not be reproduced on x86)
  * This is not a performance-critical function. */
-NO_OPTIMIZATION void v_pydaw_set_plugin_index(
+NO_OPTIMIZATION void v_set_plugin_index(
         t_pytrack * f_track, int a_index, int a_plugin_index, int a_plugin_uid,
         int a_power, int a_lock)
 {
     int f_i = 0;
-    t_pydaw_plugin * f_plugin = NULL;
+    t_plugin * f_plugin = NULL;
 
     if(a_plugin_index)
     {
@@ -2256,16 +2256,16 @@ NO_OPTIMIZATION void v_pydaw_set_plugin_index(
 
         if(!f_plugin->active)
         {
-            g_pydaw_plugin_init(
+            g_plugin_init(
                 f_plugin, (int)(musikernel->thread_storage[0].sample_rate),
-                a_plugin_index, g_pydaw_wavpool_item_get,
+                a_plugin_index, g_wavpool_item_get,
                 a_plugin_uid, v_queue_osc_message);
 
             char f_file_name[1024];
             snprintf(f_file_name, 1024, "%s%i",
                 musikernel->plugins_folder, a_plugin_uid);
 
-            if(i_pydaw_file_exists(f_file_name))
+            if(i_file_exists(f_file_name))
             {
                 f_plugin->descriptor->load(f_plugin->PYFX_handle,
                     f_plugin->descriptor, f_file_name);

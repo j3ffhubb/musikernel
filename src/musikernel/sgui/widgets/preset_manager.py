@@ -10,7 +10,7 @@ BM_FILE_DIALOG_STRING = 'MusiKernel Bookmarks (*.pybm4)'
 PLUGIN_SETTINGS_CLIPBOARD = {}
 PLUGIN_CONFIGURE_CLIPBOARD = None
 
-class pydaw_preset_manager_widget:
+class preset_manager_widget:
     def __init__(
         self,
         a_plugin_name,
@@ -132,7 +132,7 @@ class pydaw_preset_manager_widget:
             self.bank_dir,
             "{}.mkp".format(self.bank_combobox.currentText())
         )
-        util.pydaw_write_file_text(
+        util.write_file_text(
             self.bank_file,
             self.preset_path,
         )
@@ -141,7 +141,7 @@ class pydaw_preset_manager_widget:
     def load_default_preset_path(self):
         self.preset_path = self.user_factory_presets
         if os.path.isfile(self.bank_file):
-            f_text = util.pydaw_read_file_text(self.bank_file)
+            f_text = util.read_file_text(self.bank_file)
             if os.path.isfile(f_text):
                 LOG.info("Setting self.preset_path to {}".format(f_text))
                 self.preset_path = f_text
@@ -189,7 +189,7 @@ class pydaw_preset_manager_widget:
 
     def on_save_as(self, a_new=False):
         def ok_handler():
-            f_name = util.pydaw_remove_bad_chars(f_lineedit.text())
+            f_name = util.remove_bad_chars(f_lineedit.text())
             f_file = os.path.join(self.bank_dir, f_name)
             if not f_file.endswith(".mkp"):
                 f_file += ".mkp"
@@ -199,12 +199,12 @@ class pydaw_preset_manager_widget:
                     _("This bank name already exists"))
                 return
             if a_new:
-                util.pydaw_write_file_text(
+                util.write_file_text(
                     f_file, "\n".join([self.plugin_name]))
             else:
                 shutil.copy(self.preset_path, f_file)
             self.preset_path = f_file
-            util.pydaw_write_file_text(self.bank_file, self.preset_path)
+            util.write_file_text(self.bank_file, self.preset_path)
             self.load_banks()
             self.program_combobox.setCurrentIndex(
                 self.program_combobox.findText(f_name))
@@ -235,7 +235,7 @@ class pydaw_preset_manager_widget:
         if not f_file is None and not str(f_file) == "":
             f_file = str(f_file)
             self.preset_path = f_file
-            util.pydaw_write_file_text(self.bank_file, self.preset_path)
+            util.write_file_text(self.bank_file, self.preset_path)
             self.program_combobox.setCurrentIndex(0)
             self.load_presets()
 
@@ -255,10 +255,10 @@ class pydaw_preset_manager_widget:
     def load_presets(self):
         if os.path.isfile(self.preset_path):
             LOG.info("loading presets from file {}".format(self.preset_path))
-            f_text = util.pydaw_read_file_text(self.preset_path)
+            f_text = util.read_file_text(self.preset_path)
         else:
             LOG.info("loading factory presets")
-            f_text = util.pydaw_read_file_text(
+            f_text = util.read_file_text(
                 self.user_factory_presets)
         f_line_arr = f_text.split("\n")
 
@@ -315,7 +315,7 @@ class pydaw_preset_manager_widget:
         f_presets = "\n".join("|".join([x] + self.presets_delimited[x])
             for x in sorted(self.presets_delimited, key=lambda s: s.lower()))
         f_result = "{}\n{}".format(self.plugin_name, f_presets)
-        util.pydaw_write_file_text(self.preset_path, f_result)
+        util.write_file_text(self.preset_path, f_result)
         self.load_presets()
 
     def program_changed(self, a_val=None):

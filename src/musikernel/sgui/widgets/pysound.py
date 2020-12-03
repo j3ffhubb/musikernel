@@ -3,7 +3,7 @@ from sgui.sgqt import *
 import os
 
 
-PYSOUND_FOLDER = os.path.join(util.global_pydaw_home, "presets")
+PYSOUND_FOLDER = os.path.join(util.global_home, "presets")
 
 class pysound_file:
     """ Pre-production, work in progress... """

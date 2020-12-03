@@ -4,7 +4,7 @@ from sgui.daw.osc import DawOsc
 from sgui.glbl.mk_project import *
 from sgui.lib import history
 from sgui.lib.util import *
-from sgui.widgets import pydaw_modulex_settings
+from sgui.widgets import modulex_settings
 from sgui.lib.translate import _
 from sgui.sgqt import *
 import numpy
@@ -14,16 +14,16 @@ import traceback
 
 TRACK_COUNT_ALL = 32
 #Anything smaller gets deleted when doing a transform
-pydaw_min_note_length = 4.0 / 129.0
+min_note_length = 4.0 / 129.0
 
-class pydaw_abstract_marker:
+class abstract_marker:
     def __lt__(self, other):
         if self.beat == other.beat:
             return self.type < other.type
         else:
             return self.beat < other.beat
 
-class pydaw_sequencer_marker(pydaw_abstract_marker):
+class sequencer_marker(abstract_marker):
     def __init__(self, a_beat, a_text):
         self.type = 3
         self.beat = int(a_beat)
@@ -37,5 +37,5 @@ class pydaw_sequencer_marker(pydaw_abstract_marker):
 
     @staticmethod
     def from_str(self, a_str):
-        return pydaw_sequencer_marker(*a_str.split("|", 1))
+        return sequencer_marker(*a_str.split("|", 1))
 

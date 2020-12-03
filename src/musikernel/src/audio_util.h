@@ -35,7 +35,7 @@ extern "C" {
 
 /*For time(affecting pitch) time stretching...  Since this is done
  offline anyways, it's not super optimized... */
-void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
+void v_rate_envelope(char * a_file_in, char * a_file_out,
         MKFLT a_start_rate, MKFLT a_end_rate)
 {
     SF_INFO info;
@@ -174,7 +174,7 @@ void v_pydaw_rate_envelope(char * a_file_in, char * a_file_out,
 
 /*For pitch(affecting time) pitch shifting...  Since this is done
  offline anyways, it's not super optimized... */
-void v_pydaw_pitch_envelope(char * a_file_in, char * a_file_out,
+void v_pitch_envelope(char * a_file_in, char * a_file_out,
         MKFLT a_start_pitch, MKFLT a_end_pitch)
 {
     SF_INFO info;

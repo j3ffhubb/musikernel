@@ -147,7 +147,7 @@ def transform_atm_callback(a_add, a_mul):
         shared.SEQUENCER.atm_selected_vals,
     ):
         f_val = (f_val * a_mul) + a_add
-        f_val = util.pydaw_clip_value(f_val, 0.0, 127.0, True)
+        f_val = util.clip_value(f_val, 0.0, 127.0, True)
         f_point.item.cc_val = f_val
         f_point.setPos(
             shared.SEQUENCER.get_pos_from_point(f_point.item),
@@ -241,7 +241,7 @@ def lfo_atm_callback(
                 (f_pos - a_end_fade) / (1.0 - a_end_fade))
 
         f_val = (math.sin(a_phase) * f_amp) + f_center
-        f_val = util.pydaw_clip_value(f_val, 0.0, 127.0, True)
+        f_val = util.clip_value(f_val, 0.0, 127.0, True)
         f_point.item.cc_val = f_val
         f_point.setPos(shared.SEQUENCER.get_pos_from_point(f_point.item))
 

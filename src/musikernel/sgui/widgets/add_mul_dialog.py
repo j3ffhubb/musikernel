@@ -1,5 +1,5 @@
 from sgui.sgqt import *
-from .playback_widget import pydaw_playback_widget
+from .playback_widget import playback_widget
 
 
 def add_mul_dialog(a_update_callback, a_save_callback):
@@ -63,7 +63,7 @@ def add_mul_dialog(a_update_callback, a_save_callback):
     f_mul_label.setFixedWidth(100)
     f_layout.addWidget(f_mul_label, 1, 2)
 
-    f_playback_widget = pydaw_playback_widget()
+    f_playback_widget = playback_widget()
     f_layout.addWidget(f_playback_widget.play_button, 0, 30, 2, 1)
     f_layout.addWidget(f_playback_widget.stop_button, 0, 31, 2, 1)
 

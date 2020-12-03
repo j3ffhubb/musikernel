@@ -1,7 +1,7 @@
 from sgui.lib import util
 
 
-class pydaw_modulex_settings:
+class modulex_settings:
     def __init__(self, a_knob0, a_knob1, a_knob2, a_type):
         self.knobs = []
         self.knobs.append(int(a_knob0))

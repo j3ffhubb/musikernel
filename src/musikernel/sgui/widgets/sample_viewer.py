@@ -15,7 +15,7 @@ def global_set_audio_loop_clipboard(a_ls, a_le):
     AUDIO_LOOP_CLIPBOARD = (float(a_ls), float(a_le))
 
 
-class pydaw_sample_viewer_widget(pydaw_audio_item_viewer_widget):
+class sample_viewer_widget(audio_item_viewer_widget):
     def __init__(
         self,
         a_start_callback,
@@ -25,7 +25,7 @@ class pydaw_sample_viewer_widget(pydaw_audio_item_viewer_widget):
         a_fade_in_callback,
         a_fade_out_callback,
     ):
-        pydaw_audio_item_viewer_widget.__init__(
+        audio_item_viewer_widget.__init__(
             self,
             a_start_callback,
             a_end_callback,
@@ -73,16 +73,16 @@ class pydaw_sample_viewer_widget(pydaw_audio_item_viewer_widget):
         a_fade_in,
         a_fade_out,
     ):
-        pydaw_audio_item_viewer_widget.draw_item(
+        audio_item_viewer_widget.draw_item(
             self, a_path_list, a_start, a_end, a_fade_in, a_fade_out)
-        self.loop_start_marker = pydaw_audio_marker_widget(
+        self.loop_start_marker = audio_marker_widget(
             0, a_loop_start, LOOP_PEN, LOOP_GRADIENT, "L",
-            self.graph_object, pydaw_audio_marker_widget.mode_loop,
+            self.graph_object, audio_marker_widget.mode_loop,
             2, self.loop_start_callback)
         self.scene.addItem(self.loop_start_marker)
-        self.loop_end_marker = pydaw_audio_marker_widget(
+        self.loop_end_marker = audio_marker_widget(
             1, a_loop_end, LOOP_PEN, LOOP_GRADIENT, "L",
-            self.graph_object, pydaw_audio_marker_widget.mode_loop,
+            self.graph_object, audio_marker_widget.mode_loop,
             2, self.loop_end_callback)
         self.scene.addItem(self.loop_end_marker)
 

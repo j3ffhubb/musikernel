@@ -3,7 +3,7 @@ from sgui.sgqt import *
 
 NOTE_SELECTOR_CLIPBOARD = None
 
-class pydaw_note_selector_widget:
+class note_selector_widget:
     def __init__(
         self,
         a_port_num,

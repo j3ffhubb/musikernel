@@ -117,7 +117,7 @@ class TransportWidget(glbl.AbstractTransport):
         self.audio_inputs.open_project()
 
     def on_panic(self):
-        shared.PROJECT.IPC.pydaw_panic()
+        shared.PROJECT.IPC.panic()
 
     def set_time(self, a_beat):
         f_text = shared.CURRENT_REGION.get_time_at_beat(a_beat)
@@ -143,7 +143,7 @@ class TransportWidget(glbl.AbstractTransport):
         shared.SEQ_WIDGET.on_play()
         shared.AUDIO_SEQ_WIDGET.on_play()
         shared.SEQUENCER.start_playback()
-        shared.PROJECT.IPC.pydaw_en_playback(
+        shared.PROJECT.IPC.en_playback(
             1,
             shared.SEQUENCER.get_beat_value(),
         )
@@ -151,7 +151,7 @@ class TransportWidget(glbl.AbstractTransport):
         return True
 
     def on_stop(self):
-        shared.PROJECT.IPC.pydaw_en_playback(0)
+        shared.PROJECT.IPC.en_playback(0)
         shared.SEQ_WIDGET.on_stop()
         shared.AUDIO_SEQ_WIDGET.on_stop()
         self.set_controls_enabled(True)
@@ -200,7 +200,7 @@ class TransportWidget(glbl.AbstractTransport):
             f_window.close()
 
         def text_edit_handler(a_val=None):
-            f_file.setText(pydaw_remove_bad_chars(f_file.text()))
+            f_file.setText(remove_bad_chars(f_file.text()))
 
         f_window = QDialog(shared.MAIN_WINDOW)
         f_window.setWindowTitle(_("Save Recorded Files"))
@@ -258,12 +258,12 @@ class TransportWidget(glbl.AbstractTransport):
         else:
             self.rec_start, self.rec_end = f_loop_pos
         self.recording_timestamp = datetime.datetime.now()
-        shared.PROJECT.IPC.pydaw_en_playback(2, self.rec_start)
+        shared.PROJECT.IPC.en_playback(2, self.rec_start)
         return True
 
     def on_loop_mode_changed(self, a_loop_mode):
         if not self.suppress_osc:
-            shared.PROJECT.IPC.pydaw_set_loop_mode(a_loop_mode)
+            shared.PROJECT.IPC.set_loop_mode(a_loop_mode)
 
     def toggle_loop_mode(self):
         f_index = self.loop_mode_combobox.currentIndex() + 1
@@ -272,7 +272,7 @@ class TransportWidget(glbl.AbstractTransport):
         self.loop_mode_combobox.setCurrentIndex(f_index)
 
     def on_overdub_changed(self, a_val=None):
-        shared.PROJECT.IPC.pydaw_set_overdub_mode(
+        shared.PROJECT.IPC.set_overdub_mode(
             self.overdub_checkbox.isChecked())
 
     def reset(self):

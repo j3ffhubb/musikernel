@@ -1,5 +1,5 @@
 
-class pydaw_sequencer_item:
+class sequencer_item:
     def __init__(
         self,
         a_track_num,
@@ -19,7 +19,7 @@ class pydaw_sequencer_item:
 
     def clone(self):
         f_self = str(self).split("|")
-        return pydaw_sequencer_item(*f_self)
+        return sequencer_item(*f_self)
 
     def __str__(self):
         assert self.item_uid >= 0, "Negative UID"

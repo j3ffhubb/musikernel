@@ -67,14 +67,14 @@ typedef struct
     char value[5000];
 }t_key_value_pair;
 
-int i_pydaw_file_exists(char*);
+int i_file_exists(char*);
 
 #ifdef	__cplusplus
 }
 #endif
 
 /*
-void pydaw_write_log(char * a_string)
+void write_log(char * a_string)
 {
     assert(a_string);
     char buff[LMS_LARGE_STRING];
@@ -94,7 +94,7 @@ void get_string_from_file(const char * a_file, int a_size, char * a_buf)
     //char log_buff[200];
     //sprintf(log_buff, "get_string_from_file: a_file: \"%s\" a_size: %i \n",
     //a_file, a_size);
-    //pydaw_write_log(log_buff);
+    //write_log(log_buff);
     FILE * f_file;
     f_file = fopen(a_file, "r");
     if(!f_file)
@@ -410,7 +410,7 @@ typedef struct
     int count;
     char ** str_arr;
     char * str_block;
-}t_pydaw_line_split;
+}t_line_split;
 
 void get_file_setting(char * a_dest, char * a_name, char * a_default)
 {
@@ -428,7 +428,7 @@ void get_file_setting(char * a_dest, char * a_name, char * a_default)
 
     printf("get_file_setting:  %s \n", f_path);
 
-    if(i_pydaw_file_exists(f_path))
+    if(i_file_exists(f_path))
     {
         get_string_from_file(f_path, PYDAW_TINY_STRING, a_dest);
     }
@@ -438,10 +438,10 @@ void get_file_setting(char * a_dest, char * a_name, char * a_default)
     }
 }
 
-t_pydaw_line_split * g_split_line(char a_delimiter, const char * a_str)
+t_line_split * g_split_line(char a_delimiter, const char * a_str)
 {
-    t_pydaw_line_split * f_result =
-            (t_pydaw_line_split*)malloc(sizeof(t_pydaw_line_split));
+    t_line_split * f_result =
+            (t_line_split*)malloc(sizeof(t_line_split));
     f_result->count = 1;
 
     int f_i = 0;
@@ -497,7 +497,7 @@ t_pydaw_line_split * g_split_line(char a_delimiter, const char * a_str)
     return f_result;
 }
 
-void v_free_split_line(t_pydaw_line_split * a_split_line)
+void v_free_split_line(t_line_split * a_split_line)
 {
     free(a_split_line->str_block);
     free(a_split_line->str_arr);
@@ -560,7 +560,7 @@ t_dir_list * g_get_dir_list(char * a_dir)
     return f_result;
 }
 
-void v_pydaw_write_to_file(char * a_file, char * a_string)
+void v_write_to_file(char * a_file, char * a_string)
 {
     FILE* pFile = fopen(a_file, "w");
     assert(pFile);
@@ -576,7 +576,7 @@ void v_pydaw_write_to_file(char * a_file, char * a_string)
     }
 }
 
-void v_pydaw_append_to_file(char * a_file, char * a_string)
+void v_append_to_file(char * a_file, char * a_string)
 {
     FILE* pFile = fopen(a_file, "a");
     assert(pFile);
@@ -584,7 +584,7 @@ void v_pydaw_append_to_file(char * a_file, char * a_string)
     fclose(pFile);
 }
 
-int i_pydaw_file_exists(char * f_file_name)
+int i_file_exists(char * f_file_name)
 {
     struct stat sts;
 

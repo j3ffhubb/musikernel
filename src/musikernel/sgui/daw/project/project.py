@@ -1,9 +1,9 @@
 from . import _shared
 from .atm_region import DawAtmRegion
 from .audio_item import DawAudioItem
-from .item import pydaw_item
-from .seq_item import pydaw_sequencer_item
-from .sequencer import pydaw_sequencer
+from .item import item
+from .seq_item import sequencer_item
+from .sequencer import sequencer
 from sglib.models.daw.routing import MIDIRoutes, RoutingGraph
 from sgui import glbl
 from sgui import plugins as _plugins
@@ -21,22 +21,22 @@ import re
 PIXMAP_BEAT_WIDTH = 48
 PIXMAP_TILE_HEIGHT = 32
 
-pydaw_folder_daw = os.path.join("projects", "daw")
-pydaw_folder_items = os.path.join(pydaw_folder_daw, "items")
-pydaw_folder_tracks = os.path.join(pydaw_folder_daw, "tracks")
+folder_daw = os.path.join("projects", "daw")
+folder_items = os.path.join(folder_daw, "items")
+folder_tracks = os.path.join(folder_daw, "tracks")
 
-FILE_SEQUENCER = os.path.join(pydaw_folder_daw, "sequencer.txt")
-pydaw_file_regions_atm = os.path.join(pydaw_folder_daw, "automation.txt")
-pydaw_file_routing_graph = os.path.join(pydaw_folder_daw, "routing.txt")
-pydaw_file_midi_routing = os.path.join(
-    pydaw_folder_daw,
+FILE_SEQUENCER = os.path.join(folder_daw, "sequencer.txt")
+file_regions_atm = os.path.join(folder_daw, "automation.txt")
+file_routing_graph = os.path.join(folder_daw, "routing.txt")
+file_midi_routing = os.path.join(
+    folder_daw,
     "midi_routing.txt",
 )
-pydaw_file_pyitems = os.path.join(pydaw_folder_daw, "items.txt")
-pydaw_file_takes = os.path.join(pydaw_folder_daw, "takes.txt")
-pydaw_file_pytracks = os.path.join(pydaw_folder_daw, "tracks.txt")
-pydaw_file_pyinput = os.path.join(pydaw_folder_daw, "input.txt")
-pydaw_file_notes = os.path.join(pydaw_folder_daw, "notes.txt")
+file_pyitems = os.path.join(folder_daw, "items.txt")
+file_takes = os.path.join(folder_daw, "takes.txt")
+file_pytracks = os.path.join(folder_daw, "tracks.txt")
+file_pyinput = os.path.join(folder_daw, "input.txt")
+file_notes = os.path.join(folder_daw, "notes.txt")
 
 class DawProject(glbl.AbstractProject):
     def __init__(self, a_with_audio):
@@ -117,7 +117,7 @@ class DawProject(glbl.AbstractProject):
         else:
             f_files = os.listdir(a_folder)
         for f_file in f_files:
-            f_result[f_file] = pydaw_read_file_text(
+            f_result[f_file] = read_file_text(
                 os.path.join(a_folder, f_file))
         return f_result
 
@@ -127,30 +127,30 @@ class DawProject(glbl.AbstractProject):
         self.project_file = os.path.splitext(
             os.path.basename(a_project_file))[0]
         self.items_folder = os.path.join(
-            self.project_folder, pydaw_folder_items)
+            self.project_folder, folder_items)
         self.host_folder = os.path.join(
-            self.project_folder, pydaw_folder_daw)
+            self.project_folder, folder_daw)
         self.track_pool_folder = os.path.join(
-            self.project_folder, pydaw_folder_tracks)
+            self.project_folder, folder_tracks)
         #files
         self.sequencer_file = os.path.join(
             self.project_folder, FILE_SEQUENCER)
         self.pyitems_file = os.path.join(
-            self.project_folder, pydaw_file_pyitems)
+            self.project_folder, file_pyitems)
         self.takes_file = os.path.join(
-            self.project_folder, pydaw_file_takes)
+            self.project_folder, file_takes)
         self.pyscale_file = os.path.join(
             self.project_folder, "default.pyscale")
         self.pynotes_file = os.path.join(
-            self.project_folder, pydaw_file_notes)
+            self.project_folder, file_notes)
         self.routing_graph_file = os.path.join(
-            self.project_folder, pydaw_file_routing_graph)
+            self.project_folder, file_routing_graph)
         self.midi_routing_file = os.path.join(
-            self.project_folder, pydaw_file_midi_routing)
+            self.project_folder, file_midi_routing)
         self.automation_file = os.path.join(
-            self.project_folder, pydaw_file_regions_atm)
+            self.project_folder, file_regions_atm)
         self.audio_inputs_file = os.path.join(
-            self.project_folder, pydaw_file_pyinput)
+            self.project_folder, file_pyinput)
 
         self.project_folders = [
             self.project_folder, self.items_folder, self.track_pool_folder,]
@@ -163,7 +163,7 @@ class DawProject(glbl.AbstractProject):
             self.new_project(a_project_file)
 
         if a_notify_osc:
-            self.IPC.pydaw_open_song(self.project_folder)
+            self.IPC.open_song(self.project_folder)
 
     def new_project(self, a_project_file, a_notify_osc=True):
         self.set_project_folders(a_project_file)
@@ -173,23 +173,23 @@ class DawProject(glbl.AbstractProject):
             if not os.path.isdir(project_dir):
                 os.makedirs(project_dir)
 
-        self.save_file("", FILE_SEQUENCER, str(pydaw_sequencer()))
-        self.create_file("", pydaw_file_pyitems, pydaw_terminating_char)
-        f_tracks = pydaw_tracks()
+        self.save_file("", FILE_SEQUENCER, str(sequencer()))
+        self.create_file("", file_pyitems, terminating_char)
+        f_tracks = tracks()
         for i in range(_shared.TRACK_COUNT_ALL):
-            f_tracks.add_track(i, pydaw_track(
+            f_tracks.add_track(i, track(
                 a_track_uid=i, a_track_pos=i,
                 a_name="Master" if i == 0 else "track{}".format(i)))
-            plugins = glbl.pydaw_track_plugins()
+            plugins = glbl.track_plugins()
             for i2 in range(_plugins.TOTAL_PLUGINS_PER_TRACK):
-                plugins.plugins.append(glbl.pydaw_track_plugin(i2, 0, -1))
+                plugins.plugins.append(glbl.track_plugin(i2, 0, -1))
             self.save_track_plugins(i, plugins)
 
-        self.create_file("", pydaw_file_pytracks, str(f_tracks))
+        self.create_file("", file_pytracks, str(f_tracks))
 
         self.commit("Created project")
         if a_notify_osc:
-            self.IPC.pydaw_open_song(self.project_folder)
+            self.IPC.open_song(self.project_folder)
 
     def active_wav_pool_uids(self):
         f_region = self.get_region()
@@ -202,20 +202,20 @@ class DawProject(glbl.AbstractProject):
 
     def get_notes(self):
         if os.path.isfile(self.pynotes_file):
-            return pydaw_read_file_text(self.pynotes_file)
+            return read_file_text(self.pynotes_file)
         else:
             return ""
 
     def write_notes(self, a_text):
-        pydaw_write_file_text(self.pynotes_file, a_text)
+        write_file_text(self.pynotes_file, a_text)
 
     def set_midi_scale(self, a_key, a_scale):
-        pydaw_write_file_text(
+        write_file_text(
             self.pyscale_file, "{}|{}".format(a_key, a_scale))
 
     def get_midi_scale(self):
         if os.path.exists(self.pyscale_file):
-            f_list = pydaw_read_file_text(self.pyscale_file).split("|")
+            f_list = read_file_text(self.pyscale_file).split("|")
             return (int(f_list[0]), int(f_list[1]))
         else:
             return None
@@ -228,9 +228,9 @@ class DawProject(glbl.AbstractProject):
             return RoutingGraph()
 
     def save_routing_graph(self, a_graph, a_notify=True):
-        self.save_file("", pydaw_file_routing_graph, str(a_graph))
+        self.save_file("", file_routing_graph, str(a_graph))
         if a_notify:
-            self.IPC.pydaw_update_track_send()
+            self.IPC.update_track_send()
 
     def check_output(self, a_track=None):
         """ Ensure that any track with items or plugins is routed to master
@@ -263,7 +263,7 @@ class DawProject(glbl.AbstractProject):
             return MIDIRoutes()
 
     def save_midi_routing(self, a_routing, a_notify=True):
-        self.save_file("", pydaw_file_midi_routing, str(a_routing))
+        self.save_file("", file_midi_routing, str(a_routing))
         if a_notify:
             self.commit("Update MIDI routing")
 
@@ -275,26 +275,26 @@ class DawProject(glbl.AbstractProject):
             return MkTakes()
 
     def save_takes(self, a_takes):
-        self.save_file("", pydaw_file_takes, str(a_takes))
+        self.save_file("", file_takes, str(a_takes))
 
     def get_items_dict(self):
         try:
             f_file = open(self.pyitems_file, "r")
         except:
-            return pydaw_name_uid_dict()
+            return name_uid_dict()
         f_str = f_file.read()
         f_file.close()
-        return pydaw_name_uid_dict.from_str(f_str)
+        return name_uid_dict.from_str(f_str)
 
     def save_items_dict(self, a_uid_dict):
-        self.save_file("", pydaw_file_pyitems, str(a_uid_dict))
+        self.save_file("", file_pyitems, str(a_uid_dict))
 
     def get_region(self):
         if os.path.isfile(self.sequencer_file):
             with open(self.sequencer_file) as f_file:
-                return pydaw_sequencer.from_str(f_file.read())
+                return sequencer.from_str(f_file.read())
         else:
-            return pydaw_sequencer()
+            return sequencer()
 
     def import_midi_file(
             self, a_midi_file, a_beat_offset, a_track_offset):
@@ -312,7 +312,7 @@ class DawProject(glbl.AbstractProject):
             f_track = a_track_offset + int(k)
             if f_track >= _shared.TRACK_COUNT_ALL:
                 break
-            f_item_ref = pydaw_sequencer_item(
+            f_item_ref = sequencer_item(
                 f_track, a_beat_offset, v.get_length(), v.uid)
             f_sequencer.add_item_ref_by_uid(f_item_ref)
         self.save_region(f_sequencer)
@@ -325,9 +325,9 @@ class DawProject(glbl.AbstractProject):
             return DawAtmRegion()
 
     def save_atm_region(self, a_region):
-        self.save_file(pydaw_folder_daw, "automation.txt", str(a_region))
+        self.save_file(folder_daw, "automation.txt", str(a_region))
         self.commit("Update automation")
-        self.IPC.pydaw_save_atm_region()
+        self.IPC.save_atm_region()
 
     def rename_items(self, a_item_names, a_new_item_name):
         """ @a_item_names:  A list of str
@@ -420,7 +420,7 @@ class DawProject(glbl.AbstractProject):
                 if f_audio_item.uid == f_uid:
                     f_paif.set_row(f_index, a_paif)
                     self.save_audio_per_item_fx_region(f_region_uid, f_paif)
-                    self.IPC.pydaw_audio_per_item_fx_region(
+                    self.IPC.audio_per_item_fx_region(
                         f_region_uid)
                     f_changed = True
             if f_changed:
@@ -443,7 +443,7 @@ class DawProject(glbl.AbstractProject):
 
     def get_item_by_uid(self, a_item_uid):
         a_item_uid = int(a_item_uid)
-        f_result = pydaw_item.from_str(
+        f_result = item.from_str(
             self.get_item_string(a_item_uid), a_item_uid)
         assert f_result.uid == a_item_uid, "UIDs do not match"
         return f_result
@@ -451,11 +451,11 @@ class DawProject(glbl.AbstractProject):
     def get_item_by_name(self, a_item_name):
         f_items_dict = self.get_items_dict()
         f_uid = f_items_dict.get_uid_by_name(a_item_name)
-        return pydaw_item.from_str(self.get_item_string(f_uid), f_uid)
+        return item.from_str(self.get_item_string(f_uid), f_uid)
 
     def save_audio_inputs(self, a_tracks):
         if not self.suppress_updates:
-            self.save_file("", pydaw_file_pyinput, str(a_tracks))
+            self.save_file("", file_pyinput, str(a_tracks))
 
     def get_audio_inputs(self):
         if os.path.isfile(self.audio_inputs_file):
@@ -540,8 +540,8 @@ class DawProject(glbl.AbstractProject):
                 f_start = (f_audio_frame / f_frames) * 1000.0
                 f_end = 1000.0
                 #(f_audio_frame / (f_frames + a_sample_count)) * 1000.0
-                f_start = util.pydaw_clip_value(f_start, 0.0, f_end)
-                f_end = util.pydaw_clip_value(f_end, f_start, 1000.0)
+                f_start = util.clip_value(f_start, 0.0, f_end)
+                f_end = util.clip_value(f_end, f_start, 1000.0)
                 f_audio_item = DawAudioItem(
                     f_uid, a_sample_start=f_start, a_sample_end=f_end,
                     a_output_track=f_mode, a_lane_num=f_lane)
@@ -560,7 +560,7 @@ class DawProject(glbl.AbstractProject):
             f_item = self.get_item_by_uid(f_uid)
             f_items_to_save[f_uid] = f_item
             self.rec_take[a_track_num] = f_item
-            f_item_ref = pydaw_sequencer_item(
+            f_item_ref = sequencer_item(
                 a_track_num, a_start_beat, f_item_length, f_uid)
             f_sequencer.add_item_ref_by_uid(f_item_ref)
 
@@ -574,7 +574,7 @@ class DawProject(glbl.AbstractProject):
                 f_item = self.get_item_by_uid(f_uid)
                 f_items_to_save[f_uid] = f_item
                 self.rec_take[a_track_num] = f_item
-                f_item_ref = pydaw_sequencer_item(
+                f_item_ref = sequencer_item(
                     a_track_num, a_start_beat, f_item_length, f_uid)
                 f_sequencer.add_item_ref_by_uid(f_item_ref)
             else:
@@ -617,7 +617,7 @@ class DawProject(glbl.AbstractProject):
             if f_type == "on":
                 f_note_num, f_velocity, f_tick = (int(x) for x in f_event[3:])
                 LOG.info("New note: {} {}".format(f_beat, f_note_num))
-                f_note = pydaw_note(f_beat, 1.0, f_note_num, f_velocity)
+                f_note = note(f_beat, 1.0, f_note_num, f_velocity)
                 f_note.start_sample = f_tick
                 if f_note_num in f_note_tracker[f_track]:
                     LOG.info("Terminating note early: {}".format(
@@ -637,12 +637,12 @@ class DawProject(glbl.AbstractProject):
                 f_port, f_val, f_tick = f_event[3:]
                 f_port = int(f_port)
                 f_val = float(f_val)
-                f_cc = pydaw_cc(f_beat, f_port, f_val)
+                f_cc = cc(f_beat, f_port, f_val)
                 self.rec_item.add_cc(f_cc)
             elif f_type == "pb":
                 f_val = float(f_event[3]) / 8192.0
-                f_val = util.pydaw_clip_value(f_val, -1.0, 1.0)
-                f_pb = pydaw_pitchbend(f_beat, f_val)
+                f_val = util.clip_value(f_val, -1.0, 1.0)
+                f_pb = pitchbend(f_beat, f_val)
                 self.rec_item.add_pb(f_pb)
             else:
                 LOG.error("Invalid mrec event type {}".format(f_type))
@@ -689,7 +689,7 @@ class DawProject(glbl.AbstractProject):
         self.save_region(f_region, a_notify=False)
         self.save_midi_routing(f_midi_routings, a_notify=False)
 
-        self.IPC.pydaw_open_song(self.project_folder, False)
+        self.IPC.open_song(self.project_folder, False)
         glbl.IPC.resume_engine()
         self.commit("Re-order tracks", a_discard=True)
         self.clear_history()
@@ -697,15 +697,15 @@ class DawProject(glbl.AbstractProject):
     def get_tracks_string(self):
         try:
             f_file = open(
-                os.path.join(self.project_folder, pydaw_file_pytracks))
+                os.path.join(self.project_folder, file_pytracks))
         except:
-            return pydaw_terminating_char
+            return terminating_char
         f_result = f_file.read()
         f_file.close()
         return f_result
 
     def get_tracks(self):
-        return pydaw_tracks.from_str(self.get_tracks_string())
+        return tracks.from_str(self.get_tracks_string())
 
     def get_track_plugin_uids(self, a_track_num):
         f_plugins = self.get_track_plugins(a_track_num)
@@ -719,8 +719,8 @@ class DawProject(glbl.AbstractProject):
         f_item_name = self.get_next_default_item_name(
             a_item_name, a_items_dict=f_items_dict)
         f_uid = f_items_dict.add_new_item(f_item_name)
-        self.save_file(pydaw_folder_items, str(f_uid), pydaw_item(f_uid))
-        self.IPC.pydaw_save_item(f_uid)
+        self.save_file(folder_items, str(f_uid), item(f_uid))
+        self.IPC.save_item(f_uid)
         self.save_items_dict(f_items_dict)
         return f_uid
 
@@ -731,8 +731,8 @@ class DawProject(glbl.AbstractProject):
         f_new_item = self.get_item_by_uid(f_old_uid)
         f_new_item.uid = f_uid
         self.save_file(
-            pydaw_folder_items, str(f_uid), str(f_new_item))
-        self.IPC.pydaw_save_item(f_uid)
+            folder_items, str(f_uid), str(f_new_item))
+        self.IPC.save_item(f_uid)
         self.save_items_dict(f_items_dict)
         return f_uid
 
@@ -797,32 +797,32 @@ class DawProject(glbl.AbstractProject):
             self.pixmap_cache_unscaled.pop(a_uid)
         if not self.suppress_updates:
             self.save_file(
-                pydaw_folder_items,
+                folder_items,
                 str(a_uid),
                 str(a_item),
                 a_new_item,
             )
-            self.IPC.pydaw_save_item(a_uid)
+            self.IPC.save_item(a_uid)
 
     def save_region(self, a_region, a_notify=True):
         if not self.suppress_updates:
             a_region.fix_overlaps()
             self.save_file("", FILE_SEQUENCER, str(a_region))
             if a_notify:
-                self.IPC.pydaw_save_region()
+                self.IPC.save_region()
             self.check_output()
 
     def save_tracks(self, a_tracks):
         if not self.suppress_updates:
-            self.save_file("", pydaw_file_pytracks, str(a_tracks))
+            self.save_file("", file_pytracks, str(a_tracks))
             #Is there a need for a configure message here?
 
     def save_track_plugins(self, a_uid, a_track):
         """ @a_uid:   int, the track number
-            @a_track: glbl.pydaw_track_plugins
+            @a_track: glbl.track_plugins
         """
         int(a_uid)  # Test that it can be cast to an int
-        f_folder = pydaw_folder_tracks
+        f_folder = folder_tracks
         if not self.suppress_updates:
             self.save_file(f_folder, str(a_uid), str(a_track))
 

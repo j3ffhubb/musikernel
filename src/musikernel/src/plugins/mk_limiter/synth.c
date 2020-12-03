@@ -90,7 +90,7 @@ static PYFX_Handle g_mk_lim_instantiate(PYFX_Descriptor * descriptor,
 
     plugin_data->mono_modules = v_mk_lim_mono_init(s_rate, a_plugin_uid);
 
-    plugin_data->port_table = g_pydaw_get_port_table(
+    plugin_data->port_table = g_get_port_table(
         (void**)plugin_data, descriptor);
 
     v_cc_map_init(&plugin_data->cc_map);
@@ -102,7 +102,7 @@ static void v_mk_lim_load(PYFX_Handle instance,
         PYFX_Descriptor * Descriptor, char * a_file_path)
 {
     t_mk_lim *plugin_data = (t_mk_lim*)instance;
-    pydaw_generic_file_loader(instance, Descriptor,
+    generic_file_loader(instance, Descriptor,
         a_file_path, plugin_data->port_table, &plugin_data->cc_map);
 }
 
@@ -114,7 +114,7 @@ static void v_mk_lim_set_port_value(PYFX_Handle Instance,
 }
 
 static void v_mk_lim_process_midi_event(
-    t_mk_lim * plugin_data, t_pydaw_seq_event * a_event)
+    t_mk_lim * plugin_data, t_seq_event * a_event)
 {
     if (a_event->type == PYDAW_EVENT_CONTROLLER)
     {
@@ -139,7 +139,7 @@ static void v_mk_lim_run(
 {
     t_mk_lim *plugin_data = (t_mk_lim*)instance;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
+    t_seq_event **events = (t_seq_event**)midi_events->data;
     int event_count = midi_events->len;
 
     int f_i = 0;
@@ -154,10 +154,10 @@ static void v_mk_lim_run(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    t_pydaw_seq_event * ev_tmp;
+    t_seq_event * ev_tmp;
     for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
-        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
+        ev_tmp = (t_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
             &plugin_data->atm_queue, ev_tmp->type,
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
@@ -211,12 +211,12 @@ static void v_mk_lim_run(
 
 PYFX_Descriptor *mk_lim_PYFX_descriptor()
 {
-    PYFX_Descriptor *f_result = pydaw_get_pyfx_descriptor(MK_LIM_COUNT);
+    PYFX_Descriptor *f_result = get_pyfx_descriptor(MK_LIM_COUNT);
 
-    pydaw_set_pyfx_port(f_result, MK_LIM_THRESHOLD, 0.0f, -360.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, MK_LIM_CEILING, 0.0f, -180.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, MK_LIM_RELEASE, 500.0f, 50.0f, 1500.0f);
-    pydaw_set_pyfx_port(f_result, MK_LIM_UI_MSG_ENABLED, 0.0f, 0.0f, 1.0f);
+    set_pyfx_port(f_result, MK_LIM_THRESHOLD, 0.0f, -360.0f, 0.0f);
+    set_pyfx_port(f_result, MK_LIM_CEILING, 0.0f, -180.0f, 0.0f);
+    set_pyfx_port(f_result, MK_LIM_RELEASE, 500.0f, 50.0f, 1500.0f);
+    set_pyfx_port(f_result, MK_LIM_UI_MSG_ENABLED, 0.0f, 0.0f, 1.0f);
 
     f_result->cleanup = v_mk_lim_cleanup;
     f_result->connect_port = v_mk_lim_connect_port;

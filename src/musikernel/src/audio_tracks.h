@@ -103,7 +103,7 @@ typedef struct
     MKFLT fadeout_vol;
     int paif_automation_uid;  //TODO:  This was never used, delete
     t_paif * paif;
-} t_pydaw_audio_item __attribute__((aligned(16)));
+} t_audio_item __attribute__((aligned(16)));
 
 typedef struct
 {
@@ -121,16 +121,16 @@ typedef struct
 
 typedef struct
 {
-    t_pydaw_audio_item * items[PYDAW_MAX_AUDIO_ITEM_COUNT];
+    t_audio_item * items[PYDAW_MAX_AUDIO_ITEM_COUNT];
     t_audio_item_index indexes[DN_TRACK_COUNT][PYDAW_MAX_AUDIO_ITEM_COUNT];
     int index_counts[DN_TRACK_COUNT];
     int sample_rate;
     int uid;
-} t_pydaw_audio_items;
+} t_audio_items;
 
-t_pydaw_audio_item * g_pydaw_audio_item_get(MKFLT);
-t_pydaw_audio_items * g_pydaw_audio_items_get(int);
-void v_pydaw_audio_item_free(t_pydaw_audio_item *);
+t_audio_item * g_audio_item_get(MKFLT);
+t_audio_items * g_audio_items_get(int);
+void v_audio_item_free(t_audio_item *);
 t_per_audio_item_fx * g_paif_get(MKFLT);
 
 #ifdef	__cplusplus
@@ -487,7 +487,7 @@ t_wav_pool_item * g_wav_pool_get_item_by_uid(
 }
 
 
-void v_pydaw_audio_item_free(t_pydaw_audio_item* a_audio_item)
+void v_audio_item_free(t_audio_item* a_audio_item)
 {
     //TODO:  Create a free method for these...
     //if(a_audio_item->adsr)
@@ -507,11 +507,11 @@ void v_pydaw_audio_item_free(t_pydaw_audio_item* a_audio_item)
     }
 }
 
-t_pydaw_audio_item * g_pydaw_audio_item_get(MKFLT a_sr){
+t_audio_item * g_audio_item_get(MKFLT a_sr){
     int f_i;
-    t_pydaw_audio_item * f_result;
+    t_audio_item * f_result;
 
-    lmalloc((void**)&f_result, sizeof(t_pydaw_audio_item));
+    lmalloc((void**)&f_result, sizeof(t_audio_item));
 
     f_result->ratio = 1.0f;
     f_result->paif = NULL;
@@ -538,17 +538,17 @@ t_pydaw_audio_item * g_pydaw_audio_item_get(MKFLT a_sr){
     return f_result;
 }
 
-t_pydaw_audio_items * g_pydaw_audio_items_get(int a_sr){
-    t_pydaw_audio_items * f_result;
+t_audio_items * g_audio_items_get(int a_sr){
+    t_audio_items * f_result;
 
-    lmalloc((void**)&f_result, sizeof(t_pydaw_audio_items));
+    lmalloc((void**)&f_result, sizeof(t_audio_items));
 
     f_result->sample_rate = a_sr;
 
     int f_i, f_i2;
 
     for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i){
-        f_result->items[f_i] = 0; //g_pydaw_audio_item_get((MKFLT)(a_sr));
+        f_result->items[f_i] = 0; //g_audio_item_get((MKFLT)(a_sr));
     }
 
     for(f_i = 0; f_i < DN_TRACK_COUNT; ++f_i){
@@ -562,18 +562,18 @@ t_pydaw_audio_items * g_pydaw_audio_items_get(int a_sr){
     return f_result;
 }
 
-/* t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
+/* t_audio_item * g_audio_item_load_single(MKFLT a_sr,
  * t_2d_char_array * f_current_string,
- * t_pydaw_audio_items * a_items)
+ * t_audio_items * a_items)
  *
  */
-t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
+t_audio_item * g_audio_item_load_single(MKFLT a_sr,
     t_2d_char_array * f_current_string,
-    t_pydaw_audio_items * a_items,
+    t_audio_items * a_items,
     t_wav_pool * a_wav_pool,
     t_wav_pool_item * a_wav_item
 ){
-    t_pydaw_audio_item * f_result;
+    t_audio_item * f_result;
 
     v_iterate_2d_char_array(f_current_string);
 
@@ -586,7 +586,7 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
     if(a_items){
         f_result = a_items->items[f_index];
     } else {
-        f_result = g_pydaw_audio_item_get(a_sr);
+        f_result = g_audio_item_get(a_sr);
     }
 
     f_result->index = f_index;
@@ -687,7 +687,7 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
     v_iterate_2d_char_array(f_current_string);
 
     //These are multiplied by -1.0f to work correctly with
-    //v_pydaw_audio_item_set_fade_vol()
+    //v_audio_item_set_fade_vol()
     v_iterate_2d_char_array(f_current_string);
     f_result->fadein_vol = atof(f_current_string->current_str) * -1.0f;
 
@@ -879,8 +879,8 @@ t_pydaw_audio_item * g_audio_item_load_single(MKFLT a_sr,
     return f_result;
 }
 
-void v_pydaw_audio_item_set_fade_vol(
-    t_pydaw_audio_item *self,
+void v_audio_item_set_fade_vol(
+    t_audio_item *self,
     int a_send_num
 ){
     t_int_frac_read_head * read_head =
@@ -987,10 +987,10 @@ void v_pydaw_audio_item_set_fade_vol(
     }
 }
 
-void v_pydaw_audio_items_free(t_pydaw_audio_items *a_audio_items){
+void v_audio_items_free(t_audio_items *a_audio_items){
     int f_i;
     for(f_i = 0; f_i < PYDAW_MAX_AUDIO_ITEM_COUNT; ++f_i){
-        v_pydaw_audio_item_free(a_audio_items->items[f_i]);
+        v_audio_item_free(a_audio_items->items[f_i]);
         a_audio_items->items[f_i] = NULL;
     }
 

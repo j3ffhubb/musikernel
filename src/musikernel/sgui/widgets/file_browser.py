@@ -474,7 +474,7 @@ class AbstractFileBrowserWidget():
                     self.list_folder.addItem(f_item)
                 elif self.filter_func(f_file) and \
                 os.path.isfile(f_full_path):
-                    if not util.pydaw_str_has_bad_chars(f_full_path):
+                    if not util.str_has_bad_chars(f_full_path):
                         f_item = QListWidgetItem(f_file)
                         f_item.setToolTip(f_file)
                         self.list_file.addItem(f_item)
@@ -482,7 +482,7 @@ class AbstractFileBrowserWidget():
                         QMessageBox.warning(self.widget, _("Error"),
                         _("Not adding '{}' because it contains bad chars, "
                         "you must rename this file path without:\n{}").format(
-                        f_full_path, "\n".join(util.pydaw_bad_chars)))
+                        f_full_path, "\n".join(util.bad_chars)))
         self.on_filter_files()
         self.on_filter_folders()
         if self.last_open_dir in self.scroll_dict:

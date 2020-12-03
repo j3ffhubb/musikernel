@@ -1,10 +1,10 @@
-from .modulex import pydaw_modulex_single
-from .modulex_settings import pydaw_modulex_settings
+from .modulex import modulex_single
+from .modulex_settings import modulex_settings
 from sgui.lib.translate import _
 from sgui.sgqt import *
 
 
-class pydaw_per_audio_item_fx_widget:
+class per_audio_item_fx_widget:
     def __init__(
         self,
         a_rel_callback,
@@ -17,7 +17,7 @@ class pydaw_per_audio_item_fx_widget:
         self.widget.setLayout(self.layout)
         f_port = 0
         for f_i in range(8):
-            f_effect = pydaw_modulex_single(
+            f_effect = modulex_single(
                 _("FX{}").format(f_i),
                 f_port,
                 a_rel_callback,
@@ -33,12 +33,12 @@ class pydaw_per_audio_item_fx_widget:
         self.scroll_area.setWidget(self.widget)
 
     def set_from_list(self, a_list):
-        """ a_class is a pydaw_modulex_settings instance """
+        """ a_class is a modulex_settings instance """
         for f_i in range(len(a_list)):
             self.effects[f_i].set_from_class(a_list[f_i])
 
     def get_list(self):
-        """ return a list of pydaw_modulex_settings instances """
+        """ return a list of modulex_settings instances """
         f_result = []
         for f_effect in self.effects:
             f_result.append(f_effect.get_class())

@@ -54,7 +54,7 @@ def on_ready():
         mod.on_ready()
 
 def clean_wav_pool():
-    traceback.print_stack()
+    #traceback.print_stack()
     result = set()
     for host in HOST_MODULES:
         uids = host.active_wav_pool_uids()
@@ -105,8 +105,8 @@ def restart_engine():
         LOG.info("Not restarting engine because the engine is running "
             "as a shared library")
     else:
-        close_pydaw_engine()
-        reopen_pydaw_engine()
+        close_engine()
+        reopen_engine()
 
 def prepare_to_quit():
     global MAIN_WINDOW, TRANSPORT, IPC, OSC, PROJECT
@@ -178,14 +178,14 @@ class AbstractProject:
         f_full_path = os.path.join(
             *(str(x) for x in (self.project_folder, a_folder, a_file)))
         if not a_force_new and os.path.isfile(f_full_path):
-            f_old = util.pydaw_read_file_text(f_full_path)
+            f_old = util.read_file_text(f_full_path)
             if f_old == a_text:
                 return None
             f_existed = 1
         else:
             f_old = ""
             f_existed = 0
-        util.pydaw_write_file_text(f_full_path, a_text)
+        util.write_file_text(f_full_path, a_text)
         return f_existed, f_old
 
     def get_track_plugins(self, a_track_num):
@@ -194,7 +194,7 @@ class AbstractProject:
         if os.path.isfile(f_path):
             with open(f_path) as f_handle:
                 f_str = f_handle.read()
-            return pydaw_track_plugins.from_str(f_str)
+            return track_plugins.from_str(f_str)
         else:
             return None
 
@@ -283,7 +283,7 @@ class TrackColors:
         return result
 
 
-class pydaw_track_plugin:
+class track_plugin:
     def __init__(self, a_index, a_plugin_index, a_plugin_uid,
                  a_mute=0, a_solo=0, a_power=1):
         self.index = int(a_index)  # index in the plugin chain
@@ -305,7 +305,7 @@ class pydaw_track_plugin:
              self.plugin_uid, self.mute, self.solo, self.power))
 
 
-class pydaw_track_plugins:
+class track_plugins:
     def __init__(self):
         self.plugins = []
 
@@ -321,14 +321,14 @@ class pydaw_track_plugins:
 
     @staticmethod
     def from_str(a_str):
-        f_result = pydaw_track_plugins()
+        f_result = track_plugins()
         f_str = str(a_str)
         for f_line in f_str.split():
             if f_line == "\\":
                 break
             f_line_arr = f_line.split("|")
             if f_line_arr[0] == "p":
-                f_result.plugins.append(pydaw_track_plugin(*f_line_arr[1:]))
+                f_result.plugins.append(track_plugin(*f_line_arr[1:]))
             else:
                 assert(False)
         return f_result

@@ -1,6 +1,6 @@
 from . import _shared
 from .control import *
-from .modulex_settings import pydaw_modulex_settings
+from .modulex_settings import modulex_settings
 from sgui.lib.translate import _
 from sgui.sgqt import *
 
@@ -39,7 +39,7 @@ MODULEX_EFFECTS_LIST = [
     "Foldback",
 ]
 
-class pydaw_modulex_single:
+class modulex_single:
     def __init__(
         self,
         a_title,
@@ -61,7 +61,7 @@ class pydaw_modulex_single:
         self.group_box.setLayout(self.layout)
         self.knobs = []
         for f_i in range(3):
-            f_knob = pydaw_knob_control(
+            f_knob = knob_control(
                 a_knob_size,
                 "",
                 a_port_k1 + f_i,
@@ -75,7 +75,7 @@ class pydaw_modulex_single:
             )
             f_knob.add_to_grid_layout(self.layout, f_i)
             self.knobs.append(f_knob)
-        self.combobox = pydaw_combobox_control(
+        self.combobox = combobox_control(
             132,
             "Type",
             a_port_k1 + 3,
@@ -152,19 +152,19 @@ class pydaw_modulex_single:
         self.reset_settings()
 
     def reset_settings(self):
-        self.set_from_class(pydaw_modulex_settings(64, 64, 64, 0))
+        self.set_from_class(modulex_settings(64, 64, 64, 0))
         self.update_all_values()
 
     def set_from_class(self, a_class):
-        """ a_class is a pydaw_modulex_settings instance """
+        """ a_class is a modulex_settings instance """
         self.knobs[0].set_value(a_class.knobs[0])
         self.knobs[1].set_value(a_class.knobs[1])
         self.knobs[2].set_value(a_class.knobs[2])
         self.combobox.set_value(a_class.fx_type)
 
     def get_class(self):
-        """ return a pydaw_modulex_settings instance """
-        return pydaw_modulex_settings(
+        """ return a modulex_settings instance """
+        return modulex_settings(
             self.knobs[0].control.value(),
             self.knobs[1].control.value(),
             self.knobs[2].control.value(),

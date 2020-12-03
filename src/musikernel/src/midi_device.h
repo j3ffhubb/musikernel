@@ -43,9 +43,9 @@ typedef struct
     PmError f_midi_err;
     PmDeviceID f_device_id;
     int instanceEventCounts;
-    t_pydaw_seq_event instanceEventBuffers[MIDI_EVENT_BUFFER_SIZE];
+    t_seq_event instanceEventBuffers[MIDI_EVENT_BUFFER_SIZE];
     PmEvent portMidiBuffer[MIDI_EVENT_BUFFER_SIZE];
-    t_pydaw_seq_event midiEventBuffer[MIDI_EVENT_BUFFER_SIZE];
+    t_seq_event midiEventBuffer[MIDI_EVENT_BUFFER_SIZE];
     int midiEventReadIndex;
     int midiEventWriteIndex;
     char name[256];
@@ -142,7 +142,7 @@ void midiReceive(
         {
             //twoBytes = 0;
             int f_pb_val = ((value << 7) | control) - 8192;
-            v_pydaw_ev_set_pitchbend(
+            v_ev_set_pitchbend(
                 &self->midiEventBuffer[self->midiEventWriteIndex],
                 channel, f_pb_val);
             ++self->midiEventWriteIndex;
@@ -151,7 +151,7 @@ void midiReceive(
         }
             break;
         case MIDI_NOTE_OFF:
-            v_pydaw_ev_set_noteoff(
+            v_ev_set_noteoff(
                 &self->midiEventBuffer[self->midiEventWriteIndex],
                 channel, control, value);
             ++self->midiEventWriteIndex;
@@ -162,13 +162,13 @@ void midiReceive(
         case MIDI_NOTE_ON:
             if(value == 0)
             {
-                v_pydaw_ev_set_noteoff(
+                v_ev_set_noteoff(
                     &self->midiEventBuffer[self->midiEventWriteIndex],
                     channel, control, value);
             }
             else
             {
-                v_pydaw_ev_set_noteon(
+                v_ev_set_noteon(
                     &self->midiEventBuffer[self->midiEventWriteIndex],
                     channel, control, value);
             }
@@ -179,7 +179,7 @@ void midiReceive(
             break;
         //case MIDI_AFTERTOUCH:
         case MIDI_CC:
-            v_pydaw_ev_set_controller(
+            v_ev_set_controller(
                 &self->midiEventBuffer[self->midiEventWriteIndex],
                 channel, control, value);
             ++self->midiEventWriteIndex;
@@ -321,11 +321,11 @@ void midiDeviceRead(t_midi_device * self, MKFLT sample_rate,
 
     while(self->midiEventReadIndex != self->midiEventWriteIndex)
     {
-	t_pydaw_seq_event *ev =
+	t_seq_event *ev =
             &self->midiEventBuffer[self->midiEventReadIndex];
 
         /*
-        if (!v_pydaw_ev_is_channel_type(ev))
+        if (!v_ev_is_channel_type(ev))
         {
             midiEventReadIndex++
             //discard non-channel oriented messages

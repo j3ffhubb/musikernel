@@ -1,14 +1,14 @@
 from .cc_mapping import CCMapping
-from .plugin_file import pydaw_plugin_file
+from .plugin_file import plugin_file
 from sgui import glbl
-from sgui.glbl.mk_project import pydaw_folder_plugins
+from sgui.glbl.mk_project import folder_plugins
 from sgui.lib.translate import _
 from sglib.log import LOG
 from sgui.sgqt import *
 import os
 
 
-class pydaw_abstract_plugin_ui:
+class abstract_plugin_ui:
     def __init__(
         self,
         a_val_callback,
@@ -136,7 +136,7 @@ class pydaw_abstract_plugin_ui:
             f_file_path = os.path.join(
                 *(str(x) for x in (self.folder, self.plugin_uid)))
             if os.path.isfile(f_file_path):
-                f_file = pydaw_plugin_file(f_file_path)
+                f_file = plugin_file(f_file_path)
                 for k, v in f_file.port_dict.items():
                     self.set_control_val(int(k), v)
                 for k, v in f_file.configure_dict.items():
@@ -144,7 +144,7 @@ class pydaw_abstract_plugin_ui:
                 self.cc_map = f_file.cc_map
             else:
                 LOG.warning(
-                    "pydaw_abstract_plugin_ui.open_plugin_file():"
+                    "abstract_plugin_ui.open_plugin_file():"
                     " '{}' did not exist, not loading.".format(f_file_path)
                 )
                 self.has_updated_controls = True
@@ -155,13 +155,13 @@ class pydaw_abstract_plugin_ui:
 
     def save_plugin_file(self):
         if self.folder is not None:
-            f_file = pydaw_plugin_file.from_dict(
+            f_file = plugin_file.from_dict(
                 self.port_dict,
                 self.configure_dict,
                 self.cc_map,
             )
             self.mk_project.save_file(
-                pydaw_folder_plugins,
+                folder_plugins,
                 self.plugin_uid,
                 str(f_file),
             )
@@ -193,7 +193,7 @@ class pydaw_abstract_plugin_ui:
         if f_port in self.port_dict:
             self.port_dict[int(a_port)].set_value(a_val)
         else:
-            LOG.warning("pydaw_abstract_plugin_ui.set_control_val():  "
+            LOG.warning("abstract_plugin_ui.set_control_val():  "
                 "Did not have port {}".format(f_port))
 
     def set_cc_val(self, a_cc, a_val):

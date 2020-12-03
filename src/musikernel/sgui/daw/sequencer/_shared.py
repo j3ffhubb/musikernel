@@ -43,7 +43,7 @@ SEQ_SNAP_RANGE = 8
 
 REGION_EDITOR_DELETE_MODE = False
 
-def pydaw_set_seq_snap(a_val=None):
+def set_seq_snap(a_val=None):
     global \
         SEQUENCER_SNAP_VAL, \
         SEQ_LINES_ENABLED, \

@@ -41,9 +41,9 @@ MKEQ_SPECTRUM_ENABLED = 22
 MKEQ_PORT_MAP = {}
 
 
-class mkeq_plugin_ui(pydaw_abstract_plugin_ui):
+class mkeq_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "MKEQ"
         self.is_instrument = False
 
@@ -62,7 +62,7 @@ class mkeq_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.layout.addWidget(self.eq6.widget)
 
-        self.spectrum_enabled = pydaw_null_control(
+        self.spectrum_enabled = null_control(
             MKEQ_SPECTRUM_ENABLED,
             self.plugin_rel_callback, self.plugin_val_callback,
             0, self.port_dict)
@@ -72,17 +72,17 @@ class mkeq_plugin_ui(pydaw_abstract_plugin_ui):
         self.enable_spectrum(True)
 
     def open_plugin_file(self):
-        pydaw_abstract_plugin_ui.open_plugin_file(self)
+        abstract_plugin_ui.open_plugin_file(self)
         self.eq6.update_viewer()
 
     def save_plugin_file(self):
         # Don't allow the spectrum analyzer to run at startup
         self.spectrum_enabled.set_value(0)
-        pydaw_abstract_plugin_ui.save_plugin_file(self)
+        abstract_plugin_ui.save_plugin_file(self)
 
     def widget_close(self):
         self.enable_spectrum(False)
-        pydaw_abstract_plugin_ui.widget_close(self)
+        abstract_plugin_ui.widget_close(self)
 
     def widget_show(self):
         self.enable_spectrum(True)
@@ -99,5 +99,5 @@ class mkeq_plugin_ui(pydaw_abstract_plugin_ui):
         if a_name == "spectrum":
             self.eq6.set_spectrum(a_value)
         else:
-            pydaw_abstract_plugin_ui.ui_message(a_name, a_value)
+            abstract_plugin_ui.ui_message(a_name, a_value)
 

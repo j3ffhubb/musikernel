@@ -106,7 +106,7 @@ static PYFX_Handle g_mkdelay_instantiate(PYFX_Descriptor * descriptor,
     plugin_data->mono_modules =
             v_mkdelay_mono_init(plugin_data->fs, plugin_data->plugin_uid);
 
-    plugin_data->port_table = g_pydaw_get_port_table(
+    plugin_data->port_table = g_get_port_table(
         (void**)plugin_data, descriptor);
 
     v_cc_map_init(&plugin_data->cc_map);
@@ -118,7 +118,7 @@ static void v_mkdelay_load(PYFX_Handle instance,
         PYFX_Descriptor * Descriptor, char * a_file_path)
 {
     t_mkdelay *plugin_data = (t_mkdelay*)instance;
-    pydaw_generic_file_loader(instance, Descriptor,
+    generic_file_loader(instance, Descriptor,
         a_file_path, plugin_data->port_table, &plugin_data->cc_map);
 }
 
@@ -131,7 +131,7 @@ static void v_mkdelay_set_port_value(PYFX_Handle Instance,
 
 
 static void v_mkdelay_process_midi_event(
-    t_mkdelay * plugin_data, t_pydaw_seq_event * a_event)
+    t_mkdelay * plugin_data, t_seq_event * a_event)
 {
     if (a_event->type == PYDAW_EVENT_CONTROLLER)
     {
@@ -156,7 +156,7 @@ static void v_mkdelay_run(
 {
     t_mkdelay *plugin_data = (t_mkdelay*)instance;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
+    t_seq_event **events = (t_seq_event**)midi_events->data;
     int event_count = midi_events->len;
 
     register int f_i;
@@ -171,10 +171,10 @@ static void v_mkdelay_run(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    t_pydaw_seq_event * ev_tmp;
+    t_seq_event * ev_tmp;
     for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
-        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
+        ev_tmp = (t_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
             &plugin_data->atm_queue, ev_tmp->type,
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
@@ -228,15 +228,15 @@ static void v_mkdelay_run(
 
 PYFX_Descriptor *mkdelay_PYFX_descriptor()
 {
-    PYFX_Descriptor *f_result = pydaw_get_pyfx_descriptor(MKDELAY_COUNT);
+    PYFX_Descriptor *f_result = get_pyfx_descriptor(MKDELAY_COUNT);
 
-    pydaw_set_pyfx_port(f_result, MKDELAY_DELAY_TIME, 50.0f, 10.0f, 100.0f);
-    pydaw_set_pyfx_port(f_result, MKDELAY_FEEDBACK, -120.0f, -200.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, MKDELAY_DRY, 0.0f, -300.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, MKDELAY_WET, -120.0f, -300.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, MKDELAY_DUCK, -20.0f, -40.0f, 0.0f);
-    pydaw_set_pyfx_port(f_result, MKDELAY_CUTOFF, 90.0f, 40.0f, 118.0f);
-    pydaw_set_pyfx_port(f_result, MKDELAY_STEREO, 100.0f, 0.0f, 100.0f);
+    set_pyfx_port(f_result, MKDELAY_DELAY_TIME, 50.0f, 10.0f, 100.0f);
+    set_pyfx_port(f_result, MKDELAY_FEEDBACK, -120.0f, -200.0f, 0.0f);
+    set_pyfx_port(f_result, MKDELAY_DRY, 0.0f, -300.0f, 0.0f);
+    set_pyfx_port(f_result, MKDELAY_WET, -120.0f, -300.0f, 0.0f);
+    set_pyfx_port(f_result, MKDELAY_DUCK, -20.0f, -40.0f, 0.0f);
+    set_pyfx_port(f_result, MKDELAY_CUTOFF, 90.0f, 40.0f, 118.0f);
+    set_pyfx_port(f_result, MKDELAY_STEREO, 100.0f, 0.0f, 100.0f);
 
 
     f_result->cleanup = v_mkdelay_cleanup;

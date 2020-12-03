@@ -61,7 +61,7 @@ typedef struct
         MKFLT start;
         MKFLT length;
         int port;
-} t_pydaw_seq_event;
+} t_seq_event;
 
 typedef struct
 {
@@ -81,8 +81,8 @@ typedef t_wav_pool_item * (*fp_get_wavpool_item_from_host)(int);
 /* For sorting a list by start time */
 int seq_event_cmpfunc(void *self, void *other)
 {
-    t_pydaw_seq_event *self_ev = (t_pydaw_seq_event*)self;
-    t_pydaw_seq_event *other_ev = (t_pydaw_seq_event*)other;
+    t_seq_event *self_ev = (t_seq_event*)self;
+    t_seq_event *other_ev = (t_seq_event*)other;
 
     return self_ev->tick < other_ev->tick;
 }
@@ -317,13 +317,13 @@ void v_plugin_event_queue_atm_set(
     }
 }
 
-inline void v_pydaw_ev_clear(t_pydaw_seq_event * a_event)
+inline void v_ev_clear(t_seq_event * a_event)
 {
     a_event->type = -1;
     a_event->tick = 0;
 }
 
-inline void v_pydaw_ev_set_pitchbend(t_pydaw_seq_event* a_event,
+inline void v_ev_set_pitchbend(t_seq_event* a_event,
         int a_channel, int a_value)
 {
     a_event->type = PYDAW_EVENT_PITCHBEND;
@@ -331,7 +331,7 @@ inline void v_pydaw_ev_set_pitchbend(t_pydaw_seq_event* a_event,
     a_event->value = a_value;
 }
 
-inline void v_pydaw_ev_set_noteoff(t_pydaw_seq_event* a_event,
+inline void v_ev_set_noteoff(t_seq_event* a_event,
         int a_channel, int a_note, int a_velocity)
 {
     a_event->type = PYDAW_EVENT_NOTEOFF;
@@ -340,7 +340,7 @@ inline void v_pydaw_ev_set_noteoff(t_pydaw_seq_event* a_event,
     a_event->velocity = a_velocity;
 }
 
-inline void v_pydaw_ev_set_noteon(t_pydaw_seq_event* a_event,
+inline void v_ev_set_noteon(t_seq_event* a_event,
         int a_channel, int a_note, int a_velocity)
 {
     a_event->type = PYDAW_EVENT_NOTEON;
@@ -349,7 +349,7 @@ inline void v_pydaw_ev_set_noteon(t_pydaw_seq_event* a_event,
     a_event->velocity = a_velocity;
 }
 
-inline void v_pydaw_ev_set_controller(t_pydaw_seq_event* a_event,
+inline void v_ev_set_controller(t_seq_event* a_event,
         int a_channel, int a_cc_num, int a_value)
 {
     a_event->type = PYDAW_EVENT_CONTROLLER;
@@ -358,7 +358,7 @@ inline void v_pydaw_ev_set_controller(t_pydaw_seq_event* a_event,
     a_event->value = a_value;
 }
 
-inline void v_pydaw_ev_set_atm(t_pydaw_seq_event* a_event,
+inline void v_ev_set_atm(t_seq_event* a_event,
         int a_port_num, int a_value)
 {
     a_event->type = PYDAW_EVENT_AUTOMATION;
@@ -367,7 +367,7 @@ inline void v_pydaw_ev_set_atm(t_pydaw_seq_event* a_event,
     a_event->value = a_value;
 }
 
-PYFX_Descriptor * pydaw_get_pyfx_descriptor(int a_port_count)
+PYFX_Descriptor * get_pyfx_descriptor(int a_port_count)
 {
     PYFX_Descriptor *f_result =
             (PYFX_Descriptor*)malloc(sizeof(PYFX_Descriptor));
@@ -385,7 +385,7 @@ PYFX_Descriptor * pydaw_get_pyfx_descriptor(int a_port_count)
     return f_result;
 }
 
-void pydaw_set_pyfx_port(PYFX_Descriptor * a_desc, int a_port,
+void set_pyfx_port(PYFX_Descriptor * a_desc, int a_port,
         MKFLT a_default, MKFLT a_min, MKFLT a_max)
 {
     assert(a_port >= 0 && a_port < a_desc->PortCount);
@@ -401,7 +401,7 @@ void pydaw_set_pyfx_port(PYFX_Descriptor * a_desc, int a_port,
 
 
 
-PYFX_Data g_pydaw_get_port_default(PYFX_Descriptor *plugin, int port)
+PYFX_Data g_get_port_default(PYFX_Descriptor *plugin, int port)
 {
     PYFX_PortRangeHint hint = plugin->PortRangeHints[port];
     assert(hint.DefaultValue <= hint.UpperBound &&
@@ -409,7 +409,7 @@ PYFX_Data g_pydaw_get_port_default(PYFX_Descriptor *plugin, int port)
     return hint.DefaultValue;
 }
 
-MKFLT * g_pydaw_get_port_table(PYFX_Handle * handle,
+MKFLT * g_get_port_table(PYFX_Handle * handle,
         PYFX_Descriptor * descriptor)
 {
     MKFLT * pluginControlIns;
@@ -432,7 +432,7 @@ MKFLT * g_pydaw_get_port_table(PYFX_Handle * handle,
 
         if(pod)
         {
-            pluginControlIns[j] = g_pydaw_get_port_default(descriptor, j);
+            pluginControlIns[j] = g_get_port_default(descriptor, j);
 
             descriptor->connect_port(handle, j, &pluginControlIns[j]);
         }
@@ -468,7 +468,7 @@ void v_generic_cc_map_set(t_plugin_cc_map * a_cc_map, char * a_str)
     }
 }
 
-void pydaw_generic_file_loader(PYFX_Handle Instance,
+void generic_file_loader(PYFX_Handle Instance,
         PYFX_Descriptor * Descriptor, char * a_path, MKFLT * a_table,
         t_plugin_cc_map * a_cc_map)
 {

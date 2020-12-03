@@ -22,14 +22,14 @@ SFADER_PORT_MAP = {
     "Volume Slider": SFADER_VOL_SLIDER,
 }
 
-class sfader_plugin_ui(pydaw_abstract_plugin_ui):
+class sfader_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "SFADER"
         self.is_instrument = False
         self.volume_gridlayout = QGridLayout()
         self.layout.addLayout(self.volume_gridlayout, 1)
-        self.volume_slider = pydaw_slider_control(
+        self.volume_slider = slider_control(
             QtCore.Qt.Vertical if self.is_mixer else QtCore.Qt.Horizontal,
             "Vol", SFADER_VOL_SLIDER,
             self.plugin_rel_callback, self.plugin_val_callback,

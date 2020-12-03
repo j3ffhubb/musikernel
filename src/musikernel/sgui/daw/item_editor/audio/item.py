@@ -160,7 +160,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
         self.is_amp_dragging = False
         self.event_pos_orig = None
         self.width_orig = None
-        self.vol_linear = pydaw_db_to_lin(self.audio_item.vol)
+        self.vol_linear = db_to_lin(self.audio_item.vol)
         self.quantize_offset = 0.0
         if glbl.TOOLTIPS_ENABLED:
             self.set_tooltips(True)
@@ -178,7 +178,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
 
         if self.audio_item.time_stretch_mode == 1 and \
         (self.audio_item.pitch_shift_end == self.audio_item.pitch_shift):
-            f_temp_seconds /= pydaw_pitch_to_ratio(self.audio_item.pitch_shift)
+            f_temp_seconds /= pitch_to_ratio(self.audio_item.pitch_shift)
         elif self.audio_item.time_stretch_mode == 2 and \
         (self.audio_item.timestretch_amt_end ==
         self.audio_item.timestretch_amt):
@@ -187,7 +187,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
         f_start = self.audio_item.start_beat
         f_start *= shared.AUDIO_PX_PER_BEAT
 
-        f_length_seconds = pydaw_seconds_to_beats(
+        f_length_seconds = seconds_to_beats(
             f_temp_seconds) * shared.AUDIO_PX_PER_BEAT
         self.length_seconds_orig_px = f_length_seconds
         self.rect_orig = QtCore.QRectF(
@@ -206,11 +206,11 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
         f_fade_out = self.audio_item.fade_out * 0.001
         self.setRect(0.0, 0.0, f_length, shared.AUDIO_ITEM_HEIGHT)
         f_fade_in_handle_pos = (f_length * f_fade_in)
-        f_fade_in_handle_pos = pydaw_clip_value(
+        f_fade_in_handle_pos = clip_value(
             f_fade_in_handle_pos, 0.0, (f_length - 6.0))
         f_fade_out_handle_pos = \
             (f_length * f_fade_out) - shared.AUDIO_ITEM_HANDLE_SIZE
-        f_fade_out_handle_pos = pydaw_clip_value(
+        f_fade_out_handle_pos = clip_value(
             f_fade_out_handle_pos, (f_fade_in_handle_pos + 6.0), f_length)
         self.fade_in_handle.setPos(f_fade_in_handle_pos, 0.0)
         self.fade_out_handle.setPos(f_fade_out_handle_pos, 0.0)
@@ -255,7 +255,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                         self.sample_start_offset_px,
                         f_y_offset + (f_y_inc * f_i))
                 f_x_scale, f_y_scale = util.scale_to_rect(
-                    mk_project.pydaw_audio_item_scene_rect, self.rect_orig)
+                    mk_project.audio_item_scene_rect, self.rect_orig)
                 f_y_scale *= self.vol_linear
                 f_scale_transform = QTransform()
                 f_scale_transform.scale(f_x_scale, f_y_scale)
@@ -313,7 +313,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
             self.audio_item.sample_end = \
                 ((self.rect().width() + self.length_px_start) /
                 self.length_seconds_orig_px) * 1000.0
-            self.audio_item.sample_end = util.pydaw_clip_value(
+            self.audio_item.sample_end = util.clip_value(
                 self.audio_item.sample_end, 1.0, 1000.0, True)
             self.draw()
             return True
@@ -559,10 +559,10 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
             f_item.fade_in = 0.0
             f_item_old.fade_out = 999.0
             f_width_percent = a_event.pos().x() / self.rect().width()
-            f_item.fade_out = pydaw_clip_value(
+            f_item.fade_out = clip_value(
                 f_item.fade_out, (f_item.fade_in + 90.0), 999.0, True)
             f_item_old.fade_in /= f_width_percent
-            f_item_old.fade_in = pydaw_clip_value(
+            f_item_old.fade_in = clip_value(
                 f_item_old.fade_in, 0.0, (f_item_old.fade_out - 90.0), True)
 
             f_index = shared.CURRENT_ITEM.get_next_index()
@@ -587,7 +587,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
             f_sample_rect_pos = f_pos / self.rect().width()
             f_item.sample_start = \
                 (f_sample_rect_pos * f_sample_shown) + f_item.sample_start
-            f_item.sample_start = pydaw_clip_value(
+            f_item.sample_start = clip_value(
                 f_item.sample_start, 0.0, 999.0, True)
             f_item.start_beat = f_musical_pos
             f_item_old.sample_end = f_item.sample_start
@@ -668,13 +668,13 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
 
     def y_pos_to_lane_number(self, a_y_pos):
         f_lane_num = int((a_y_pos - shared.AUDIO_RULER_HEIGHT) / shared.AUDIO_ITEM_HEIGHT)
-        f_lane_num = pydaw_clip_value(
+        f_lane_num = clip_value(
             f_lane_num, 0, shared.AUDIO_ITEM_MAX_LANE)
         f_y_pos = (f_lane_num * shared.AUDIO_ITEM_HEIGHT) + shared.AUDIO_RULER_HEIGHT
         return f_lane_num, f_y_pos
 
     def lane_number_to_y_pos(self, a_lane_num):
-        a_lane_num = util.pydaw_clip_value(
+        a_lane_num = util.clip_value(
             a_lane_num,
             0,
             TRACK_COUNT_ALL,
@@ -744,7 +744,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                 if f_item.isSelected():
                     f_x = f_item.width_orig + f_event_diff + \
                         f_item.quantize_offset
-                    f_x = pydaw_clip_value(
+                    f_x = clip_value(
                         f_x, shared.AUDIO_ITEM_HANDLE_SIZE,
                         f_item.length_px_minus_start)
                     if f_x < f_item.length_px_minus_start:
@@ -758,10 +758,10 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                 if f_item.isSelected():
                     f_x = f_item.width_orig + f_event_diff + \
                         f_item.quantize_offset
-                    f_x = pydaw_clip_value(
+                    f_x = clip_value(
                         f_x, f_item.sample_start_offset_px,
                         f_item.length_handle.pos().x())
-                    f_x = pydaw_clip_min(f_x, f_item.min_start)
+                    f_x = clip_min(f_x, f_item.min_start)
                     if f_x > f_item.min_start:
                         f_x = f_item.quantize_start(f_x)
                         f_x -= f_item.quantize_offset
@@ -772,7 +772,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                 if f_item.isSelected():
                     #f_x = f_event_pos #f_item.width_orig + f_event_diff
                     f_x = f_item.fade_orig_pos + f_event_diff
-                    f_x = pydaw_clip_value(
+                    f_x = clip_value(
                         f_x, 0.0, f_item.fade_out_handle.pos().x() - 4.0)
                     f_item.fade_in_handle.setPos(f_x, 0.0)
                     f_item.update_fade_in_line()
@@ -780,7 +780,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
             for f_item in shared.AUDIO_SEQ.audio_items:
                 if f_item.isSelected():
                     f_x = f_item.fade_orig_pos + f_event_diff
-                    f_x = pydaw_clip_value(
+                    f_x = clip_value(
                         f_x, f_item.fade_in_handle.pos().x() + 4.0,
                         f_item.width_orig - shared.AUDIO_ITEM_HANDLE_SIZE)
                     f_item.fade_out_handle.setPos(f_x, 0.0)
@@ -791,10 +791,10 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                 f_item.audio_item.time_stretch_mode >= 2:
                     f_x = f_item.width_orig + f_event_diff + \
                         f_item.quantize_offset
-                    f_x = pydaw_clip_value(
+                    f_x = clip_value(
                         f_x, f_item.stretch_width_default * 0.1,
                         f_item.stretch_width_default * 200.0)
-                    f_x = pydaw_clip_max(f_x, f_item.max_stretch)
+                    f_x = clip_max(f_x, f_item.max_stretch)
                     f_x = f_item.quantize(f_x)
                     f_x -= f_item.quantize_offset
                     f_item.stretch_handle.setPos(
@@ -803,7 +803,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                         (shared.AUDIO_ITEM_HANDLE_HEIGHT * 0.5))
         elif self.is_amp_dragging:
             for f_item in shared.AUDIO_SEQ.get_selected():
-                f_new_vel = util.pydaw_clip_value(
+                f_new_vel = util.clip_value(
                     f_val + f_item.orig_value, -24.0, 24.0)
                 f_new_vel = round(f_new_vel, 1)
                 f_item.audio_item.vol = f_new_vel
@@ -827,7 +827,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                         f_new_vel = util.linear_interpolate(
                             0.3 * f_val, f_val, f_frac)
                     f_new_vel += f_item.orig_value
-                f_new_vel = util.pydaw_clip_value(f_new_vel, -24.0, 24.0)
+                f_new_vel = util.clip_value(f_new_vel, -24.0, 24.0)
                 f_new_vel = round(f_new_vel, 1)
                 f_item.audio_item.vol = f_new_vel
                 f_item.set_vol_line()
@@ -847,7 +847,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
             for f_item in shared.AUDIO_SEQ.audio_items:
                 if f_item.isSelected():
                     f_pos_x = f_item.pos().x()
-                    f_pos_x = pydaw_clip_value(f_pos_x, 0.0, f_max_x)
+                    f_pos_x = clip_value(f_pos_x, 0.0, f_max_x)
                     f_pos_x = f_item.quantize_scene(f_pos_x)
                     f_pos_y = self.lane_number_to_y_pos(
                         f_lane_offset + f_item.audio_item.lane_num)
@@ -882,7 +882,7 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                     +
                     f_audio_item.quantize_offset
                 )
-                f_x = pydaw_clip_value(
+                f_x = clip_value(
                     f_x,
                     shared.AUDIO_ITEM_HANDLE_SIZE,
                     f_audio_item.length_px_minus_start,
@@ -897,11 +897,11 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                         f_audio_item.length_px_start
                     ) / f_audio_item.length_seconds_orig_px
                 ) * 1000.0
-                f_item.sample_end = util.pydaw_clip_value(
+                f_item.sample_end = util.clip_value(
                     f_item.sample_end, 1.0, 1000.0, True)
             elif f_audio_item.is_start_resizing:
                 f_x = f_audio_item.start_handle.scenePos().x()
-                f_x = pydaw_clip_min(f_x, 0.0)
+                f_x = clip_min(f_x, 0.0)
                 f_x = self.quantize_all(f_x)
                 if f_x < f_audio_item.sample_start_offset_px:
                     f_x = f_audio_item.sample_start_offset_px
@@ -916,17 +916,17 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                         f_audio_item.start_handle_scene_min
                     )
                 ) * 1000.0
-                f_item.sample_start = pydaw_clip_value(
+                f_item.sample_start = clip_value(
                     f_item.sample_start, 0.0, 999.0, True)
             elif f_audio_item.is_fading_in:
                 f_pos = f_audio_item.fade_in_handle.pos().x()
                 f_val = (f_pos / f_audio_item.rect().width()) * 1000.0
-                f_item.fade_in = pydaw_clip_value(f_val, 0.0, 997.0, True)
+                f_item.fade_in = clip_value(f_val, 0.0, 997.0, True)
             elif f_audio_item.is_fading_out:
                 f_pos = f_audio_item.fade_out_handle.pos().x()
                 f_val = ((f_pos + shared.AUDIO_ITEM_HANDLE_SIZE) /
                     (f_audio_item.rect().width())) * 1000.0
-                f_item.fade_out = pydaw_clip_value(f_val, 1.0, 998.0, True)
+                f_item.fade_out = clip_value(f_val, 1.0, 998.0, True)
             elif (
                 f_audio_item.is_stretching
                 and
@@ -935,10 +935,10 @@ class AudioSeqItem(widgets.QGraphicsRectItemNDL):
                 f_reset_selection = True
                 f_x = f_audio_item.width_orig + f_event_diff + \
                     f_audio_item.quantize_offset
-                f_x = pydaw_clip_value(
+                f_x = clip_value(
                     f_x, f_audio_item.stretch_width_default * 0.1,
                     f_audio_item.stretch_width_default * 200.0)
-                f_x = pydaw_clip_max(f_x, f_audio_item.max_stretch)
+                f_x = clip_max(f_x, f_audio_item.max_stretch)
                 f_x = f_audio_item.quantize(f_x)
                 f_x -= f_audio_item.quantize_offset
                 f_item.timestretch_amt = \

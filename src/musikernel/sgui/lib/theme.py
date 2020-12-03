@@ -42,7 +42,7 @@ print("Using stylesheet " + STYLESHEET_FILE)
 STYLESHEET_DIR = os.path.dirname(STYLESHEET_FILE)
 STYLESHEET = None
 
-def pydaw_escape_stylesheet(a_stylesheet, a_path):
+def escape_stylesheet(a_stylesheet, a_path):
     f_dir = os.path.dirname(str(a_path))
     if IS_WINDOWS:
         f_dir = f_dir[0].lower() + f_dir[1:].replace("\\", "/")
@@ -51,8 +51,8 @@ def pydaw_escape_stylesheet(a_stylesheet, a_path):
 
 def load_color_palette():
     global STYLESHEET
-    STYLESHEET = pydaw_read_file_text(STYLESHEET_FILE)
-    STYLESHEET = pydaw_escape_stylesheet(STYLESHEET, STYLESHEET_FILE)
+    STYLESHEET = read_file_text(STYLESHEET_FILE)
+    STYLESHEET = escape_stylesheet(STYLESHEET, STYLESHEET_FILE)
 
     css_hex_color_regex = re.compile("#(?:[0-9a-fA-F]{6})$")
 

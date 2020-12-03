@@ -2,13 +2,13 @@ from sgui.lib import *
 from sgui.lib.util import *
 
 
-class pydaw_abstract_midi_event:
+class abstract_midi_event:
     """ Allows inheriting classes to be sorted by .start variable
     , which is left to the iheriter's to implement"""
     def __lt__(self, other):
         return self.start < other.start
 
-class pydaw_note(pydaw_abstract_midi_event):
+class note(abstract_midi_event):
     def __init__(self, a_start, a_length, a_note_number, a_velocity):
         self.start = round(float(a_start), 6)
         self.length = round(float(a_length), 6)
@@ -57,13 +57,13 @@ class pydaw_note(pydaw_abstract_midi_event):
 
     @staticmethod
     def from_arr(a_arr):
-        f_result = pydaw_note(*a_arr)
+        f_result = note(*a_arr)
         return f_result
 
     @staticmethod
     def from_str(a_str):
         f_arr = a_str.split("|")
-        return pydaw_note.from_arr(f_arr[1:])
+        return note.from_arr(f_arr[1:])
 
     def __str__(self):
         return "|".join(
@@ -77,10 +77,10 @@ class pydaw_note(pydaw_abstract_midi_event):
         )
 
     def clone(self):
-        return pydaw_note.from_str(str(self))
+        return note.from_str(str(self))
 
 
-class pydaw_cc(pydaw_abstract_midi_event):
+class cc(abstract_midi_event):
     def __init__(self, a_start, a_cc_num, a_cc_val):
         self.start = round(float(a_start), 6)
         self.cc_num = int(a_cc_num)
@@ -96,7 +96,7 @@ class pydaw_cc(pydaw_abstract_midi_event):
         )
 
     def set_val(self, a_val):
-        self.cc_val = pydaw_clip_value(float(a_val), 0.0, 127.0, True)
+        self.cc_val = clip_value(float(a_val), 0.0, 127.0, True)
 
     def __str__(self):
         return "|".join(
@@ -110,19 +110,19 @@ class pydaw_cc(pydaw_abstract_midi_event):
 
     @staticmethod
     def from_arr(a_arr):
-        f_result = pydaw_cc(*a_arr)
+        f_result = cc(*a_arr)
         return f_result
 
     @staticmethod
     def from_str(a_str):
         f_arr = a_str.split("|")
-        return pydaw_cc.from_arr(f_arr[1:])
+        return cc.from_arr(f_arr[1:])
 
     def clone(self):
-        return pydaw_cc.from_str(str(self))
+        return cc.from_str(str(self))
 
 
-class pydaw_pitchbend(pydaw_abstract_midi_event):
+class pitchbend(abstract_midi_event):
     def __init__(self, a_start, a_pb_val):
         self.start = round(float(a_start), 6)
         self.pb_val = round(float(a_pb_val), 6)
@@ -136,7 +136,7 @@ class pydaw_pitchbend(pydaw_abstract_midi_event):
         )
 
     def set_val(self, a_val):
-        self.pb_val = pydaw_clip_value(float(a_val), -1.0, 1.0, True)
+        self.pb_val = clip_value(float(a_val), -1.0, 1.0, True)
 
     def __str__(self):
         return "|".join(
@@ -149,14 +149,14 @@ class pydaw_pitchbend(pydaw_abstract_midi_event):
 
     @staticmethod
     def from_arr(a_arr):
-        f_result = pydaw_pitchbend(*a_arr)
+        f_result = pitchbend(*a_arr)
         return f_result
 
     @staticmethod
     def from_str(a_str):
         f_arr = a_str.split("|")
-        return pydaw_pitchbend.from_arr(f_arr[1:])
+        return pitchbend.from_arr(f_arr[1:])
 
     def clone(self):
-        return pydaw_pitchbend.from_str(str(self))
+        return pitchbend.from_str(str(self))
 

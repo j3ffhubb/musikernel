@@ -51,7 +51,7 @@ def show(event):
 
 def header_time_modify():
     def ok_handler():
-        marker = pydaw_tempo_marker(
+        marker = tempo_marker(
             shared.SEQUENCER.header_event_pos, tempo.value(),
             tsig_num.value(), int(str(tsig_den.currentText())))
         shared.CURRENT_REGION.set_marker(marker)
@@ -166,7 +166,7 @@ def header_time_range():
             shared.CURRENT_REGION.loop_marker.start_beat,
             shared.CURRENT_REGION.loop_marker.beat + 1,
         ):
-            marker = pydaw_tempo_marker(
+            marker = tempo_marker(
                 i,
                 int(round(tempo)),
                 tsig_num.value(),
@@ -236,7 +236,7 @@ def header_time_range():
 
 def header_marker_modify():
     def ok_handler():
-        marker = pydaw_sequencer_marker(
+        marker = sequencer_marker(
             shared.SEQUENCER.header_event_pos, text.text())
         shared.CURRENT_REGION.set_marker(marker)
         shared.PROJECT.save_region(shared.CURRENT_REGION)
@@ -295,14 +295,14 @@ def header_loop_start():
         shared.SEQUENCER.header_event_pos,
     )
     if shared.CURRENT_REGION.loop_marker:
-        end = util.pydaw_clip_min(
+        end = util.clip_min(
             shared.CURRENT_REGION.loop_marker.beat,
             shared.SEQUENCER.header_event_pos + tsig_beats,
         )
     else:
         end = shared.SEQUENCER.header_event_pos + tsig_beats
 
-    marker = pydaw_loop_marker(
+    marker = loop_marker(
         end,
         shared.SEQUENCER.header_event_pos,
     )
@@ -315,12 +315,12 @@ def header_loop_end():
     tsig_beats = shared.CURRENT_REGION.get_tsig_at_pos(
         shared.SEQUENCER.header_event_pos,
     )
-    shared.CURRENT_REGION.loop_marker.beat = util.pydaw_clip_min(
+    shared.CURRENT_REGION.loop_marker.beat = util.clip_min(
         shared.SEQUENCER.header_event_pos,
         tsig_beats,
     )
     shared.CURRENT_REGION.loop_marker.start_beat = \
-        util.pydaw_clip_max(
+        util.clip_max(
             shared.CURRENT_REGION.loop_marker.start_beat,
             shared.CURRENT_REGION.loop_marker.beat - tsig_beats,
         )

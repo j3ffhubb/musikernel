@@ -2,7 +2,7 @@ from sgui.lib.translate import _
 from sgui.sgqt import *
 
 
-class pydaw_preset_browser_widget:
+class preset_browser_widget:
     """ To eventually replace the legacy preset system """
     def __init__(
         self,

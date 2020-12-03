@@ -26,9 +26,9 @@ MKCHNL_PORT_MAP = {
     "Pan": MKCHNL_PAN,
 }
 
-class mkchnl_plugin_ui(pydaw_abstract_plugin_ui):
+class mkchnl_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "MKCHNL"
         self.is_instrument = False
         f_knob_size = 42
@@ -39,19 +39,19 @@ class mkchnl_plugin_ui(pydaw_abstract_plugin_ui):
             self.hlayout = QHBoxLayout()
             self.layout.addLayout(self.hlayout)
             self.hlayout.addLayout(self.gain_gridlayout)
-        self.gain_knob = pydaw_knob_control(
+        self.gain_knob = knob_control(
             f_knob_size, _("Gain"), MKCHNL_GAIN,
             self.plugin_rel_callback, self.plugin_val_callback,
             -2400, 2400, 0, KC_DECIMAL, self.port_dict, None)
         self.gain_knob.add_to_grid_layout(self.gain_gridlayout, 0)
         self.gain_knob.value_label.setMinimumWidth(55)
 
-        self.pan_knob = pydaw_knob_control(
+        self.pan_knob = knob_control(
             f_knob_size, _("Pan"), MKCHNL_PAN,
             self.plugin_rel_callback, self.plugin_val_callback,
             -100, 100, 0, KC_DECIMAL, self.port_dict, None)
         self.pan_knob.add_to_grid_layout(self.gain_gridlayout, 1)
-        self.pan_law_knob = pydaw_knob_control(
+        self.pan_law_knob = knob_control(
             f_knob_size, _("Law"), MKCHNL_LAW,
             self.plugin_rel_callback, self.plugin_val_callback,
             -600, 0, -300, KC_DECIMAL, self.port_dict, None)
@@ -59,7 +59,7 @@ class mkchnl_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.volume_gridlayout = QGridLayout()
         self.layout.addLayout(self.volume_gridlayout)
-        self.volume_slider = pydaw_slider_control(
+        self.volume_slider = slider_control(
             QtCore.Qt.Vertical if self.is_mixer else QtCore.Qt.Horizontal,
             "Vol", MKCHNL_VOL_SLIDER,
             self.plugin_rel_callback, self.plugin_val_callback,

@@ -1,7 +1,7 @@
 from .cc_mapping import CCMapping
 from sgui.lib import util
 
-class pydaw_plugin_file:
+class plugin_file:
     """ Abstracts an instrument state file.  Plugins are not required
         to implement this and can instead implement their own custom
         state files, but this should be a sane and well tested way
@@ -12,7 +12,7 @@ class pydaw_plugin_file:
         self.configure_dict = {}
         self.cc_map = {}
         if a_path is not None:
-            f_text = util.pydaw_read_file_text(a_path)
+            f_text = util.read_file_text(a_path)
             self.set_from_str(f_text)
 
     def set_from_str(self, a_str):
@@ -32,13 +32,13 @@ class pydaw_plugin_file:
 
     @staticmethod
     def from_str(a_str):
-        f_result = pydaw_plugin_file()
+        f_result = plugin_file()
         f_result.set_from_str(a_str)
         return f_result
 
     @staticmethod
     def from_dict(a_port_dict, a_configure_dict, a_cc_map_dict):
-        f_result = pydaw_plugin_file()
+        f_result = plugin_file()
         for k, v in a_port_dict.items():
             f_result.port_dict[int(k)] = v
         for k, v in a_configure_dict.items():

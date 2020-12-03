@@ -187,7 +187,7 @@ class ItemSequencer(QGraphicsView):
                 print(f_track, shared.TRACK_NAMES)
                 f_item_name = "{}-1".format(shared.TRACK_NAMES[f_track])
                 f_uid = shared.PROJECT.create_empty_item(f_item_name)
-                f_item_ref = pydaw_sequencer_item(
+                f_item_ref = sequencer_item(
                     f_track,
                     f_beat,
                     _shared.LAST_ITEM_LENGTH,
@@ -300,8 +300,8 @@ class ItemSequencer(QGraphicsView):
         f_pos_x > 0 and
         f_pos_y > 0 and
         f_pos_y < _shared.REGION_EDITOR_TOTAL_HEIGHT):
-            f_pos_x = util.pydaw_clip_min(f_pos_x, 0.0)
-            f_pos_y = util.pydaw_clip_value(
+            f_pos_x = util.clip_min(f_pos_x, 0.0)
+            f_pos_y = util.clip_value(
                 f_pos_y,
                 0.0,
                 _shared.REGION_EDITOR_TOTAL_HEIGHT,
@@ -390,9 +390,9 @@ class ItemSequencer(QGraphicsView):
         self.clear_drawn_items()
         self.ignore_selection_change = True
         #, key=lambda x: x.bar_num,
-        _shared.CACHED_SEQ_LEN = pydaw_get_current_region_length()
+        _shared.CACHED_SEQ_LEN = get_current_region_length()
         for f_item in sorted(shared.CURRENT_REGION.items, reverse=True):
-            if f_item.start_beat < pydaw_get_current_region_length():
+            if f_item.start_beat < get_current_region_length():
                 f_item_name = f_items_dict.get_name_by_uid(f_item.item_uid)
                 f_new_item = self.draw_item(f_item_name, f_item)
                 if f_new_item.get_selected_string() in \
@@ -539,12 +539,12 @@ class ItemSequencer(QGraphicsView):
 
     def pos_to_beat_and_track(self, a_pos):
         f_beat_frac = (a_pos.x() / _shared.SEQUENCER_PX_PER_BEAT)
-        f_beat_frac = pydaw_clip_min(f_beat_frac, 0.0)
+        f_beat_frac = clip_min(f_beat_frac, 0.0)
         f_beat_frac = self.quantize(f_beat_frac)
 
         f_lane_num = int((a_pos.y() - _shared.REGION_EDITOR_HEADER_HEIGHT) /
             shared.REGION_EDITOR_TRACK_HEIGHT)
-        f_lane_num = pydaw_clip_value(
+        f_lane_num = clip_value(
             f_lane_num, 0, TRACK_COUNT_ALL - 1)
 
         return f_beat_frac, f_lane_num
@@ -583,7 +583,7 @@ class ItemSequencer(QGraphicsView):
             f_item_name = "{}-1".format(shared.TRACK_NAMES[f_track_num])
             f_item_uid = shared.PROJECT.create_empty_item(f_item_name)
             f_items = shared.PROJECT.get_item_by_uid(f_item_uid)
-            f_item_ref = pydaw_sequencer_item(
+            f_item_ref = sequencer_item(
                 f_track_num,
                 f_beat_frac,
                 1.0,
@@ -622,7 +622,7 @@ class ItemSequencer(QGraphicsView):
                     if f_length > f_item_ref.length_beats:
                         f_item_ref.length_beats = f_length
                 else:
-                    f_item_ref = pydaw_sequencer_item(
+                    f_item_ref = sequencer_item(
                         f_track_num,
                         f_beat_frac,
                         f_length,
@@ -704,7 +704,7 @@ class ItemSequencer(QGraphicsView):
 
     def update_zoom(self):
         pass
-        #pydaw_set_SEQUENCER_zoom(self.h_zoom, self.v_zoom)
+        #set_SEQUENCER_zoom(self.h_zoom, self.v_zoom)
 
     def header_click_event(self, a_event):
         if (
@@ -775,7 +775,7 @@ class ItemSequencer(QGraphicsView):
 
     def draw_header(self, a_cursor_pos=None):
         self.loop_start = self.loop_end = None
-        f_region_length = pydaw_get_current_region_length()
+        f_region_length = get_current_region_length()
         f_size = _shared.SEQUENCER_PX_PER_BEAT * f_region_length
         self.max_x = f_size
         self.setSceneRect(
@@ -850,7 +850,7 @@ class ItemSequencer(QGraphicsView):
         self.set_header_y_pos()
 
     def draw_region(self, a_marker):
-        f_region_length = pydaw_get_current_region_length()
+        f_region_length = get_current_region_length()
         f_size = _shared.SEQUENCER_PX_PER_BEAT * f_region_length
         f_v_pen = QPen(QtCore.Qt.black)
         f_beat_pen = QPen(QColor(210, 210, 210))

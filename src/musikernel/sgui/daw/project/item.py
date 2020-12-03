@@ -4,7 +4,7 @@ from sgui import glbl
 from sgui.glbl.mk_project import *
 from sgui.lib.util import *
 from sglib.log import LOG
-from sgui.widgets import pydaw_modulex_settings
+from sgui.widgets import modulex_settings
 from sgui.lib.translate import _
 from sgui.sgqt import *
 import traceback
@@ -13,7 +13,7 @@ import traceback
 PIXMAP_TILE_WIDTH = 4000
 MAX_AUDIO_ITEM_COUNT = 256
 
-class pydaw_item:
+class item:
     def __init__(self, a_uid):
         self.items = {}  # audio items:  TODO rename
         self.notes = []
@@ -56,7 +56,7 @@ class pydaw_item:
                 set(x.note_num for x in self.notes), reverse=True)
             f_note_h_area = (a_height * 0.6)
             f_note_height = round(f_note_h_area / len(f_note_set))
-            f_note_height = util.pydaw_clip_max(
+            f_note_height = util.clip_max(
                 f_note_height, a_height * 0.1)
             f_min = 1.0 - (min(f_note_set) / 127.0)
             f_note_bias = (f_note_h_area -
@@ -242,7 +242,7 @@ class pydaw_item:
             else:
                 f_result = []
                 for f_i in range(8):
-                    f_result.append(pydaw_modulex_settings(64, 64, 64, 0))
+                    f_result.append(modulex_settings(64, 64, 64, 0))
                 return f_result
 
     #end per-audio-item-fx
@@ -391,9 +391,9 @@ class pydaw_item:
             if a_selected_only and not note.is_selected:
                 continue
             if a_duplicate:
-                f_duplicates.append(pydaw_note.from_str(str(note)))
+                f_duplicates.append(note.from_str(str(note)))
             note.note_num += f_total
-            note.note_num = pydaw_clip_value(note.note_num, 0, 120)
+            note.note_num = clip_value(note.note_num, 0, 120)
             f_result.append(str(note))
         if a_duplicate:
             self.notes += f_duplicates
@@ -407,7 +407,7 @@ class pydaw_item:
             f_cc_num = int(a_cc_num)
             for f_cc in self.ccs:
                 if f_cc.cc_num == f_cc_num:
-                    f_new_cc = pydaw_cc(f_cc.start, f_cc_num, f_cc.cc_val)
+                    f_new_cc = cc(f_cc.start, f_cc_num, f_cc.cc_val)
                     f_this_cc_arr.append(f_new_cc)
             f_this_cc_arr.sort()
             for f_cc1, f_cc2 in zip(f_this_cc_arr, f_this_cc_arr[1:]):
@@ -426,7 +426,7 @@ class pydaw_item:
                     f_inc *= -1.0
                 f_new_val = f_cc1.cc_val + f_inc
                 while True:
-                    f_interpolated_cc = pydaw_cc(f_start, f_cc_num, f_new_val)
+                    f_interpolated_cc = cc(f_start, f_cc_num, f_new_val)
                     f_new_val += f_inc
                     f_result_arr.append(f_interpolated_cc)
                     f_start += f_time_inc
@@ -440,7 +440,7 @@ class pydaw_item:
             f_result_arr = []
 
             for f_pb in self.pitchbends:
-                f_new_pb = pydaw_pitchbend(f_pb.start, f_pb.pb_val)
+                f_new_pb = pitchbend(f_pb.start, f_pb.pb_val)
                 f_this_pb_arr.append(f_new_pb)
 
             for f_pb1, f_pb2 in zip(f_this_pb_arr, f_this_pb_arr[1:]):
@@ -459,7 +459,7 @@ class pydaw_item:
                 f_new_val = f_pb1.pb_val + f_val_inc
 
                 while True:
-                    f_interpolated_pb = pydaw_pitchbend(f_start, f_new_val)
+                    f_interpolated_pb = pitchbend(f_start, f_new_val)
                     f_new_val += f_val_inc
                     f_result_arr.append(f_interpolated_pb)
                     f_start += f_time_inc
@@ -497,7 +497,7 @@ class pydaw_item:
                                         f_note2.start - f_note.start
                                     f_note.set_end()
         for f_note in self.notes:
-            if f_note.length < _shared.pydaw_min_note_length:
+            if f_note.length < _shared.min_note_length:
                 f_to_delete.append(f_note)
         for f_note in f_to_delete:
             self.notes.remove(f_note)
@@ -554,7 +554,7 @@ class pydaw_item:
             f_inc = 1
         f_time_inc = abs(f_start_diff / float(f_val_diff))
         for i in range(0, (f_val_diff + 1)):
-            self.ccs.append(pydaw_cc(f_start, f_cc, f_start_val))
+            self.ccs.append(cc(f_start, f_cc, f_start_val))
             f_start_val += f_inc
             f_start += f_time_inc
         self.ccs.sort()
@@ -597,7 +597,7 @@ class pydaw_item:
             f_inc = 0.025
         f_time_inc = abs(f_start_diff/(float(f_val_diff) * 40.0))
         for i in range(0, int((f_val_diff * 40) + 1)):
-            self.pitchbends.append(pydaw_pitchbend(f_start, f_start_val))
+            self.pitchbends.append(pitchbend(f_start, f_start_val))
             f_start_val += f_inc
             f_start += f_time_inc
         #Ensure that the last value is what the user wanted it to be
@@ -609,19 +609,19 @@ class pydaw_item:
 
     @staticmethod
     def from_str(a_str, a_uid):
-        f_result = pydaw_item(a_uid)
+        f_result = item(a_uid)
         f_arr = a_str.split("\n")
         for f_event_str in f_arr:
-            if f_event_str == pydaw_terminating_char:
+            if f_event_str == terminating_char:
                 break
             else:
                 f_event_arr = f_event_str.split("|")
                 if f_event_arr[0] == "n":
-                    f_result.add_note(pydaw_note.from_arr(f_event_arr[1:]))
+                    f_result.add_note(note.from_arr(f_event_arr[1:]))
                 elif f_event_arr[0] == "c":
-                    f_result.add_cc(pydaw_cc.from_arr(f_event_arr[1:]))
+                    f_result.add_cc(cc.from_arr(f_event_arr[1:]))
                 elif f_event_arr[0] == "p":
-                    f_result.add_pb(pydaw_pitchbend.from_arr(f_event_arr[1:]))
+                    f_result.add_pb(pitchbend.from_arr(f_event_arr[1:]))
                 elif f_event_arr[0] == "a":
                     f_result.add_item(
                         int(f_event_arr[1]),
@@ -636,7 +636,7 @@ class pydaw_item:
                         a_knob0, a_knob1, a_knob2, a_type = f_vals_arr[
                             f_index:f_index_end]
                         f_items_arr.append(
-                            pydaw_modulex_settings(
+                            modulex_settings(
                                 a_knob0, a_knob1, a_knob2, a_type))
                     f_result.set_row(f_item_index, f_items_arr)
                 elif f_event_arr[0] == "U":
@@ -654,7 +654,7 @@ class pydaw_item:
         note_diff = len_orig - len(f_note_set)
         if note_diff:
             LOG.info("Deduplicated {} notes".format(note_diff))
-            self.notes = [pydaw_note.from_str(x) for x in f_note_set]
+            self.notes = [note.from_str(x) for x in f_note_set]
             self.notes.sort()
         # TODO:  Others
 
@@ -670,7 +670,7 @@ class pydaw_item:
             f_result.append("a|{}|{}".format(k, f_item))
         for k, v in self.fx_list.items():
             f_result.append("f|{}".format(self.get_row_str(k)))
-        f_result.append(pydaw_terminating_char)
+        f_result.append(terminating_char)
         return "\n".join(f_result)
 
     def reorder(self, a_dict):
@@ -691,8 +691,8 @@ class pydaw_item:
         return -1
 
     def split(self, a_index):
-        f_region0 = pydaw_audio_region()
-        f_region1 = pydaw_audio_region()
+        f_region0 = audio_region()
+        f_region1 = audio_region()
         for k, v in list(self.items.items()):
             if v.start_bar >= a_index:
                 v.start_bar -= a_index

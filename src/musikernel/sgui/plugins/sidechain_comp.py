@@ -30,9 +30,9 @@ SCC_PORT_MAP = {
 }
 
 
-class scc_plugin_ui(pydaw_abstract_plugin_ui):
+class scc_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
         self._plugin_name = "Sidechain Comp."
         self.is_instrument = False
 
@@ -48,35 +48,35 @@ class scc_plugin_ui(pydaw_abstract_plugin_ui):
         self.reverb_groupbox_gridlayout = QGridLayout()
         self.delay_hlayout.addLayout(self.reverb_groupbox_gridlayout)
 
-        self.thresh_knob = pydaw_knob_control(
+        self.thresh_knob = knob_control(
             f_knob_size, _("Thresh"), SCC_THRESHOLD,
             self.plugin_rel_callback, self.plugin_val_callback,
             -36, -6, -24, KC_INTEGER, self.port_dict, self.preset_manager)
         self.thresh_knob.add_to_grid_layout(
             self.reverb_groupbox_gridlayout, 3)
 
-        self.ratio_knob = pydaw_knob_control(
+        self.ratio_knob = knob_control(
             f_knob_size, _("Ratio"), SCC_RATIO,
             self.plugin_rel_callback, self.plugin_val_callback,
             1, 100, 20, KC_TENTH, self.port_dict, self.preset_manager)
         self.ratio_knob.add_to_grid_layout(
             self.reverb_groupbox_gridlayout, 7)
 
-        self.attack_knob = pydaw_knob_control(
+        self.attack_knob = knob_control(
             f_knob_size, _("Attack"), SCC_ATTACK,
             self.plugin_rel_callback, self.plugin_val_callback,
             0, 100, 20, KC_INTEGER, self.port_dict, self.preset_manager)
         self.attack_knob.add_to_grid_layout(
             self.reverb_groupbox_gridlayout, 15)
 
-        self.release_knob = pydaw_knob_control(
+        self.release_knob = knob_control(
             f_knob_size, _("Release"), SCC_RELEASE,
             self.plugin_rel_callback, self.plugin_val_callback,
             20, 300, 50, KC_INTEGER, self.port_dict, self.preset_manager)
         self.release_knob.add_to_grid_layout(
             self.reverb_groupbox_gridlayout, 18)
 
-        self.wet_knob = pydaw_knob_control(
+        self.wet_knob = knob_control(
             f_knob_size, _("Wet"), SCC_WET,
             self.plugin_rel_callback, self.plugin_val_callback,
             0, 100, 100, KC_INTEGER, self.port_dict, self.preset_manager)
@@ -86,7 +86,7 @@ class scc_plugin_ui(pydaw_abstract_plugin_ui):
         self.peak_meter = peak_meter(16, False)
         self.delay_hlayout.addWidget(self.peak_meter.widget)
 
-        self.ui_msg_enabled = pydaw_null_control(
+        self.ui_msg_enabled = null_control(
             SCC_UI_MSG_ENABLED,
             self.plugin_rel_callback, self.plugin_val_callback,
             0, self.port_dict)
@@ -97,7 +97,7 @@ class scc_plugin_ui(pydaw_abstract_plugin_ui):
 
     def widget_close(self):
         self.enable_ui_msg(False)
-        pydaw_abstract_plugin_ui.widget_close(self)
+        abstract_plugin_ui.widget_close(self)
 
     def widget_show(self):
         self.enable_ui_msg(True)
@@ -114,11 +114,11 @@ class scc_plugin_ui(pydaw_abstract_plugin_ui):
         if a_name == "gain":
             self.peak_meter.set_value([a_value] * 2)
         else:
-            pydaw_abstract_plugin_ui.ui_message(a_name, a_value)
+            abstract_plugin_ui.ui_message(a_name, a_value)
 
     def save_plugin_file(self):
         # Don't allow the peak meter to run at startup
         self.ui_msg_enabled.set_value(0)
-        pydaw_abstract_plugin_ui.save_plugin_file(self)
+        abstract_plugin_ui.save_plugin_file(self)
 
 

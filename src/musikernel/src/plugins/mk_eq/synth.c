@@ -111,7 +111,7 @@ static PYFX_Handle g_mkeq_instantiate(PYFX_Descriptor * descriptor,
     plugin_data->mono_modules =
             v_mkeq_mono_init(plugin_data->fs, plugin_data->plugin_uid);
 
-    plugin_data->port_table = g_pydaw_get_port_table(
+    plugin_data->port_table = g_get_port_table(
         (void**)plugin_data, descriptor);
 
     v_cc_map_init(&plugin_data->cc_map);
@@ -123,7 +123,7 @@ static void v_mkeq_load(PYFX_Handle instance,
         PYFX_Descriptor * Descriptor, char * a_file_path)
 {
     t_mkeq *plugin_data = (t_mkeq*)instance;
-    pydaw_generic_file_loader(instance, Descriptor,
+    generic_file_loader(instance, Descriptor,
         a_file_path, plugin_data->port_table, &plugin_data->cc_map);
 }
 
@@ -136,7 +136,7 @@ static void v_mkeq_set_port_value(PYFX_Handle Instance,
 
 
 static void v_mkeq_process_midi_event(
-    t_mkeq * plugin_data, t_pydaw_seq_event * a_event)
+    t_mkeq * plugin_data, t_seq_event * a_event)
 {
     if (a_event->type == PYDAW_EVENT_CONTROLLER)
     {
@@ -160,7 +160,7 @@ static void v_mkeq_run(
 {
     t_mkeq *plugin_data = (t_mkeq*)instance;
 
-    t_pydaw_seq_event **events = (t_pydaw_seq_event**)midi_events->data;
+    t_seq_event **events = (t_seq_event**)midi_events->data;
     int event_count = midi_events->len;
 
     register int f_i = 0;
@@ -174,10 +174,10 @@ static void v_mkeq_run(
 
     v_plugin_event_queue_reset(&plugin_data->atm_queue);
 
-    t_pydaw_seq_event * ev_tmp;
+    t_seq_event * ev_tmp;
     for(f_i = 0; f_i < atm_events->len; ++f_i)
     {
-        ev_tmp = (t_pydaw_seq_event*)atm_events->data[f_i];
+        ev_tmp = (t_seq_event*)atm_events->data[f_i];
         v_plugin_event_queue_add(
             &plugin_data->atm_queue, ev_tmp->type,
             ev_tmp->tick, ev_tmp->value, ev_tmp->port);
@@ -247,28 +247,28 @@ static void v_mkeq_run(
 
 PYFX_Descriptor *mkeq_PYFX_descriptor()
 {
-    PYFX_Descriptor *f_result = pydaw_get_pyfx_descriptor(MKEQ_COUNT);
+    PYFX_Descriptor *f_result = get_pyfx_descriptor(MKEQ_COUNT);
 
 
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ1_FREQ, 24.0f, 4.0f, 123.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ2_FREQ, 42.0f, 4.0f, 123.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ3_FREQ, 60.0f, 4.0f, 123.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ4_FREQ, 78.0f, 4.0f, 123.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ5_FREQ, 96.0f, 4.0f, 123.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ6_FREQ, 114.0f, 4.0f, 123.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ1_RES, 300.0f, 100.0f, 600.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ2_RES, 300.0f, 100.0f, 600.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ3_RES, 300.0f, 100.0f, 600.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ4_RES, 300.0f, 100.0f, 600.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ5_RES, 300.0f, 100.0f, 600.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ6_RES, 300.0f, 100.0f, 600.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ1_GAIN, 0.0f, -240.0f, 240.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ2_GAIN, 0.0f, -240.0f, 240.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ3_GAIN, 0.0f, -240.0f, 240.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ4_GAIN, 0.0f, -240.0f, 240.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ5_GAIN, 0.0f, -240.0f, 240.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_EQ6_GAIN, 0.0f, -240.0f, 240.0f);
-    pydaw_set_pyfx_port(f_result, MKEQ_SPECTRUM_ENABLED, 0.0f, 0.0f, 1.0f);
+    set_pyfx_port(f_result, MKEQ_EQ1_FREQ, 24.0f, 4.0f, 123.0f);
+    set_pyfx_port(f_result, MKEQ_EQ2_FREQ, 42.0f, 4.0f, 123.0f);
+    set_pyfx_port(f_result, MKEQ_EQ3_FREQ, 60.0f, 4.0f, 123.0f);
+    set_pyfx_port(f_result, MKEQ_EQ4_FREQ, 78.0f, 4.0f, 123.0f);
+    set_pyfx_port(f_result, MKEQ_EQ5_FREQ, 96.0f, 4.0f, 123.0f);
+    set_pyfx_port(f_result, MKEQ_EQ6_FREQ, 114.0f, 4.0f, 123.0f);
+    set_pyfx_port(f_result, MKEQ_EQ1_RES, 300.0f, 100.0f, 600.0f);
+    set_pyfx_port(f_result, MKEQ_EQ2_RES, 300.0f, 100.0f, 600.0f);
+    set_pyfx_port(f_result, MKEQ_EQ3_RES, 300.0f, 100.0f, 600.0f);
+    set_pyfx_port(f_result, MKEQ_EQ4_RES, 300.0f, 100.0f, 600.0f);
+    set_pyfx_port(f_result, MKEQ_EQ5_RES, 300.0f, 100.0f, 600.0f);
+    set_pyfx_port(f_result, MKEQ_EQ6_RES, 300.0f, 100.0f, 600.0f);
+    set_pyfx_port(f_result, MKEQ_EQ1_GAIN, 0.0f, -240.0f, 240.0f);
+    set_pyfx_port(f_result, MKEQ_EQ2_GAIN, 0.0f, -240.0f, 240.0f);
+    set_pyfx_port(f_result, MKEQ_EQ3_GAIN, 0.0f, -240.0f, 240.0f);
+    set_pyfx_port(f_result, MKEQ_EQ4_GAIN, 0.0f, -240.0f, 240.0f);
+    set_pyfx_port(f_result, MKEQ_EQ5_GAIN, 0.0f, -240.0f, 240.0f);
+    set_pyfx_port(f_result, MKEQ_EQ6_GAIN, 0.0f, -240.0f, 240.0f);
+    set_pyfx_port(f_result, MKEQ_SPECTRUM_ENABLED, 0.0f, 0.0f, 1.0f);
 
     f_result->cleanup = v_mkeq_cleanup;
     f_result->connect_port = v_mkeq_connect_port;

@@ -5,7 +5,7 @@ from sgui.lib.translate import _
 from sgui.sgqt import *
 
 
-class pydaw_loop_marker(_shared.pydaw_abstract_marker):
+class loop_marker(_shared.abstract_marker):
     def __init__(self, a_beat, a_start_beat):
         self.type = 1
         self.beat = int(a_beat)
@@ -17,5 +17,5 @@ class pydaw_loop_marker(_shared.pydaw_abstract_marker):
 
     @staticmethod
     def from_str(self, a_str):
-        return _shared.pydaw_sequencer_marker(*a_str.split("|", 1))
+        return _shared.sequencer_marker(*a_str.split("|", 1))
 

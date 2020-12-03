@@ -49,13 +49,13 @@ typedef struct
     int uid;
     int pool_uid;
     int atm_count;
-    t_pydaw_seq_event * atm_buffer;
+    t_seq_event * atm_buffer;
     struct ShdsList * atm_list;
     PYFX_Descriptor_Function descfn;
     int mute;
     int solo;
     char padding[CACHE_LINE_SIZE - ((8 * sizeof(int)) + (sizeof(void*) * 4))];
-}t_pydaw_plugin;
+}t_plugin;
 
 #ifdef	__cplusplus
 }
@@ -80,8 +80,8 @@ PYFX_Descriptor_Function PLUGIN_DESC_FUNCS[] = {
     mk_lim_PYFX_descriptor //15
 };
 
-NO_OPTIMIZATION void g_pydaw_plugin_init(
-        t_pydaw_plugin * f_result,
+NO_OPTIMIZATION void g_plugin_init(
+        t_plugin * f_result,
         int a_sample_rate, int a_index,
         fp_get_wavpool_item_from_host a_host_wavpool_func,
         int a_plugin_uid, fp_queue_message a_queue_func)
@@ -96,7 +96,7 @@ NO_OPTIMIZATION void g_pydaw_plugin_init(
     f_result->atm_list = shds_list_new(buff_max, NULL);
 
     hpalloc(
-        (void**)&f_result->atm_buffer, sizeof(t_pydaw_seq_event) * buff_max);
+        (void**)&f_result->atm_buffer, sizeof(t_seq_event) * buff_max);
 
     f_result->descfn = PLUGIN_DESC_FUNCS[a_index];
 
@@ -114,7 +114,7 @@ NO_OPTIMIZATION void g_pydaw_plugin_init(
 }
 
 /*
-void v_free_pydaw_plugin(t_pydaw_plugin * a_plugin)
+void v_free_plugin(t_plugin * a_plugin)
 {
     if(a_plugin)
     {
@@ -128,7 +128,7 @@ void v_free_pydaw_plugin(t_pydaw_plugin * a_plugin)
     else
     {
         printf("Error, attempted to free NULL plugin "
-                "with v_free_pydaw_plugin()\n");
+                "with v_free_plugin()\n");
     }
 }
 */

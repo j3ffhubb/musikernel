@@ -275,7 +275,7 @@ class hardware_dialog:
                         LOG.info(f_device)
                         util.global_device_val_dict["name"] = f_device
                         f_file = open(
-                            util.global_pydaw_device_config,
+                            util.global_device_config,
                             "w", newline="\n")
                         for k, v in util.global_device_val_dict.items():
                             f_file.write("{}|{}\n".format(k, v))
@@ -553,14 +553,14 @@ class hardware_dialog:
             if not util.IS_WINDOWS and not util.IS_MAC_OSX:
                 f_in_count = f_result_dict[
                     self.subsystem][self.device_name].maxInputChannels
-                f_in_count = util.pydaw_clip_value(f_in_count, 0, 128)
+                f_in_count = util.clip_value(f_in_count, 0, 128)
                 f_audio_in_spinbox.setMaximum(f_in_count)
                 f_audio_in_spinbox.setValue(
                     f_in_count if f_in_count < 16 else 16)
 
             f_out_count = f_result_dict[
                 self.subsystem][self.device_name].maxOutputChannels
-            f_out_count = util.pydaw_clip_value(f_out_count, 0, 128)
+            f_out_count = util.clip_value(f_out_count, 0, 128)
             if f_out_count == 1:
                 f_audio_out_spinbox.setMinimum(1)
             else:
@@ -575,7 +575,7 @@ class hardware_dialog:
                 return
             f_in_count = f_result_dict[
                 self.subsystem][self.input_name].maxInputChannels
-            f_in_count = util.pydaw_clip_value(f_in_count, 0, 128)
+            f_in_count = util.clip_value(f_in_count, 0, 128)
             f_audio_in_spinbox.setMaximum(f_in_count)
             f_audio_in_spinbox.setValue(
                     f_in_count if f_in_count < 16 else 16)
@@ -652,7 +652,7 @@ class hardware_dialog:
                     if not f_supported:
                         raise Exception()
                 f_file = open(
-                    util.global_pydaw_device_config, "w", newline="\n")
+                    util.global_device_config, "w", newline="\n")
                 f_file.write("hostApi|{}\n".format(self.subsystem))
                 f_file.write("name|{}\n".format(self.device_name))
                 if (util.IS_WINDOWS or util.IS_MAC_OSX) \
@@ -680,7 +680,7 @@ class hardware_dialog:
                 self.dialog_result = True
 
                 time.sleep(1.0)
-                util.pydaw_read_device_config()
+                util.read_device_config()
                 f_window.close()
 
             except Exception as ex:

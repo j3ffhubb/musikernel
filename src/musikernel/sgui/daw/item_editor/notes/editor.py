@@ -154,7 +154,7 @@ class PianoRollEditor(AbstractItemEditor):
             f_note_num = f_note.note_item.note_num
             f_velocity = f_note.note_item.velocity
             self.selected_note_strings.append(str(f_note.note_item))
-            f_new_note_item = mk_project.pydaw_note(
+            f_new_note_item = mk_project.note(
                 f_new_start, f_half, f_note_num, f_velocity)
             shared.CURRENT_ITEM.add_note(f_new_note_item, False)
             self.selected_note_strings.append(str(f_new_note_item))
@@ -204,7 +204,7 @@ class PianoRollEditor(AbstractItemEditor):
                 LOG.info(str(f_length))
                 f_start = f_min
                 LOG.info(str(f_start))
-                f_new_note = mk_project.pydaw_note(f_start, f_length, k, f_vel)
+                f_new_note = mk_project.note(f_start, f_length, k, f_vel)
                 LOG.info(str(f_new_note))
                 f_result.append(f_new_note)
 
@@ -234,7 +234,7 @@ class PianoRollEditor(AbstractItemEditor):
             )
             return
         for f_item in self.clipboard:
-            shared.CURRENT_ITEM.add_note(mk_project.pydaw_note.from_str(f_item))
+            shared.CURRENT_ITEM.add_note(mk_project.note.from_str(f_item))
         global_save_and_reload_items()
         self.scene.clearSelection()
         for f_item in self.note_items:
@@ -263,7 +263,7 @@ class PianoRollEditor(AbstractItemEditor):
             return
         self.selected_note_strings = []
         for f_item in f_list:
-            f_item.note_item.note_num = pydaw_clip_value(
+            f_item.note_item.note_num = clip_value(
                 f_item.note_item.note_num + a_amt, 0, 120)
             self.selected_note_strings.append(f_item.get_selected_string())
         global_save_and_reload_items()
@@ -340,7 +340,7 @@ class PianoRollEditor(AbstractItemEditor):
                             shared.PIANO_ROLL_SNAP_VALUE
                         ) * shared.PIANO_ROLL_SNAP_VALUE
                     ) * f_recip * shared.CURRENT_ITEM_LEN
-                    f_note_item = mk_project.pydaw_note(
+                    f_note_item = mk_project.note(
                         f_beat,
                         shared.LAST_NOTE_RESIZE,
                         f_note,
@@ -350,7 +350,7 @@ class PianoRollEditor(AbstractItemEditor):
                     f_beat = (
                         f_pos_x - shared.PIANO_KEYS_WIDTH
                     ) * f_recip * shared.CURRENT_ITEM_LEN
-                    f_note_item = mk_project.pydaw_note(
+                    f_note_item = mk_project.note(
                         f_beat, 0.25, f_note, self.get_vel(f_beat))
                 shared.ITEM_EDITOR.add_note(f_note_item)
                 _shared.SELECTED_PIANO_NOTE = f_note_item
@@ -450,7 +450,7 @@ class PianoRollEditor(AbstractItemEditor):
 
                 f_key.setToolTip("{} - {}hz - MIDI note #{}".format(
                     util.note_num_to_string(f_note_num),
-                    round(pydaw_pitch_to_hz(f_note_num)), f_note_num))
+                    round(pitch_to_hz(f_note_num)), f_note_num))
                 f_note_num += 1
                 if j == 12:
                     f_label = QGraphicsSimpleTextItem("C{}".format(
@@ -616,7 +616,7 @@ class PianoRollEditor(AbstractItemEditor):
         self.update()
 
     def draw_note(self, a_note, a_enabled=True, a_offset=0.0):
-        """ a_note is an instance of the mk_project.pydaw_note class"""
+        """ a_note is an instance of the mk_project.note class"""
         f_start = (self.piano_width + self.padding +
             self.px_per_beat * (a_note.start - a_offset))
         f_length = self.px_per_beat * a_note.length

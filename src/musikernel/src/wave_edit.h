@@ -30,16 +30,16 @@ extern "C" {
 typedef struct
 {
     t_wav_pool_item * ab_wav_item;
-    t_pydaw_audio_item * ab_audio_item;
+    t_audio_item * ab_audio_item;
     t_pytrack * track_pool[1];
     char * tracks_folder;
     char * project_folder;
 }t_wave_edit;
 
-void v_pydaw_set_ab_mode(int a_mode);
-void v_pydaw_set_we_file(t_wave_edit * self, const char * a_file);
-void v_pydaw_set_wave_editor_item(t_wave_edit * self, const char * a_string);
-inline void v_pydaw_run_wave_editor(int sample_count,
+void v_set_ab_mode(int a_mode);
+void v_set_we_file(t_wave_edit * self, const char * a_file);
+void v_set_wave_editor_item(t_wave_edit * self, const char * a_string);
+inline void v_run_wave_editor(int sample_count,
     MKFLT **output, MKFLT * a_input);
 
 #ifdef	__cplusplus
@@ -53,7 +53,7 @@ void g_wave_edit_get()
     MKFLT f_sample_rate = musikernel->thread_storage[0].sample_rate;
     clalloc((void**)&wave_edit, sizeof(t_wave_edit));
     wave_edit->ab_wav_item = 0;
-    wave_edit->ab_audio_item = g_pydaw_audio_item_get(f_sample_rate);
+    wave_edit->ab_audio_item = g_audio_item_get(f_sample_rate);
     wave_edit->tracks_folder = (char*)malloc(sizeof(char) * 1024);
     wave_edit->project_folder = (char*)malloc(sizeof(char) * 1024);
     int f_i = 0;
@@ -146,7 +146,7 @@ void v_wn_set_playback_mode(t_wave_edit * self, int a_mode, int a_lock)
     }
 }
 
-void v_pydaw_we_export(t_wave_edit * self, const char * a_file_out)
+void v_we_export(t_wave_edit * self, const char * a_file_out)
 {
     pthread_spin_lock(&musikernel->main_lock);
     musikernel->is_offline_rendering = 1;
@@ -201,7 +201,7 @@ void v_pydaw_we_export(t_wave_edit * self, const char * a_file_out)
             ++f_i;
         }
 
-        v_pydaw_run_wave_editor(f_block_size, f_buffer, NULL);
+        v_run_wave_editor(f_block_size, f_buffer, NULL);
 
         f_i = 0;
         /*Interleave the samples...*/
@@ -221,7 +221,7 @@ void v_pydaw_we_export(t_wave_edit * self, const char * a_file_out)
 
     clock_gettime(CLOCK_REALTIME, &f_finish);
 
-    v_pydaw_print_benchmark("v_pydaw_offline_render ", f_start, f_finish);
+    v_print_benchmark("v_offline_render ", f_start, f_finish);
     printf("f_size = %ld\n", f_size);
 
 #endif
@@ -238,7 +238,7 @@ void v_pydaw_we_export(t_wave_edit * self, const char * a_file_out)
 
     sprintf(f_tmp_finished, "%s.finished", a_file_out);
 
-    v_pydaw_write_to_file(f_tmp_finished, "finished");
+    v_write_to_file(f_tmp_finished, "finished");
 
     pthread_spin_lock(&musikernel->main_lock);
     musikernel->is_offline_rendering = 0;
@@ -251,7 +251,7 @@ void v_pydaw_we_export(t_wave_edit * self, const char * a_file_out)
 }
 
 
-void v_pydaw_set_we_file(t_wave_edit * self, const char * a_uid)
+void v_set_we_file(t_wave_edit * self, const char * a_uid)
 {
     int uid = atoi(a_uid);
 
@@ -270,13 +270,13 @@ void v_pydaw_set_we_file(t_wave_edit * self, const char * a_uid)
     }
     else
     {
-        printf("i_wav_pool_item_load failed in v_pydaw_set_we_file\n");
+        printf("i_wav_pool_item_load failed in v_set_we_file\n");
     }
 }
 
 void v_wn_open_tracks()
 {
-    v_pydaw_open_track(wave_edit->track_pool[0], wave_edit->tracks_folder, 0);
+    v_open_track(wave_edit->track_pool[0], wave_edit->tracks_folder, 0);
 }
 
 void v_wn_open_project()
@@ -289,13 +289,13 @@ void v_wn_open_project()
     v_wn_open_tracks();
 }
 
-void v_pydaw_set_wave_editor_item(t_wave_edit * self,
+void v_set_wave_editor_item(t_wave_edit * self,
         const char * a_val)
 {
     t_2d_char_array * f_current_string = g_get_2d_array(PYDAW_MEDIUM_STRING);
     sprintf(f_current_string->array, "%s", a_val);
-    t_pydaw_audio_item * f_old = self->ab_audio_item;
-    t_pydaw_audio_item * f_result = g_audio_item_load_single(
+    t_audio_item * f_old = self->ab_audio_item;
+    t_audio_item * f_result = g_audio_item_load_single(
             musikernel->thread_storage[0].sample_rate, f_current_string, 0, 0,
             self->ab_wav_item);
 
@@ -306,19 +306,19 @@ void v_pydaw_set_wave_editor_item(t_wave_edit * self,
     g_free_2d_char_array(f_current_string);
     if(f_old)
     {
-        v_pydaw_audio_item_free(f_old);
+        v_audio_item_free(f_old);
     }
 }
 
 
-inline void v_pydaw_run_wave_editor(
+inline void v_run_wave_editor(
     int sample_count,
     MKFLT **output,
     MKFLT * a_input
 ){
     int sent_stop = 0;
     t_wave_edit * self = wave_edit;
-    t_pydaw_plugin * f_plugin;
+    t_plugin * f_plugin;
 
     int f_global_track_num = 0;
     t_pytrack * f_track = self->track_pool[f_global_track_num];
@@ -348,7 +348,7 @@ inline void v_pydaw_run_wave_editor(
                 self->ab_audio_item->sample_end_offset
             ){
                 v_adsr_run(&self->ab_audio_item->adsrs[0]);
-                v_pydaw_audio_item_set_fade_vol(self->ab_audio_item, 0);
+                v_audio_item_set_fade_vol(self->ab_audio_item, 0);
 
                 if(self->ab_wav_item->channels == 1)
                 {
@@ -525,7 +525,7 @@ void v_wn_osc_send(t_osc_send_data * a_buffers)
 
 void v_wn_update_audio_inputs()
 {
-    v_pydaw_update_audio_inputs(wave_edit->project_folder);
+    v_update_audio_inputs(wave_edit->project_folder);
 }
 
 void v_wn_configure(const char* a_key, const char* a_value)
@@ -534,7 +534,7 @@ void v_wn_configure(const char* a_key, const char* a_value)
 
     if(!strcmp(a_key, WN_CONFIGURE_KEY_LOAD_AB_OPEN))
     {
-        v_pydaw_set_we_file(wave_edit, a_value);
+        v_set_we_file(wave_edit, a_value);
     }
     else if(!strcmp(a_key, WN_CONFIGURE_KEY_AUDIO_INPUTS))
     {
@@ -542,11 +542,11 @@ void v_wn_configure(const char* a_key, const char* a_value)
     }
     else if(!strcmp(a_key, WN_CONFIGURE_KEY_WE_SET))
     {
-        v_pydaw_set_wave_editor_item(wave_edit, a_value);
+        v_set_wave_editor_item(wave_edit, a_value);
     }
     else if(!strcmp(a_key, WN_CONFIGURE_KEY_WE_EXPORT))
     {
-        v_pydaw_we_export(wave_edit, a_value);
+        v_we_export(wave_edit, a_value);
     }
     else if(!strcmp(a_key, WN_CONFIGURE_KEY_WN_PLAYBACK))
     {
@@ -566,7 +566,7 @@ void v_wn_configure(const char* a_key, const char* a_value)
 
         t_pytrack * f_track = wave_edit->track_pool[f_track_num];
 
-        v_pydaw_set_plugin_index(
+        v_set_plugin_index(
             f_track, f_index, f_plugin_index, f_plugin_uid, f_power, 1);
 
         g_free_1d_char_array(f_val_arr);
@@ -583,7 +583,7 @@ void v_wn_test()
 
     musikernel->sample_count = 512;
 
-    v_pydaw_set_host(MK_HOST_WAVENEXT);
+    v_set_host(MK_HOST_WAVENEXT);
     v_wn_set_playback_mode(wave_edit, PYDAW_PLAYBACK_MODE_REC, 0);
     MKFLT * f_output_arr[2];
 
@@ -609,7 +609,7 @@ void v_wn_test()
 
     for(f_i = 0; f_i < 100000; ++f_i)
     {
-        v_pydaw_run_wave_editor(512, f_output_arr, f_input_arr);
+        v_run_wave_editor(512, f_output_arr, f_input_arr);
     }
 
     v_wn_set_playback_mode(wave_edit, PYDAW_PLAYBACK_MODE_OFF, 0);

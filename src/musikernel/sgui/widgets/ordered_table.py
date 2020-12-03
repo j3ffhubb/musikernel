@@ -21,7 +21,7 @@ class OrderedTable(QGraphicsView):
         self.setScene(self.scene)
         self.setFixedSize(
             self.item_width + 20,
-            util.pydaw_clip_max(self.total_height + 10, 600),
+            util.clip_max(self.total_height + 10, 600),
         )
         self.item_list = []
         for f_i, f_label in zip(

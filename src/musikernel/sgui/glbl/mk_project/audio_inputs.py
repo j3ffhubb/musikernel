@@ -13,7 +13,7 @@ class AudioInputTracks:
         f_result = []
         for k, v in list(self.tracks.items()):
             f_result.append("{}|{}".format(k, v))
-        f_result.append(pydaw_terminating_char)
+        f_result.append(terminating_char)
         return "\n".join(f_result)
 
     def reorder(self, a_dict):
@@ -32,7 +32,7 @@ class AudioInputTracks:
         f_result = AudioInputTracks()
         f_arr = a_str.split("\n")
         for f_line in f_arr:
-            if f_line == pydaw_terminating_char:
+            if f_line == terminating_char:
                 break
             else:
                 f_line_arr = f_line.split("|")

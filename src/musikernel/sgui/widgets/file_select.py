@@ -3,7 +3,7 @@ from sgui.sgqt import *
 import os
 
 
-class pydaw_file_select_widget:
+class file_select_widget:
     def __init__(
         self,
         a_load_callback,

@@ -347,9 +347,9 @@ SMP_TB_INTERPOLATION_MODE_INDEX = 11
 
 EUPHORIA_INSTRUMENT_CLIPBOARD = None
 
-class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
+class euphoria_plugin_ui(abstract_plugin_ui):
     def __init__(self, *args, **kwargs):
-        pydaw_abstract_plugin_ui.__init__(self, *args, **kwargs)
+        abstract_plugin_ui.__init__(self, *args, **kwargs)
 
         self.widget.setUpdatesEnabled(False)
         self.is_instrument = True
@@ -404,7 +404,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_base_pitches = []
         f_port_start = EUPHORIA_SAMPLE_PITCH_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_sample_pitch = pydaw_note_selector_widget(
+            f_sample_pitch = note_selector_widget(
                 f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 self.port_dict, 60)
@@ -414,7 +414,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_low_notes = []
         f_port_start = EUPHORIA_PLAY_PITCH_LOW_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_low_pitch = pydaw_note_selector_widget(
+            f_low_pitch = note_selector_widget(
                 f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 self.port_dict, 0)
@@ -424,7 +424,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_high_notes = []
         f_port_start = EUPHORIA_PLAY_PITCH_HIGH_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_high_pitch = pydaw_note_selector_widget(
+            f_high_pitch = note_selector_widget(
                 f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 self.port_dict, 120)
@@ -436,7 +436,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_vols = []
         f_port_start = EUPHORIA_SAMPLE_VOLUME_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_sample_vol = pydaw_spinbox_control(
+            f_sample_vol = spinbox_control(
                 None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 -50.0, 36.0, 0.0, KC_NONE, self.port_dict)
@@ -446,7 +446,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_vel_sens = []
         f_port_start = EUPHORIA_SAMPLE_VEL_SENS_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_vel_sens = pydaw_spinbox_control(
+            f_vel_sens = spinbox_control(
                 None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 0, 20, 10, KC_NONE, self.port_dict)
@@ -456,7 +456,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_low_vels = []
         f_port_start = EUPHORIA_SAMPLE_VEL_LOW_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_vel_low = pydaw_spinbox_control(
+            f_vel_low = spinbox_control(
                 None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 1, 127, 1, KC_NONE, self.port_dict)
@@ -466,7 +466,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_high_vels = []
         f_port_start = EUPHORIA_SAMPLE_VEL_HIGH_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_vel_high = pydaw_spinbox_control(
+            f_vel_high = spinbox_control(
                 None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 1, 128, 128, KC_NONE, self.port_dict)
@@ -476,7 +476,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_pitches = []
         f_port_start = EUPHORIA_PITCH_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_sample_pitch = pydaw_spinbox_control(
+            f_sample_pitch = spinbox_control(
                 None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 -36, 36, 0, KC_NONE, self.port_dict)
@@ -486,7 +486,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_tunes = []
         f_port_start = EUPHORIA_TUNE_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_sample_tune = pydaw_spinbox_control(
+            f_sample_tune = spinbox_control(
                 None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 -100, 100, 0, KC_NONE, self.port_dict)
@@ -497,7 +497,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         f_port_start = \
             EUPHORIA_SAMPLE_INTERPOLATION_MODE_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_sample_mode = pydaw_combobox_control(
+            f_sample_mode = combobox_control(
                 120, None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 self.interpolation_modes_list, self.port_dict, 1)
@@ -507,7 +507,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.noise_types = []
         f_port_start = EUPHORIA_NOISE_TYPE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_noise_type = pydaw_combobox_control(
+            f_noise_type = combobox_control(
                 75, None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 self.noise_types_list, self.port_dict, 0)
@@ -517,7 +517,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.noise_amps = []
         f_port_start = EUPHORIA_NOISE_AMP_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_noise_amp = pydaw_spinbox_control(
+            f_noise_amp = spinbox_control(
                 None, f_port_start + f_i,
                 self.plugin_rel_callback, self.plugin_val_callback,
                 -60, 0, -30, KC_NONE, self.port_dict)
@@ -527,7 +527,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_starts = []
         f_port_start = EUPHORIA_SAMPLE_START_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_sample_start = pydaw_null_control(
+            f_sample_start = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.sample_starts.append(f_sample_start)
@@ -535,7 +535,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.sample_ends = []
         f_port_start = EUPHORIA_SAMPLE_END_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_sample_end = pydaw_null_control(
+            f_sample_end = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 1000, self.port_dict)
             self.sample_ends.append(f_sample_end)
@@ -545,7 +545,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.loop_starts = []
         f_port_start = EUPHORIA_SAMPLE_LOOP_START_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_loop_start = pydaw_null_control(
+            f_loop_start = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.loop_starts.append(f_loop_start)
@@ -553,7 +553,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.loop_modes = []
         f_port_start = EUPHORIA_SAMPLE_LOOP_MODE_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_loop_mode = pydaw_null_control(
+            f_loop_mode = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.loop_modes.append(f_loop_mode)
@@ -561,7 +561,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.loop_ends = []
         f_port_start = EUPHORIA_SAMPLE_LOOP_END_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_loop_end = pydaw_null_control(
+            f_loop_end = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 1000, self.port_dict)
             self.loop_ends.append(f_loop_end)
@@ -569,7 +569,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.fade_in_ends = []
         f_port_start = EUPHORIA_SAMPLE_FADE_IN_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_fade_in = pydaw_null_control(
+            f_fade_in = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.fade_in_ends.append(f_fade_in)
@@ -577,7 +577,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.fade_out_starts = []
         f_port_start = EUPHORIA_SAMPLE_FADE_OUT_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_fade_out = pydaw_null_control(
+            f_fade_out = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 1000, self.port_dict)
             self.fade_out_starts.append(f_fade_out)
@@ -588,7 +588,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx0knob0_ctrls = []
         f_port_start = EUPHORIA_MONO_FX0_KNOB0_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx0knob0_ctrls.append(f_ctrl)
@@ -596,7 +596,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx0knob1_ctrls = []
         f_port_start = EUPHORIA_MONO_FX0_KNOB1_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx0knob1_ctrls.append(f_ctrl)
@@ -604,7 +604,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx0knob2_ctrls = []
         f_port_start = EUPHORIA_MONO_FX0_KNOB2_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx0knob2_ctrls.append(f_ctrl)
@@ -612,7 +612,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx0comboboxes = []
         f_port_start = EUPHORIA_MONO_FX0_COMBOBOX_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.monofx0comboboxes.append(f_ctrl)
@@ -620,7 +620,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx1knob0_ctrls = []
         f_port_start = EUPHORIA_MONO_FX1_KNOB0_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx1knob0_ctrls.append(f_ctrl)
@@ -630,7 +630,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx1knob1_ctrls = []
         f_port_start = EUPHORIA_MONO_FX1_KNOB1_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx1knob1_ctrls.append(f_ctrl)
@@ -638,7 +638,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx1knob2_ctrls = []
         f_port_start = EUPHORIA_MONO_FX1_KNOB2_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx1knob2_ctrls.append(f_ctrl)
@@ -646,7 +646,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx1comboboxes = []
         f_port_start = EUPHORIA_MONO_FX1_COMBOBOX_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.monofx1comboboxes.append(f_ctrl)
@@ -655,7 +655,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx2knob0_ctrls = []
         f_port_start = EUPHORIA_MONO_FX2_KNOB0_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx2knob0_ctrls.append(f_ctrl)
@@ -663,7 +663,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx2knob1_ctrls = []
         f_port_start = EUPHORIA_MONO_FX2_KNOB1_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx2knob1_ctrls.append(f_ctrl)
@@ -671,7 +671,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx2knob2_ctrls = []
         f_port_start = EUPHORIA_MONO_FX2_KNOB2_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx2knob2_ctrls.append(f_ctrl)
@@ -679,7 +679,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx2comboboxes = []
         f_port_start = EUPHORIA_MONO_FX2_COMBOBOX_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.monofx2comboboxes.append(f_ctrl)
@@ -690,7 +690,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx3knob0_ctrls = []
         f_port_start = EUPHORIA_MONO_FX3_KNOB0_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx3knob0_ctrls.append(f_ctrl)
@@ -698,7 +698,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx3knob1_ctrls = []
         f_port_start = EUPHORIA_MONO_FX3_KNOB1_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx3knob1_ctrls.append(f_ctrl)
@@ -706,7 +706,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx3knob2_ctrls = []
         f_port_start = EUPHORIA_MONO_FX3_KNOB2_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 64, self.port_dict)
             self.monofx3knob2_ctrls.append(f_ctrl)
@@ -714,7 +714,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx3comboboxes = []
         f_port_start = EUPHORIA_MONO_FX3_COMBOBOX_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_ctrl = pydaw_null_control(
+            f_ctrl = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.monofx3comboboxes.append(f_ctrl)
@@ -722,7 +722,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.monofx_groups = []
         f_port_start = EUPHORIA_SAMPLE_MONO_FX_GROUP_PORT_RANGE_MIN
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
-            f_monofx_group = pydaw_null_control(
+            f_monofx_group = null_control(
                 f_port_start + f_i, self.plugin_rel_callback,
                 self.plugin_val_callback, 0, self.port_dict)
             self.monofx_groups.append(f_monofx_group)
@@ -746,15 +746,15 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                 f_eq_list = []
                 f_group_list.append(f_eq_list)
                 f_eq_port = f_port_start + (f_i * 18) + (f_i2 * 3)
-                f_freq = pydaw_null_control(
+                f_freq = null_control(
                     f_eq_port, self.plugin_rel_callback,
                     self.plugin_val_callback, (f_i2 * 18) + 24, self.port_dict)
                 f_eq_port += 1
-                f_bw = pydaw_null_control(
+                f_bw = null_control(
                     f_eq_port, self.plugin_rel_callback,
                     self.plugin_val_callback, 300, self.port_dict)
                 f_eq_port += 1
-                f_gain = pydaw_null_control(
+                f_gain = null_control(
                     f_eq_port, self.plugin_rel_callback,
                     self.plugin_val_callback, 0, self.port_dict)
                 f_eq_list.append(f_freq)
@@ -768,7 +768,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             QHeaderView.Fixed)
         self.sample_table.resizeRowsToContents()
 
-        self.file_selector = pydaw_file_select_widget(self.load_files)
+        self.file_selector = file_select_widget(self.load_files)
         self.file_selector.clear_button.pressed.connect(self.clearFile)
         self.file_selector.reload_button.pressed.connect(self.reloadSample)
 
@@ -894,7 +894,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.view_sample_tab_main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         #Sample Graph
-        self.sample_graph = pydaw_sample_viewer_widget(
+        self.sample_graph = sample_viewer_widget(
             self.sample_start_callback, self.sample_end_callback,
             self.loop_start_callback, self.loop_end_callback,
             self.fade_in_callback, self.fade_out_callback)
@@ -950,7 +950,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.loop_mode_combobox.addItems([_("Off"), _("On")])
         self.loop_mode_combobox.currentIndexChanged.connect(
             self.loopModeChanged)
-        self.loop_tune_note_selector = pydaw_note_selector_widget(
+        self.loop_tune_note_selector = note_selector_widget(
             0, None, None)
         self.loop_tune_button = QPushButton(_("Tune"))
         self.loop_tune_button.pressed.connect(self.on_loop_tune)
@@ -971,7 +971,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
         #The file select on the 'view' tab
         self.sample_view_file_select_hlayout = QHBoxLayout()
-        self.view_file_selector = pydaw_file_select_widget(self.load_files)
+        self.view_file_selector = file_select_widget(self.load_files)
         self.view_file_selector.clear_button.pressed.connect(self.clearFile)
         self.view_file_selector.reload_button.pressed.connect(
             self.reloadSample)
@@ -1002,24 +1002,24 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.hlayout0 = QHBoxLayout()
         self.main_layout.addLayout(self.hlayout0)
-        self.fx0 = pydaw_modulex_single(
+        self.fx0 = modulex_single(
             _("FX0"), EUPHORIA_FX0_KNOB0,
             self.plugin_rel_callback, self.plugin_val_callback, self.port_dict,
             a_knob_size=f_knob_size)
         self.hlayout0.addWidget(self.fx0.group_box)
-        self.fx1 = pydaw_modulex_single(
+        self.fx1 = modulex_single(
             _("FX1"), EUPHORIA_FX1_KNOB0,
             self.plugin_rel_callback, self.plugin_val_callback,
             self.port_dict, a_knob_size=f_knob_size)
         self.hlayout0.addWidget(self.fx1.group_box)
         self.hlayout1 = QHBoxLayout()
         self.main_layout.addLayout(self.hlayout1)
-        self.fx2 = pydaw_modulex_single(
+        self.fx2 = modulex_single(
             _("FX2"), EUPHORIA_FX2_KNOB0,
             self.plugin_rel_callback, self.plugin_val_callback, self.port_dict,
             a_knob_size=f_knob_size)
         self.hlayout1.addWidget(self.fx2.group_box)
-        self.fx3 = pydaw_modulex_single(
+        self.fx3 = modulex_single(
             _("FX3"), EUPHORIA_FX3_KNOB0,
             self.plugin_rel_callback, self.plugin_val_callback, self.port_dict,
             a_knob_size=f_knob_size)
@@ -1047,7 +1047,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         for f_i_dst in range(4):
             for f_i_src in range(4):
                 for f_i_ctrl in range(3):
-                    f_ctrl = pydaw_spinbox_control(
+                    f_ctrl = spinbox_control(
                         None, f_port_num,
                         self.plugin_rel_callback, self.plugin_val_callback,
                         -100, 100, 0, KC_NONE, self.port_dict)
@@ -1061,7 +1061,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         for f_i_src in range(4, 6):
             for f_i_dst in range(4):
                 for f_i_ctrl in range(3):
-                    f_ctrl = pydaw_spinbox_control(
+                    f_ctrl = spinbox_control(
                         None, f_port_num,
                         self.plugin_rel_callback, self.plugin_val_callback,
                         -100, 100, 0, KC_NONE, self.port_dict)
@@ -1076,7 +1076,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.hlayout2.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.modulation_layout.addLayout(self.hlayout2)
 
-        self.adsr_amp = pydaw_adsr_widget(
+        self.adsr_amp = adsr_widget(
             f_knob_size, True, EUPHORIA_ATTACK,
             EUPHORIA_DECAY, EUPHORIA_SUSTAIN,
             EUPHORIA_RELEASE, _("ADSR Amp"),
@@ -1087,7 +1087,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         #low minimum default that won't click
         self.adsr_amp.release_knob.control.setMinimum(5)
         self.hlayout2.addWidget(self.adsr_amp.groupbox)
-        self.adsr_filter = pydaw_adsr_widget(
+        self.adsr_filter = adsr_widget(
             f_knob_size, False, EUPHORIA_FILTER_ATTACK,
             EUPHORIA_FILTER_DECAY,
             EUPHORIA_FILTER_SUSTAIN,
@@ -1095,27 +1095,27 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             _("ADSR 2"), self.plugin_rel_callback,
             self.plugin_val_callback, self.port_dict, a_knob_type=KC_LOG_TIME)
         self.hlayout2.addWidget(self.adsr_filter.groupbox)
-        self.pitch_env = pydaw_ramp_env_widget(
+        self.pitch_env = ramp_env_widget(
             f_knob_size, self.plugin_rel_callback,
             self.plugin_val_callback, self.port_dict,
             EUPHORIA_PITCH_ENV_TIME, None, _("Ramp Env"))
 
         self.hlayout2.addWidget(self.pitch_env.groupbox)
 
-        self.lfo = pydaw_lfo_widget(
+        self.lfo = lfo_widget(
             f_knob_size, self.plugin_rel_callback,
             self.plugin_val_callback, self.port_dict,
             EUPHORIA_LFO_FREQ,
             EUPHORIA_LFO_TYPE, f_lfo_types, _("LFO"))
         self.hlayout2.addWidget(self.lfo.groupbox)
 
-        self.lfo_pitch = pydaw_knob_control(
+        self.lfo_pitch = knob_control(
             f_knob_size, _("Pitch"), EUPHORIA_LFO_PITCH,
             self.plugin_rel_callback, self.plugin_val_callback,
             -36, 36, 0, KC_INTEGER, self.port_dict)
         self.lfo_pitch.add_to_grid_layout(self.lfo.layout, 7)
 
-        self.lfo_pitch_fine = pydaw_knob_control(
+        self.lfo_pitch_fine = knob_control(
             f_knob_size, _("Fine"),
             EUPHORIA_LFO_PITCH_FINE,
             self.plugin_rel_callback, self.plugin_val_callback,
@@ -1168,18 +1168,18 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
         self.hlayout11 = QHBoxLayout()
         self.monofx_sub_tab_fx_layout.addLayout(self.hlayout11)
-        self.mono_fx0 = pydaw_modulex_single(
+        self.mono_fx0 = modulex_single(
             _("FX0"), 0, None, self.monofx0_callback, a_knob_size=f_knob_size)
         self.hlayout11.addWidget(self.mono_fx0.group_box)
-        self.mono_fx1 = pydaw_modulex_single(
+        self.mono_fx1 = modulex_single(
             _("FX1"), 0, None, self.monofx1_callback, a_knob_size=f_knob_size)
         self.hlayout11.addWidget(self.mono_fx1.group_box)
         self.hlayout12 = QHBoxLayout()
         self.monofx_sub_tab_fx_layout.addLayout(self.hlayout12)
-        self.mono_fx2 = pydaw_modulex_single(
+        self.mono_fx2 = modulex_single(
             _("FX2"), 0, None, self.monofx2_callback, a_knob_size=f_knob_size)
         self.hlayout12.addWidget(self.mono_fx2.group_box)
-        self.mono_fx3 = pydaw_modulex_single(
+        self.mono_fx3 = modulex_single(
             _("FX3"), 0, None, self.monofx3_callback, a_knob_size=f_knob_size)
         self.hlayout12.addWidget(self.mono_fx3.group_box)
 
@@ -1190,7 +1190,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.last_monofx_group = None
         self.set_monofx_knob_callbacks(0)
 
-        self.master = pydaw_master_widget(
+        self.master = master_widget(
             f_knob_size, self.plugin_rel_callback, self.plugin_val_callback,
             EUPHORIA_MASTER_VOLUME, EUPHORIA_MASTER_GLIDE,
             EUPHORIA_MASTER_PITCHBEND_AMT, self.port_dict, _("Master"),
@@ -1220,7 +1220,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             *(str(x) for x in
             (glbl.PROJECT.plugin_pool_folder, a_plugin_uid)))
         if os.path.isfile(f_file_path):
-            f_file = pydaw_plugin_file(f_file_path)
+            f_file = plugin_file(f_file_path)
             return set(int(x) for x in
                 f_file.configure_dict['load'].split("|") if x)
 
@@ -1326,13 +1326,13 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                 f_graph = self.mk_project.get_sample_graph_by_name(
                     f_file_name)
                 f_note = self.loop_tune_note_selector.get_value()
-                f_hz = util.pydaw_pitch_to_hz(f_note)
+                f_hz = util.pitch_to_hz(f_note)
                 f_time = 1.0 / f_hz
                 f_loop_length = (f_time / f_graph.length_in_seconds) * 1000.0
                 f_loop_end_value = \
                     self.loop_starts[
                     self.selected_row_index].get_value() + f_loop_length
-                f_loop_end_value = util.pydaw_clip_value(
+                f_loop_end_value = util.clip_value(
                     f_loop_end_value,
                     self.loop_starts[self.selected_row_index].get_value() +
                     MARKER_MIN_DIFF,
@@ -1380,7 +1380,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         self.file_browser.open_file_in_browser(f_path)
 
     def open_plugin_file(self):
-        pydaw_abstract_plugin_ui.open_plugin_file(self)
+        abstract_plugin_ui.open_plugin_file(self)
         self.sample_table.resizeColumnsToContents()
         f_combobox_items = []
         for f_i in range(EUPHORIA_MAX_SAMPLE_COUNT):
@@ -1420,56 +1420,56 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             print("Unknown configure message '{}'".format(a_key))
 
     def set_all_base_pitches(self):
-        f_widget = pydaw_note_selector_widget(0, None, None)
+        f_widget = note_selector_widget(0, None, None)
         self.set_all_dialog(
             f_widget, self.sample_base_pitches, _("Set all base pitches"))
 
     def set_all_low_notes(self):
-        f_widget = pydaw_note_selector_widget(0, None, None)
+        f_widget = note_selector_widget(0, None, None)
         self.set_all_dialog(
             f_widget, self.sample_low_notes, _("Set all low notes"))
 
     def set_all_high_notes(self):
-        f_widget = pydaw_note_selector_widget(0, None, None)
+        f_widget = note_selector_widget(0, None, None)
         self.set_all_dialog(
             f_widget, self.sample_high_notes, _("Set all high notes"))
 
     def set_all_volumes(self):
-        f_widget = pydaw_spinbox_control(
+        f_widget = spinbox_control(
             _("Low Velocity"), 0, None, None, -60, 36, 0)
         self.set_all_dialog(f_widget, self.sample_vols, _("Set all volumes"))
 
     def set_all_vel_sens(self):
-        f_widget = pydaw_spinbox_control(
+        f_widget = spinbox_control(
             _("Velocity Sensitivity"), 0, None, None, 0, 20, 0)
         self.set_all_dialog(
             f_widget, self.sample_vel_sens, _("Set all velocity sensitivity"))
 
     def set_all_low_vels(self):
-        f_widget = pydaw_spinbox_control(
+        f_widget = spinbox_control(
             _("Low Velocity"), 0, None, None, 0, 127, 0)
         self.set_all_dialog(
             f_widget, self.sample_low_vels, _("Set all low velocities"))
 
     def set_all_high_vels(self):
-        f_widget = pydaw_spinbox_control(
+        f_widget = spinbox_control(
             _("High Velocity"), 0, None, None, 0, 127, 127)
         self.set_all_dialog(
             f_widget, self.sample_high_vels, _("Set all high velocities"))
 
     def set_all_pitches(self):
-        f_widget = pydaw_spinbox_control(_("Pitch"), 0, None, None, -36, 36, 0)
+        f_widget = spinbox_control(_("Pitch"), 0, None, None, -36, 36, 0)
         self.set_all_dialog(
             f_widget, self.sample_pitches, _("Set all sample pitches"))
 
     def set_all_tunes(self):
-        f_widget = pydaw_spinbox_control(
+        f_widget = spinbox_control(
             _("Tune"), 0, None, None, -100, 100, 0)
         self.set_all_dialog(
             f_widget, self.sample_tunes, _("Set all sample tunes"))
 
     def set_all_interpolation_modes(self):
-        f_widget = pydaw_combobox_control(
+        f_widget = combobox_control(
             120, _("Mode"), 0, None, None,
             self.interpolation_modes_list)
         self.set_all_dialog(
@@ -1477,14 +1477,14 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             _("Set all sample interpolation modes"))
 
     def set_all_noise_types(self):
-        f_widget = pydaw_combobox_control(
+        f_widget = combobox_control(
             120, _("Noise Type"), 0, None, None, self.noise_types_list)
         self.set_all_dialog(
             f_widget, self.noise_types,
             _("Set all sample interpolation modes"))
 
     def set_all_noise_amps(self):
-        f_widget = pydaw_spinbox_control(_("Tune"), 0, None, None, -60, 0, -30)
+        f_widget = spinbox_control(_("Tune"), 0, None, None, -60, 0, -30)
         self.set_all_dialog(f_widget, self.noise_amps, _("Set all noise amps"))
 
     def set_all_dialog(self, a_widget, a_list, a_title):
@@ -1661,7 +1661,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         path = str(self.file_selector.file_path.text()).strip()
         if path != "":
             f_uid = self.mk_project.get_wav_uid_by_name(path)
-            glbl.IPC.pydaw_reload_wavpool_item(f_uid)
+            glbl.IPC.reload_wavpool_item(f_uid)
 
 
     def selectionChanged(self):
@@ -1697,10 +1697,10 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
     def file_browser_preview_button_pressed(self):
         f_list = self.file_browser.files_selected()
         if len(f_list) > 0:
-            glbl.IPC.pydaw_preview_audio(f_list[0])
+            glbl.IPC.preview_audio(f_list[0])
 
     def file_browser_stop_preview(self):
-        glbl.IPC.pydaw_stop_preview()
+        glbl.IPC.stop_preview()
 
     def sample_selected_monofx_groupChanged(self, a_value):
         self.mono_fx0.knobs[0].set_value(
@@ -1792,7 +1792,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
             f_dir = self.mk_project.audio_tmp_folder
             f_selected_index = self.selected_row_index
-            f_uid = util.pydaw_gen_uid()
+            f_uid = util.gen_uid()
 
             for f_i in range(f_bottom, f_top, f_step):
                 f_new_note = f_i + f_base_note
@@ -1813,11 +1813,11 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     f_dir, "{}-{}-{}.wav".format(
                         f_uid, f_base_file_name, f_note_str))
                 if f_algo == 0:
-                    f_proc = util.pydaw_rubberband(
+                    f_proc = util.rubberband(
                         f_path, f_file, f_stretch, f_i,
                         f_crispness, f_preserve_formants)
                 elif f_algo == 1:
-                    f_proc = util.pydaw_sbsms(
+                    f_proc = util.sbsms(
                         f_path, f_file, f_stretch, f_i)
                 f_file_list.append(f_file)
                 f_proc_list.append(f_proc)
@@ -1850,7 +1850,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
         f_layout.addLayout(f_time_gridlayout)
 
         f_time_gridlayout.addWidget(QLabel(_("Base Pitch")), 1, 0)
-        f_base_note_selector = pydaw_note_selector_widget(0, None, None)
+        f_base_note_selector = note_selector_widget(0, None, None)
         f_time_gridlayout.addWidget(f_base_note_selector.widget, 1, 1)
         self.find_selected_radio_button()
         f_base_note_selector.set_value(
@@ -1963,13 +1963,13 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
     def copy_instrument(self):
         global EUPHORIA_INSTRUMENT_CLIPBOARD
-        f_plugin_file = pydaw_plugin_file.from_dict(
+        f_plugin_file = plugin_file.from_dict(
             self.port_dict, self.configure_dict, self.cc_map)
         EUPHORIA_INSTRUMENT_CLIPBOARD = str(f_plugin_file)
 
     def paste_instrument(self):
         if EUPHORIA_INSTRUMENT_CLIPBOARD:
-            f_file = pydaw_plugin_file.from_str(EUPHORIA_INSTRUMENT_CLIPBOARD)
+            f_file = plugin_file.from_str(EUPHORIA_INSTRUMENT_CLIPBOARD)
             for k, v in list(f_file.port_dict.items()):
                 f_port = int(k)
                 f_value = int(v)
@@ -2008,10 +2008,10 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if f_answer == QMessageBox.No:
                         continue
                 f_sample_str = self.copySamplesToSingleDirectory(f_dir)
-                f_plugin_file = pydaw_plugin_file.from_dict(
+                f_plugin_file = plugin_file.from_dict(
                     self.port_dict, {}, {})
                 f_result_str = "{}{}".format(f_sample_str, f_plugin_file)
-                util.pydaw_write_file_text(f_selected_path, f_result_str)
+                util.write_file_text(f_selected_path, f_result_str)
             else:
                 break
 
@@ -2028,7 +2028,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
             if f_selected_path == "":
                 return
             f_dir = os.path.dirname(f_selected_path)
-            f_file_str = util.pydaw_read_file_text(f_selected_path)
+            f_file_str = util.read_file_text(f_selected_path)
             self.clearAllSamples()
 
             for f_line in f_file_str.split("\n"):
@@ -2199,7 +2199,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if "offset" in f_sample.dict:
                         f_val = (float(f_sample.dict["offset"]) /
                             f_frame_count) * 1000.0
-                        f_val = util.pydaw_clip_value(f_val, 0.0, 998.0)
+                        f_val = util.clip_value(f_val, 0.0, 998.0)
                         self.sample_starts[f_index].set_value(f_val)
                     else:
                         self.sample_starts[f_index].set_value(0.0)
@@ -2210,7 +2210,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if "end" in f_sample.dict:
                         f_val = (float(f_sample.dict["end"]) /
                             f_frame_count) * 1000.0
-                        f_val = util.pydaw_clip_value(f_val, 1.0, 999.0)
+                        f_val = util.clip_value(f_val, 1.0, 999.0)
                         self.sample_ends[f_index].set_value(f_val)
                     else:
                         self.sample_ends[f_index].set_value(999.0)
@@ -2233,7 +2233,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if "loop_start" in f_sample.dict:
                         f_val = (float(f_sample.dict["loop_start"]) /
                             f_frame_count) * 1000.0
-                        f_val = util.pydaw_clip_value(f_val, 0.0, 1000.0)
+                        f_val = util.clip_value(f_val, 0.0, 1000.0)
                         self.loop_starts[f_index].set_value(f_val)
                     else:
                         self.loop_starts[f_index].set_value(0.0)
@@ -2244,7 +2244,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
                     if "loop_end" in f_sample.dict:
                         f_val = (float(f_sample.dict["loop_end"]) /
                             f_frame_count) * 1000.0
-                        f_val = util.pydaw_clip_value(f_val, 0.0, 1000.0)
+                        f_val = util.clip_value(f_val, 0.0, 1000.0)
                         self.loop_ends[f_index].set_value(f_val)
                     else:
                         self.loop_ends[f_index].set_value(1000.0)
@@ -2254,7 +2254,7 @@ class euphoria_plugin_ui(pydaw_abstract_plugin_ui):
 
                     if "volume" in f_sample.dict:
                         f_val = int(float(f_sample.dict["volume"]))
-                        f_val = util.pydaw_clip_value(f_val, -40, 12)
+                        f_val = util.clip_value(f_val, -40, 12)
                         self.sample_vols[f_index].set_value(f_val)
                         self.sample_vols[f_index].control_value_changed(f_val)
 

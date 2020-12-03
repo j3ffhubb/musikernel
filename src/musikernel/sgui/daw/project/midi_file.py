@@ -7,7 +7,7 @@ from sgui.sgqt import *
 
 
 class DawMidiFile:
-    """ Convert the MIDI file at a_file to a dict of channel#:pydaw_item
+    """ Convert the MIDI file at a_file to a dict of channel#:item
         @a_file:  The path to the MIDI file
         @a_project:  An instance of DawProject
     """
@@ -16,7 +16,7 @@ class DawMidiFile:
         self.result_dict = {}
 
         for f_event in f_item_list:
-            if f_event.length >= _shared.pydaw_min_note_length:
+            if f_event.length >= _shared.min_note_length:
                 f_velocity = f_event.ev.velocity
                 f_beat = f_event.start_beat
                 print("f_beat : {}".format(f_beat))
@@ -27,7 +27,7 @@ class DawMidiFile:
                 if not f_key in self.result_dict:
                     f_uid = a_project.create_empty_item()
                     self.result_dict[f_key] = a_project.get_item_by_uid(f_uid)
-                f_note = pydaw_note(f_beat, f_length, f_pitch, f_velocity)
+                f_note = note(f_beat, f_length, f_pitch, f_velocity)
                 self.result_dict[f_key].add_note(f_note) #, a_check=False)
             else:
                 print("Ignoring note event with <= zero length")

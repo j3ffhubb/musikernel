@@ -1,6 +1,6 @@
 from . import _shared
-from .control import pydaw_knob_control
-from .playback_widget import pydaw_playback_widget
+from .control import knob_control
+from .playback_widget import playback_widget
 from sgui.lib.translate import _
 from sgui.sgqt import *
 
@@ -40,17 +40,17 @@ def lfo_dialog(a_update_callback, a_save_callback):
 
     f_knob_size = 48
 
-    f_phase_knob = pydaw_knob_control(
+    f_phase_knob = knob_control(
         f_knob_size, _("Phase"), 0, save, update,
         0, 100, 0, _shared.KC_DECIMAL)
     f_phase_knob.add_to_grid_layout(f_layout, 0)
 
-    f_start_freq_knob = pydaw_knob_control(
+    f_start_freq_knob = knob_control(
         f_knob_size, _("Start Freq"), 0, save, update,
         10, 400, 100, _shared.KC_DECIMAL)
     f_start_freq_knob.add_to_grid_layout(f_layout, 5)
 
-    f_end_freq_knob = pydaw_knob_control(
+    f_end_freq_knob = knob_control(
         f_knob_size, _("End Freq"), 0, save, update,
         10, 400, 100, _shared.KC_DECIMAL)
     f_end_freq_knob.add_to_grid_layout(f_layout, 10)
@@ -59,12 +59,12 @@ def lfo_dialog(a_update_callback, a_save_callback):
     f_end_freq_cbox.stateChanged.connect(update_and_save)
     f_layout.addWidget(f_end_freq_cbox, 5, 10)
 
-    f_start_amp_knob = pydaw_knob_control(
+    f_start_amp_knob = knob_control(
         f_knob_size, _("Start Amp"), 0, save, update,
         0, 127, 64, _shared.KC_INTEGER)
     f_start_amp_knob.add_to_grid_layout(f_layout, 11)
 
-    f_end_amp_knob = pydaw_knob_control(
+    f_end_amp_knob = knob_control(
         f_knob_size, _("End Amp"), 0, save, update,
         0, 127, 64, _shared.KC_INTEGER)
     f_end_amp_knob.add_to_grid_layout(f_layout, 12)
@@ -73,12 +73,12 @@ def lfo_dialog(a_update_callback, a_save_callback):
     f_end_amp_cbox.stateChanged.connect(update_and_save)
     f_layout.addWidget(f_end_amp_cbox, 5, 12)
 
-    f_start_center_knob = pydaw_knob_control(
+    f_start_center_knob = knob_control(
         f_knob_size, _("Start Center"), 0, save, update,
         0, 127, 64, _shared.KC_INTEGER)
     f_start_center_knob.add_to_grid_layout(f_layout, 15)
 
-    f_end_center_knob = pydaw_knob_control(
+    f_end_center_knob = knob_control(
         f_knob_size, _("End Center"), 0, save, update,
         0, 127, 64, _shared.KC_INTEGER)
     f_end_center_knob.add_to_grid_layout(f_layout, 16)
@@ -95,7 +95,7 @@ def lfo_dialog(a_update_callback, a_save_callback):
         else:
             update()
 
-    f_start_fade_knob = pydaw_knob_control(
+    f_start_fade_knob = knob_control(
         f_knob_size, _("Start Fade"), 0, save, start_fade_changed,
         0, 99, 0, _shared.KC_INTEGER)
     f_start_fade_knob.add_to_grid_layout(f_layout, 20)
@@ -108,12 +108,12 @@ def lfo_dialog(a_update_callback, a_save_callback):
         else:
             update()
 
-    f_end_fade_knob = pydaw_knob_control(
+    f_end_fade_knob = knob_control(
         f_knob_size, _("End Fade"), 0, save, end_fade_changed,
         1, 100, 100, _shared.KC_INTEGER)
     f_end_fade_knob.add_to_grid_layout(f_layout, 25)
 
-    f_playback_widget = pydaw_playback_widget()
+    f_playback_widget = playback_widget()
     f_layout.addWidget(f_playback_widget.play_button, 1, 30)
     f_layout.addWidget(f_playback_widget.stop_button, 1, 31)
 

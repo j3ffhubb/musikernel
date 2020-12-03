@@ -69,11 +69,11 @@ class MkAudioItem:
         self.start_beat = float(a_beat)
 
     def set_fade_in(self, a_value):
-        f_value = pydaw_clip_value(a_value, 0.0, self.fade_out - 1.0)
+        f_value = clip_value(a_value, 0.0, self.fade_out - 1.0)
         self.fade_in = f_value
 
     def set_fade_out(self, a_value):
-        f_value = pydaw_clip_value(a_value, self.fade_in + 1.0, 999.0)
+        f_value = clip_value(a_value, self.fade_in + 1.0, 999.0)
         self.fade_out = f_value
 
     def __eq__(self, other):

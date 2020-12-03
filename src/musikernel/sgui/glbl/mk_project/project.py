@@ -1,7 +1,7 @@
 from .sample_graph import (
-    pydaw_clear_sample_graph_cache,
-    pydaw_remove_item_from_sg_cache,
-    pydaw_sample_graph,
+    clear_sample_graph_cache,
+    remove_item_from_sg_cache,
+    sample_graph,
 )
 from sgui import glbl
 from sgui.lib import *
@@ -15,21 +15,21 @@ import shutil
 import tarfile
 
 
-pydaw_folder_audio = os.path.join("audio", "files")
-pydaw_folder_audio_rec = os.path.join("audio", "rec")
-pydaw_folder_samplegraph = os.path.join("audio", "samplegraph")
-pydaw_folder_samples = os.path.join("audio", "samples")
-pydaw_folder_timestretch = os.path.join("audio", "timestretch")
-pydaw_folder_glued = os.path.join("audio", "glued")
-pydaw_folder_user = "user"
-pydaw_folder_backups = "backups"
-pydaw_folder_projects = "projects"
-pydaw_folder_plugins = os.path.join("projects", "plugins")
-pydaw_file_plugin_uid = os.path.join("projects", "plugin_uid.txt")
-pydaw_file_pywavs = os.path.join("audio", "wavs.txt")
-pydaw_file_pystretch = os.path.join("audio", "stretch.txt")
-pydaw_file_pystretch_map = os.path.join("audio", "stretch_map.txt")
-pydaw_file_backups = "backups.json"
+folder_audio = os.path.join("audio", "files")
+folder_audio_rec = os.path.join("audio", "rec")
+folder_samplegraph = os.path.join("audio", "samplegraph")
+folder_samples = os.path.join("audio", "samples")
+folder_timestretch = os.path.join("audio", "timestretch")
+folder_glued = os.path.join("audio", "glued")
+folder_user = "user"
+folder_backups = "backups"
+folder_projects = "projects"
+folder_plugins = os.path.join("projects", "plugins")
+file_plugin_uid = os.path.join("projects", "plugin_uid.txt")
+file_pywavs = os.path.join("audio", "wavs.txt")
+file_pystretch = os.path.join("audio", "stretch.txt")
+file_pystretch_map = os.path.join("audio", "stretch_map.txt")
+file_backups = "backups.json"
 
 
 class MkProject(glbl.AbstractProject):
@@ -44,37 +44,37 @@ class MkProject(glbl.AbstractProject):
             os.path.basename(a_project_file))[0]
 
         self.audio_folder = os.path.join(
-            self.project_folder, pydaw_folder_audio)
+            self.project_folder, folder_audio)
         self.audio_rec_folder = os.path.join(
-            self.project_folder, pydaw_folder_audio_rec)
+            self.project_folder, folder_audio_rec)
         self.audio_tmp_folder = os.path.join(
-            self.project_folder, pydaw_folder_audio, "tmp")
+            self.project_folder, folder_audio, "tmp")
         self.samplegraph_folder = os.path.join(
-            self.project_folder, pydaw_folder_samplegraph)
+            self.project_folder, folder_samplegraph)
         self.timestretch_folder = os.path.join(
-            self.project_folder, pydaw_folder_timestretch)
+            self.project_folder, folder_timestretch)
         self.glued_folder = os.path.join(
-            self.project_folder, pydaw_folder_glued)
+            self.project_folder, folder_glued)
         self.user_folder = os.path.join(
-            self.project_folder, pydaw_folder_user)
+            self.project_folder, folder_user)
         self.backups_folder = os.path.join(
-            self.project_folder, pydaw_folder_backups)
+            self.project_folder, folder_backups)
         self.samples_folder = os.path.join(
-            self.project_folder, pydaw_folder_samples)
+            self.project_folder, folder_samples)
         self.backups_file = os.path.join(
-            self.project_folder, pydaw_file_backups)
+            self.project_folder, file_backups)
         self.plugin_pool_folder = os.path.join(
-            self.project_folder, pydaw_folder_plugins)
+            self.project_folder, folder_plugins)
         self.projects_folder = os.path.join(
-            self.project_folder, pydaw_folder_projects)
+            self.project_folder, folder_projects)
         self.plugin_uid_file = os.path.join(
-            self.project_folder, pydaw_file_plugin_uid)
+            self.project_folder, file_plugin_uid)
         self.pywavs_file = os.path.join(
-            self.project_folder, pydaw_file_pywavs)
+            self.project_folder, file_pywavs)
         self.pystretch_file = os.path.join(
-            self.project_folder, pydaw_file_pystretch)
+            self.project_folder, file_pystretch)
         self.pystretch_map_file = os.path.join(
-            self.project_folder, pydaw_file_pystretch_map)
+            self.project_folder, file_pystretch_map)
 
         self.project_folders = [
             self.audio_folder, self.audio_tmp_folder, self.samples_folder,
@@ -83,7 +83,7 @@ class MkProject(glbl.AbstractProject):
             self.backups_folder, self.plugin_pool_folder,
             self.audio_rec_folder]
 
-        pydaw_clear_sample_graph_cache()
+        clear_sample_graph_cache()
 
     def open_project(self, a_project_file, a_notify_osc=True):
         self.set_project_folders(a_project_file)
@@ -102,7 +102,7 @@ class MkProject(glbl.AbstractProject):
             if not os.path.isdir(project_dir):
                 os.makedirs(project_dir)
 
-        f_version = pydaw_read_file_text(os.path.join(
+        f_version = read_file_text(os.path.join(
             INSTALL_PREFIX, "lib", MAJOR_VERSION,
             "minor-version.txt"))
         self.create_file(
@@ -113,9 +113,9 @@ class MkProject(glbl.AbstractProject):
             "", os.path.basename(a_project_file),
             "This file is not supposed to contain any data, it is "
             "only a placeholder for saving and opening the project")
-        self.create_file("", pydaw_file_pywavs, pydaw_terminating_char)
-        self.create_file("", pydaw_file_pystretch_map, pydaw_terminating_char)
-        self.create_file("", pydaw_file_pystretch, pydaw_terminating_char)
+        self.create_file("", file_pywavs, terminating_char)
+        self.create_file("", file_pystretch_map, terminating_char)
+        self.create_file("", file_pystretch, terminating_char)
 
         self.open_stretch_dicts()
         #self.commit("Created project")
@@ -129,7 +129,7 @@ class MkProject(glbl.AbstractProject):
         shutil.rmtree(f_new_project_folder)
         shutil.copytree(self.project_folder, f_new_project_folder)
 #        self.set_project_folders(f_file_name)
-#        self.this_pydaw_osc.pydaw_open_song(self.project_folder)
+#        self.this_osc.open_song(self.project_folder)
 
     def get_next_plugin_uid(self):
         if os.path.isfile(self.plugin_uid_file):
@@ -247,9 +247,9 @@ class MkProject(glbl.AbstractProject):
         self.timestretch_cache = {}
         self.timestretch_reverse_lookup = {}
 
-        f_cache_text = pydaw_read_file_text(self.pystretch_file)
+        f_cache_text = read_file_text(self.pystretch_file)
         for f_line in f_cache_text.split("\n"):
-            if f_line == pydaw_terminating_char:
+            if f_line == terminating_char:
                 break
             f_line_arr = f_line.split("|", 5)
             f_file_path_and_uid = f_line_arr[5].split("|||")
@@ -259,9 +259,9 @@ class MkProject(glbl.AbstractProject):
                 float(f_line_arr[4]),
                 f_file_path_and_uid[0])] = int(f_file_path_and_uid[1])
 
-        f_map_text = pydaw_read_file_text(self.pystretch_map_file)
+        f_map_text = read_file_text(self.pystretch_map_file)
         for f_line in f_map_text.split("\n"):
-            if f_line == pydaw_terminating_char:
+            if f_line == terminating_char:
                 break
             f_line_arr = f_line.split("|||")
             self.timestretch_reverse_lookup[f_line_arr[0]] = f_line_arr[1]
@@ -272,27 +272,27 @@ class MkProject(glbl.AbstractProject):
             for f_tuple_val in k:
                 f_stretch_text += "{}|".format(f_tuple_val)
             f_stretch_text += "||{}\n".format(v)
-        f_stretch_text += pydaw_terminating_char
-        self.save_file("", pydaw_file_pystretch, f_stretch_text)
+        f_stretch_text += terminating_char
+        self.save_file("", file_pystretch, f_stretch_text)
 
         f_map_text = ""
         for k, v in list(self.timestretch_reverse_lookup.items()):
             f_map_text += "{}|||{}\n".format(k, v)
-        f_map_text += pydaw_terminating_char
-        self.save_file("", pydaw_file_pystretch_map, f_map_text)
+        f_map_text += terminating_char
+        self.save_file("", file_pystretch_map, f_map_text)
 
     def get_wavs_dict(self):
         try:
             f_file = open(self.pywavs_file, "r")
         except:
-            return pydaw_name_uid_dict()
+            return name_uid_dict()
         f_str = f_file.read()
         f_file.close()
-        return pydaw_name_uid_dict.from_str(f_str)
+        return name_uid_dict.from_str(f_str)
 
     def save_wavs_dict(self, a_uid_dict):
-        pydaw_write_file_text(self.pywavs_file, str(a_uid_dict))
-        #self.save_file("", pydaw_file_pywavs, str(a_uid_dict))
+        write_file_text(self.pywavs_file, str(a_uid_dict))
+        #self.save_file("", file_pywavs, str(a_uid_dict))
 
 
     def timestretch_lookup_orig_path(self, a_path):
@@ -342,33 +342,33 @@ class MkProject(glbl.AbstractProject):
 
             f_cmd = None
             if a_audio_item.time_stretch_mode == 1:
-                glbl.IPC.pydaw_pitch_env(
+                glbl.IPC.pitch_env(
                     f_src_path, f_dest_path, a_audio_item.pitch_shift,
                     a_audio_item.pitch_shift_end)
                 #add it to the pool
                 self.get_wav_uid_by_name(f_dest_path, a_uid=f_uid)
             elif a_audio_item.time_stretch_mode == 2:
-                glbl.IPC.pydaw_rate_env(
+                glbl.IPC.rate_env(
                     f_src_path, f_dest_path, a_audio_item.timestretch_amt,
                     a_audio_item.timestretch_amt_end)
                 #add it to the pool
                 self.get_wav_uid_by_name(f_dest_path, a_uid=f_uid)
             elif a_audio_item.time_stretch_mode == 3:
                 f_cmd = [
-                    pydaw_rubberband_util, "-c", str(a_audio_item.crispness),
+                    rubberband_util, "-c", str(a_audio_item.crispness),
                     "-t", str(a_audio_item.timestretch_amt), "-p",
                     str(a_audio_item.pitch_shift), "-R", "--pitch-hq",
                     f_src_path, f_dest_path]
             elif a_audio_item.time_stretch_mode == 4:
                 f_cmd = [
-                    pydaw_rubberband_util, "-F", "-c",
+                    rubberband_util, "-F", "-c",
                     str(a_audio_item.crispness), "-t",
                     str(a_audio_item.timestretch_amt), "-p",
                     str(a_audio_item.pitch_shift), "-R", "--pitch-hq",
                     f_src_path, f_dest_path]
             elif a_audio_item.time_stretch_mode == 5:
                 f_cmd = [
-                    pydaw_sbsms_util, f_src_path, f_dest_path,
+                    sbsms_util, f_src_path, f_dest_path,
                     str(1.0 / a_audio_item.timestretch_amt),
                     str(1.0 / a_audio_item.timestretch_amt_end),
                     str(a_audio_item.pitch_shift),
@@ -420,14 +420,14 @@ class MkProject(glbl.AbstractProject):
     def get_sample_graph_by_uid(self, a_uid):
         f_pygraph_file = os.path.join(
             *(str(x) for x in (self.samplegraph_folder, a_uid)))
-        f_result = pydaw_sample_graph.create(
+        f_result = sample_graph.create(
             f_pygraph_file, self.samples_folder)
         if not f_result.is_valid(): # or not f_result.check_mtime():
             LOG.info("\n\nNot valid, or else mtime is newer than graph time, "
                   "deleting sample graph...\n")
-            pydaw_remove_item_from_sg_cache(f_pygraph_file)
+            remove_item_from_sg_cache(f_pygraph_file)
             self.create_sample_graph(self.get_wav_path_by_uid(a_uid), a_uid)
-            return pydaw_sample_graph.create(
+            return sample_graph.create(
                 f_pygraph_file, self.samples_folder)
         else:
             return f_result
@@ -439,7 +439,7 @@ class MkProject(glbl.AbstractProject):
     def delete_sample_graph_by_uid(self, a_uid):
         f_pygraph_file = os.path.join(
             *(str(x) for x in (self.samplegraph_folder, a_uid)))
-        pydaw_remove_item_from_sg_cache(f_pygraph_file)
+        remove_item_from_sg_cache(f_pygraph_file)
 
     def get_wav_uid_by_name(self, a_path, a_uid_dict=None,
                             a_uid=None, a_cp=True):
@@ -512,7 +512,7 @@ class MkProject(glbl.AbstractProject):
             raise Exception("Cannot create sample graph, the "
                 "following do not exist:\n{}\n{}\n".format(
                 a_path, f_sample_dir_path))
-        glbl.IPC.pydaw_add_to_wav_pool(f_path, f_uid)
+        glbl.IPC.add_to_wav_pool(f_path, f_uid)
 
 
     def copy_plugin(self, a_old, a_new):
@@ -521,7 +521,7 @@ class MkProject(glbl.AbstractProject):
         if os.path.exists(f_old_path):
             with open(f_old_path) as file_handle:
                 self.save_file(
-                    pydaw_folder_plugins, a_new, file_handle.read())
+                    folder_plugins, a_new, file_handle.read())
                 #self.commit("Copy plugin UID {} to {}".format(a_old, a_new))
         else:
             LOG.info("{} does not exist, not copying".format(f_old_path))

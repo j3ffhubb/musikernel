@@ -169,14 +169,14 @@ class DawAtmRegion:
                     ("q", port_num, len(port_list))))
                 for f_point in port_list:
                     f_result.append(str(f_point))
-        f_result.append(pydaw_terminating_char)
+        f_result.append(terminating_char)
         return "\n".join(f_result)
 
     @staticmethod
     def from_str(a_str):
         f_result = DawAtmRegion()
         for f_line in str(a_str).split("\n"):
-            if f_line == pydaw_terminating_char:
+            if f_line == terminating_char:
                 break
             if f_line[0] in ("p", "q"):
                 continue

@@ -111,7 +111,7 @@ def project_recover_dialog(a_file):
     if a_file is None:
         f_file, f_filter = QFileDialog.getOpenFileName(
             caption='Open Project',
-            filter=util.global_pydaw_file_type_string,
+            filter=util.global_file_type_string,
             directory=util.global_default_project_folder,
             options=QFileDialog.DontUseNativeDialog,
         )

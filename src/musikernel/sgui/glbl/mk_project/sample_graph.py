@@ -8,44 +8,44 @@ import os
 #From old sample_graph..py
 AUDIO_ITEM_SCENE_HEIGHT = 900.0
 AUDIO_ITEM_SCENE_WIDTH = 3600.0
-pydaw_audio_item_scene_rect = QtCore.QRectF(
+audio_item_scene_rect = QtCore.QRectF(
     0.0, 0.0, AUDIO_ITEM_SCENE_WIDTH, AUDIO_ITEM_SCENE_HEIGHT)
 
-pydaw_audio_item_scene_gradient = QLinearGradient(
+audio_item_scene_gradient = QLinearGradient(
     0, 0, 0, AUDIO_ITEM_SCENE_HEIGHT)
-pydaw_audio_item_scene_gradient.setColorAt(
+audio_item_scene_gradient.setColorAt(
     0.0, QColor.fromRgb(60, 60, 60, 120))
-pydaw_audio_item_scene_gradient.setColorAt(
+audio_item_scene_gradient.setColorAt(
     1.0, QColor.fromRgb(30, 30, 30, 120))
 
-pydaw_audio_item_editor_gradient = QLinearGradient(
+audio_item_editor_gradient = QLinearGradient(
     0, 0, 0, AUDIO_ITEM_SCENE_HEIGHT)
-pydaw_audio_item_editor_gradient.setColorAt(
+audio_item_editor_gradient.setColorAt(
     0.0, QColor.fromRgb(190, 192, 123, 120))
-pydaw_audio_item_editor_gradient.setColorAt(
+audio_item_editor_gradient.setColorAt(
     1.0, QColor.fromRgb(130, 130, 100, 120))
 #end from sample_graph.py
 
-def pydaw_clear_sample_graph_cache():
+def clear_sample_graph_cache():
     global global_sample_graph_cache
     global_sample_graph_cache = {}
 
-def pydaw_remove_item_from_sg_cache(a_path):
+def remove_item_from_sg_cache(a_path):
     global global_sample_graph_cache
     if os.path.exists(a_path):
         os.remove(a_path)
     if a_path in global_sample_graph_cache:
         global_sample_graph_cache.pop(a_path)
     else:
-        print("\n\npydaw_remove_item_from_sg_cache: {} "
+        print("\n\nremove_item_from_sg_cache: {} "
             "not found.\n\n".format(a_path))
 
 global_sample_graph_cache = {}
 
-class pydaw_sample_graph:
+class sample_graph:
     @staticmethod
     def create(a_file_name, a_sample_dir):
-        """ Used to instantiate a pydaw_sample_graph, but
+        """ Used to instantiate a sample_graph, but
             grabs from the cache if it already exists...
             Prefer this over directly instantiating.
         """
@@ -54,7 +54,7 @@ class pydaw_sample_graph:
         if f_file_name in global_sample_graph_cache:
             return global_sample_graph_cache[f_file_name]
         else:
-            f_result = pydaw_sample_graph(f_file_name, a_sample_dir)
+            f_result = sample_graph(f_file_name, a_sample_dir)
             global_sample_graph_cache[f_file_name] = f_result
             return f_result
 
@@ -137,23 +137,23 @@ class pydaw_sample_graph:
 
     def is_valid(self):
         if (self._file is None):
-            print("\n\npydaw_sample_graph.is_valid() "
+            print("\n\nsample_graph.is_valid() "
                 "self._file is None {}\n".format(self._file))
             return False
         if self.timestamp is None:
-            print("\n\npydaw_sample_graph.is_valid() "
+            print("\n\nsample_graph.is_valid() "
                 "self.timestamp is None {}\n".format(self._file))
             return False
         if self.channels is None:
-            print("\n\npydaw_sample_graph.is_valid() "
+            print("\n\nsample_graph.is_valid() "
                 "self.channels is None {}\n".format(self._file))
             return False
         if self.frame_count is None:
-            print("\n\npydaw_sample_graph.is_valid() "
+            print("\n\nsample_graph.is_valid() "
                 "self.frame_count is None {}\n".format(self._file))
             return False
         if self.sample_rate is None:
-            print("\n\npydaw_sample_graph.is_valid() "
+            print("\n\nsample_graph.is_valid() "
                 "self.sample_rate is None {}\n".format(self._file))
             return False
         return True
@@ -161,10 +161,10 @@ class pydaw_sample_graph:
     def normalize(self, a_db=0.0):
         if self.peak == 0.0:
             return 0.0
-        f_norm_lin = pydaw_db_to_lin(a_db)
+        f_norm_lin = db_to_lin(a_db)
         f_diff = f_norm_lin / self.peak
-        f_result = round(pydaw_lin_to_db(f_diff), 1)
-        f_result = pydaw_clip_value(f_result, -24, 24)
+        f_result = round(lin_to_db(f_diff), 1)
+        f_result = clip_value(f_result, -24, 24)
         return f_result
 
     def create_sample_graph(
@@ -174,7 +174,7 @@ class pydaw_sample_graph:
             f_ss = a_audio_item.sample_start * 0.001
             f_se = a_audio_item.sample_end * 0.001
             #f_width_frac = f_se - f_ss
-            f_vol = util.pydaw_db_to_lin(a_audio_item.vol)
+            f_vol = util.db_to_lin(a_audio_item.vol)
             f_len = len(self.high_peaks[0])
             f_slice_low = int(f_ss * f_len)
             f_slice_high = int(f_se * f_len)
